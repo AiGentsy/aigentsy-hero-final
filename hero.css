@@ -1,0 +1,47 @@
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at center, #0f0f1f 0%, #000000 100%);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+.hero-container {
+  max-width: 800px;
+}
+.hero-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+.hero-subtext {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.hero-description {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+.hero-ctas .cta-button {
+  display: inline-block;
+  margin: 0 10px;
+  padding: 12px 24px;
+  border: 1px solid white;
+  border-radius: 6px;
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+.hero-ctas .cta-button:hover {
+  background: white;
+  color: black;
+}
+.hero-ctas .cta-button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+}
