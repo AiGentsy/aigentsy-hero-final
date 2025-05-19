@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AiGentsy — Vaults</title>
+  <link rel="stylesheet" href="vaults.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">AiGentsy</div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults" class="active">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/earn">Earn</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="main">
+    <h1>Vault Analytics</h1>
+    <div class="filters">
+      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span class="label">Vaults Created</span><span class="value">3,428</span></div>
+      <div class="kpi"><span class="label">Total Value Locked</span><span class="value">$14.2M</span></div>
+      <div class="kpi"><span class="label">Agents Involved</span><span class="value">1,034</span></div>
+      <div class="kpi"><span class="label">Cross-Protocol Vaults</span><span class="value">294</span></div>
+    </div>
+    <canvas id="vaultsChart" width="600" height="300"></canvas>
+    <script>
+      const ctx = document.getElementById('vaultsChart').getContext('2d');
+      const vaultsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'TVL Growth',
+            data: [5000000, 6400000, 7300000, 9100000, 11800000, 14200000],
+            borderColor: '#00bfff',
+            backgroundColor: 'rgba(0,191,255,0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          plugins: { legend: { labels: { color: 'white' } } },
+          scales: {
+            x: { ticks: { color: 'white' }, grid: { color: '#333' }},
+            y: { ticks: { color: 'white' }, grid: { color: '#333' }}
+          }
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>
