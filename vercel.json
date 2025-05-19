@@ -1,0 +1,6 @@
+
+{
+  "rewrites": [
+    { "source": "/earn", "destination": "/earn.html" }
+  ]
+}
