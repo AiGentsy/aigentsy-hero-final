@@ -1,0 +1,6 @@
+
+{
+  "rewrites": [
+    { "source": "/exchange", "destination": "/exchange.html" }
+  ]
+}
