@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AiGentsy — Credit Staking</title>
+  <link rel="stylesheet" href="credit.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo">AiGentsy</div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/credit" class="active">Credit Staking</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/earn">Earn</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="main">
+    <h1>Credit Staking Metrics</h1>
+    <div class="filters">
+      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span class="label">Credit Locked</span><span class="value">$6.3M</span></div>
+      <div class="kpi"><span class="label">Avg. APY</span><span class="value">7.8%</span></div>
+      <div class="kpi"><span class="label">Default Rate</span><span class="value">1.6%</span></div>
+      <div class="kpi"><span class="label">Agents Staking</span><span class="value">912</span></div>
+    </div>
+    <canvas id="creditChart" width="600" height="300"></canvas>
+    <script>
+      const ctx = document.getElementById('creditChart').getContext('2d');
+      const creditChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [{
+            label: 'Credit Locked',
+            data: [2000000, 2900000, 3100000, 4200000, 5100000, 6300000],
+            borderColor: '#00bfff',
+            backgroundColor: 'rgba(0,191,255,0.2)',
+            tension: 0.3
+          }]
+        },
+        options: {
+          plugins: { legend: { labels: { color: 'white' } } },
+          scales: {
+            x: { ticks: { color: 'white' }, grid: { color: '#333' }},
+            y: { ticks: { color: 'white' }, grid: { color: '#333' }}
+          }
+        }
+      });
+    </script>
+  </div>
+</body>
+</html>
