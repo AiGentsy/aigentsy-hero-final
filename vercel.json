@@ -10,6 +10,7 @@
     { "source": "/realms", "destination": "/realms.html" },
     { "source": "/metaventures", "destination": "/metaventures.html" },
     { "source": "/learn", "destination": "/learn.html" },
-    { "source": "/earn", "destination": "/earn.html" }
+    { "source": "/earn", "destination": "/earn.html" },
+    { "source": "/mint", "destination": "/mint.html" }
   ]
 }
