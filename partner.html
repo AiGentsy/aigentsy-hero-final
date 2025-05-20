@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGentsy — Partner Access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="partner.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="partner.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <img src="aigentsy-logo.png" class="logo" alt="AiGentsy Logo" />
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/learn">Learn</a></li>
+        <li><a href="/earn">Earn</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/partner" class="active">Partner</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="main">
+    <div class="filters">
+      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Total Requests</div><div class="value" data-count="1825">0</div></div>
+      <div class="kpi"><div class="label">Enterprise Interest</div><div class="value" data-count="784">0</div></div>
+      <div class="kpi"><div class="label">Avg Review Time</div><div class="value" data-count="3.2">0d</div></div>
+      <div class="kpi"><div class="label">SDK Downloads</div><div class="value" data-count="2900">0</div></div>
+      <div class="kpi"><div class="label">Approval Rate</div><div class="value" data-count="88">0%</div></div>
+      <div class="kpi"><div class="label">Top Tier</div><div class="value" data-count="Level 3">0</div></div>
+    </div>
+
+    <div class="partner-form">
+      <h3>SDK / Licensing Request</h3>
+      <form>
+        <input type="text" placeholder="Company Name" required />
+        <input type="email" placeholder="Contact Email" required />
+        <textarea placeholder="Brief Description of Intended Use"></textarea>
+        <select><option>Tier 1: Read-Only SDK</option><option>Tier 2: Integrator</option><option>Tier 3: Co-Build License</option></select>
+        <button type="submit">Apply for Access</button>
+      </form>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="chart" height="300"></canvas>
+    </div>
+
+    <div class="pdf-view">
+      <h3>Official Licensing Guide</h3>
+      <embed src="AiGentsy_Licensing_Guide.pdf" width="100%" height="400px" />
+    </div>
+  </div>
+</body>
+</html>
