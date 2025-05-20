@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>AiGentsy — Remix</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="remix.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer="" src="remix.js"></script>
+</head>
+<body>
+<div class="sidebar">
+<img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+<nav>
+<ul>
+<li><a href="/dashboard">Dashboard</a></li>
+<li><a href="/vaults">Vaults</a></li>
+<li><a href="/exchange">Exchange</a></li>
+<li><a href="/credit">Credit Staking</a></li>
+<li><a href="/metagrowth">MetaGrowth</a></li>
+<li><a href="/sentinel">Sentinel</a></li>
+<li><a href="/realms">Realms</a></li>
+<li><a href="/metaventures">MetaVentures</a></li>
+<li><a href="/learn">Learn</a></li>
+<li><a href="/earn">Earn</a></li>
+<li><a href="/mint">Mint</a></li>
+<li><a class="active" href="/remix">Remix</a></li>
+<li><a href="/wallet">Wallet</a></li>
+<li><a href="/arena">Arena</a></li><li><a href="/partner">Partner</a></li></ul>
+</nav>
+</div>
+<div class="main">
+<div class="filters">
+<select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+<select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+<select><option>Raw Value</option><option>% Change</option></select>
+</div>
+<div class="fusion-ui">
+<h3>Protocol Fusion</h3>
+<label>Base Protocol:
+        <select>
+<option>Agent Logic A</option>
+<option>Agent Logic B</option>
+<option>Agent Logic C</option>
+</select>
+</label>
+<label>Combine With:
+        <select>
+<option>Fusion Layer X</option>
+<option>Fusion Layer Y</option>
+<option>Fusion Layer Z</option>
+</select>
+</label>
+<label><input type="checkbox"/> Deploy as MetaVenture</label>
+</div>
+<div class="kpi-grid">
+<div class="kpi"><div class="label">Protocols Used</div><div class="value" data-count="680">0</div></div>
+<div class="kpi"><div class="label">Fusion Power</div><div class="value" data-count="92.6">0%</div></div>
+<div class="kpi"><div class="label">Remix Rate</div><div class="value" data-count="4.8">0%</div></div>
+<div class="kpi"><div class="label">MetaDeploy %</div><div class="value" data-count="38.2">0%</div></div>
+<div class="kpi"><div class="label">Avg Value Score</div><div class="value" data-count="74.1">0</div></div>
+<div class="kpi"><div class="label">Network Impact</div><div class="value" data-count="9.4">0%</div></div>
+</div>
+<div class="chart-container">
+<canvas height="300" id="chart"></canvas>
+</div>
+</div>
+</body>
+</html>
