@@ -11,6 +11,11 @@
     { "source": "/metaventures", "destination": "/metaventures.html" },
     { "source": "/learn", "destination": "/learn.html" },
     { "source": "/earn", "destination": "/earn.html" },
-    { "source": "/mint", "destination": "/mint.html" }
+    { "source": "/mint", "destination": "/mint.html" },
+    { "source": "/remix", "destination": "/remix.html" },
+    { "source": "/wallet", "destination": "/wallet.html" },
+    { "source": "/arena", "destination": "/arena.html" },
+    { "source": "/partner", "destination": "/partner.html" },
+    { "source": "/snapshot", "destination": "/snapshot.html" }
   ]
 }
