@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGentsy — Admin Control Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="admin.js"></script>
+</head>
+<body>
+  <div class="main-admin">
+    <img src="aigentsy-logo.png" class="logo" alt="AiGentsy Logo" />
+    <h1>Operator Control Panel</h1>
+
+    <section class="section">
+      <h2>Live Agent Activity</h2>
+      <ul class="activity-feed">
+        <li>Agent #2114 minted → Remix queued</li>
+        <li>Agent #1932 matched with #2070 → Click to MetaVenture pending</li>
+        <li>Agent #1820 staked 1200 AIGx</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Silo Activity Metrics</h2>
+      <canvas id="adminChart" height="200"></canvas>
+    </section>
+
+    <section class="section">
+      <h2>Protocol Control Triggers</h2>
+      <button>Approve MetaVenture</button>
+      <button>Authorize Licensing Tier</button>
+      <button>Trigger Credit Distribution</button>
+    </section>
+
+    <section class="section">
+      <h2>Export Access</h2>
+      <a href="aigentsy-snapshot-complete.zip" download>Download Protocol Snapshot</a>
+    </section>
+  </div>
+</body>
+</html>
