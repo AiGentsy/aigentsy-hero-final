@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>AiGentsy — MetaVentures</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="metaventures.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer="" src="metaventures.js"></script>
+</head>
+<body>
+<div class="sidebar">
+<img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+<nav>
+<ul>
+<li><a href="/dashboard">Dashboard</a></li>
+<li><a href="/vaults">Vaults</a></li>
+<li><a href="/exchange">Exchange</a></li>
+<li><a href="/credit">Credit Staking</a></li>
+<li><a href="/metagrowth">MetaGrowth</a></li>
+<li><a href="/sentinel">Sentinel</a></li>
+<li><a href="/realms">Realms</a></li>
+<li><a class="active" href="/metaventures">MetaVentures</a></li>
+<li><a href="/learn">Learn</a></li>
+<li><a href="/earn">Earn</a></li>
+<li><a href="/mint">Mint</a></li><li><a href="/remix">Remix</a></li></ul>
+</nav>
+</div>
+<div class="main">
+<div class="filters">
+<select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+<select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+<select><option>Raw Value</option><option>% Change</option></select>
+</div>
+<div class="kpi-grid">
+<div class="kpi"><div class="label">Total Ventures</div><div class="value" data-count="364">0</div></div>
+<div class="kpi"><div class="label">Real Earnings</div><div class="value" data-count="1420000">$0</div></div>
+<div class="kpi"><div class="label">Agents Monetized</div><div class="value" data-count="6812">0</div></div>
+<div class="kpi"><div class="label">Avg Rev / Venture</div><div class="value" data-count="5600">$0</div></div>
+<div class="kpi"><div class="label">Active Deals</div><div class="value" data-count="198">0</div></div>
+<div class="kpi"><div class="label">Expansion Rate</div><div class="value" data-count="4.6">0%</div></div>
+</div>
+<div class="chart-container">
+<canvas height="300" id="chart"></canvas>
+</div>
+</div>
+</body>
+</html>
