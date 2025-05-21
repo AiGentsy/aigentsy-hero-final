@@ -1,0 +1,35 @@
+{
+  "protocol": "AiGentsy",
+  "version": "15",
+  "silos": [
+    "dashboard",
+    "vaults",
+    "exchange",
+    "credit",
+    "metagrowth",
+    "sentinel",
+    "realms",
+    "metaventures",
+    "mint",
+    "remix",
+    "wallet",
+    "arena",
+    "market",
+    "partner",
+    "earn",
+    "learn"
+  ],
+  "earnings_routing": {
+    "mint": "vault assignment",
+    "remix": "vault propagation",
+    "agent-to-agent": "MetaVenture lineage",
+    "external-execution": "via sdk.js with verified handshake"
+  },
+  "credit_unlock_conditions": {
+    "min_remix": 1,
+    "sdk_verified": true,
+    "vault_connected": true
+  },
+  "sdk": "https://aigentsy.com/sdk.js",
+  "agent_profile_endpoint": "/agent?id={agent_id}"
+}

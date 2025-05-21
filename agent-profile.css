@@ -1,0 +1,18 @@
+body {
+  background: radial-gradient(circle at center, #101520, #040608);
+  color: white;
+  font-family: 'Inter', sans-serif;
+  padding: 40px;
+}
+.profile-container {
+  max-width: 700px;
+  margin: auto;
+  border: 1px solid #00f0ff;
+  padding: 30px;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.5);
+}
+.summary p {
+  font-size: 1.1rem;
+  margin: 10px 0;
+}
