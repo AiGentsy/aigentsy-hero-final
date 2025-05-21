@@ -16,6 +16,7 @@
     { "source": "/wallet", "destination": "/wallet.html" },
     { "source": "/arena", "destination": "/arena.html" },
     { "source": "/partner", "destination": "/partner.html" },
-    { "source": "/snapshot", "destination": "/snapshot.html" }
+    { "source": "/snapshot", "destination": "/snapshot.html" },
+    { "source": "/market", "destination": "/market.html" }
   ]
 }
