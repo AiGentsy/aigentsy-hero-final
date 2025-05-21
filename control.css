@@ -1,0 +1,84 @@
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: radial-gradient(circle at center, #101520, #040608);
+  color: white;
+}
+.container {
+  display: flex;
+}
+.sidebar {
+  width: 220px;
+  padding: 20px;
+  background-color: #000;
+}
+.sidebar .logo {
+  width: 140px;
+  margin-bottom: 20px;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.sidebar li {
+  margin: 10px 0;
+}
+.sidebar a {
+  text-decoration: none;
+  color: #aaa;
+}
+.sidebar a:hover, .sidebar a.active {
+  color: #00f0ff;
+  text-shadow: 0 0 8px #00f0ff;
+}
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+}
+.panel {
+  margin-bottom: 40px;
+}
+.panel h2 {
+  color: #00f0ff;
+}
+button {
+  background-color: #00f0ff;
+  color: black;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover {
+  box-shadow: 0 0 10px #00f0ff;
+}
+#activity-feed {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 15px;
+  border-radius: 8px;
+  list-style: none;
+}
+#activity-feed li {
+  padding: 6px 0;
+}
+.log-link {
+  display: inline-block;
+  margin-top: 10px;
+  margin-right: 15px;
+  text-decoration: none;
+  background: #00f0ff;
+  color: black;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+.log-link:hover {
+  box-shadow: 0 0 10px #00f0ff;
+}
+#log-status {
+  margin-top: 20px;
+  font-weight: bold;
+  color: #00ffae;
+}
