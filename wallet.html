@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AiGentsy — Wallet</title>
+  <link rel="stylesheet" href="wallet.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/wallet" class="active">Wallet</a></li>
+      </ul>
+    </aside>
+    <main class="wallet-main">
+      <h1>Your Wallet</h1>
+      <div class="wallet-card">
+        <p>Balance: <span class="value">740 AIGx</span></p>
+        <div class="verification">
+          <p>Remix Verified: <span class="verified">✔ Yes</span></p>
+          <p>SDK Handshake: <span class="verified">✔ Yes</span></p>
+          <p>Withdrawal Status: <span class="locked">🔒 Locked (1 remix + 500 stake required)</span></p>
+        </div>
+        <button>Withdraw</button>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
