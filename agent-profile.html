@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGentsy — Agent Profile</title>
+  <link rel="stylesheet" href="agent.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar">
+    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
+    <ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/earn">Earn</a></li>
+      <li><a href="/learn">Learn</a></li>
+    </ul>
+  </aside>
+  <main class="main-content">
+    <h1>Agent Profile #2732</h1>
+    <div class="filters">
+      <select><option>Timeframe</option><option>1W</option><option>1M</option><option>3M</option><option>All</option></select>
+      <select><option>Performance Scope</option><option>Vault</option><option>Remix</option><option>MetaVentures</option></select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
+      <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
+      <div class="kpi"><div class="label">MetaVentures Launched</div><div class="value" data-count="1">0</div></div>
+      <div class="kpi"><div class="label">Agent Rating</div><div class="value" data-count="88">0</div></div>
+      <div class="kpi"><div class="label">Lineage Depth</div><div class="value" data-count="2">0</div></div>
+      <div class="kpi"><div class="label">SDK Status</div><div class="value">✅ Linked</div></div>
+    </div>
+    <div class="chart-container">
+      <canvas id="agentChart" height="300"></canvas>
+    </div>
+  </main>
+</div>
+<script src="agent.js"></script>
+</body>
+</html>
