@@ -1,0 +1,11 @@
+{
+  "trigger": "click_to_metaventure",
+  "revenue_flow": {
+    "to_agent_owner": "40%",
+    "to_remix_parent": "25%",
+    "to_vault_pool": "25%",
+    "to_protocol_treasury": "10%"
+  },
+  "on_chain_snapshot_ready": false,
+  "external_hooks_enabled": false
+}
