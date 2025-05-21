@@ -67,6 +67,22 @@ body {
 .kpi .value {
   font-size: 1.6rem;
   font-weight: bold;
+}.snapshot-link {
+  margin-top: 30px;
+  text-align: center;
+}
+.snapshot-link a {
+  text-decoration: none;
+  color: #00f0ff;
+  font-weight: bold;
+  padding: 12px 20px;
+  display: inline-block;
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid #00f0ff;
+  border-radius: 8px;
+}
+.snapshot-link a:hover {
+  box-shadow: 0 0 10px #00f0ff;
 }
 .chart-container {
   max-width: 600px;
