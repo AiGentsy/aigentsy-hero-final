@@ -18,6 +18,7 @@
     { "source": "/partner", "destination": "/partner.html" },
     { "source": "/snapshot", "destination": "/snapshot.html" },
     { "source": "/control", "destination": "/control.html" },
-    { "source": "/market", "destination": "/market.html" }
+    { "source": "/market", "destination": "/market.html" },
+    { "source": "/agent", "destination": "/agent-profile.html" }
   ]
 }
