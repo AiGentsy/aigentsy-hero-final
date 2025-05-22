@@ -19,6 +19,7 @@
     { "source": "/snapshot", "destination": "/snapshot.html" },
     { "source": "/control", "destination": "/control.html" },
     { "source": "/market", "destination": "/market.html" },
-    { "source": "/agent", "destination": "/agent-profile.html" }
+    { "source": "/agent", "destination": "/agent-profile.html" },
+    { "source": "/remix-lineage", "destination": "/remix-lineage.html" }
   ]
 }
