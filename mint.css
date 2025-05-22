@@ -99,3 +99,20 @@ button:hover {
   max-width: 700px;
   margin-top: 40px;
 }
+
+/* View Profile Button Styling */
+.view-profile-btn {
+  color: #00d9ff;
+  text-decoration: none;
+  font-weight: bold;
+  border: 1px solid #00d9ff;
+  border-radius: 6px;
+  padding: 6px 12px;
+  display: inline-block;
+  margin-top: 16px;
+}
+.view-profile-btn:hover {
+  background: #00d9ff;
+  color: black;
+  box-shadow: 0 0 8px #00d9ff;
+}
