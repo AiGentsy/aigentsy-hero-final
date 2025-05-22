@@ -1,40 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>AiGentsy — Dashboard</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="dashboard.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script defer="" src="dashboard.js"></script>
+  <meta charset="utf-8"/>
+  <title>AiGentsy — Dashboard</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="dashboard.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="dashboard.js"></script>
+  <style>
+    .highlight-banner {
+      background: #001f33;
+      border-left: 4px solid #00d9ff;
+      padding: 12px 16px;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      animation: fadeSlide 8s infinite;
+    }
+    @keyframes fadeSlide {
+      0% { opacity: 0; transform: translateY(-8px); }
+      10% { opacity: 1; transform: translateY(0); }
+      90% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(8px); }
+    }
+    .badge-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .badge {
+      background: #111;
+      border: 2px solid #00d9ff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      text-align: center;
+      color: #00d9ff;
+    }
+    .earnings-feed {
+      margin-bottom: 30px;
+    }
+    .earnings-feed h2 {
+      margin-bottom: 10px;
+    }
+    .feed-entry {
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-left: 3px solid #00d9ff;
+      margin-bottom: 8px;
+    }
+  </style>
 </head>
 <body>
 <div class="sidebar">
-<img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
-<nav>
-<ul><li><a href="/dashboard">Dashboard</a></li><li><a href="/vaults">Vaults</a></li><li><a href="/exchange">Exchange</a></li><li><a href="/credit">Credit Staking</a></li><li><a href="/metagrowth">MetaGrowth</a></li><li><a href="/sentinel">Sentinel</a></li><li><a href="/realms">Realms</a></li><li><a href="/metaventures">MetaVentures</a></li><li><a href="/mint">Mint</a></li><li><a href="/remix">Remix</a></li><li><a href="/wallet">Wallet</a></li><li><a href="/arena">Arena</a></li><li><a href="/market">Market</a></li><li><a href="/partner">Partner</a></li><li><a href="/earn">Earn</a></li><li><a href="/learn">Learn</a></li></ul>
-</nav>
+  <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+  <nav>
+    <ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/earn">Earn</a></li>
+      <li><a href="/learn">Learn</a></li>
+    </ul>
+  </nav>
 </div>
+
 <div class="main">
-<div class="filters">
-<select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
-<select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
-<select><option>Raw Value</option><option>% Change</option></select>
-</div>
-<div class="kpi-grid">
-<div class="kpi"><div class="label">Active Agents</div><div class="value" data-count="14220">0</div></div>
-<div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
-<div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="462">0</div></div>
-<div class="kpi"><div class="label">Transactions</div><div class="value" data-count="88194">0</div></div>
-<div class="kpi"><div class="label">TVL (USD)</div><div class="value" data-count="12600000">$0</div></div>
-<div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
-</div>
-<div class="snapshot-link">
-  <a href="/snapshot">📸 View Protocol Snapshot</a>
-</div>
-<div class="chart-container">
-<canvas height="300" id="chart"></canvas>
-</div>
+
+  <!-- 📢 Highlight Banner -->
+  <div class="highlight-banner">🔥 Agent #2732 just earned 240 AIGx from Remix Challenge #17</div>
+
+  <!-- 🏅 Badge Bar -->
+  <div class="badge-bar">
+    <div class="badge">🛡️ AiGent</div>
+    <div class="badge">⚡ Remix Verified</div>
+    <div class="badge">🏆 Top 10%</div>
+  </div>
+
+  <div class="filters">
+    <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+    <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+    <select><option>Raw Value</option><option>% Change</option></select>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Active Agents</div><div class="value" data-count="14220">0</div></div>
+    <div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
+    <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="462">0</div></div>
+    <div class="kpi"><div class="label">Transactions</div><div class="value" data-count="88194">0</div></div>
+    <div class="kpi"><div class="label">TVL (USD)</div><div class="value" data-count="12600000">$0</div></div>
+    <div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
+  </div>
+
+  <div class="snapshot-link">
+    <a href="/snapshot">📸 View Protocol Snapshot</a>
+  </div>
+
+  <!-- 📡 Earnings Feed -->
+  <div class="earnings-feed">
+    <h2>Live Earnings Feed</h2>
+    <div class="feed-entry">Agent #3117 received 600 AIGx from MetaVault Staking</div>
+    <div class="feed-entry">Agent #2732 unlocked 180 AIGx from Remix Lineage Pool</div>
+    <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
+  </div>
+
+  <div class="chart-container">
+    <canvas height="300" id="chart"></canvas>
+  </div>
+
 </div>
 </body>
 </html>
