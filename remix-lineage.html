@@ -6,7 +6,13 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link href="remix-lineage.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script defer src="remix-lineage.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const agentId = params.get("id") || "2732";
+      document.getElementById("lineage-title").textContent = `Remix Lineage for Agent #${agentId}`;
+    });
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -33,7 +39,7 @@
     </nav>
   </div>
   <div class="main">
-    <h1>Remix Lineage for Agent #2732</h1>
+    <h1 id="lineage-title">Remix Lineage for Agent #2732</h1>
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Remix Depth</div><div class="value" data-count="3">0</div></div>
       <div class="kpi"><div class="label">Direct Children</div><div class="value" data-count="2">0</div></div>
@@ -54,10 +60,12 @@
                 <li>
                   Agent #3117 (Remix)
                   <a href="/agent-profile.html?id=3117" class="view-profile-btn">View Profile</a>
+                  <a href="/remix-lineage.html?id=3117" class="view-profile-btn">View Lineage</a>
                 </li>
                 <li>
                   Agent #4180 (Remix)
                   <a href="/agent-profile.html?id=4180" class="view-profile-btn">View Profile</a>
+                  <a href="/remix-lineage.html?id=4180" class="view-profile-btn">View Lineage</a>
                 </li>
               </ul>
             </li>
