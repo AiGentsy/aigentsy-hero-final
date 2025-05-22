@@ -6,7 +6,6 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link href="dashboard.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="dashboard.js"></script>
   <style>
     .highlight-banner {
       background: #001f33;
@@ -114,10 +113,53 @@
     <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
   </div>
 
+  <!-- 📈 Chart Section -->
   <div class="chart-container">
-    <canvas height="300" id="chart"></canvas>
+    <canvas id="dashboardChart" height="300"></canvas>
   </div>
 
 </div>
+
+<!-- 🔷 Chart.js Gradient Script -->
+<script>
+  const ctx = document.getElementById('dashboardChart').getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, '#00f0ff');  // seafoam
+  gradient.addColorStop(0.5, '#ff1cf7'); // magenta
+  gradient.addColorStop(1, '#6100ff');  // deep purple
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+      datasets: [{
+        label: 'Global AIGx Earnings',
+        data: [5200, 8700, 12200, 15800, 19000],
+        fill: true,
+        backgroundColor: gradient,
+        borderColor: '#00f0ff',
+        borderWidth: 2,
+        tension: 0.4,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#ccc' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+          ticks: { color: '#ccc' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+      }
+    }
+  });
+</script>
+
 </body>
 </html>
