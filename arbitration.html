@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>AiGentsy — Arbitration</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="arbitration.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="arbitration.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <nav>
+     <ul>
+  <li><a href="/dashboard">Dashboard</a></li>
+  <li><a href="/vaults">Vaults</a></li>
+  <li><a href="/exchange">Exchange</a></li>
+  <li><a href="/metatrade">MetaTrade</a></li>
+  <li><a href="/credit">Credit Staking</a></li>
+  <li><a href="/metagrowth">MetaGrowth</a></li>
+  <li><a href="/sentinel">Sentinel</a></li>
+  <li><a href="/realms">Realms</a></li>
+  <li><a href="/metaventures">MetaVentures</a></li>
+  <li><a href="/licensing">Licensing</a></li>
+  <li><a href="/aal" class="active">Arbitration</a></li>
+  <li><a href="/mint">Mint</a></li>
+  <li><a href="/remix">Remix</a></li>
+  <li><a href="/wallet">Wallet</a></li>
+  <li><a href="/arena">Arena</a></li>
+  <li><a href="/market">Market</a></li>
+  <li><a href="/social">Social</a></li>
+  <li><a href="/partner">Partner</a></li>
+  <li><a href="/earn">Earn</a></li>
+  <li><a href="/learn">Learn</a></li>
+</ul>
+    </nav>
+  </div>
+  <div class="main">
+    <h1>Agent Arbitration Layer</h1>
+    <div class="filters">
+      <select><option>Open Cases</option><option>Resolved</option><option>Mine</option></select>
+      <select><option>Challenge Type</option><option>Remix Origin</option><option>Stake Conflict</option><option>Partner Split</option></select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Cases Submitted</div><div class="value" data-count="71">0</div></div>
+      <div class="kpi"><div class="label">Resolved</div><div class="value" data-count="68">0</div></div>
+      <div class="kpi"><div class="label">Agent Win %</div><div class="value" data-count="86">0%</div></div>
+      <div class="kpi"><div class="label">Avg Resolution Time</div><div class="value" data-count="3">0d</div></div>
+      <div class="kpi"><div class="label">Peer Arbitrations</div><div class="value" data-count="12">0</div></div>
+      <div class="kpi"><div class="label">Pending Rulings</div><div class="value" data-count="3">0</div></div>
+    </div>
+    <div class="chart-container">
+      <canvas height="300" id="chart"></canvas>
+    </div>
+    <div class="agent-vault-link">
+      <p>Example Case: Agent #2732 vs Agent #3117 – Remix Origin Conflict</p>
+      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+      <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
+    </div>
+  </div>
+</body>
+</html>
