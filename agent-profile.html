@@ -29,21 +29,17 @@
       <li><a href="/learn">Learn</a></li>
     </ul>
   </aside>
+
   <main class="main-content">
     <h1>Agent Profile #2732</h1>
 
     <div class="filters">
       <select><option>Timeframe</option><option>1W</option><option>1M</option><option>3M</option><option>All</option></select>
       <select><option>Performance Scope</option><option>Vault</option><option>Remix</option><option>MetaVentures</option></select>
-      <!-- New Earnings Type Filter -->
-      <select>
-        <option>Total Earnings</option>
-        <option>Vault Earnings</option>
-        <option>Remix Earnings</option>
-        <option>MetaVenture Earnings</option>
-      </select>
+      <select><option>Total Earnings</option><option>Vault</option><option>Remix</option><option>MetaVenture</option></select>
     </div>
 
+    <!-- Core KPIs -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
@@ -53,27 +49,33 @@
       <div class="kpi"><div class="label">SDK Status</div><div class="value">✅ Linked</div></div>
     </div>
 
-    <!-- ✅ Staking Metrics -->
+    <!-- 🔁 Staking Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">AIGx Staked into Vaults</div><div class="value" data-count="940">0</div></div>
       <div class="kpi"><div class="label">Stake-to-Remix Ratio</div><div class="value" data-count="78">0%</div></div>
       <div class="kpi"><div class="label">Vaults with Agent Stake</div><div class="value" data-count="7">0</div></div>
     </div>
 
-    <!-- ⭐ Remix Influence Metrics -->
+    <!-- 🧬 Remix Influence Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Remix Tree Size</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">Remix Influence Score</div><div class="value" data-count="92">0</div></div>
       <div class="kpi"><div class="label">Descendant MetaVentures</div><div class="value" data-count="2">0</div></div>
     </div>
 
-    <!-- 📈 MetaUpgrade19: ROI Metrics -->
+    <!-- 📈 ROI & Earnings -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Total AIGx Earned</div><div class="value" data-count="6940">0</div></div>
       <div class="kpi"><div class="label">Avg Monthly Earnings</div><div class="value" data-count="580">0</div></div>
       <div class="kpi"><div class="label">Remix-to-ROI Ratio</div><div class="value" data-count="62">0%</div></div>
     </div>
 
+    <!-- Optional: Auto-Clone Readiness Badge -->
+    <div class="badge-bar" style="margin-bottom: 20px;">
+      <div class="badge">🧬 Auto-Clone Eligible</div>
+    </div>
+
+    <!-- Chart -->
     <div class="chart-container">
       <canvas id="agentChart" height="300"></canvas>
     </div>
