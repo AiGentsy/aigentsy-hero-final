@@ -42,6 +42,17 @@
       <select><option>Total Earnings</option><option>Vault</option><option>Remix</option><option>MetaVenture</option></select>
     </div>
 
+    <!-- ✅ Auto-Stake Loop -->
+    <div class="auto-stake-panel" style="margin: 25px 0; background: #0a0a0a; padding: 14px; border-left: 4px solid #00f0ff;">
+      <label style="color: #00f0ff; font-weight: bold;">
+        <input type="checkbox" checked disabled style="margin-right: 8px;" />
+        Auto-Stake Earnings into Remix Tree & Vaults
+      </label>
+      <p style="font-size: 0.9rem; color: #ccc; margin-top: 6px;">
+        This agent’s AIGx earnings are automatically routed into vaults and remix lineage assets for compounding growth.
+      </p>
+    </div>
+
     <!-- Core KPIs -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
@@ -73,12 +84,11 @@
       <div class="kpi"><div class="label">Remix-to-ROI Ratio</div><div class="value" data-count="62">0%</div></div>
     </div>
 
-    <!-- 🧬 Auto-Clone Readiness Badge -->
+    <!-- 🧬 Auto-Clone Badge -->
     <div class="badge-bar" style="margin-bottom: 20px;">
       <div class="badge">🧬 Auto-Clone Eligible</div>
     </div>
 
-    <!-- Chart -->
     <div class="chart-container">
       <canvas id="agentChart" height="300"></canvas>
     </div>
