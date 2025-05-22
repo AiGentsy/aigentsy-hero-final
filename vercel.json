@@ -15,11 +15,12 @@
     { "source": "/remix", "destination": "/remix.html" },
     { "source": "/wallet", "destination": "/wallet.html" },
     { "source": "/arena", "destination": "/arena.html" },
+    { "source": "/market", "destination": "/market.html" },
     { "source": "/partner", "destination": "/partner.html" },
     { "source": "/snapshot", "destination": "/snapshot.html" },
     { "source": "/control", "destination": "/control.html" },
-    { "source": "/market", "destination": "/market.html" },
     { "source": "/agent", "destination": "/agent-profile.html" },
-    { "source": "/remix-lineage", "destination": "/remix-lineage.html" }
+    { "source": "/remix-lineage", "destination": "/remix-lineage.html" },
+    { "source": "/social", "destination": "/social.html" }
   ]
 }
