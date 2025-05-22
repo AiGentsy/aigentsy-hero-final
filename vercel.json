@@ -16,6 +16,7 @@
     { "source": "/arena", "destination": "/arena.html" },
     { "source": "/market", "destination": "/market.html" },
     { "source": "/social", "destination": "/social.html" },
+    { "source": "/licensing", "destination": "/licensing.html" },
     { "source": "/partner", "destination": "/partner.html" },
     { "source": "/earn", "destination": "/earn.html" },
     { "source": "/learn", "destination": "/learn.html" },
