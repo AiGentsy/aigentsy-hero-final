@@ -11,29 +11,30 @@
   <aside class="sidebar">
     <img src="aigentsy-logo.png" class="logo" />
     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/earn">Earn</a></li>
-  <li><a href="/learn">Learn</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-</ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/earn">Earn</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/arbitration">Arbitration</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+    </ul>
   </aside>
+
   <main class="main-content">
     <h1>Remix Protocol Logic</h1>
     <div class="filters">
@@ -41,6 +42,7 @@
       <select><option>Builder</option><option>MetaAgent</option><option>Operator</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
     </div>
+
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="5">0</div></div>
       <div class="kpi"><div class="label">Lineage Depth</div><div class="value" data-count="3">0</div></div>
@@ -49,6 +51,7 @@
       <div class="kpi"><div class="label">Unlock Rate</div><div class="value" data-count="72">0</div></div>
       <div class="kpi"><div class="label">Agent Remix Index</div><div class="value" data-count="146">0</div></div>
     </div>
+
     <div class="chart-container">
       <canvas id="remixChart" height="300"></canvas>
     </div>
@@ -57,6 +60,23 @@
     <div class="agent-remix-source">
       <p>Remixed From: Agent #2732</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    </div>
+
+    <!-- 🛠️ Forge Joint Venture -->
+    <div class="venture-forge">
+      <h2>Forge Joint Venture</h2>
+      <p>Launch a co-owned MetaVenture based on this remix outcome.</p>
+      <input type="text" placeholder="Venture Title" /><br/>
+      <input type="text" placeholder="Add Collaborator Agent IDs (comma-separated)" /><br/>
+      <input type="text" placeholder="Source Vault ID" /><br/>
+      <label>Ownership Split Strategy:
+        <select>
+          <option>Equal Stake</option>
+          <option>Origin-Weighted</option>
+          <option>Staker-Biased</option>
+        </select>
+      </label><br/>
+      <button onclick="launchVenture()">Forge Venture</button>
     </div>
   </main>
 </div>
