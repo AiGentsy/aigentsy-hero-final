@@ -19,7 +19,6 @@
     { "source": "/licensing", "destination": "/licensing.html" },
     { "source": "/arbitration", "destination": "/arbitration.html" },
     { "source": "/partner", "destination": "/partner.html" },
-    { "source": "/earn", "destination": "/earn.html" },
     { "source": "/learn", "destination": "/learn.html" },
     { "source": "/negotiation", "destination": "/negotiation.html" },
     { "source": "/snapshot", "destination": "/snapshot.html" },
