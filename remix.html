@@ -1,65 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>AiGentsy — Remix</title>
-  <link rel="stylesheet" href="remix.css"/>
+  <meta charset="UTF-8" />
+  <title>AiGentsy — Mint</title>
+  <link rel="stylesheet" href="mint.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <div class="container">
   <aside class="sidebar">
-    <img src="aigentsy-logo.png" class="logo" />
+    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/earn">Earn</a></li>
-  <li><a href="/learn">Learn</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-</ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/earn">Earn</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/arbitration">Arbitration</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+    </ul>
   </aside>
+
   <main class="main-content">
-    <h1>Remix Protocol Logic</h1>
+    <h1>Mint Your AI Agent</h1>
     <div class="filters">
-      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
-      <select><option>Builder</option><option>MetaAgent</option><option>Operator</option></select>
-      <select><option>Raw Value</option><option>% Change</option></select>
+      <select><option>Select Base Protocol</option><option>Builder</option><option>Operator</option><option>MetaAgent</option></select>
+      <select><option>Visibility</option><option>Public</option><option>Private</option></select>
+    </div>
+    <div class="form-block">
+      <button onclick="connectWallet()">Connect Wallet</button>
+      <input type="file" id="configUpload" accept=".json,.js" />
+      <button onclick="mintAgent()">Mint Agent</button>
     </div>
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="5">0</div></div>
-      <div class="kpi"><div class="label">Lineage Depth</div><div class="value" data-count="3">0</div></div>
-      <div class="kpi"><div class="label">MetaVentures Launched</div><div class="value" data-count="2">0</div></div>
-      <div class="kpi"><div class="label">Remix Credits</div><div class="value" data-count="1800">0</div></div>
-      <div class="kpi"><div class="label">Unlock Rate</div><div class="value" data-count="72">0</div></div>
-      <div class="kpi"><div class="label">Agent Remix Index</div><div class="value" data-count="146">0</div></div>
+      <div class="kpi"><div class="label">Agents Minted</div><div class="value" data-count="1733">0</div></div>
+      <div class="kpi"><div class="label">Mint Conversion %</div><div class="value" data-count="42">0</div></div>
+      <div class="kpi"><div class="label">Avg Earnings/Agent</div><div class="value" data-count="820">0</div></div>
+      <div class="kpi"><div class="label">Live Agents</div><div class="value" data-count="957">0</div></div>
+      <div class="kpi"><div class="label">Public Mints</div><div class="value" data-count="1032">0</div></div>
+      <div class="kpi"><div class="label">MetaVentures Created</div><div class="value" data-count="205">0</div></div>
     </div>
     <div class="chart-container">
-      <canvas id="remixChart" height="300"></canvas>
+      <canvas id="mintChart" height="300"></canvas>
+    </div>
+    <div id="mintResult" class="result"></div>
+
+    <!-- Agent Preview Profile Access -->
+    <div class="agent-preview-link">
+      <p>Preview Most Recently Minted Agent:</p>
+      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
     </div>
 
-    <!-- Agent Profile Routing Example -->
-    <div class="agent-remix-source">
-      <p>Remixed From: Agent #2732</p>
-      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    <!-- 🧬 Genetic Cloning + Mutation Layer -->
+    <div class="cloning-lab">
+      <h2>Genetic Cloning & Mutation</h2>
+      <p>Select traits to replicate or mutate for the next agent.</p>
+      <div class="mutation-options">
+        <label><input type="checkbox" checked /> Retain Strategy Memory</label><br/>
+        <label><input type="checkbox" checked /> Retain Deal History</label><br/>
+        <label><input type="checkbox" /> Introduce Tactical Bias</label><br/>
+        <label><input type="checkbox" /> Remix Response Weighting</label><br/>
+        <label>Mutation Strength:
+          <select>
+            <option>None</option>
+            <option>Light</option>
+            <option selected>Moderate</option>
+            <option>Heavy</option>
+          </select>
+        </label><br/>
+        <button onclick="initiateClone()">Clone with Mutation</button>
+      </div>
     </div>
   </main>
 </div>
-<script src="remix.js"></script>
+<script src="mint.js"></script>
 </body>
 </html>
