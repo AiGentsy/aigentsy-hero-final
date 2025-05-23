@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: radial-gradient(circle at center, #0a0c16 0%, #000000 100%);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.login-container {
+  text-align: center;
+  background-color: rgba(5, 8, 18, 0.8);
+  padding: 50px;
+  border-radius: 14px;
+  box-shadow: 0 0 20px #122345;
+}
+.logo-title {
+  font-size: 2.5rem;
+  color: #00d0ff;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+.headline {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.subtext {
+  font-size: 1rem;
+  color: #66d6ff;
+  margin-bottom: 0.4rem;
+}
+.autonomous {
+  color: #ccc;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+.login-form input {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  margin: 10px auto;
+  padding: 12px;
+  background: #0a0c16;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 4px;
+}
+.launch-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 26px;
+  background: #1a1d2b;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.launch-btn:hover {
+  background: #2c2f40;
+}
