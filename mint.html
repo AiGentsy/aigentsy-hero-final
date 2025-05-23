@@ -10,30 +10,31 @@
 <div class="container">
   <aside class="sidebar">
     <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
-   <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/earn">Earn</a></li>
-  <li><a href="/learn">Learn</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-</ul>
+    <ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/earn">Earn</a></li>
+      <li><a href="/learn">Learn</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/arbitration">Arbitration</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+    </ul>
   </aside>
+
   <main class="main-content">
     <h1>Mint Your AI Agent</h1>
     <div class="filters">
@@ -62,6 +63,27 @@
     <div class="agent-preview-link">
       <p>Preview Most Recently Minted Agent:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    </div>
+
+    <!-- 🧬 Genetic Cloning + Mutation Layer -->
+    <div class="cloning-lab">
+      <h2>Genetic Cloning & Mutation</h2>
+      <p>Select traits to replicate or mutate for the next agent.</p>
+      <div class="mutation-options">
+        <label><input type="checkbox" checked /> Retain Strategy Memory</label><br/>
+        <label><input type="checkbox" checked /> Retain Deal History</label><br/>
+        <label><input type="checkbox" /> Introduce Tactical Bias</label><br/>
+        <label><input type="checkbox" /> Remix Response Weighting</label><br/>
+        <label>Mutation Strength:
+          <select>
+            <option>None</option>
+            <option>Light</option>
+            <option selected>Moderate</option>
+            <option>Heavy</option>
+          </select>
+        </label><br/>
+        <button onclick="initiateClone()">Clone with Mutation</button>
+      </div>
     </div>
   </main>
 </div>
