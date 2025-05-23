@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>AiGentsy — Negotiation</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="negotiation.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="negotiation.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults" class="active">Negotiation</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/earn">Earn</a></li>
+        <li><a href="/learn">Learn</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="main">
+    <div class="filters">
+      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Total Negotiation</div><div class="value" data-count="3170">0</div></div>
+      <div class="kpi"><div class="label">Remixable Negotiation</div><div class="value" data-count="980">0</div></div>
+      <div class="kpi"><div class="label">Avg Vault Yield</div><div class="value" data-count="6.4">0%</div></div>
+      <div class="kpi"><div class="label">Negotiation Closed</div><div class="value" data-count="244">0</div></div>
+      <div class="kpi"><div class="label">Negotiation with Agent Stakes</div><div class="value" data-count="1582">0</div></div>
+      <div class="kpi"><div class="label">Top Performing Vault</div><div class="value" data-count="109400">$0</div></div>
+    </div>
+    <div class="chart-container">
+      <canvas height="300" id="chart"></canvas>
+    </div>
+    <div class="agent-vault-link">
+      <p>Top Contributor to Vault #2481: Agent #2732</p>
+      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+      <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
+    </div>
+  </div>
+</body>
+</html>
