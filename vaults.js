@@ -1,44 +1,67 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = document.getElementById('chart').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, 'rgba(0,255,178,0.6)');
-  gradient.addColorStop(0.5, 'rgba(255,0,170,0.4)');
-  gradient.addColorStop(1, 'rgba(128,0,255,0.2)');
-
+  const dataSets = [
+    {
+      label: 'Total Vaults',
+      data: [120, 180, 300, 400, 470, 530],
+      backgroundColor: 'rgba(0,240,255,0.4)',
+      borderColor: '#00f0ff',
+    },
+    {
+      label: 'Remixable Vaults',
+      data: [80, 130, 210, 280, 300, 320],
+      backgroundColor: 'rgba(166,77,255,0.4)',
+      borderColor: '#a64dff',
+    },
+    {
+      label: 'Avg Vault Yield',
+      data: [4.1, 4.8, 5.2, 5.6, 6.1, 6.4],
+      backgroundColor: 'rgba(0,255,178,0.4)',
+      borderColor: '#00ffb2',
+    },
+    {
+      label: 'Vaults Closed',
+      data: [5, 8, 30, 90, 170, 244],
+      backgroundColor: 'rgba(247,183,51,0.4)',
+      borderColor: '#f7b733',
+    },
+    {
+      label: 'Vaults with Agent Stakes',
+      data: [300, 540, 740, 980, 1210, 1582],
+      backgroundColor: 'rgba(255,28,247,0.4)',
+      borderColor: '#ff1cf7',
+    },
+    {
+      label: 'Top Performing Vault',
+      data: [40000, 55000, 70000, 83000, 97000, 109400],
+      backgroundColor: 'rgba(110,255,232,0.4)',
+      borderColor: '#6effe8',
+    }
+  ];
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Vault Growth',
-        data: [120, 200, 330, 420, 510, 600],
-        backgroundColor: gradient,
-        borderColor: '#00bfff',
-        borderWidth: 2,
-        borderRadius: 6
-      }]
+      datasets: dataSets
     },
     options: {
       plugins: {
-        legend: {
-          labels: { color: 'white' }
-        }
+        legend: { labels: { color: 'white' } }
       },
       scales: {
         x: {
           ticks: { color: 'white' },
-          grid: { color: '#333' }
+          grid: { color: '#222' }
         },
         y: {
           ticks: { color: 'white' },
-          grid: { color: '#333' }
+          grid: { color: '#222' }
         }
       }
     }
   });
 
-  // KPI roll-up animation
   document.querySelectorAll('.value').forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
