@@ -1,31 +1,81 @@
-
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = document.getElementById('chart').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, 'rgba(0,255,178,0.6)');
-  gradient.addColorStop(0.5, 'rgba(255,0,170,0.4)');
-  gradient.addColorStop(1, 'rgba(128,0,255,0.2)');
+  const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient1.addColorStop(0, 'rgba(0,255,178,0.6)');
+  gradient1.addColorStop(0.5, 'rgba(0,191,255,0.3)');
+  gradient1.addColorStop(1, 'rgba(0,191,255,0.1)');
+
+  const gradient2 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient2.addColorStop(0, 'rgba(255,0,170,0.6)');
+  gradient2.addColorStop(1, 'rgba(255,0,170,0.1)');
+
+  const gradient3 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient3.addColorStop(0, 'rgba(128,0,255,0.6)');
+  gradient3.addColorStop(1, 'rgba(128,0,255,0.1)');
+
   new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Staking Growth',
-        data: [90000, 120000, 150000, 180000, 210000, 240000],
-        borderColor: '#00bfff',
-        backgroundColor: gradient,
-        fill: true
-      }]
+      datasets: [
+        {
+          label: 'Stake Volume',
+          data: [80000, 120000, 160000, 200000, 240000, 280000],
+          borderColor: '#00f0ff',
+          backgroundColor: gradient1,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0
+        },
+        {
+          label: 'Credit Deployed',
+          data: [40000, 80000, 120000, 160000, 200000, 240000],
+          borderColor: '#ff1cf7',
+          backgroundColor: gradient2,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0
+        },
+        {
+          label: 'ROI %',
+          data: [2, 4, 6, 8, 10, 11.2],
+          borderColor: '#a64dff',
+          backgroundColor: gradient3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 0,
+          yAxisID: 'y1'
+        }
+      ]
     },
     options: {
-      plugins: { legend: { labels: { color: 'white' } } },
+      plugins: {
+        legend: {
+          labels: { color: 'white' }
+        }
+      },
       scales: {
-        x: { ticks: { color: 'white' }, grid: { color: '#333' }},
-        y: { ticks: { color: 'white' }, grid: { color: '#333' }}
+        x: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+          position: 'left',
+          beginAtZero: true,
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y1: {
+          position: 'right',
+          beginAtZero: true,
+          grid: { drawOnChartArea: false },
+          ticks: { color: '#aaa' }
+        }
       }
     }
   });
 
+  // Animate KPI roll-up
   document.querySelectorAll('.value[data-count]').forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
