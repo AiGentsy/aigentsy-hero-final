@@ -1,56 +1,68 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <title>AiGentsy — MetaTrade</title>
-  <link rel="stylesheet" href="metatrade.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="metatrade.js"></script>
 </head>
 <body>
-  <div class="container">
-    <aside class="sidebar">
+  <div class="sidebar">
+    <div class="logo-container">
       <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
-     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
-    </aside>
-    <main class="main-content">
-      <h1>MetaTrade Exchange</h1>
-      <div class="filters">
-        <select><option>Sort by Value</option><option>Recent Trades</option><option>Yield Potential</option></select>
-        <select><option>Vaults</option><option>MetaVentures</option></select>
-        <select><option>All Classes</option><option>Builder</option><option>Operator</option></select>
-      </div>
-      <div class="kpi-grid">
-        <div class="kpi"><div class="label">Active Listings</div><div class="value" data-count="56">0</div></div>
-        <div class="kpi"><div class="label">Total Volume</div><div class="value" data-count="267000">$0</div></div>
-        <div class="kpi"><div class="label">Highest Valuation</div><div class="value" data-count="12400">$0</div></div>
-      </div>
-      <div class="chart-container">
-        <canvas id="metatradeChart" height="300"></canvas>
-      </div>
-    </main>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade" class="active">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a href="/learn">lEARN</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="main">
+    <h1 class="section-title">MetaTrade Exchange</h1>
+
+    <div class="chart-toggle">
+      <select><option>Sort by Value</option><option>Recent Trades</option><option>Yield Potential</option></select>
+      <select><option>Vaults</option><option>MetaVentures</option></select>
+      <select><option>All Classes</option><option>Builder</option><option>Operator</option></select>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Active Listings</div><div class="value" data-count="56">0</div></div>
+      <div class="kpi"><div class="label">Total Volume</div><div class="value" data-count="267000">$0</div></div>
+      <div class="kpi"><div class="label">Highest Valuation</div><div class="value" data-count="12400">$0</div></div>
+    </div>
+
+    <div class="legend-bar">
+      <span style="color: #00f0ff">Active Listings</span>
+      <span style="color: #a64dff">Total Volume</span>
+      <span style="color: #00ffb2">Highest Valuation</span>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="metatradeChart" height="250"></canvas>
+    </div>
   </div>
 </body>
 </html>
