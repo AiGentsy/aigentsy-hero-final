@@ -15,12 +15,14 @@ body {
 }
 
 .logo-container {
-  background: rgba(0, 191, 255, 0.08);
+  background: rgba(0, 191, 255, 0.03);
   border-radius: 16px;
   padding: 12px;
   margin-bottom: 24px;
-  box-shadow: 0 0 16px rgba(0, 191, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.08), inset 0 0 10px rgba(0, 191, 255, 0.04);
+  backdrop-filter: blur(4px);
 }
+
 
 .logo {
   width: 140px;
