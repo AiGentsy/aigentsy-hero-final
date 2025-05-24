@@ -4,13 +4,15 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Vaults</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="vaults.css" rel="stylesheet"/>
+  <link href="vaults-final.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script defer src="vaults.js"></script>
+  <script defer src="vaults-final.js"></script>
 </head>
 <body>
   <div class="sidebar">
-    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    </div>
     <nav>
       <ul>
         <li><a href="/dashboard">Dashboard</a></li>
@@ -36,9 +38,8 @@
       </ul>
     </nav>
   </div>
-
   <div class="main">
-    <div class="filters">
+    <div class="chart-toggle">
       <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
@@ -53,16 +54,17 @@
       <div class="kpi"><div class="label">Top Performing Vault</div><div class="value" data-count="109400">$0</div></div>
     </div>
 
-    <div class="chart-wrapper">
-      <canvas id="chart" height="300"></canvas>
-      <div class="chart-legend">
-        <span style="color:#00f0ff;">■ Total Vaults</span>
-        <span style="color:#ff1cf7;">■ Remixable Vaults</span>
-        <span style="color:#6100ff;">■ Avg Yield</span>
-        <span style="color:#00ffcc;">■ Closed</span>
-        <span style="color:#ffcc00;">■ With Stakes</span>
-        <span style="color:#ff5c5c;">■ Top Vault</span>
-      </div>
+    <div class="legend-bar">
+      <span style="color: #00f0ff">Total Vaults</span>
+      <span style="color: #a64dff">Remixable</span>
+      <span style="color: #00ffb2">Avg Yield</span>
+      <span style="color: #f7b733">Closed</span>
+      <span style="color: #ff1cf7">Agent Stakes</span>
+      <span style="color: #6effe8">Top Vault</span>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="chart" height="250"></canvas>
     </div>
 
     <div class="agent-vault-link">
