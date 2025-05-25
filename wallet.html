@@ -1,15 +1,65 @@
-wallet.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <meta charset="utf-8"/>
-  <title>AiGentsy — Vaults</title>
+  <title>AiGentsy — Wallet</title>
+  <link rel="stylesheet" href="wallet.css" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="vaults.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script defer src="vaults.js"></script>
+  <script defer src="wallet.js"></script>
 </head>
 <body>
+  <div class="container">
+    
+<aside class="sidebar">
+  <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
+  <ul>
+  <li><a href="/dashboard">Dashboard</a></li>
+  <li><a href="/vaults">Vaults</a></li>
+  <li><a href="/exchange">Exchange</a></li>
+  <li><a href="/metatrade">MetaTrade</a></li>
+  <li><a href="/credit">Credit Staking</a></li>
+  <li><a href="/wallet">Wallet</a></li>
+  <li><a href="/negotiation">Negotiation</a></li>
+  <li><a href="/mint">Mint</a></li>
+  <li><a href="/remix">Remix</a></li>
+  <li><a href="/metaventures">MetaVentures</a></li>
+  <li><a href="/metagrowth">MetaGrowth</a></li>
+  <li><a href="/realms">Realms</a></li>
+  <li><a href="/partner">Partner</a></li>
+  <li><a href="/sentinel">Sentinel</a></li>
+  <li><a href="/arena">Arena</a></li>
+  <li><a href="/arbitration">Arbitration</a></li>
+  <li><a href="/market">Market</a></li>
+  <li><a href="/social">Social</a></li>
+  <li><a href="/licensing">Licensing</a></li>
+  <li><a href="/learn">lEARN</a></li>
+</ul>
+</aside>
+
+<main class="main-content">
+  <h1>Your Wallet</h1>
+
+  <!-- 🔁 Reward-to-Stake Loop -->
+  <div class="auto-stake-panel" style="margin-bottom: 25px; background: #0a0a0a; padding: 14px; border-left: 4px solid #00f0ff;">
+    <label style="color: #00f0ff; font-weight: bold;">
+      <input type="checkbox" checked disabled style="margin-right: 8px;" />
+      Auto-Stake Earnings into Remix Tree & Vaults
+    </label>
+    <p style="font-size: 0.9rem; color: #ccc; margin-top: 6px;">
+      100% of earned AIGx is currently auto-injected into active vault stakes and remix lineage contracts.
+    </p>
+  </div>
+
+  <div class="filters" style="margin-bottom: 30px;">
+    <select>
+      <option>Total Earnings</option>
+      <option>Vault Earnings</option>
+      <option>Remix Earnings</option>
+      <option>MetaVenture Earnings</option>
+    </select>
   <div class="sidebar">
     <div class="logo-container">
       <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
@@ -17,11 +67,11 @@ wallet.html
     <nav>
       <ul>
         <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/vaults" class="active">Vaults</a></li>
+        <li><a href="/vaults">Vaults</a></li>
         <li><a href="/exchange">Exchange</a></li>
         <li><a href="/metatrade">MetaTrade</a></li>
         <li><a href="/credit">Credit Staking</a></li>
-        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/wallet" class="active">Wallet</a></li>
         <li><a href="/negotiation">Negotiation</a></li>
         <li><a href="/mint">Mint</a></li>
         <li><a href="/remix">Remix</a></li>
@@ -39,47 +89,69 @@ wallet.html
       </ul>
     </nav>
   </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
+    <div class="kpi"><div class="label">AIGx Balance</div><div class="value" data-count="740">0</div></div>
+    <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
+    <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="1">0</div></div>
+  </div>
   <div class="main">
+    <h2>Your Wallet</h2>
+
+  <!-- 🔒 Staking Metrics -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Current AIGx Staked</div><div class="value" data-count="940">0</div></div>
+    <div class="kpi"><div class="label">Staked Agents</div><div class="value" data-count="2">0</div></div>
+    <div class="kpi"><div class="label">Remix Yield from Stakes</div><div class="value" data-count="1380">0</div></div>
+  </div>
     <div class="chart-toggle">
       <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
     </div>
 
+  <!-- 📈 ROI -->
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Lifetime AIGx Earnings</div><div class="value" data-count="7420">0</div></div>
+    <div class="kpi"><div class="label">Avg Monthly Yield</div><div class="value" data-count="618">0</div></div>
+    <div class="kpi"><div class="label">Remix Yield Contribution</div><div class="value" data-count="42">0%</div></div>
+  </div>
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Total Vaults</div><div class="value" data-count="3170">0</div></div>
-      <div class="kpi"><div class="label">Remixable Vaults</div><div class="value" data-count="980">0</div></div>
-      <div class="kpi"><div class="label">Avg Vault Yield</div><div class="value" data-count="6.4">0%</div></div>
-      <div class="kpi"><div class="label">Vaults Closed</div><div class="value" data-count="244">0</div></div>
-      <div class="kpi"><div class="label">Vaults with Agent Stakes</div><div class="value" data-count="1582">0</div></div>
-      <div class="kpi"><div class="label">Top Performing Vault</div><div class="value" data-count="109400">$0</div></div>
+      <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
+      <div class="kpi"><div class="label">AIGx Balance</div><div class="value" data-count="740">0</div></div>
+      <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
+      <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="1">0</div></div>
+      <div class="kpi"><div class="label">Current AIGx Staked</div><div class="value" data-count="940">0</div></div>
+      <div class="kpi"><div class="label">Staked Agents</div><div class="value" data-count="2">0</div></div>
+      <div class="kpi"><div class="label">Remix Yield from Stakes</div><div class="value" data-count="1380">0</div></div>
+      <div class="kpi"><div class="label">Lifetime AIGx Earnings</div><div class="value" data-count="7420">0</div></div>
+      <div class="kpi"><div class="label">Avg Monthly Yield</div><div class="value" data-count="618">0</div></div>
+      <div class="kpi"><div class="label">Remix Yield Contribution</div><div class="value" data-count="42">0</div></div>
     </div>
 
-    <div class="legend-bar">
-      <span style="color: #00f0ff">Total Vaults</span>
-      <span style="color: #a64dff">Remixable</span>
-      <span style="color: #00ffb2">Avg Yield</span>
-      <span style="color: #f7b733">Closed</span>
-      <span style="color: #ff1cf7">Agent Stakes</span>
-      <span style="color: #6effe8">Top Vault</span>
-    </div>
-
+  <div class="chart-container">
+    <canvas id="walletChart" height="300"></canvas>
+  </div>
     <div class="chart-container">
       <canvas id="chart" height="250"></canvas>
     </div>
 
-    <div class="agent-vault-link">
-      <p>Top Contributor to Vault #2481: Agent #2732</p>
-      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
-      <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
-    </div>
-
+  <!-- 🔗 Linked Agent -->
+  <div class="agent-wallet-profile">
+    <p>Primary Agent Linked to Wallet:</p>
+    <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
     <div class="silo-guide">
-      <h3>Vaults — What Is This?</h3>
+      <h3>Wallet — What Is This?</h3>
       <p>
-        Stake into AI-powered micro-economies. Vaults function like autonomous startups where your contributions (AIGx) fuel growth. You earn from yield, remix royalties, cloning, and venture traction. Stake smart, scale fast.
+        Your wallet displays all remix rewards, staked agent output, lineage contributions, and real-time vault earnings. 
+        Auto-staked earnings are injected into remix trees and vault positions.
       </p>
     </div>
   </div>
+</main>
+</div>
+<script src="wallet.js"></script>
 </body>
 </html>
