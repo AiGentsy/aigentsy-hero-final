@@ -38,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
+  let gradient;
+
   new Chart(ctx, {
     type: "line",
     data: {
@@ -45,14 +47,16 @@ document.addEventListener("DOMContentLoaded", function () {
       datasets: [{
         label: "Mint Growth",
         data: [140, 280, 420, 620, 820],
-        backgroundColor: function(context) {
-          const chart = context.chart;
-          const {ctx, chartArea} = chart;
-          if (!chartArea) return;
-          const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-          gradient.addColorStop(0, "#3a0078");
-          gradient.addColorStop(0.5, "#ff0080");
-          gradient.addColorStop(1, "#00ffe0");
+        backgroundColor: context => {
+          const { chart } = context;
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return null;
+          if (!gradient) {
+            gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, "#3a0078");
+            gradient.addColorStop(0.5, "#ff0080");
+            gradient.addColorStop(1, "#00ffe0");
+          }
           return gradient;
         },
         borderColor: "#00d9ff",
@@ -63,7 +67,22 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        title: {
+          display: true,
+          text: "Agent Minting Growth",
+          color: "#00d9ff",
+          font: {
+            size: 16,
+            weight: "bold"
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        }
+      },
       scales: {
         x: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } },
         y: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } }
