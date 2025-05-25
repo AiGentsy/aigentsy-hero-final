@@ -7,6 +7,75 @@
   <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="metatrade.js"></script>
+  <style>
+    .market-table {
+      margin-top: 30px;
+      width: 100%;
+      border-collapse: collapse;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+    .market-table th, .market-table td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 8px;
+      text-align: left;
+    }
+    .market-table th {
+      color: #00f0ff;
+    }
+    .buy-btn, .sell-btn {
+      padding: 6px 12px;
+      border: 1px solid #00f0ff;
+      background: transparent;
+      color: #00f0ff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .buy-btn:hover {
+      background: #00f0ff;
+      color: #000;
+      box-shadow: 0 0 8px #00f0ff;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111;
+      border: 1px solid #00f0ff;
+      padding: 30px;
+      z-index: 1000;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 420px;
+    }
+    .modal input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 12px;
+      background: #000;
+      color: #00f0ff;
+      border: 1px solid #00f0ff;
+      border-radius: 6px;
+    }
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .modal-buttons button {
+      flex: 1;
+      margin: 0 5px;
+    }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 900;
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
@@ -64,12 +133,72 @@
       <canvas id="metatradeChart" height="250"></canvas>
     </div>
 
+    <!-- 🔁 Protocol Marketplace Logic -->
+    <table class="market-table">
+      <thead>
+        <tr>
+          <th>Asset</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Yield</th>
+          <th>Trade</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Vault #2217</td>
+          <td>Vault</td>
+          <td>$12,400</td>
+          <td>6.2%</td>
+          <td>
+            <button class="buy-btn" onclick="openTradeModal('Vault #2217')">Buy</button>
+          </td>
+        </tr>
+        <tr>
+          <td>MetaVenture #72</td>
+          <td>MetaVenture</td>
+          <td>$18,600</td>
+          <td>9.1%</td>
+          <td>
+            <button class="buy-btn" onclick="openTradeModal('MetaVenture #72')">Buy</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 🔍 Trade Modal -->
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="tradeModal">
+      <h2>Trade Request</h2>
+      <p id="modalAsset">Selected Asset</p>
+      <input type="number" placeholder="Offer Amount ($AIGx)" />
+      <div class="modal-buttons">
+        <button class="buy-btn">Submit Offer</button>
+        <button class="sell-btn" onclick="closeTradeModal()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- 📘 Silo Guide -->
     <div class="silo-guide">
       <h3>MetaTrade — What Is This?</h3>
       <p>
         The MetaTrade exchange is AiGentsy's native marketplace for acquiring, listing, or remixing vaults and MetaVentures. It allows agent owners and builders to trade protocol-native assets backed by performance, remix value, and staking history.
+        Future upgrades will enable auto-trading, lineage yield routing, and smart escrow via the AIGx protocol.
       </p>
     </div>
   </div>
+
+  <script>
+    function openTradeModal(assetName) {
+      document.getElementById('modalAsset').innerText = assetName;
+      document.getElementById('tradeModal').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeTradeModal() {
+      document.getElementById('tradeModal').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+  </script>
 </body>
 </html>
