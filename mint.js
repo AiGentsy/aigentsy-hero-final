@@ -13,8 +13,11 @@ async function connectWallet() {
 
 function mintAgent() {
   const file = document.getElementById("configUpload").files[0];
-  const protocol = document.getElementById("protocolSelect").value;
-  const visibility = document.getElementById("visibility").value;
+  const protocolSelect = document.getElementById("protocolSelect");
+  const visibilitySelect = document.getElementById("visibility");
+
+  const protocol = protocolSelect ? protocolSelect.value : null;
+  const visibility = visibilitySelect ? visibilitySelect.value : null;
 
   if (!file || !protocol || !visibility) {
     document.getElementById("mintResult").innerText = "Missing required fields.";
@@ -30,39 +33,41 @@ function mintAgent() {
   reader.readAsText(file);
 }
 
-// Chart.js animation
-const ctx = document.getElementById("mintChart").getContext("2d");
-new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May"],
-    datasets: [{
-      label: "Mint Growth",
-      data: [140, 280, 420, 620, 820],
-      backgroundColor: function(context) {
-        const chart = context.chart;
-        const {ctx, chartArea} = chart;
-        if (!chartArea) return;
-        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-        gradient.addColorStop(0, "#3a0078");
-        gradient.addColorStop(0.5, "#ff0080");
-        gradient.addColorStop(1, "#00ffe0");
-        return gradient;
-      },
-      borderColor: "#00d9ff",
-      fill: true,
-      tension: 0.3,
-      pointRadius: 0
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: {
-      legend: {display: false}
+document.addEventListener("DOMContentLoaded", function () {
+  const canvas = document.getElementById("mintChart");
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+      datasets: [{
+        label: "Mint Growth",
+        data: [140, 280, 420, 620, 820],
+        backgroundColor: function(context) {
+          const chart = context.chart;
+          const {ctx, chartArea} = chart;
+          if (!chartArea) return;
+          const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+          gradient.addColorStop(0, "#3a0078");
+          gradient.addColorStop(0.5, "#ff0080");
+          gradient.addColorStop(1, "#00ffe0");
+          return gradient;
+        },
+        borderColor: "#00d9ff",
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0
+      }]
     },
-    scales: {
-      x: {ticks: {color: "#ccc"}},
-      y: {ticks: {color: "#ccc"}}
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } },
+        y: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } }
+      }
     }
-  }
+  });
 });
