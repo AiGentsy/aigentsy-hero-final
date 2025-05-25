@@ -38,14 +38,14 @@
       </ul>
     </nav>
   </div>
-
   <div class="main">
     <h2>Your Wallet</h2>
-
+    <div class="auto-stake-banner">
+      <strong>🔁 Auto-Stake Earnings into Remix Tree & Vaults</strong>
+      <p>100% of earned AIGx is currently auto-injected into active vault stakes and remix lineage contracts.</p>
+    </div>
     <div class="chart-toggle">
-      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
-      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
-      <select><option>Raw Value</option><option>% Change</option></select>
+      <select><option>Total Earnings</option></select>
     </div>
 
     <div class="kpi-grid">
@@ -62,15 +62,7 @@
     </div>
 
     <div class="chart-container">
-      <canvas id="chart" height="250"></canvas>
-    </div>
-
-    <div class="silo-guide">
-      <h3>Wallet — What Is This?</h3>
-      <p>
-        Your wallet displays all remix rewards, staked agent output, lineage contributions, and real-time vault earnings. 
-        Auto-staked earnings are injected into remix trees and vault positions.
-      </p>
+      <canvas id="walletChart" height="250"></canvas>
     </div>
   </div>
 </body>
