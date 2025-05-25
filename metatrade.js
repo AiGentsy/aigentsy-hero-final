@@ -16,42 +16,52 @@ document.addEventListener("DOMContentLoaded", () => {
     animate();
   });
 
-  // Chart.js setup
+  // Chart.js with 3 metrics
   const canvas = document.getElementById('metatradeChart');
   const ctx = canvas.getContext('2d');
 
-  let gradient;
-
-  const chart = new Chart(ctx, {
+  new Chart(ctx, {
     type: 'line',
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-      datasets: [{
-        label: 'Trade Volume',
-        data: [2500, 5400, 7300, 9200, 11300],
-        fill: true,
-        backgroundColor: context => {
-          const { chart } = context;
-          const { ctx, chartArea } = chart;
-          if (!chartArea) return null;
-          if (!gradient) {
-            gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop(0, '#6100ff');
-            gradient.addColorStop(0.5, '#ff1cf7');
-            gradient.addColorStop(1, '#00f0ff');
-          }
-          return gradient;
+      datasets: [
+        {
+          label: 'Active Listings',
+          data: [2500, 3000, 3400, 4000, 4500],
+          borderColor: '#00f0ff',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0
         },
-        borderColor: '#00f0ff',
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0
-      }]
+        {
+          label: 'Total Volume',
+          data: [6000, 7200, 9100, 11000, 12700],
+          borderColor: '#a64dff',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0
+        },
+        {
+          label: 'Highest Valuation',
+          data: [1000, 1400, 1900, 2500, 3100],
+          borderColor: '#00ffb2',
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 0
+        }
+      ]
     },
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false }
+        legend: {
+          labels: {
+            color: '#ccc'
+          }
+        }
       },
       scales: {
         x: {
