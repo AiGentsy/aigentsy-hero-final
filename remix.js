@@ -1,62 +1,56 @@
-ddocument.addEventListener("DOMContentLoaded", () => {
-  // Animate KPIs
+document.addEventListener("DOMContentLoaded", () => {
+  // Animate KPI Counters
   document.querySelectorAll(".value[data-count]").forEach(el => {
-    const count = parseFloat(el.dataset.count);
-    let i = 0;
-    const inc = count / 60;
-    const interval = setInterval(() => {
-      i += inc;
-      el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
-      if (i >= count) {
-        el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
-        clearInterval(interval);
+    const end = parseFloat(el.dataset.count);
+    let start = 0;
+    const step = end / 60;
+    const animate = () => {
+      start += step;
+      el.textContent = end >= 1000 ? Math.floor(start).toLocaleString() : start.toFixed(1);
+      if (start < end) {
+        requestAnimationFrame(animate);
+      } else {
+        el.textContent = end >= 1000 ? Math.floor(end).toLocaleString() : end.toFixed(1);
       }
-    }, 16);
+    };
+    animate();
   });
 
-  // Chart Setup
-  const ctx = document.getElementById("remixChart").getContext("2d");
+  // Render Chart After Canvas Layout
+  const canvas = document.getElementById("remixChart");
+  const ctx = canvas.getContext("2d");
 
-  const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient1.addColorStop(0, "rgba(0,255,255,0.6)");
-  gradient1.addColorStop(1, "rgba(0,255,255,0.1)");
-
-  const gradient2 = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient2.addColorStop(0, "rgba(255,0,170,0.6)");
-  gradient2.addColorStop(1, "rgba(255,0,170,0.1)");
-
-  const gradient3 = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient3.addColorStop(0, "rgba(128,0,255,0.6)");
-  gradient3.addColorStop(1, "rgba(128,0,255,0.1)");
+  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient.addColorStop(0, "rgba(58, 0, 120, 0.6)");
+  gradient.addColorStop(0.5, "rgba(255, 0, 128, 0.4)");
+  gradient.addColorStop(1, "rgba(0, 255, 224, 0.2)");
 
   new Chart(ctx, {
     type: "bar",
     data: {
-      labels: ["Earnings (AIGx)", "Clones", "Collabs"],
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
       datasets: [{
-        label: "Remix Protocol Metrics",
-        data: [1800, 4, 2], // Based on available lineage, credits, collaborations
-        backgroundColor: [gradient1, gradient2, gradient3],
-        borderColor: ["#00f0ff", "#ff1cf7", "#a64dff"],
+        label: "Remix Growth",
+        data: [12, 24, 36, 44, 60],
+        backgroundColor: gradient,
+        borderColor: "#00f0ff",
         borderWidth: 1
       }]
     },
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false },
+        legend: {
+          labels: {
+            color: "#ccc"
+          }
+        },
         title: {
           display: true,
           text: "Remix Propagation Over Time",
           color: "#00f0ff",
-          font: {
-            size: 16,
-            weight: "bold"
-          },
-          padding: {
-            top: 10,
-            bottom: 20
-          }
+          font: { size: 16, weight: "bold" },
+          padding: { top: 10, bottom: 20 }
         }
       },
       scales: {
@@ -72,4 +66,9 @@ ddocument.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  // Venture Launch Logic Stub
+  window.launchVenture = function () {
+    alert("MetaVenture launched! Revenue share logic is now active.");
+  };
 });
