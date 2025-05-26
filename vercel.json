@@ -9,7 +9,7 @@
     { "source": "/metagrowth", "destination": "/metagrowth.html" },
     { "source": "/sentinel", "destination": "/sentinel.html" },
     { "source": "/realms", "destination": "/realms.html" },
-    { "source": "/metaventures", "destination": "/metaventures.html" },
+    { "source": "/metaventures", "destination": "/metaventures-v3.html" },
     { "source": "/mint", "destination": "/mint.html" },
     { "source": "/remix", "destination": "/remix.html" },
     { "source": "/wallet", "destination": "/wallet.html" },
