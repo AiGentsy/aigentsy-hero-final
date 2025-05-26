@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
   // Animate KPIs
   document.querySelectorAll(".value[data-count]").forEach(el => {
@@ -103,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedAsset = null;
   };
 
-  // Submit Offer with internal credit logic
+  // Submit Offer with internal credit logic and transaction logging
   const submitBtn = modal.querySelector(".buy-btn");
   submitBtn.addEventListener("click", async () => {
     const offerInput = modal.querySelector("input[type='number']");
@@ -122,9 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     userCredits -= offerAmount;
-    alert(`Trade confirmed: ${selectedAsset} purchased for ${offerAmount} AIGx.
-New balance: ${userCredits} AIGx.`);
+    const tradeLog = document.getElementById("tradeHistory");
+    const logEntry = document.createElement("li");
+    logEntry.textContent = `${selectedAsset} — Offer submitted for ${offerAmount} AIGx. Remaining: ${userCredits} AIGx.`;
+    tradeLog.prepend(logEntry);
 
+    alert(`Trade confirmed: ${selectedAsset} purchased for ${offerAmount} AIGx.\nNew balance: ${userCredits} AIGx.`);
     window.closeTradeModal();
   });
 });
