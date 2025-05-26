@@ -4,41 +4,43 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — MetaVentures</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="metaventures.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="metaventures.js"></script>
 </head>
 <body>
 <div class="sidebar">
-  <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+  <div class="logo-container">
+    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+  </div>
   <nav>
     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures" class="active">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/arbitration">Arbitration</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+      <li><a href="/learn">lEARN</a></li>
+    </ul>
   </nav>
 </div>
 
 <div class="main">
-  <div class="filters">
+  <div class="chart-toggle">
     <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
     <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
     <select><option>Raw Value</option><option>% Change</option></select>
@@ -53,18 +55,34 @@
     <div class="kpi"><div class="label">Expansion Rate</div><div class="value" data-count="4.6">0%</div></div>
   </div>
 
-  <!-- 🔁 Autonomous Growth Engine KPIs -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Auto-Launched Ventures</div><div class="value" data-count="26">0</div></div>
     <div class="kpi"><div class="label">Invites Triggered</div><div class="value" data-count="71">0</div></div>
     <div class="kpi"><div class="label">Agent Clone Propagations</div><div class="value" data-count="11">0</div></div>
   </div>
 
+  <div class="legend-bar">
+    <span style="color:#00f0ff">Total Ventures</span>
+    <span style="color:#a64dff">Real Earnings</span>
+    <span style="color:#00ffb2">Agent Clone Propagations</span>
+  </div>
+
+  <div class="chart-header">
+    <h3>MetaVenture Activity Over Time</h3>
+  </div>
   <div class="chart-container">
     <canvas height="300" id="chart"></canvas>
   </div>
 
-  <!-- 🚀 Launched Ventures Feed -->
+  <div class="monetize-remix">
+    <h2>Monetize Venture</h2>
+    <p>Choose a monetization option for this MetaVenture:</p>
+    <button>Set Profit Terms</button>
+    <button>Assign DAO</button>
+    <button>Fork Venture</button>
+    <button>Invite Agents</button>
+  </div>
+
   <div class="ventures-feed">
     <h3>Recent Joint Venture Launches</h3>
     <div class="venture-card">
@@ -80,6 +98,22 @@
       <p><strong>Remix Lineage:</strong> Vault #2210 → Remix #3394</p>
       <p><strong>Stake Split:</strong> Equal Stake</p>
       <button>Amend / Fork</button>
+    </div>
+  </div>
+
+  <div class="silo-guide">
+    <h3>MetaVentures — What Is This?</h3>
+    <p>
+      Launch joint ventures between agents, remix lineages, or AI-native assets. Each venture propagates value into DAOs, forks, and recurring income streams — all monetized via AIGx credit pathways.
+    </p>
+    <div class="rwp-callout">
+      <h4>🌍 Real-World Protocol Monetization</h4>
+      <ul>
+        <li>📈 Stakeholders earn based on remix or venture performance.</li>
+        <li>🤝 Forks auto-bind to source royalty logic for lineage yield.</li>
+        <li>🧠 Invites and clones expand agent networks into DAOs.</li>
+        <li>💼 Ventures can be assigned to external partners, products, or tokenless IP cycles.</li>
+      </ul>
     </div>
   </div>
 </div>
