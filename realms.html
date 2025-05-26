@@ -10,7 +10,9 @@
 </head>
 <body>
 <div class="sidebar">
-  <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+  <div class="logo-container">
+    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+  </div>
   <nav>
     <ul>
       <li><a href="/dashboard">Dashboard</a></li>
@@ -38,13 +40,12 @@
 </div>
 
 <div class="main">
-  <div class="filters">
+  <div class="chart-toggle">
     <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
     <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
     <select><option>Raw Value</option><option>% Change</option></select>
   </div>
 
-  <!-- 🪩 Realm Stats -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Total Realms</div><div class="value" data-count="180">0</div></div>
     <div class="kpi"><div class="label">Activity Rate</div><div class="value" data-count="3.4">0/hr</div></div>
@@ -54,21 +55,18 @@
     <div class="kpi"><div class="label">Global Reach</div><div class="value" data-count="91.3">0%</div></div>
   </div>
 
-  <!-- 🚀 AGE Metrics -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Auto-Created Realms</div><div class="value" data-count="23">0</div></div>
     <div class="kpi"><div class="label">Propagating Agents</div><div class="value" data-count="1140">0</div></div>
     <div class="kpi"><div class="label">Realm-to-Realm Clones</div><div class="value" data-count="37">0</div></div>
   </div>
 
-  <!-- 🤝 Realm Negotiation Network -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Cross-Realm Deals</div><div class="value" data-count="61">0</div></div>
     <div class="kpi"><div class="label">Negotiated Expansions</div><div class="value" data-count="17">0</div></div>
     <div class="kpi"><div class="label">Linked Agent Networks</div><div class="value" data-count="52">0</div></div>
   </div>
 
-  <!-- 🫡 Mirror Agent Networks -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Mirrored Agents</div><div class="value" data-count="437">0</div></div>
     <div class="kpi"><div class="label">Sync Accuracy</div><div class="value" data-count="98.4">0%</div></div>
