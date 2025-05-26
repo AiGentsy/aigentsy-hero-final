@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGentsy — Test Deploy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: radial-gradient(circle at center, #101c2c, #050505);
+      color: #00f0ff;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      padding: 100px;
+    }
+    h1 {
+      font-size: 2.5rem;
+    }
+    p {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>✅ AiGentsy Vercel Test Deploy</h1>
+  <p>If you can see this, Vercel is working correctly again.</p>
+</body>
+</html>
