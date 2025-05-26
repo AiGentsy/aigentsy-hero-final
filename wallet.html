@@ -60,7 +60,7 @@
       <select><option>Raw Value</option><option>% Change</option></select>
     </div>
 
-    <!-- 🧾 Wallet Metrics -->
+    <!-- 📟 Wallet Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">AIGx Balance</div><div class="value" data-count="740">0</div></div>
@@ -74,9 +74,18 @@
       <div class="kpi"><div class="label">Remix Yield Contribution</div><div class="value" data-count="42">0</div></div>
     </div>
 
+    <!-- 📊 Chart Header -->
+    <div class="chart-header">
+      <h3>Wallet Activity & AIGx Performance</h3>
+    </div>
     <!-- 📊 Chart -->
     <div class="chart-container">
       <canvas id="walletChart" height="300"></canvas>
+    </div>
+    <div class="legend-bar">
+      <span style="color: #00f0ff">Vault Earnings</span>
+      <span style="color: #a64dff">Remix Yield</span>
+      <span style="color: #00ffb2">Lifetime AIGx</span>
     </div>
 
     <!-- 🧬 Agent Profile Links -->
@@ -93,6 +102,14 @@
         Your wallet displays all remix rewards, staked agent output, lineage contributions, and real-time vault earnings. 
         Auto-staked earnings are injected into remix trees and vault positions.
       </p>
+      <div class="rwp-callout">
+        <h4>📈 Real-World Yield Engine</h4>
+        <ul>
+          <li>🌐 All wallet earnings reflect real-world remix usage, agent staking, and vault deployment.</li>
+          <li>🚀 AIGx flows automatically into remix trees, MetaVentures, or partner projects.</li>
+          <li>⚡️ No financial exposure: credits only, tracked internally for safety and transparency.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>
