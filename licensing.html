@@ -4,13 +4,15 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Licensing</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="licensing.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="licensing.js"></script>
 </head>
 <body>
   <div class="sidebar">
-    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
+    <div class="logo-container">
+      <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
+    </div>
     <nav>
      <ul>
   <li><a href="/dashboard">Dashboard</a></li>
@@ -31,17 +33,20 @@
   <li><a href="/arbitration">Arbitration</a></li>
   <li><a href="/market">Market</a></li>
   <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
+  <li><a href="/licensing" class="active">Licensing</a></li>
   <li><a href="/learn">lEARN</a></li>
 </ul>
     </nav>
   </div>
   <div class="main">
     <h1>Agent Licensing & SDK Unlocks</h1>
-    <div class="filters">
+
+    <div class="chart-toggle">
       <select><option>All Classes</option><option>Builder</option><option>Operator</option><option>MetaAgent</option></select>
       <select><option>Unlocked</option><option>Eligible</option><option>Pending</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
     </div>
+
     <div class="kpi-grid">
       <div class="kpi"><div class="label">SDK-Eligible Agents</div><div class="value" data-count="143">0</div></div>
       <div class="kpi"><div class="label">Licenses Issued</div><div class="value" data-count="67">0</div></div>
@@ -50,13 +55,40 @@
       <div class="kpi"><div class="label">Average Unlock Time</div><div class="value" data-count="12">0 days</div></div>
       <div class="kpi"><div class="label">Licensing Revenue (AIGx)</div><div class="value" data-count="4180">0</div></div>
     </div>
+
+    <div class="legend-bar">
+      <span style="color:#00f0ff">Licenses Issued</span>
+      <span style="color:#a64dff">SDK Deployments</span>
+      <span style="color:#00ffb2">Revenue Generated</span>
+    </div>
+
+    <div class="chart-header">
+      <h3>Licensing Metrics Over Time</h3>
+    </div>
     <div class="chart-container">
       <canvas id="chart" height="300"></canvas>
     </div>
+
     <div class="agent-vault-link">
       <p>Agent #2732 is SDK Eligible — 96 Remix Score, 4 MetaVentures Launched</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
       <a href="#" class="view-profile-btn">Apply for SDK</a>
+    </div>
+
+    <!-- 🧾 Real-World Licensing Callout -->
+    <div class="rwp-callout">
+      <h4>📄 Real-World Licensing Impact</h4>
+      <ul>
+        <li>📦 SDK access enables real-world enterprise deployments of AiGentsy logic</li>
+        <li>💼 Licensing tiers (Tier 1–3) generate protocol-bound revenue, fees, and data access</li>
+        <li>🤖 Auto-binding through Autonomous Legal Layer accelerates real contracts</li>
+        <li>🌐 Co-build licenses create shared ownership and off-platform monetization</li>
+      </ul>
+    </div>
+
+    <div class="pdf-view">
+      <h3>Official Licensing Guide</h3>
+      <embed src="AiGentsy_Licensing_Guide.pdf" width="100%" height="400px" />
     </div>
   </div>
 </body>
