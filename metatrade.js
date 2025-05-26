@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   // Animate KPIs
   document.querySelectorAll(".value[data-count]").forEach(el => {
@@ -77,19 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return gradient;
   }
 
-  // Wallet Connection
+  // Internal Credit Ledger
+  let userCredits = 10000;  // Example starting credit balance
+
   window.connectWallet = async function () {
-    if (!window.ethereum) {
-      alert("MetaMask not found.");
-      return;
-    }
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      alert(`Connected wallet: ${accounts[0]}`);
-      return accounts[0];
-    } catch (err) {
-      alert("Wallet connection failed.");
-    }
+    return "user@example.eth"; // Simulated wallet identity
   };
 
   // Trade Modal Logic
@@ -110,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
     selectedAsset = null;
   };
 
-  // Submit Offer
+  // Submit Offer with internal credit logic
   const submitBtn = modal.querySelector(".buy-btn");
   submitBtn.addEventListener("click", async () => {
     const offerInput = modal.querySelector("input[type='number']");
@@ -123,10 +116,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const wallet = await window.connectWallet();
     if (!wallet) return;
 
-    // Placeholder: Add transaction routing logic
-    alert(`Submitted offer of ${offerAmount} AIGx for ${selectedAsset} from wallet ${wallet}.`);
+    if (offerAmount > userCredits) {
+      alert(`Insufficient AIGx Credits. You have ${userCredits}.`);
+      return;
+    }
 
-    // Close modal
+    userCredits -= offerAmount;
+    alert(`Trade confirmed: ${selectedAsset} purchased for ${offerAmount} AIGx.
+New balance: ${userCredits} AIGx.`);
+
     window.closeTradeModal();
   });
 });
