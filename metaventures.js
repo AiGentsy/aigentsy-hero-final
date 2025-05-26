@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 16);
   });
 
-  // Bar Chart Setup (Vault Fidelity)
+  // Chart.js Bar Chart Setup (Vault Style)
   const ctx = document.getElementById('chart').getContext('2d');
 
   const gradientVentures = ctx.createLinearGradient(0, 0, 0, 300);
@@ -59,16 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: false,
       plugins: {
         legend: {
           labels: {
             color: '#ccc',
             font: {
-              weight: 'bold',
-              size: 12
-            },
-            padding: 16
+              weight: 'bold'
+            }
           }
         },
         title: {
@@ -87,12 +84,12 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       scales: {
         x: {
-          ticks: { color: '#ccc', font: { size: 11 } },
+          ticks: { color: '#ccc' },
           grid: { color: 'rgba(255,255,255,0.05)' }
         },
         y: {
           beginAtZero: true,
-          ticks: { color: '#ccc', font: { size: 11 } },
+          ticks: { color: '#ccc' },
           grid: { color: 'rgba(255,255,255,0.05)' }
         }
       }
