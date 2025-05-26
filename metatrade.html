@@ -75,6 +75,15 @@
       background: rgba(0,0,0,0.6);
       z-index: 900;
     }
+    .trade-log {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      color: #ccc;
+      background: #0a0a0a;
+      padding: 16px;
+      border-left: 4px solid #00f0ff;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
@@ -136,7 +145,6 @@
       <canvas id="metatradeChart" height="250"></canvas>
     </div>
 
-    <!-- 🔁 Protocol-Native Asset Ledger -->
     <table class="market-table">
       <thead>
         <tr>
@@ -153,35 +161,34 @@
           <td>Operator</td>
           <td>$12,400</td>
           <td>4</td>
-          <td>
-            <button class="buy-btn" onclick="openTradeModal('Vault #2912')">Buy</button>
-          </td>
+          <td><button class="buy-btn" onclick="openTradeModal('Vault #2912')">Buy</button></td>
         </tr>
         <tr>
           <td>MetaVenture #992</td>
           <td>MetaAgent</td>
           <td>$18,600</td>
           <td>7</td>
-          <td>
-            <button class="buy-btn" onclick="openTradeModal('MetaVenture #992')">Buy</button>
-          </td>
+          <td><button class="buy-btn" onclick="openTradeModal('MetaVenture #992')">Buy</button></td>
         </tr>
       </tbody>
     </table>
 
-    <!-- 🔍 Trade Modal -->
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="tradeModal">
       <h2>Trade Request</h2>
       <p id="modalAsset">Selected Asset</p>
-      <input type="number" placeholder="Offer Amount ($AIGx)" />
+      <input type="number" id="offerInput" placeholder="Offer Amount ($AIGx)" />
       <div class="modal-buttons">
-        <button class="buy-btn">Submit Offer</button>
+        <button class="buy-btn" onclick="submitOffer()">Submit Offer</button>
         <button class="sell-btn" onclick="closeTradeModal()">Cancel</button>
       </div>
     </div>
 
-    <!-- 📘 Silo Guide -->
+    <div class="trade-log" id="tradeLog">
+      <strong>Recent Trades:</strong>
+      <ul id="tradeHistory"></ul>
+    </div>
+
     <div class="silo-guide">
       <h3>MetaTrade — What Is This?</h3>
       <p>
@@ -200,7 +207,11 @@
   </div>
 
   <script>
+    let userCredits = 10000;
+    let selectedAsset = null;
+
     function openTradeModal(assetName) {
+      selectedAsset = assetName;
       document.getElementById('modalAsset').innerText = assetName;
       document.getElementById('tradeModal').style.display = 'block';
       document.getElementById('overlay').style.display = 'block';
@@ -209,7 +220,27 @@
     function closeTradeModal() {
       document.getElementById('tradeModal').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
+      selectedAsset = null;
+    }
+
+    function submitOffer() {
+      const input = document.getElementById('offerInput');
+      const offer = parseFloat(input.value);
+      if (!offer || offer <= 0 || isNaN(offer)) {
+        alert('Enter a valid AIGx offer amount.');
+        return;
+      }
+      if (offer > userCredits) {
+        alert('Insufficient AIGx balance.');
+        return;
+      }
+      userCredits -= offer;
+      const log = document.getElementById('tradeHistory');
+      const entry = document.createElement('li');
+      entry.textContent = `${selectedAsset} — Offer submitted for ${offer} AIGx. Remaining balance: ${userCredits} AIGx.`;
+      log.prepend(entry);
+      closeTradeModal();
     }
   </script>
 </body>
-</html>
+</html
