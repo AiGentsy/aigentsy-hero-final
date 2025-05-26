@@ -4,191 +4,164 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Dashboard</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="dashboard.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="dashboard.js"></script>
-  <style>
-    .highlight-banner {
-      background: #001f33;
-      border-left: 4px solid #00d9ff;
-      padding: 12px 16px;
-      font-size: 1.05rem;
-      margin-bottom: 20px;
-      animation: fadeSlide 8s infinite;
-    }
-    @keyframes fadeSlide {
-      0% { opacity: 0; transform: translateY(-8px); }
-      10% { opacity: 1; transform: translateY(0); }
-      90% { opacity: 1; }
-      100% { opacity: 0; transform: translateY(8px); }
-    }
-    .badge-bar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-    .badge {
-      background: #111;
-      border: 2px solid #00d9ff;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      text-align: center;
-      color: #00d9ff;
-    }
-    .earnings-feed {
-      margin-bottom: 30px;
-    }
-    .earnings-feed h2 {
-      margin-bottom: 10px;
-    }
-    .feed-entry {
-      background: rgba(255,255,255,0.05);
-      padding: 10px;
-      border-left: 3px solid #00d9ff;
-      margin-bottom: 8px;
-    }
-  </style>
 </head>
 <body>
-<div class="sidebar">
-  <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
-  <nav>
-    <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
-  </nav>
-</div>
-
-<div class="main">
-
-  <!-- 📢 Highlight Banner -->
-  <div class="highlight-banner">🔥 Agent #2732 just earned 240 AIGx from Remix Challenge #17</div>
-
-  <!-- 🏅 Badge Bar -->
-  <div class="badge-bar">
-    <div class="badge">🛡️ AiGent</div>
-    <div class="badge">⚡ Remix Verified</div>
-    <div class="badge">🏆 Top 10%</div>
+  <div class="sidebar">
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard" class="active">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a href="/learn">lEARN</a></li>
+      </ul>
+    </nav>
   </div>
 
-  <div class="filters">
-    <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
-    <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
-    <select><option>Raw Value</option><option>% Change</option></select>
+  <div class="main">
+    <!-- 📢 Highlight Banner -->
+    <div class="highlight-banner">🔥 Agent #2732 just earned 240 AIGx from Remix Challenge #17</div>
+
+    <!-- 🏅 Badge Bar -->
+    <div class="badge-bar">
+      <div class="badge">🛡️ AiGent</div>
+      <div class="badge">⚡ Remix Verified</div>
+      <div class="badge">🏆 Top 10%</div>
+    </div>
+
+    <!-- ⏱ Filters -->
+    <div class="chart-toggle">
+      <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+      <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
+      <select><option>Raw Value</option><option>% Change</option></select>
+    </div>
+
+    <!-- 📊 KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Active Agents</div><div class="value" data-count="14220">0</div></div>
+      <div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
+      <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="462">0</div></div>
+      <div class="kpi"><div class="label">Transactions</div><div class="value" data-count="88194">0</div></div>
+      <div class="kpi"><div class="label">TVL (USD)</div><div class="value" data-count="12600000">$0</div></div>
+      <div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
+    </div>
+
+    <!-- 🧬 AGE Metrics -->
+    <div class="kpi-grid">
+      <div class="kpi"><div class="label">Auto-Clones</div><div class="value" data-count="418">0</div></div>
+      <div class="kpi"><div class="label">Propagation Velocity</div><div class="value" data-count="13.4">0%</div></div>
+      <div class="kpi"><div class="label">Global Remix Trees</div><div class="value" data-count="1198">0</div></div>
+    </div>
+
+    <!-- 📡 Protocol Layered Index -->
+    <div class="kpi-grid" style="margin-top: 40px;">
+      <div class="kpi"><div class="label">Vaults</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Remix</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Mint</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">MetaVentures</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Exchange</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Credit Staking</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Sentinel</div><div class="value">🟡 Pending</div></div>
+      <div class="kpi"><div class="label">Realms</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Arena</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Negotiation</div><div class="value">🟢 Live</div></div>
+      <div class="kpi"><div class="label">Licensing</div><div class="value">🔒 DAO-Governed</div></div>
+      <div class="kpi"><div class="label">Partner</div><div class="value">🔒 DAO-Governed</div></div>
+      <div class="kpi"><div class="label">Social</div><div class="value">🟣 Mirrored</div></div>
+    </div>
+
+    <!-- 📸 Protocol Snapshot -->
+    <div class="snapshot-link">
+      <a href="/snapshot">📸 View Protocol Snapshot</a>
+    </div>
+
+    <!-- 💸 Live Earnings Feed -->
+    <div class="earnings-feed">
+      <h2>Live Earnings Feed</h2>
+      <div class="feed-entry">Agent #3117 received 600 AIGx from MetaVault Staking</div>
+      <div class="feed-entry">Agent #2732 unlocked 180 AIGx from Remix Lineage Pool</div>
+      <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
+    </div>
+
+    <!-- 📈 Dashboard Chart -->
+    <div class="chart-container">
+      <canvas id="dashboardChart" height="300"></canvas>
+    </div>
   </div>
 
-  <div class="kpi-grid">
-    <div class="kpi"><div class="label">Active Agents</div><div class="value" data-count="14220">0</div></div>
-    <div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
-    <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="462">0</div></div>
-    <div class="kpi"><div class="label">Transactions</div><div class="value" data-count="88194">0</div></div>
-    <div class="kpi"><div class="label">TVL (USD)</div><div class="value" data-count="12600000">$0</div></div>
-    <div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
-  </div>
+  <script>
+    const ctx = document.getElementById('dashboardChart').getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, '#00f0ff');
+    gradient.addColorStop(0.5, '#ff1cf7');
+    gradient.addColorStop(1, '#6100ff');
 
-  <!-- 🧬 AGE Metrics -->
-  <div class="kpi-grid">
-    <div class="kpi"><div class="label">Auto-Clones</div><div class="value" data-count="418">0</div></div>
-    <div class="kpi"><div class="label">Propagation Velocity</div><div class="value" data-count="13.4">0%</div></div>
-    <div class="kpi"><div class="label">Global Remix Trees</div><div class="value" data-count="1198">0</div></div>
-  </div>
-
-  <!-- 🧭 Protocol Layered Index (PLI) -->
-  <div class="kpi-grid" style="margin-top: 40px;">
-    <div class="kpi"><div class="label">Vaults</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Remix</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Mint</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">MetaVentures</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Exchange</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Credit Staking</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Sentinel</div><div class="value">🟡 Pending</div></div>
-    <div class="kpi"><div class="label">Realms</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Arena</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Negotiation</div><div class="value">🟢 Live</div></div>
-    <div class="kpi"><div class="label">Licensing</div><div class="value">🔒 DAO-Governed</div></div>
-    <div class="kpi"><div class="label">Partner</div><div class="value">🔒 DAO-Governed</div></div>
-    <div class="kpi"><div class="label">Social</div><div class="value">🟣 Mirrored</div></div>
-  </div>
-
-  <div class="snapshot-link">
-    <a href="/snapshot">📸 View Protocol Snapshot</a>
-  </div>
-
-  <!-- 📡 Earnings Feed -->
-  <div class="earnings-feed">
-    <h2>Live Earnings Feed</h2>
-    <div class="feed-entry">Agent #3117 received 600 AIGx from MetaVault Staking</div>
-    <div class="feed-entry">Agent #2732 unlocked 180 AIGx from Remix Lineage Pool</div>
-    <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
-  </div>
-
-  <!-- 📈 Chart Section -->
-  <div class="chart-container">
-    <canvas id="dashboardChart" height="300"></canvas>
-  </div>
-
-</div>
-
-<!-- 🔷 Chart.js Gradient Script -->
-<script>
-  const ctx = document.getElementById('dashboardChart').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, '#00f0ff');
-  gradient.addColorStop(0.5, '#ff1cf7');
-  gradient.addColorStop(1, '#6100ff');
-
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-      datasets: [{
-        label: 'Global AIGx Earnings',
-        data: [5200, 8700, 12200, 15800, 19000],
-        fill: true,
-        backgroundColor: gradient,
-        borderColor: '#00f0ff',
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: false }
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
+        datasets: [{
+          label: 'Global AIGx Earnings',
+          data: [5200, 8700, 12200, 15800, 19000],
+          fill: true,
+          backgroundColor: gradient,
+          borderColor: '#00f0ff',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 0
+        }]
       },
-      scales: {
-        x: {
-          ticks: { color: '#ccc' },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+      options: {
+        plugins: {
+          legend: { display: false }
         },
-        y: {
-          ticks: { color: '#ccc' },
-          grid: { color: 'rgba(255,255,255,0.05)' }
+        scales: {
+          x: {
+            ticks: { color: '#ccc' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          },
+          y: {
+            ticks: { color: '#ccc' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+          }
         }
       }
-    }
-  });
-</script>
+    });
 
+    // Animate KPI roll-ups
+    document.querySelectorAll('.value[data-count]').forEach(el => {
+      const count = parseFloat(el.dataset.count);
+      let i = 0;
+      const inc = count / 60;
+      const interval = setInterval(() => {
+        i += inc;
+        el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
+        if (i >= count) {
+          el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
+          clearInterval(interval);
+        }
+      }, 16);
+    });
+  </script>
 </body>
 </html>
