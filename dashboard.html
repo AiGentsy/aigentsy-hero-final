@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -95,19 +95,16 @@
       <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
     </div>
 
-    <!-- 🧠 Chart Legend Bar -->
     <div class="legend-bar">
       <span style="color: #00f0ff;">Protocol Earnings</span>
       <span style="color: #a64dff;">Remix Activity</span>
       <span style="color: #00ffb2;">Agent Propagation</span>
     </div>
 
-    <!-- 📊 Bar Chart -->
     <div class="chart-container">
       <canvas id="dashboardChart" height="300"></canvas>
     </div>
 
-    <!-- 📘 Silo Guide -->
     <div class="silo-guide">
       <h3>Dashboard — What Is This?</h3>
       <p>
@@ -116,7 +113,6 @@
     </div>
   </div>
 
-  <!-- 📊 Chart Script -->
   <script>
     const ctx = document.getElementById('dashboardChart').getContext('2d');
 
@@ -178,7 +174,6 @@
       }
     });
 
-    // 🔁 Animate KPI values
     document.querySelectorAll('.value[data-count]').forEach(el => {
       const count = parseFloat(el.dataset.count);
       let i = 0;
