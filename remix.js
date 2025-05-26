@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   gradient.addColorStop(1, "rgba(0, 255, 224, 0.2)");
 
   new Chart(ctx, {
-    type: "line",
+    type: "bar",
     data: {
       labels: ["Jan", "Feb", "Mar", "Apr", "May"],
       datasets: [{
@@ -34,9 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         data: [12, 24, 36, 44, 60],
         backgroundColor: gradient,
         borderColor: "#00f0ff",
-        fill: true,
-        tension: 0.4,
-        pointRadius: 0
+        borderWidth: 1
       }]
     },
     options: {
@@ -46,6 +44,13 @@ document.addEventListener("DOMContentLoaded", () => {
           labels: {
             color: "#ccc"
           }
+        },
+        title: {
+          display: true,
+          text: "Remix Propagation Over Time",
+          color: "#00f0ff",
+          font: { size: 16, weight: "bold" },
+          padding: { top: 10, bottom: 20 }
         }
       },
       scales: {
@@ -54,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
           grid: { color: "rgba(255,255,255,0.05)" }
         },
         y: {
+          beginAtZero: true,
           ticks: { color: "#ccc" },
           grid: { color: "rgba(255,255,255,0.05)" }
         }
@@ -61,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Bonus Panel Logic Stub (if needed in future)
+  // Venture Launch Logic Stub
   window.launchVenture = function () {
     alert("MetaVenture launched! Revenue share logic is now active.");
   };
