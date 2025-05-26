@@ -38,41 +38,56 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
-  let gradient;
+
+  function createGradient(context, color) {
+    const { chart } = context;
+    const { ctx, chartArea } = chart;
+    if (!chartArea) return null;
+    const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+    gradient.addColorStop(0, color + "66");
+    gradient.addColorStop(0.5, color + "33");
+    gradient.addColorStop(1, color + "00");
+    return gradient;
+  }
 
   new Chart(ctx, {
-    type: "line",
+    type: "bar",
     data: {
       labels: ["Jan", "Feb", "Mar", "Apr", "May"],
-      datasets: [{
-        label: "Mint Growth",
-        data: [140, 280, 420, 620, 820],
-        backgroundColor: context => {
-          const { chart } = context;
-          const { ctx, chartArea } = chart;
-          if (!chartArea) return null;
-          if (!gradient) {
-            gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            gradient.addColorStop(0, "#3a0078");
-            gradient.addColorStop(0.5, "#ff0080");
-            gradient.addColorStop(1, "#00ffe0");
-          }
-          return gradient;
+      datasets: [
+        {
+          label: "Agents Minted",
+          data: [140, 280, 420, 620, 820],
+          borderColor: "#00f0ff",
+          backgroundColor: context => createGradient(context, "#00f0ff"),
+          borderWidth: 1
         },
-        borderColor: "#00d9ff",
-        fill: true,
-        tension: 0.3,
-        pointRadius: 0
-      }]
+        {
+          label: "Conversion Rate (%)",
+          data: [18, 22, 30, 35, 42],
+          borderColor: "#a64dff",
+          backgroundColor: context => createGradient(context, "#a64dff"),
+          borderWidth: 1
+        },
+        {
+          label: "Avg Earnings/Agent",
+          data: [200, 360, 520, 690, 820],
+          borderColor: "#00ffb2",
+          backgroundColor: context => createGradient(context, "#00ffb2"),
+          borderWidth: 1
+        }
+      ]
     },
     options: {
       responsive: true,
       plugins: {
-        legend: { display: false },
+        legend: {
+          labels: { color: "#ccc" }
+        },
         title: {
           display: true,
-          text: "Agent Minting Growth",
-          color: "#00d9ff",
+          text: "Mint Volume, Success Rate & Earnings",
+          color: "#00f0ff",
           font: {
             size: 16,
             weight: "bold"
@@ -84,8 +99,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       },
       scales: {
-        x: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } },
-        y: { ticks: { color: "#ccc" }, grid: { color: "rgba(255,255,255,0.05)" } }
+        x: {
+          ticks: { color: "#ccc" },
+          grid: { color: "rgba(255,255,255,0.05)" }
+        },
+        y: {
+          ticks: { color: "#ccc" },
+          grid: { color: "rgba(255,255,255,0.05)" }
+        }
       }
     }
   });
