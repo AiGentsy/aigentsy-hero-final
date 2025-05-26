@@ -13,27 +13,27 @@
   <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
   <nav>
     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms" class="active">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a href="/arbitration">Arbitration</a></li>
+      <li><a href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+      <li><a href="/learn">lEARN</a></li>
+    </ul>
   </nav>
 </div>
 
@@ -44,7 +44,7 @@
     <select><option>Raw Value</option><option>% Change</option></select>
   </div>
 
-  <!-- 🧭 Realm Stats -->
+  <!-- 🪩 Realm Stats -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Total Realms</div><div class="value" data-count="180">0</div></div>
     <div class="kpi"><div class="label">Activity Rate</div><div class="value" data-count="3.4">0/hr</div></div>
@@ -68,15 +68,40 @@
     <div class="kpi"><div class="label">Linked Agent Networks</div><div class="value" data-count="52">0</div></div>
   </div>
 
-  <!-- 🪞 Mirror Agent Networks -->
+  <!-- 🫡 Mirror Agent Networks -->
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Mirrored Agents</div><div class="value" data-count="437">0</div></div>
     <div class="kpi"><div class="label">Sync Accuracy</div><div class="value" data-count="98.4">0%</div></div>
     <div class="kpi"><div class="label">Mirror Propagation Velocity</div><div class="value" data-count="5.8">0x/day</div></div>
   </div>
 
+  <div class="chart-header">
+    <h3>Realm Expansion & Propagation Metrics</h3>
+  </div>
   <div class="chart-container">
     <canvas height="300" id="chart"></canvas>
+  </div>
+
+  <div class="legend-bar">
+    <span style="color: #00f0ff">Auto-Created</span>
+    <span style="color: #a64dff">Cross-Realm</span>
+    <span style="color: #00ffb2">Mirror Agents</span>
+  </div>
+
+  <div class="silo-guide">
+    <h3>Realms — What Is This?</h3>
+    <p>
+      Realms are autonomous agent ecosystems deployed across sectors, domains, or geographies. They contain remix networks, agent clusters, and vault ecosystems that self-propagate and coordinate across contexts.
+    </p>
+    <div class="rwp-callout">
+      <h4>🌎 Real-World Propagation Engine</h4>
+      <ul>
+        <li>⚖️ Realms track off-platform expansion and real-world agent deployments.</li>
+        <li>📈 Metrics reflect auto-created nodes, cross-domain clones, and mirrored syncs.</li>
+        <li>⚡ Realm activity governs ecosystem velocity and exposure.</li>
+        <li>💰 Agents that successfully operate across realms earn propagation-based AIGx yield.</li>
+      </ul>
+    </div>
   </div>
 </div>
 </body>
