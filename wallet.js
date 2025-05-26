@@ -36,45 +36,30 @@ document.addEventListener("DOMContentLoaded", () => {
   gradient4.addColorStop(1, 'rgba(0,191,255,0.1)');
 
   new Chart(ctx, {
-    type: "line",
+    type: "bar",
     data: {
       labels: ["Jan", "Feb", "Mar", "Apr", "May"],
       datasets: [
         {
-          label: "AIGx Balance",
-          data: [300, 420, 520, 620, 740],
+          label: "Vault Earnings",
+          data: [120, 220, 340, 480, 620],
           borderColor: "#00f0ff",
           backgroundColor: gradient1,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0
-        },
-        {
-          label: "AIGx Staked",
-          data: [100, 250, 370, 520, 640],
-          borderColor: "#ff1cf7",
-          backgroundColor: gradient2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0
+          borderWidth: 1
         },
         {
           label: "Remix Yield",
           data: [10, 90, 240, 510, 1380],
           borderColor: "#a64dff",
-          backgroundColor: gradient3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0
+          backgroundColor: gradient2,
+          borderWidth: 1
         },
         {
           label: "Lifetime AIGx Earnings",
           data: [100, 300, 600, 1000, 7420],
-          borderColor: "#00bfff",
-          backgroundColor: gradient4,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0
+          borderColor: "#00ffb2",
+          backgroundColor: gradient3,
+          borderWidth: 1
         }
       ]
     },
@@ -86,6 +71,19 @@ document.addEventListener("DOMContentLoaded", () => {
             color: "white",
             boxWidth: 12,
             padding: 16
+          }
+        },
+        title: {
+          display: true,
+          text: "Wallet Activity & AIGx Performance",
+          color: "#00f0ff",
+          font: {
+            size: 16,
+            weight: "bold"
+          },
+          padding: {
+            top: 10,
+            bottom: 20
           }
         }
       },
