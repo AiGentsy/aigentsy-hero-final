@@ -4,14 +4,14 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Realms</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="realms.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="realms.js"></script>
 </head>
 <body>
 <div class="sidebar">
   <div class="logo-container">
-    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
   </div>
   <nav>
     <ul>
@@ -48,20 +48,17 @@
 
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Total Realms</div><div class="value" data-count="180">0</div></div>
-    <div class="kpi"><div class="label">Activity Rate</div><div class="value" data-count="3.4">0/hr</div></div>
     <div class="kpi"><div class="label">Linked Realms</div><div class="value" data-count="92">0</div></div>
     <div class="kpi"><div class="label">Expansion Loops</div><div class="value" data-count="68">0</div></div>
     <div class="kpi"><div class="label">Realm Agents</div><div class="value" data-count="2042">0</div></div>
     <div class="kpi"><div class="label">Global Reach</div><div class="value" data-count="91.3">0%</div></div>
+    <div class="kpi"><div class="label">Activity Rate</div><div class="value" data-count="3.4">0/hr</div></div>
   </div>
 
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Auto-Created Realms</div><div class="value" data-count="23">0</div></div>
     <div class="kpi"><div class="label">Propagating Agents</div><div class="value" data-count="1140">0</div></div>
     <div class="kpi"><div class="label">Realm-to-Realm Clones</div><div class="value" data-count="37">0</div></div>
-  </div>
-
-  <div class="kpi-grid">
     <div class="kpi"><div class="label">Cross-Realm Deals</div><div class="value" data-count="61">0</div></div>
     <div class="kpi"><div class="label">Negotiated Expansions</div><div class="value" data-count="17">0</div></div>
     <div class="kpi"><div class="label">Linked Agent Networks</div><div class="value" data-count="52">0</div></div>
@@ -77,7 +74,7 @@
     <h3>Realm Expansion & Propagation Metrics</h3>
   </div>
   <div class="chart-container">
-    <canvas height="300" id="chart"></canvas>
+    <canvas id="chart" height="300"></canvas>
   </div>
 
   <div class="legend-bar">
