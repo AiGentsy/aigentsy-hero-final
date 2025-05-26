@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // KPI Animation
+  // Animate KPI counters
   document.querySelectorAll('.value[data-count]').forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
@@ -14,24 +14,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 16);
   });
 
-  // Chart Setup
+  // Multi-line chart with 3 aligned datasets
   const ctx = document.getElementById('chart').getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, 'rgba(0,255,178,0.6)');
-  gradient.addColorStop(0.5, 'rgba(255,0,170,0.4)');
-  gradient.addColorStop(1, 'rgba(128,0,255,0.2)');
+
+  const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient1.addColorStop(0, 'rgba(0,255,255,0.6)');
+  gradient1.addColorStop(1, 'rgba(0,255,255,0.1)');
+
+  const gradient2 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient2.addColorStop(0, 'rgba(166, 77, 255, 0.6)');
+  gradient2.addColorStop(1, 'rgba(166, 77, 255, 0.1)');
+
+  const gradient3 = ctx.createLinearGradient(0, 0, 0, 300);
+  gradient3.addColorStop(0, 'rgba(0, 255, 178, 0.6)');
+  gradient3.addColorStop(1, 'rgba(0, 255, 178, 0.1)');
 
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-      datasets: [{
-        label: 'Partner SDK Requests',
-        data: [180, 240, 210, 310, 280, 360],
-        backgroundColor: gradient,
-        borderColor: '#00f0ff',
-        borderWidth: 1
-      }]
+      datasets: [
+        {
+          label: 'SDK Downloads',
+          data: [380, 420, 460, 510, 570, 640],
+          backgroundColor: gradient1,
+          borderColor: '#00f0ff',
+          borderWidth: 1
+        },
+        {
+          label: 'Enterprise Requests',
+          data: [240, 280, 260, 320, 300, 360],
+          backgroundColor: gradient2,
+          borderColor: '#a64dff',
+          borderWidth: 1
+        },
+        {
+          label: 'Approvals Granted',
+          data: [160, 190, 210, 230, 240, 270],
+          backgroundColor: gradient3,
+          borderColor: '#00ffb2',
+          borderWidth: 1
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -39,16 +63,13 @@ document.addEventListener('DOMContentLoaded', () => {
         legend: { labels: { color: 'white' } },
         title: {
           display: true,
-          text: 'Partner SDK Requests Over Time',
+          text: 'Partner Access Metrics Over Time',
           color: '#00f0ff',
           font: {
             size: 16,
             weight: 'bold'
           },
-          padding: {
-            top: 10,
-            bottom: 20
-          }
+          padding: { top: 10, bottom: 20 }
         }
       },
       scales: {
@@ -65,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 🚧 Auto-Partnership Button Logic (stubs)
+  // Partnership Ping Button Logic (stub)
   document.querySelectorAll('.accept-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       alert('Partnership accepted and logged to ledger.');
