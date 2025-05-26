@@ -88,8 +88,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 🔁 Bonus Panel Logic: Launch Venture
+  // 🔁 Bonus Monetization Panel Logic
   window.launchVenture = function () {
     alert("MetaVenture launched! Revenue share logic is now active.");
   };
+
+  // 💰 Optional: Inject Monetization Panel if not present
+  const container = document.querySelector(".chart-container");
+  if (container && !document.querySelector(".monetize-remix")) {
+    const panel = document.createElement("div");
+    panel.className = "monetize-remix";
+    panel.innerHTML = `
+      <h2>Monetize This Remix</h2>
+      <p>Turn your remix into a monetizable asset. Choose one of the actions below:</p>
+      <button onclick="alert('Staked to boost propagation!')">Stake to Boost Propagation</button>
+      <button onclick="alert('Converted to Vault!')">Convert to Vault</button>
+      <button onclick="alert('Royalty terms saved!')">Set Royalty Terms</button>
+      <button onclick="alert('Collaborators invited!')">Invite Collaborators</button>
+    `;
+    container.parentNode.insertBefore(panel, container.nextSibling);
+  }
+
+  // 🧠 Optional: Inject Silo Guide if not already present
+  if (!document.querySelector(".silo-guide")) {
+    const guide = document.createElement("div");
+    guide.className = "silo-guide";
+    guide.innerHTML = `
+      <h3>Remix — What Is This?</h3>
+      <p>
+        This silo visualizes your remix lineage. Every remix creates a branching tree of derivative value and agent credit.
+        Track earnings, trigger MetaVentures, and convert remix chains into protocol-native vaults or royalties.
+      </p>
+    `;
+    document.querySelector(".main").appendChild(guide);
+  }
 });
