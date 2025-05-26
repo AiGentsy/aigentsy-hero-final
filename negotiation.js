@@ -76,4 +76,18 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   });
+
+  document.querySelectorAll(".value[data-count]").forEach(el => {
+    const count = parseFloat(el.dataset.count);
+    let i = 0;
+    const inc = count / 60;
+    const interval = setInterval(() => {
+      i += inc;
+      el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
+      if (i >= count) {
+        el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
+        clearInterval(interval);
+      }
+    }, 16);
+  });
 });
