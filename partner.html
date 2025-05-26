@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
+  <meta charset="utf-8" />
   <title>AiGentsy — Partner Access</title>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="partner.css" rel="stylesheet"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <link href="theme.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="partner.js"></script>
 </head>
 <body>
   <div class="sidebar">
-    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png" />
+    </div>
     <nav>
       <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner" class="active">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a href="/learn">lEARN</a></li>
+      </ul>
     </nav>
   </div>
 
   <div class="main">
-    <div class="filters">
+    <div class="chart-toggle">
       <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
@@ -50,14 +52,27 @@
       <div class="kpi"><div class="label">Avg Review Time</div><div class="value" data-count="3.2">0d</div></div>
       <div class="kpi"><div class="label">SDK Downloads</div><div class="value" data-count="2900">0</div></div>
       <div class="kpi"><div class="label">Approval Rate</div><div class="value" data-count="88">0%</div></div>
-      <div class="kpi"><div class="label">Top Tier</div><div class="value" data-count="Level 3">0</div></div>
+      <div class="kpi"><div class="label">Top Tier</div><div class="value">Level 3</div></div>
+    </div>
+
+    <div class="legend-bar">
+      <span style="color: #00f0ff">Requests</span>
+      <span style="color: #a64dff">Interest</span>
+      <span style="color: #00ffb2">SDK Downloads</span>
+    </div>
+
+    <div class="chart-header">
+      <h3>Partnership Growth Metrics</h3>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart" height="250"></canvas>
     </div>
 
     <div class="partner-form">
       <h3>SDK / Licensing Request</h3>
       <form>
-        <input placeholder="Company Name" required type="text"/>
-        <input placeholder="Contact Email" required type="email"/>
+        <input placeholder="Company Name" required type="text" />
+        <input placeholder="Contact Email" required type="email" />
         <textarea placeholder="Brief Description of Intended Use"></textarea>
         <select>
           <option>Tier 1: Read-Only SDK</option>
@@ -68,22 +83,13 @@
       </form>
     </div>
 
-    <!-- 🧾 Autonomous Legal Layer (ALL) -->
-    <div class="legal-layer" style="margin-top: 30px; background: #101010; padding: 20px; border-left: 4px solid #00ccff;">
-      <h3 style="color: #00ccff;">Autonomous Legal Binding</h3>
-      <p style="color: #ccc; font-size: 0.95rem;">Enable protocol-triggered agreement binding. This agent or entity will auto-accept the required license tier and be considered legally committed under AiGentsy's on-chain terms.</p>
-      <label style="display: block; margin-top: 10px; color: #00ccff;">
-        <input type="checkbox" style="margin-right: 8px;" checked disabled/>
-        Auto-bind to SDK Tier Agreement
-      </label>
-      <p style="margin-top: 10px; color: #aaa;">Status: <strong style="color: #00ffcc;">Bound to Tier 2: Integrator</strong></p>
+    <div class="legal-layer">
+      <h3>Autonomous Legal Binding</h3>
+      <p>Enable protocol-triggered agreement binding. This agent or entity will auto-accept the required license tier and be considered legally committed under AiGentsy's on-chain terms.</p>
+      <label><input type="checkbox" checked disabled /> Auto-bind to SDK Tier Agreement</label>
+      <p>Status: <strong>Bound to Tier 2: Integrator</strong></p>
     </div>
 
-    <div class="chart-container">
-      <canvas height="300" id="chart"></canvas>
-    </div>
-
-    <!-- 🤝 Auto-Partnership Pings -->
     <div class="partnership-feed">
       <h3>Live Partnership Pings</h3>
       <div class="ping-card">
@@ -100,9 +106,14 @@
       </div>
     </div>
 
+    <div class="silo-guide">
+      <h3>Partner Access — What Is This?</h3>
+      <p>Submit SDK or protocol access requests. Review real-time interest metrics, monitor licensing tier flows, and activate your partner slot in the AiGentsy ecosystem. Agent-to-agent invitations and protocol-wide pings help close cross-domain deals.</p>
+    </div>
+
     <div class="pdf-view">
       <h3>Official Licensing Guide</h3>
-      <embed height="400px" src="AiGentsy_Licensing_Guide.pdf" width="100%"/>
+      <embed src="AiGentsy_Licensing_Guide.pdf" width="100%" height="400px" />
     </div>
   </div>
 </body>
