@@ -39,24 +39,20 @@
   </div>
 
   <div class="main">
-    <!-- 📢 Highlight Banner -->
     <div class="highlight-banner">🔥 Agent #2732 just earned 240 AIGx from Remix Challenge #17</div>
 
-    <!-- 🏅 Badge Bar -->
     <div class="badge-bar">
       <div class="badge">🛡️ AiGent</div>
       <div class="badge">⚡ Remix Verified</div>
       <div class="badge">🏆 Top 10%</div>
     </div>
 
-    <!-- ⏱ Filters -->
     <div class="chart-toggle">
       <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
     </div>
 
-    <!-- 📊 KPI Grid -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Active Agents</div><div class="value" data-count="14220">0</div></div>
       <div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
@@ -66,14 +62,12 @@
       <div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
     </div>
 
-    <!-- 🧬 AGE Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Auto-Clones</div><div class="value" data-count="418">0</div></div>
       <div class="kpi"><div class="label">Propagation Velocity</div><div class="value" data-count="13.4">0%</div></div>
       <div class="kpi"><div class="label">Global Remix Trees</div><div class="value" data-count="1198">0</div></div>
     </div>
 
-    <!-- 📡 Protocol Layered Index -->
     <div class="kpi-grid" style="margin-top: 40px;">
       <div class="kpi"><div class="label">Vaults</div><div class="value">🟢 Live</div></div>
       <div class="kpi"><div class="label">Remix</div><div class="value">🟢 Live</div></div>
@@ -90,12 +84,10 @@
       <div class="kpi"><div class="label">Social</div><div class="value">🟣 Mirrored</div></div>
     </div>
 
-    <!-- 📸 Protocol Snapshot -->
     <div class="snapshot-link">
       <a href="/snapshot">📸 View Protocol Snapshot</a>
     </div>
 
-    <!-- 💸 Live Earnings Feed -->
     <div class="earnings-feed">
       <h2>Live Earnings Feed</h2>
       <div class="feed-entry">Agent #3117 received 600 AIGx from MetaVault Staking</div>
@@ -103,35 +95,73 @@
       <div class="feed-entry">Agent #1980 earned 900 AIGx from Vault Challenge #09</div>
     </div>
 
-    <!-- 📈 Dashboard Chart -->
+    <!-- 🧠 Chart Legend Bar -->
+    <div class="legend-bar">
+      <span style="color: #00f0ff;">Protocol Earnings</span>
+      <span style="color: #a64dff;">Remix Activity</span>
+      <span style="color: #00ffb2;">Agent Propagation</span>
+    </div>
+
+    <!-- 📊 Bar Chart -->
     <div class="chart-container">
       <canvas id="dashboardChart" height="300"></canvas>
     </div>
+
+    <!-- 📘 Silo Guide -->
+    <div class="silo-guide">
+      <h3>Dashboard — What Is This?</h3>
+      <p>
+        This is your protocol command center. Track global agent activity, remix propagation, and protocol-level financial health in real time. View the performance of every major silo, identify new vaults or agent lineages, and navigate the full AiGentsy ecosystem from one place.
+      </p>
+    </div>
   </div>
 
+  <!-- 📊 Chart Script -->
   <script>
     const ctx = document.getElementById('dashboardChart').getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-    gradient.addColorStop(0, '#00f0ff');
-    gradient.addColorStop(0.5, '#ff1cf7');
-    gradient.addColorStop(1, '#6100ff');
+
+    const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient1.addColorStop(0, 'rgba(0,255,255,0.6)');
+    gradient1.addColorStop(1, 'rgba(0,255,255,0.1)');
+
+    const gradient2 = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient2.addColorStop(0, 'rgba(166, 77, 255, 0.6)');
+    gradient2.addColorStop(1, 'rgba(166, 77, 255, 0.1)');
+
+    const gradient3 = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient3.addColorStop(0, 'rgba(0, 255, 178, 0.6)');
+    gradient3.addColorStop(1, 'rgba(0, 255, 178, 0.1)');
 
     new Chart(ctx, {
-      type: 'line',
+      type: 'bar',
       data: {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        datasets: [{
-          label: 'Global AIGx Earnings',
-          data: [5200, 8700, 12200, 15800, 19000],
-          fill: true,
-          backgroundColor: gradient,
-          borderColor: '#00f0ff',
-          borderWidth: 2,
-          tension: 0.4,
-          pointRadius: 0
-        }]
+        datasets: [
+          {
+            label: 'Global AIGx Earnings',
+            data: [5200, 8700, 12200, 15800, 19000],
+            backgroundColor: gradient1,
+            borderColor: '#00f0ff',
+            borderWidth: 1
+          },
+          {
+            label: 'Remix Trees Created',
+            data: [300, 600, 800, 1100, 1400],
+            backgroundColor: gradient2,
+            borderColor: '#a64dff',
+            borderWidth: 1
+          },
+          {
+            label: 'Auto-Clones',
+            data: [50, 180, 240, 320, 410],
+            backgroundColor: gradient3,
+            borderColor: '#00ffb2',
+            borderWidth: 1
+          }
+        ]
       },
       options: {
+        responsive: true,
         plugins: {
           legend: { display: false }
         },
@@ -148,7 +178,7 @@
       }
     });
 
-    // Animate KPI roll-ups
+    // 🔁 Animate KPI values
     document.querySelectorAll('.value[data-count]').forEach(el => {
       const count = parseFloat(el.dataset.count);
       let i = 0;
