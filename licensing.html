@@ -7,6 +7,41 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="licensing.js"></script>
+  <style>
+    .revenue-pulse {
+      animation: pulseRevenue 2s ease-out;
+    }
+    @keyframes pulseRevenue {
+      0% { background-color: #111; }
+      50% { background-color: #002244; }
+      100% { background-color: #111; }
+    }
+
+    .venture-card {
+      animation: fadeIn 0.6s ease-in;
+      background: #111;
+      border-left: 3px solid #00f0ff;
+      margin-bottom: 12px;
+      padding: 14px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const revenueTile = [...document.querySelectorAll(".kpi")].find(k =>
+        k.querySelector(".label")?.textContent?.includes("Licensing Revenue")
+      )?.querySelector(".value");
+
+      if (revenueTile) {
+        revenueTile.classList.add("revenue-pulse");
+        setTimeout(() => revenueTile.classList.remove("revenue-pulse"), 2000);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -93,6 +128,13 @@
         <p><strong>SDK Deployments:</strong> 3</p>
         <button>View Deployment</button>
       </div>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/partner'">Partner Access</button>
+      <button class="btn-glow" onclick="window.location.href='/mint'">Mint Agent</button>
+      <button class="btn-glow" onclick="window.location.href='/wallet'">Wallet View</button>
     </div>
 
     <div class="rwp-callout">
