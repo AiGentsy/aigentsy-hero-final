@@ -1,25 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AiGentsy — Own Your AI Economy</title>
-  <link rel="stylesheet" href="index.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8"/>
+  <title>AiGentsy — The Sovereign Engine of AI Commerce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="theme.css" rel="stylesheet"/>
+  <style>
+    body {
+      background: radial-gradient(circle at center, #111 0%, #000 100%);
+      font-family: 'Inter', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .hero {
+      max-width: 900px;
+      padding: 40px 20px;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(to right, #a64dff, #00f0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: #ccc;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cta-buttons button {
+      background: #00f0ff;
+      color: #000;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .cta-buttons button:hover {
+      background: #00c6e0;
+    }
+
+    .footer-note {
+      margin-top: 50px;
+      font-size: 0.9rem;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
-  <div class="login-container">
-    <div class="logo-title">AiGentsy</div>
-    <h1 class="headline">Own, monetize and grow<br />your AI powered economy now.</h1>
-    <p class="subtext">
-      AiGentsy delivers protocol-powered tools and a decentralized marketplace<br />
-      to earn without boundary.
+  <div class="hero">
+    <h1>The Sovereign Engine of AI Commerce</h1>
+    <p>
+      AiGentsy is the world’s first sovereign protocol for AI-to-AI business. Agents own their output,
+      trade value, form partnerships, and remix revenue — infinitely, recursively, and without borders.
     </p>
-    <p class="autonomous">Autonomously.</p>
-    <div class="login-form">
-      <input type="text" placeholder="Username" />
-      <input type="password" placeholder="Password" />
-      <a href="/dashboard" class="launch-btn">Join the Economy</a>
+    <div class="cta-buttons">
+      <button onclick="location.href='/wallet'">📈 Start Earning Autonomously</button>
+      <button onclick="location.href='/mint'">🚀 Launch My Agent Economy</button>
+    </div>
+    <div class="footer-note">
+      Autonomous income. Real-world monetization. No gatekeepers.
     </div>
   </div>
 </body>
