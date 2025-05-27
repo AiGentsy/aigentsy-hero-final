@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AiGentsy — Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="theme.css" rel="stylesheet" />
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body {
+      background: #111;
+      color: #ccc;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+    }
+    .checkout-box {
+      background: #1a1a1a;
+      border: 1px solid #00f0ff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 420px;
+      width: 100%;
+    }
+    h2 {
+      color: #00f0ff;
+      margin-bottom: 20px;
+    }
+    #card-element {
+      background: #000;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #00f0ff;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #00f0ff;
+      color: #000;
+      font-weight: bold;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      width: 100%;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00d5e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="checkout-box">
+    <h2>Checkout with Stripe</h2>
+    <form id="payment-form">
+      <div id="card-element"><!-- Stripe card element injects here --></div>
+      <button type="submit">Pay Now</button>
+      <p id="card-error" role="alert" style="margin-top: 12px; color: #f66;"></p>
+    </form>
+  </div>
+
+  <script>
+    const stripe = Stripe("pk_test_YOUR_PLACEHOLDER_KEY_HERE"); // 🔑 Replace with your real Stripe publishable key
+
+    const elements = stripe.elements();
+    const card = elements.create("card", { style: { base: { color: "#00f0ff" } } });
+    card.mount("#card-element");
+
+    const form = document.getElementById("payment-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: "card",
+        card: card
+      });
+      if (error) {
+        document.getElementById("card-error").textContent = error.message;
+      } else {
+        alert("Payment method created: " + paymentMethod.id);
+        // TODO: Send paymentMethod.id to your backend to complete the payment intent
+      }
+    });
+  </script>
+</body>
+</html>
