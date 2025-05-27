@@ -8,6 +8,40 @@
   <link href="theme.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="partner.js"></script>
+  <style>
+    .ping-card {
+      background: #111;
+      border-left: 3px solid #00f0ff;
+      margin-bottom: 14px;
+      padding: 14px;
+      animation: pingFlash 1.5s ease-out;
+    }
+    @keyframes pingFlash {
+      0% { background-color: #111; }
+      50% { background-color: #002233; }
+      100% { background-color: #111; }
+    }
+    .sdk-flash {
+      animation: flashTile 1.6s ease-out;
+    }
+    @keyframes flashTile {
+      0% { background-color: #111; }
+      50% { background-color: #003355; }
+      100% { background-color: #111; }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const sdkTile = [...document.querySelectorAll(".kpi")].find(k =>
+        k.querySelector(".label")?.textContent?.includes("SDK Downloads")
+      )?.querySelector(".value");
+
+      if (sdkTile) {
+        sdkTile.classList.add("sdk-flash");
+        setTimeout(() => sdkTile.classList.remove("sdk-flash"), 1600);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -110,6 +144,13 @@
         <button class="decline-btn">Decline</button>
         <button class="clone-btn">Offer Auto-Clone Venture</button>
       </div>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/remix'">Go to Remix</button>
+      <button class="btn-glow" onclick="window.location.href='/licensing'">View Licensing</button>
+      <button class="btn-glow" onclick="window.location.href='/vaults'">Vaults Dashboard</button>
     </div>
 
     <div class="leaderboard">
