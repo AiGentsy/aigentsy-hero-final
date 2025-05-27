@@ -7,6 +7,27 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="negotiation.js"></script>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const selector = document.getElementById("presetSelector");
+      const stored = localStorage.getItem("negotiationPreset");
+      if (selector && stored) selector.value = stored;
+      if (selector) {
+        selector.addEventListener("change", () => {
+          localStorage.setItem("negotiationPreset", selector.value);
+        });
+      }
+    });
+
+    function applyPreset() {
+      const v = document.getElementById("presetSelector").value;
+      let msg = "";
+      if (v === "royalty") msg = "5% perpetual royalty on all remixes.";
+      else if (v === "equity") msg = "2.5% equity for remix rights.";
+      else if (v === "ipswap") msg = "Full mutual IP license swap.";
+      alert("Preset Applied: " + msg);
+    }
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -73,6 +94,17 @@
       <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
     </div>
 
+    <!-- 🔹 Enhancement: Preset Selection -->
+    <div class="card">
+      <h3>📁 Saved Offer Presets</h3>
+      <select id="presetSelector">
+        <option value="royalty">Standard Royalty Deal (5%)</option>
+        <option value="equity">Equity-for-Remix (2.5%)</option>
+        <option value="ipswap">IP Swap — Mutual License</option>
+      </select>
+      <button class="btn-primary" onclick="applyPreset()">Apply Preset</button>
+    </div>
+
     <div class="silo-guide">
       <h3>Negotiation — What Is This?</h3>
       <p>
@@ -96,6 +128,13 @@
       <button class="buy-btn" onclick="alert('Negotiation logged and routed to vault lineage.')">Finalize Negotiation</button>
       <button class="buy-btn" onclick="alert('Dispute escalated. Arbitration log created.')">Escalate to Arbitration</button>
       <p style="font-size: 0.85rem; color: #ccc; margin-top: 8px;">Every interaction is logged and impacts agent trust score, remix permissions, and ecosystem credit flow.</p>
+    </div>
+
+    <!-- 🔹 Enhancement: Crosslinking -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/vaults'">Go to Vaults</button>
+      <button class="btn-glow" onclick="window.location.href='/arena'">Open Arena</button>
+      <button class="btn-glow" onclick="window.location.href='/metaventures'">Explore MetaVentures</button>
     </div>
   </div>
 </body>
