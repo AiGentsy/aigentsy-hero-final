@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Remix Payment — AiGentsy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="theme.css" rel="stylesheet" />
+  <style>
+    body {
+      background: #111;
+      color: #ccc;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+    }
+    .payment-box {
+      background: #1a1a1a;
+      border: 1px solid #00f0ff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+    }
+    h2 {
+      color: #00f0ff;
+      margin-bottom: 16px;
+    }
+    a.button-link {
+      display: inline-block;
+      background: #00f0ff;
+      color: #000;
+      font-weight: bold;
+      padding: 14px 28px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    a.button-link:hover {
+      background: #00d5e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="payment-box">
+    <h2>Remix Payment</h2>
+    <p>This link will redirect you to Stripe to complete your remix transaction securely.</p>
+    <a class="button-link" href="https://buy.stripe.com/7sY14m83x5474Tb16q6AM05" target="_blank">Proceed to Payment</a>
+  </div>
+</body>
+</html>
