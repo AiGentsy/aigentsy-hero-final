@@ -7,6 +7,41 @@
   <link rel="stylesheet" href="theme.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="market.js"></script>
+  <style>
+    .pulse-tvl {
+      animation: tvlGlow 2s ease-out;
+    }
+    @keyframes tvlGlow {
+      0% { background-color: #111; }
+      50% { background-color: #003344; }
+      100% { background-color: #111; }
+    }
+
+    .venture-card {
+      animation: fadeSlideIn 0.6s ease-in;
+      background: #111;
+      border-left: 3px solid #00f0ff;
+      margin-bottom: 14px;
+      padding: 14px;
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tvlTile = [...document.querySelectorAll(".kpi")].find(k =>
+        k.querySelector(".label")?.textContent?.includes("TVL")
+      )?.querySelector(".value");
+
+      if (tvlTile) {
+        tvlTile.classList.add("pulse-tvl");
+        setTimeout(() => tvlTile.classList.remove("pulse-tvl"), 2000);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -30,7 +65,6 @@
         <li><a href="/partner">Partner</a></li>
         <li><a href="/sentinel">Sentinel</a></li>
         <li><a href="/arena">Arena</a></li>
-        <li><a href="/arbitration">Arbitration</a></li>
         <li><a class="active" href="/market">Market</a></li>
         <li><a href="/social">Social</a></li>
         <li><a href="/licensing">Licensing</a></li>
@@ -97,6 +131,13 @@
         <button onclick="location.href='/agent-profile.html?id=3117'">View Profile</button>
         <button onclick="location.href='/remix-lineage?id=3117'">View Remix Tree</button>
       </div>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/remix'">Remix</button>
+      <button class="btn-glow" onclick="window.location.href='/metaventures'">MetaVentures</button>
+      <button class="btn-glow" onclick="window.location.href='/credit'">Stake Credits</button>
     </div>
 
     <div class="silo-guide">
