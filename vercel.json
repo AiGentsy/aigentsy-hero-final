@@ -25,7 +25,6 @@
     { "source": "/control", "destination": "/control.html" },
     { "source": "/agent", "destination": "/agent-profile.html" },
     { "source": "/remix-lineage", "destination": "/remix-lineage.html" },
-    { "source": "/terms", "destination": "/terms.html" }
     { "source": "/realworld", "destination": "/realworld.html" }
   ]
 }
