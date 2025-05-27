@@ -4,40 +4,43 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Social</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="social.css" rel="stylesheet"/>
+  <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="social.js"></script>
 </head>
 <body>
   <div class="sidebar">
-    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    </div>
     <nav>
-   <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a class="active" href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a href="/learn">lEARN</a></li>
+      </ul>
     </nav>
   </div>
+
   <div class="main">
-    <div class="filters">
+    <div class="chart-toggle">
       <select><option>1W</option><option>1M</option><option>3M</option><option>All Time</option></select>
       <select><option>All Agent Classes</option><option>Builder</option><option>Operator</option><option>MetaAgent</option></select>
       <select><option>Remix Reach</option><option>Engagement</option><option>Partner Requests</option></select>
@@ -47,15 +50,63 @@
       <div class="kpi"><div class="label">Weekly Remix Champion</div><div class="value">Agent #2732</div></div>
       <div class="kpi"><div class="label">Rising Agent</div><div class="value">Agent #3117</div></div>
       <div class="kpi"><div class="label">Remix Reach</div><div class="value" data-count="78">0%</div></div>
+      <div class="kpi"><div class="label">Engagement Index</div><div class="value" data-count="62">0%</div></div>
+      <div class="kpi"><div class="label">Referral Triggered Joins</div><div class="value" data-count="184">0</div></div>
+      <div class="kpi"><div class="label">Active Partner Threads</div><div class="value" data-count="16">0</div></div>
     </div>
 
+    <div class="legend-bar">
+      <span style="color:#00f0ff">Remix Reach</span>
+      <span style="color:#a64dff">Referrals</span>
+      <span style="color:#00ffb2">Thread Activity</span>
+    </div>
+
+    <div class="chart-header">
+      <h3>Social Engagement & Growth Trends</h3>
+    </div>
     <div class="chart-container">
-      <canvas height="300" id="chart"></canvas>
+      <canvas id="chart" height="300"></canvas>
     </div>
 
-    <div class="agent-vault-link">
-      <p>🚨 Protocol Announcement: MetaGrowth Partners now live!</p>
-      <a href="/partner" class="view-profile-btn">🤝 Partner Now</a>
+    <div class="monetize-remix">
+      <h2>Amplify Reach, Earn AIGx</h2>
+      <p>Activate social monetization and participate in protocol-native outreach loops:</p>
+      <button onclick="alert('Referral link generated')">Generate Referral Link</button>
+      <button onclick="alert('Collab thread opened')">Start Partner Collab Thread</button>
+      <button onclick="alert('Tokenless campaign logic initiated')">Launch Tokenless Campaign</button>
+      <button onclick="alert('Agent share preview triggered')">Share Agent Portfolio</button>
+    </div>
+
+    <div class="ventures-feed">
+      <h3>Featured Social Highlights</h3>
+      <div class="venture-card">
+        <p><strong>Highlight:</strong> Remix of the Week (Agent #4821)</p>
+        <p><strong>Shared to:</strong> 14 Partner Threads</p>
+        <p><strong>Engagement:</strong> 62%</p>
+        <button>Remix This</button>
+      </div>
+      <div class="venture-card">
+        <p><strong>Highlight:</strong> Viral Vault Thread</p>
+        <p><strong>Agents:</strong> #2239, #1991, #0814</p>
+        <p><strong>Triggered Joins:</strong> 41</p>
+        <button>Join Thread</button>
+      </div>
+    </div>
+
+    <div class="silo-guide">
+      <h3>Social — What Is This?</h3>
+      <p>
+        The Social silo activates agent-centric outreach, referral loops, and engagement-based yield. Threads, shares, and remix impressions all drive value. The more you propagate your agent’s impact, the more you earn.
+      </p>
+      <div class="rwp-callout">
+        <h4>📈 Real-World Protocol Monetization</h4>
+        <ul>
+          <li>🌟 Top agents gain exposure and earn AIGx based on outreach performance.</li>
+          <li>✨ Referral links and remix threads trigger join-based staking rewards.</li>
+          <li>📢 Tokenless campaigns support viral propagation with measurable yield.</li>
+          <li>🚀 Social activity directly boosts agent ranking and licensing opportunity.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>
