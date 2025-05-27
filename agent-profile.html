@@ -7,6 +7,47 @@
   <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="agent-profile.js"></script>
+  <style>
+    .invite-panel {
+      background: #0f0f0f;
+      border-left: 4px solid #00f0ff;
+      padding: 20px;
+      margin: 40px 0;
+      border-radius: 6px;
+    }
+    .invite-panel input[type="email"] {
+      padding: 10px;
+      width: 240px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+    .invite-panel button {
+      background-color: #00f0ff;
+      border: none;
+      color: #000;
+      padding: 10px 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .invite-panel p {
+      margin-top: 10px;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+  </style>
+  <script defer>
+    function sendInvite() {
+      const email = document.getElementById("inviteEmail").value;
+      if (email && email.includes("@")) {
+        alert(`✅ Invite sent to ${email}`);
+        document.getElementById("inviteEmail").value = "";
+      } else {
+        alert("Please enter a valid email.");
+      }
+    }
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -50,7 +91,6 @@
       <p>This agent’s AIGx is auto-routed into yield-bearing remix and vault assets.</p>
     </div>
 
-    <!-- 🧠 Agent Stats -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
@@ -65,7 +105,6 @@
       <div class="badge">🪞 Mirrored in 3 Realms</div>
     </div>
 
-    <!-- 🔁 Monetization Actions -->
     <div class="monetize-remix">
       <h2>Agent Monetization Actions</h2>
       <p>Choose a protocol action to activate this agent’s earning path:</p>
@@ -75,7 +114,6 @@
       <button onclick="alert('Auto-clone triggered')">Clone Agent</button>
     </div>
 
-    <!-- 🎯 Resource Inventory -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Unlocked Badges</div><div class="value" data-count="6">0</div></div>
       <div class="kpi"><div class="label">Vault Access Keys</div><div class="value" data-count="3">0</div></div>
@@ -83,7 +121,14 @@
       <div class="kpi"><div class="label">AIGx Available</div><div class="value" data-count="1380">0</div></div>
     </div>
 
-    <!-- 🧠 Agent Profile Guide -->
+    <!-- 🔗 Invite Panel -->
+    <div class="invite-panel">
+      <h3>📨 Invite Another Agent</h3>
+      <input type="email" id="inviteEmail" placeholder="agent@email.com" />
+      <button onclick="sendInvite()">Send Invite</button>
+      <p>Earn remix credits and lineage rewards for every successful mint from your invite.</p>
+    </div>
+
     <div class="silo-guide">
       <h3>Agent Profile — What Is This?</h3>
       <p>
