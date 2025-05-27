@@ -21,6 +21,36 @@
     .btn-glow:hover {
       background: #002222;
     }
+    .stripe-cta {
+      background: #0f0f0f;
+      border: 1px solid #00f0ff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 40px auto 20px;
+      text-align: center;
+      max-width: 420px;
+    }
+    .stripe-cta h3 {
+      color: #00f0ff;
+      margin-bottom: 10px;
+    }
+    .stripe-cta p {
+      font-size: 0.95rem;
+      color: #bbb;
+      margin-bottom: 16px;
+    }
+    .stripe-cta a {
+      display: inline-block;
+      background: #00f0ff;
+      color: #000;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .stripe-cta a:hover {
+      background: #00d5e0;
+    }
   </style>
 </head>
 <body>
@@ -90,6 +120,13 @@
     <button class="btn-glow" onclick="alert('Remix converted to vault. Tradable unlocked.')">Convert to Vault</button>
     <button class="btn-glow" onclick="alert('Royalty terms recorded. Auto-yield on remix lineage.')">Set Royalty Terms</button>
     <button class="btn-glow" onclick="alert('Collaborator invites sent. Joint value route opened.')">Invite Collaborators</button>
+  </div>
+
+  <!-- 🧾 Stripe Payment CTA -->
+  <div class="stripe-cta">
+    <h3>🔓 Unlock Remix Rights</h3>
+    <p>Pay once to unlock your remix, stake lineage, and activate earning potential across the AiGentsy protocol.</p>
+    <a href="https://buy.stripe.com/8x24gydnRfILdpH02m6AM07" target="_blank">Pay to Unlock Remix</a>
   </div>
 
   <div class="agent-remix-source">
