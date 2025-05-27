@@ -1,4 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
+ddocument.addEventListener('DOMContentLoaded', () => {
+  // Animate KPI values
+  document.querySelectorAll('.value[data-count]').forEach(el => {
+    const count = parseFloat(el.dataset.count);
+    let i = 0;
+    const inc = count / 60;
+    const interval = setInterval(() => {
+      i += inc;
+      el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
+      if (i >= count) {
+        el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
+        clearInterval(interval);
+      }
+    }, 16);
+  });
+
+  // Chart.js Bar Chart Setup
   const ctx = document.getElementById('chart').getContext('2d');
 
   const gradient1 = ctx.createLinearGradient(0, 0, 0, 300);
@@ -55,26 +71,36 @@ document.addEventListener('DOMContentLoaded', () => {
     options: {
       responsive: true,
       plugins: {
-        legend: { labels: { color: 'white' } }
+        legend: { labels: { color: 'white' } },
+        title: {
+          display: true,
+          text: 'Protocol Security Metrics',
+          color: '#00f0ff',
+          font: { size: 16, weight: 'bold' },
+          padding: { top: 10, bottom: 20 }
+        }
       },
       scales: {
-        x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-        y: { beginAtZero: true, ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+        x: {
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: { color: 'white' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
       }
     }
   });
 
-  document.querySelectorAll('.value[data-count]').forEach(el => {
-    const count = parseFloat(el.dataset.count);
-    let i = 0;
-    const inc = count / 60;
-    const interval = setInterval(() => {
-      i += inc;
-      el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
-      if (i >= count) {
-        el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
-        clearInterval(interval);
-      }
-    }, 16);
+  // Sentinel Transaction Buttons (Monetization Hooks)
+  document.querySelectorAll('.buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const label = btn.textContent.trim();
+      const yieldEvent = `[SENTINEL YIELD] ${label} — +Merit, +Defense Score`;
+      console.log(yieldEvent); // Can be logged to ledger in backend
+      alert(`${label} confirmed. Monetization event logged.`);
+    });
   });
 });
