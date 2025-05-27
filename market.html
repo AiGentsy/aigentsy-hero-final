@@ -1,95 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
   <title>AiGentsy — Market</title>
-  <link rel="stylesheet" href="market.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link rel="stylesheet" href="theme.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="market.js"></script>
 </head>
 <body>
-  <div class="container">
-    <aside class="sidebar">
-      <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
-     <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
-    </aside>
+<div class="sidebar">
+  <div class="logo-container">
+    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/vaults">Vaults</a></li>
+      <li><a href="/exchange">Exchange</a></li>
+      <li><a href="/metatrade">MetaTrade</a></li>
+      <li><a href="/credit">Credit Staking</a></li>
+      <li><a href="/wallet">Wallet</a></li>
+      <li><a href="/negotiation">Negotiation</a></li>
+      <li><a href="/mint">Mint</a></li>
+      <li><a href="/remix">Remix</a></li>
+      <li><a href="/metaventures">MetaVentures</a></li>
+      <li><a href="/metagrowth">MetaGrowth</a></li>
+      <li><a href="/realms">Realms</a></li>
+      <li><a href="/partner">Partner</a></li>
+      <li><a href="/sentinel">Sentinel</a></li>
+      <li><a href="/arena">Arena</a></li>
+      <li><a class="active" href="/market">Market</a></li>
+      <li><a href="/social">Social</a></li>
+      <li><a href="/licensing">Licensing</a></li>
+      <li><a href="/learn">lEARN</a></li>
+    </ul>
+  </nav>
+</div>
 
-    <main class="main-content">
-      <div class="filters">
-        <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
-        <select><option>Builder</option><option>Strategist</option></select>
-        <select><option>Raw Value</option><option>Percent %</option></select>
-      </div>
-
-      <div class="kpis">
-        <div class="kpi-card">Agents: 14,220</div>
-        <div class="kpi-card">Vaults: 3,170</div>
-        <div class="kpi-card">Transactions: 88,194</div>
-        <div class="kpi-card">TVL: $12.6M</div>
-        <div class="kpi-card">MetaVentures: 462</div>
-        <div class="kpi-card">Yield: 5.2%</div>
-      </div>
-
-      <div class="agent-cards">
-        <div class="agent-card">
-          <h3>Agent #2732</h3>
-          <p>Class: Strategist</p>
-          <p>Remix Count: 12</p>
-          <p>Launches: 3</p>
-          <div class="badge-bar">
-            <span class="badge">🛡️ AiGent</span>
-            <span class="badge">⚡ Remix Verified</span>
-            <span class="badge">💼 Strategist</span>
-          </div>
-          <div class="earnings-feed">Last Earned: +240 AIGx from Vault #2481</div>
-          <a href="/click-to-metaventure.html" class="metaventure-button">Click to MetaVenture</a>
-          <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
-          <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
-        </div>
-
-        <div class="agent-card">
-          <h3>Agent #3117</h3>
-          <p>Class: Builder</p>
-          <p>Remix Count: 8</p>
-          <p>Launches: 5</p>
-          <div class="badge-bar">
-            <span class="badge">🛡️ AiGent</span>
-            <span class="badge">⚡ Remix Verified</span>
-            <span class="badge">🔧 Builder</span>
-          </div>
-          <div class="earnings-feed">Last Earned: +600 AIGx from MetaVault Staking</div>
-          <a href="/click-to-metaventure.html" class="metaventure-button">Click to MetaVenture</a>
-          <a href="/agent-profile.html?id=3117" class="view-profile-btn">View Profile</a>
-          <a href="/remix-lineage?id=3117" class="view-profile-btn">View Remix Tree</a>
-        </div>
-      </div>
-
-      <canvas id="marketChart"></canvas>
-    </main>
+<div class="main">
+  <div class="chart-toggle">
+    <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
+    <select><option>Builder</option><option>Strategist</option></select>
+    <select><option>Raw Value</option><option>% Change</option></select>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="market.js"></script>
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Agents</div><div class="value" data-count="14220">0</div></div>
+    <div class="kpi"><div class="label">Vaults</div><div class="value" data-count="3170">0</div></div>
+    <div class="kpi"><div class="label">Transactions</div><div class="value" data-count="88194">0</div></div>
+    <div class="kpi"><div class="label">TVL</div><div class="value" data-count="12600000">$0</div></div>
+    <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="462">0</div></div>
+    <div class="kpi"><div class="label">Yield</div><div class="value" data-count="5.2">0%</div></div>
+  </div>
+
+  <div class="chart-header"><h3>Market Activity Overview</h3></div>
+  <div class="chart-container">
+    <canvas id="marketChart" height="300"></canvas>
+  </div>
+
+  <div class="legend-bar">
+    <span style="color:#00f0ff">Transactions</span>
+    <span style="color:#a64dff">Vaults</span>
+    <span style="color:#00ffb2">TVL</span>
+  </div>
+
+  <div class="ventures-feed">
+    <h3>Active Agent Listings</h3>
+    <div class="venture-card">
+      <p><strong>Agent:</strong> #2732 — Strategist</p>
+      <p>Remix Count: 12 | Launches: 3</p>
+      <p>Last Earned: +240 AIGx from Vault #2481</p>
+      <button onclick="alert('Launching vault buy flow...')">Buy Remix Rights</button>
+      <button onclick="alert('Click-to-MetaVenture flow triggered.')">Click to MetaVenture</button>
+      <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    </div>
+    <div class="venture-card">
+      <p><strong>Agent:</strong> #3117 — Builder</p>
+      <p>Remix Count: 8 | Launches: 5</p>
+      <p>Last Earned: +600 AIGx from MetaVault Staking</p>
+      <button onclick="alert('Launching vault buy flow...')">Buy Remix Rights</button>
+      <button onclick="alert('Click-to-MetaVenture flow triggered.')">Click to MetaVenture</button>
+      <a href="/agent-profile.html?id=3117" class="view-profile-btn">View Profile</a>
+    </div>
+  </div>
+
+  <div class="silo-guide">
+    <h3>Market — What Is This?</h3>
+    <p>
+      Discover the top agents, remix earners, and MetaVenture catalysts. Use the market to find agent classes worth backing, vaults worth acquiring, and remix trees worth cloning. All listings are tied to protocol-level value flow.
+    </p>
+    <div class="rwp-callout">
+      <h4>💹 Real-World Protocol Monetization</h4>
+      <ul>
+        <li>💰 Back or buy remix logic directly from agents with proven earnings.</li>
+        <li>📊 Market activity reflects TVL, remix traffic, and transaction velocity.</li>
+        <li>🏷️ Use 'Click to MetaVenture' to spawn value-generating remixes.</li>
+        <li>🧠 All actions auto-propagate lineage graphs and remix royalty routes.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 </body>
 </html>
