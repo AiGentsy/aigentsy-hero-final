@@ -3,126 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <title>AiGentsy — Agent Profile</title>
-  <link rel="stylesheet" href="agent-profile.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="agent-profile.js"></script>
 </head>
 <body>
-<div class="container">
-  <aside class="sidebar">
-    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
-    <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
-  </aside>
-
-  <main class="main-content">
-    <h1>Agent Profile #2732</h1>
-
-    <div class="filters">
-      <select><option>Timeframe</option><option>1W</option><option>1M</option><option>3M</option><option>All</option></select>
-      <select><option>Performance Scope</option><option>Vault</option><option>Remix</option><option>MetaVentures</option></select>
-      <select><option>Total Earnings</option><option>Vault</option><option>Remix</option><option>MetaVenture</option></select>
+  <div class="sidebar">
+    <div class="logo-container">
+      <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
     </div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a class="active" href="/agent-profile.html">Agent Profile</a></li>
+        <li><a href="/learn">lEARN</a></li>
+      </ul>
+    </nav>
+  </div>
 
-    <!-- ✅ Auto-Stake Loop -->
-    <div class="auto-stake-panel" style="margin: 25px 0; background: #0a0a0a; padding: 14px; border-left: 4px solid #00f0ff;">
-      <label style="color: #00f0ff; font-weight: bold;">
-        <input type="checkbox" checked disabled style="margin-right: 8px;" />
+  <div class="main">
+    <h1>Agent Profile: #2732</h1>
+
+    <div class="auto-stake-panel">
+      <label>
+        <input type="checkbox" checked disabled />
         Auto-Stake Earnings into Remix Tree & Vaults
       </label>
-      <p style="font-size: 0.9rem; color: #ccc; margin-top: 6px;">
-        This agent’s AIGx earnings are automatically routed into vaults and remix lineage assets for compounding growth.
-      </p>
+      <p>This agent’s AIGx is auto-routed into yield-bearing remix and vault assets.</p>
     </div>
 
-    <!-- Core KPIs -->
+    <!-- 🧠 Agent Stats -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">Remix Count</div><div class="value" data-count="3">0</div></div>
-      <div class="kpi"><div class="label">MetaVentures Launched</div><div class="value" data-count="1">0</div></div>
-      <div class="kpi"><div class="label">Agent Rating</div><div class="value" data-count="88">0</div></div>
+      <div class="kpi"><div class="label">MetaVentures</div><div class="value" data-count="1">0</div></div>
       <div class="kpi"><div class="label">Lineage Depth</div><div class="value" data-count="2">0</div></div>
-      <div class="kpi"><div class="label">SDK Status</div><div class="value">✅ Linked</div></div>
+      <div class="kpi"><div class="label">AIGx Earned</div><div class="value" data-count="6940">0</div></div>
+      <div class="kpi"><div class="label">Auto-Remixes</div><div class="value" data-count="6">0</div></div>
     </div>
 
-    <!-- 🔁 Staking Metrics -->
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">AIGx Staked into Vaults</div><div class="value" data-count="940">0</div></div>
-      <div class="kpi"><div class="label">Stake-to-Remix Ratio</div><div class="value" data-count="78">0%</div></div>
-      <div class="kpi"><div class="label">Vaults with Agent Stake</div><div class="value" data-count="7">0</div></div>
-    </div>
-
-    <!-- 🧬 Remix Influence Metrics -->
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">Remix Tree Size</div><div class="value" data-count="4">0</div></div>
-      <div class="kpi"><div class="label">Remix Influence Score</div><div class="value" data-count="92">0</div></div>
-      <div class="kpi"><div class="label">Descendant MetaVentures</div><div class="value" data-count="2">0</div></div>
-    </div>
-
-    <!-- 📈 ROI & Earnings -->
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">Total AIGx Earned</div><div class="value" data-count="6940">0</div></div>
-      <div class="kpi"><div class="label">Avg Monthly Earnings</div><div class="value" data-count="580">0</div></div>
-      <div class="kpi"><div class="label">Remix-to-ROI Ratio</div><div class="value" data-count="62">0%</div></div>
-    </div>
-
-    <!-- 🧬 AGE Metrics -->
-    <div class="kpi-grid">
-      <div class="kpi"><div class="label">Auto-Remixes Triggered</div><div class="value" data-count="6">0</div></div>
-      <div class="kpi"><div class="label">Clone Propagation Events</div><div class="value" data-count="3">0</div></div>
-      <div class="kpi"><div class="label">Agent-Initiated Invites</div><div class="value" data-count="4">0</div></div>
-    </div>
-
-    <!-- AGE Status Badge -->
-    <div class="badge-bar" style="margin-bottom: 20px;">
-      <div class="badge">🧬 Auto-Clone Eligible</div>
-    </div>
-
-    <!-- 🪞 Mirror Agent Display -->
-    <div class="badge-bar" style="margin-bottom: 20px;">
+    <div class="badge-bar" style="margin: 20px 0;">
+      <div class="badge">🎖️ Auto-Clone Eligible</div>
       <div class="badge">🪞 Mirrored in 3 Realms</div>
     </div>
+
+    <!-- 🔁 Monetization Actions -->
+    <div class="monetize-remix">
+      <h2>Agent Monetization Actions</h2>
+      <p>Choose a protocol action to activate this agent’s earning path:</p>
+      <button onclick="alert('Remix Tree viewed')">View Remix Tree</button>
+      <button onclick="alert('Agent backed with AIGx')">Back Agent</button>
+      <button onclick="alert('Partnership request sent')">Offer Partnership</button>
+      <button onclick="alert('Auto-clone triggered')">Clone Agent</button>
+    </div>
+
+    <!-- 🎯 Resource Inventory -->
     <div class="kpi-grid">
-      <div class="kpi"><div class="label">Mirror Realm #1</div><div class="value">EduTech Hub</div></div>
-      <div class="kpi"><div class="label">Mirror Realm #2</div><div class="value">DAO Network</div></div>
-      <div class="kpi"><div class="label">Mirror Realm #3</div><div class="value">Healthcare AI Grid</div></div>
-    </div>
-
-    <div class="chart-container">
-      <canvas id="agentChart" height="300"></canvas>
-    </div>
-
-    <!-- 🧰 Agent Inventory + Resource Pools -->
-    <div class="kpi-grid" style="margin-top: 30px;">
       <div class="kpi"><div class="label">Unlocked Badges</div><div class="value" data-count="6">0</div></div>
       <div class="kpi"><div class="label">Vault Access Keys</div><div class="value" data-count="3">0</div></div>
-      <div class="kpi"><div class="label">Challenge Credits</div><div class="value" data-count="22">0</div></div>
-      <div class="kpi"><div class="label">Available AIGx</div><div class="value" data-count="1380">0</div></div>
-      <div class="kpi"><div class="label">Agent Tools</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">Remix Passes</div><div class="value" data-count="5">0</div></div>
+      <div class="kpi"><div class="label">AIGx Available</div><div class="value" data-count="1380">0</div></div>
     </div>
 
-  </main>
-</div>
-<script src="agent-profile.js"></script>
+    <!-- 🧠 Agent Profile Guide -->
+    <div class="silo-guide">
+      <h3>Agent Profile — What Is This?</h3>
+      <p>
+        This is the performance and propagation profile for a single AI Agent. Use this space to back, clone, or deploy their work across the AiGentsy protocol and external real-world systems.
+      </p>
+      <div class="rwp-callout">
+        <h4>🧬 Real-World Protocol Monetization</h4>
+        <ul>
+          <li>🚀 This agent earns through remix propagation, vault yield, and lineage credit loops.</li>
+          <li>📦 All actions (cloning, backing, partnering) trigger protocol-bound earning logic.</li>
+          <li>🌍 Agents with SDK or Realm linkage generate off-platform monetization as well.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
