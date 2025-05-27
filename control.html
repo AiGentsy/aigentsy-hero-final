@@ -4,127 +4,6 @@
   <meta charset="UTF-8"/>
   <title>AiGentsy — Control Deck</title>
   <link rel="stylesheet" href="control.css"/>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-    }
-
-    .container {
-      display: flex;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: #111;
-      padding: 20px;
-      border-right: 1px solid #222;
-      height: 100vh;
-    }
-
-    .sidebar .logo {
-      width: 140px;
-      margin-bottom: 30px;
-    }
-
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .sidebar ul li {
-      margin-bottom: 14px;
-    }
-
-    .sidebar ul li a {
-      color: #bbb;
-      text-decoration: none;
-      font-size: 0.95rem;
-    }
-
-    .sidebar ul li a:hover {
-      color: #00f0ff;
-    }
-
-    .main-content {
-      flex: 1;
-      padding: 40px;
-      position: relative;
-    }
-
-    .main-content::before {
-      content: '';
-      position: absolute;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 400px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(0,255,255,0.08) 0%, transparent 70%);
-      animation: pulseGlow 3s ease-in-out infinite;
-      z-index: 0;
-      filter: blur(40px);
-      pointer-events: none;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      background: linear-gradient(to right, #00f0ff, #a64dff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 30px;
-      position: relative;
-      z-index: 2;
-    }
-
-    .log-section {
-      background: #1a1a1a;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0, 255, 255, 0.08);
-      z-index: 2;
-      position: relative;
-    }
-
-    .log-entry p {
-      margin: 6px 0;
-      font-size: 0.95rem;
-    }
-
-    .log-entry #log-status {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    button {
-      margin-right: 10px;
-      padding: 10px 16px;
-      background: #00f0ff;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-
-    button:hover {
-      background: #00d5e0;
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% {
-        transform: translateX(-50%) scale(1);
-        opacity: 0.4;
-      }
-      50% {
-        transform: translateX(-50%) scale(1.07);
-        opacity: 0.8;
-      }
-    }
-  </style>
 </head>
 <body>
 <div class="container">
@@ -173,30 +52,23 @@
   </main>
 </div>
 
-<!-- 🔐 Control Script -->
+<!-- ✅ Unlocked Control Script -->
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const adminKey = localStorage.getItem("adminAccess");
-    if (adminKey !== "true") {
-      window.location.href = "/404";
-      return;
-    }
+  // Directly expose control actions without admin check
+  window.approveMetaVenture = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "✅ MetaVenture Approved.";
+  };
 
-    window.approveMetaVenture = function () {
-      const status = document.getElementById("log-status");
-      if (status) status.textContent = "✅ MetaVenture Approved.";
-    };
+  window.unlockVault = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "🔓 Vault payout unlocked.";
+  };
 
-    window.unlockVault = function () {
-      const status = document.getElementById("log-status");
-      if (status) status.textContent = "🔓 Vault payout unlocked.";
-    };
-
-    window.grantLicense = function () {
-      const status = document.getElementById("log-status");
-      if (status) status.textContent = "📜 Tier 1 License granted.";
-    };
-  });
+  window.grantLicense = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "📜 Tier 1 License granted.";
+  };
 </script>
 </body>
 </html>
