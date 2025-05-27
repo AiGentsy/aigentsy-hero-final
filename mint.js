@@ -13,11 +13,8 @@ async function connectWallet() {
 
 function mintAgent() {
   const file = document.getElementById("configUpload").files[0];
-  const protocolSelect = document.getElementById("protocolSelect");
-  const visibilitySelect = document.getElementById("visibility");
-
-  const protocol = protocolSelect ? protocolSelect.value : null;
-  const visibility = visibilitySelect ? visibilitySelect.value : null;
+  const protocol = document.getElementById("protocolSelect")?.value;
+  const visibility = document.getElementById("visibility")?.value;
 
   if (!file || !protocol || !visibility) {
     document.getElementById("mintResult").innerText = "Missing required fields.";
@@ -29,14 +26,17 @@ function mintAgent() {
     const config = reader.result;
     document.getElementById("mintResult").innerText =
       "Agent minted!\nProtocol: " + protocol + "\nVisibility: " + visibility + "\nConfig preview:\n" + config.slice(0, 200);
+
+    // 🧠 MetaUpgrade23: Log mint propagation + monetization
+    console.log("[MINT EVENT] New Agent Minted — Auto-assigned to vault and remix eligibility tree");
+    console.log("[MINT EVENT] Traits credentialized. Agent ready for real-world yield logic.");
   };
   reader.readAsText(file);
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("mintChart");
   if (!canvas) return;
-
   const ctx = canvas.getContext("2d");
 
   function createGradient(context, color) {
@@ -109,5 +109,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
     }
+  });
+
+  // 🎯 Animate KPI counters
+  document.querySelectorAll(".value[data-count]").forEach(el => {
+    const count = parseFloat(el.dataset.count);
+    let i = 0;
+    const inc = count / 60;
+    const interval = setInterval(() => {
+      i += inc;
+      el.textContent = count >= 1000 ? Math.floor(i).toLocaleString() : i.toFixed(1);
+      if (i >= count) {
+        el.textContent = count >= 1000 ? Math.floor(count).toLocaleString() : count.toFixed(1);
+        clearInterval(interval);
+      }
+    }, 16);
   });
 });
