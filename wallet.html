@@ -67,7 +67,6 @@
   <div class="main">
     <h1>Your Wallet</h1>
 
-    <!-- 🔁 Auto-Stake Panel -->
     <div class="auto-stake-panel" style="margin-bottom: 30px; background: #0a0a0a; padding: 14px; border-left: 4px solid #00f0ff;">
       <label style="color: #00f0ff; font-weight: bold;">
         <input type="checkbox" checked disabled style="margin-right: 8px;" />
@@ -78,14 +77,12 @@
       </p>
     </div>
 
-    <!-- 🔧 Filters -->
     <div class="chart-toggle">
       <select><option>Total Earnings</option><option>Vault Earnings</option><option>Remix Earnings</option><option>MetaVenture Earnings</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
       <select><option>Raw Value</option><option>% Change</option></select>
     </div>
 
-    <!-- 📟 Wallet Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Vaults Joined</div><div class="value" data-count="4">0</div></div>
       <div class="kpi"><div class="label">AIGx Balance</div><div class="value" data-count="740">0</div></div>
@@ -99,7 +96,6 @@
       <div class="kpi"><div class="label">Remix Yield Contribution</div><div class="value" data-count="42">0</div></div>
     </div>
 
-    <!-- 📊 Chart Header -->
     <div class="chart-header">
       <h3>Wallet Activity & AIGx Performance</h3>
     </div>
@@ -112,14 +108,12 @@
       <span style="color: #00ffb2">Lifetime AIGx</span>
     </div>
 
-    <!-- 🧬 Agent Profile Links -->
     <div class="agent-vault-link">
       <p>Primary Agent Linked to Wallet:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
       <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
     </div>
 
-    <!-- 💵 Withdrawal Options -->
     <div class="payout-panel" style="margin-top: 40px; background: #111; padding: 20px; border-left: 4px solid #00ffb2;">
       <h3 style="color: #00ffb2;">💸 Withdrawal & Payout Settings</h3>
       <p style="color: #ccc; font-size: 0.95rem;">Choose your payout method. Default: Auto-stake into remix trees and vaults. Withdrawals must exceed minimum threshold (250 AIGx).</p>
@@ -142,7 +136,16 @@
       <p style="font-size: 0.85rem; color: #aaa; margin-top: 10px;">Minimum withdrawal: <strong>250 AIGx</strong> · Protocol Fee: <strong>1%</strong> processing</p>
     </div>
 
-    <!-- 🧾 Fee Breakdown -->
+    <div class="stripe-cta" style="background:#0f0f0f; border:1px solid #00f0ff; border-radius:8px; padding:20px; margin:40px auto 20px; text-align:center; max-width:420px;">
+      <h3 style="color:#00f0ff; margin-bottom:10px;">🔁 Fund Wallet / Agent Clone Payout</h3>
+      <p style="font-size:0.95rem; color:#bbb; margin-bottom:16px;">
+        Top up your AIGx balance or pre-fund agent clone payouts and remix streams. Stripe handles payment processing.
+      </p>
+      <a href="https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09" target="_blank" style="display:inline-block; background:#00f0ff; color:#000; padding:10px 18px; border-radius:6px; font-weight:bold; text-decoration:none;">
+        Fund Wallet with Stripe
+      </a>
+    </div>
+
     <div class="fee-summary" style="margin-top: 40px; background: #0a0a0a; padding: 20px; border-left: 4px solid #a64dff;">
       <h3 style="color: #a64dff;">📊 Platform Fee Schedule</h3>
       <ul style="line-height: 1.6; color: #ccc;">
@@ -155,19 +158,16 @@
       </ul>
     </div>
 
-    <!-- 📘 Terms Reminder -->
     <div style="margin-top: 30px; font-size: 0.85rem; color: #999;">
       All earnings, fees, and withdrawals are governed by the <a href="/learn" style="color:#00f0ff; text-decoration: underline;">AiGentsy Protocol Terms</a>.
     </div>
 
-    <!-- 🔗 Crosslinks -->
     <div class="crosslinks">
       <button class="btn-glow" onclick="window.location.href='/vaults'">Go to Vaults</button>
       <button class="btn-glow" onclick="window.location.href='/metaventures'">View MetaVentures</button>
       <button class="btn-glow" onclick="window.location.href='/remix'">Remix Hub</button>
     </div>
 
-    <!-- ℹ️ Guide -->
     <div class="silo-guide">
       <h3>Wallet — What Is This?</h3>
       <p>
