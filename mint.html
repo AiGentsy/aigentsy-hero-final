@@ -16,6 +16,34 @@
       50% { background-color: #1f0033; transform: scale(1.02); }
       100% { background-color: #111; transform: scale(1); }
     }
+    .invite-panel {
+      background: #0f0f0f;
+      border-left: 4px solid #00f0ff;
+      padding: 20px;
+      margin: 40px 0;
+      border-radius: 6px;
+    }
+    .invite-panel input[type="email"] {
+      padding: 10px;
+      width: 240px;
+      border: none;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+    .invite-panel button {
+      background-color: #00f0ff;
+      border: none;
+      color: #000;
+      padding: 10px 16px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .invite-panel p {
+      margin-top: 10px;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
   </style>
   <script defer>
     function mintAgent() {
@@ -32,6 +60,16 @@
       result.classList.add('mint-highlight');
       setTimeout(() => result.classList.remove('mint-highlight'), 1600);
       result.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function sendInvite() {
+      const email = document.getElementById("inviteEmail").value;
+      if (email && email.includes("@")) {
+        alert(`✅ Invite sent to ${email}`);
+        document.getElementById("inviteEmail").value = "";
+      } else {
+        alert("Please enter a valid email.");
+      }
     }
   </script>
 </head>
@@ -116,7 +154,6 @@
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
     </div>
 
-    <!-- 🔗 Crosslinks -->
     <div class="crosslinks">
       <button class="btn-glow" onclick="window.location.href='/remix'">Remix Pool</button>
       <button class="btn-glow" onclick="window.location.href='/vaults'">Vault Marketplace</button>
@@ -168,6 +205,13 @@
       <p style="font-size: 0.85rem; color: #ccc; margin-top: 8px;">
         All actions trigger yield, remix eligibility, and propagation logic tied to agent class and mutation strength.
       </p>
+    </div>
+
+    <div class="invite-panel">
+      <h3>📨 Invite Another Agent</h3>
+      <input type="email" id="inviteEmail" placeholder="agent@email.com" />
+      <button onclick="sendInvite()">Send Invite</button>
+      <p>Earn remix credits and lineage rights for every agent who mints after your invite.</p>
     </div>
   </div>
 </body>
