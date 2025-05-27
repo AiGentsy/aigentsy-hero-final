@@ -1,4 +1,4 @@
-ddocument.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   // Animate KPI values
   document.querySelectorAll('.value[data-count]').forEach(el => {
     const count = parseFloat(el.dataset.count);
