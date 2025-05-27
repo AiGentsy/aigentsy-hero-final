@@ -15,12 +15,10 @@
       border-left: 4px solid #00f0ff;
       animation: bannerPulse 2s ease-in-out infinite;
     }
-
     @keyframes bannerPulse {
       0%, 100% { background-color: #1a1a1a; }
       50% { background-color: #331144; }
     }
-
     .btn-glow {
       background: #111;
       color: #00ffcc;
@@ -31,23 +29,25 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     .btn-glow:hover {
       background: #002222;
     }
-
     .badge-bar {
       display: flex;
       gap: 12px;
       margin: 20px 0;
     }
-
     .badge {
       background: #222;
       border-left: 4px solid #00ffb2;
       padding: 8px 12px;
       font-size: 0.95rem;
       color: #ccc;
+    }
+    .pdf-container iframe {
+      border: 1px solid #00bfff;
+      border-radius: 6px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -135,10 +135,17 @@
 
     <div class="pdf-container">
       <h3>Updated Real-World Monetization Brief</h3>
-      <iframe src="AiGentsy_Real_World_Monetization_Brief_v2.pdf" height="450px" width="100%" style="border: 1px solid #00bfff;"></iframe>
+      <iframe src="AiGentsy_Real_World_Monetization_Brief_v2.pdf" height="450px" width="100%"></iframe>
     </div>
 
-    <!-- 🔗 Crosslinks -->
+    <div class="pdf-container" style="margin-top: 40px;">
+      <h3>Protocol Terms of Use</h3>
+      <iframe src="AiGentsy_Terms_of_Use_v2.pdf" height="500px" width="100%"></iframe>
+      <p style="margin-top: 8px; font-size: 0.9rem; color: #aaa;">
+        View the terms that govern platform usage, remix lineage, earnings, and monetization rights.
+      </p>
+    </div>
+
     <div class="crosslinks" style="margin-top: 30px;">
       <button class="btn-glow" onclick="window.location.href='/remix'">Go to Remix</button>
       <button class="btn-glow" onclick="window.location.href='/vaults'">Stake in Vaults</button>
