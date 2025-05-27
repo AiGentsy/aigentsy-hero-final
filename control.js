@@ -1,18 +1,24 @@
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const adminKey = localStorage.getItem("adminAccess");
-    if (adminKey !== "true") {
-      // Redirect unauthorized users to 404
-      window.location.href = "/404";
-    }
-  });
-</script>
-function approveMetaVenture() {
-  document.getElementById("log-status").textContent = "✅ MetaVenture Approved.";
-}
-function unlockVault() {
-  document.getElementById("log-status").textContent = "🔓 Vault payout unlocked.";
-}
-function grantLicense() {
-  document.getElementById("log-status").textContent = "📜 Tier 1 License granted.";
-}
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔐 Admin Access Check
+  const adminKey = localStorage.getItem("adminAccess");
+  if (adminKey !== "true") {
+    window.location.href = "/404"; // Redirect if unauthorized
+    return;
+  }
+
+  // ✅ Admin Action Handlers
+  window.approveMetaVenture = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "✅ MetaVenture Approved.";
+  };
+
+  window.unlockVault = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "🔓 Vault payout unlocked.";
+  };
+
+  window.grantLicense = function () {
+    const status = document.getElementById("log-status");
+    if (status) status.textContent = "📜 Tier 1 License granted.";
+  };
+});
