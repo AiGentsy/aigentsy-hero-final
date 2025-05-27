@@ -19,13 +19,18 @@
   </style>
   <script defer>
     document.addEventListener("DOMContentLoaded", () => {
-      const target = document.querySelector('.kpi .label:contains("Lifetime AIGx Earnings")')?.nextElementSibling;
-      if (target) {
-        setTimeout(() => {
-          target.classList.add("pulse");
-          setTimeout(() => target.classList.remove("pulse"), 1600);
-        }, 1000);
-      }
+      const labels = document.querySelectorAll('.kpi .label');
+      labels.forEach(label => {
+        if (label.textContent.includes("Lifetime AIGx Earnings")) {
+          const target = label.nextElementSibling;
+          if (target) {
+            setTimeout(() => {
+              target.classList.add("pulse");
+              setTimeout(() => target.classList.remove("pulse"), 1600);
+            }, 1000);
+          }
+        }
+      });
     });
   </script>
 </head>
@@ -99,7 +104,6 @@
     <div class="chart-header">
       <h3>Wallet Activity & AIGx Performance</h3>
     </div>
-    <!-- 📊 Chart -->
     <div class="chart-container">
       <canvas id="walletChart" height="300"></canvas>
     </div>
@@ -114,6 +118,47 @@
       <p>Primary Agent Linked to Wallet:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
       <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
+    </div>
+
+    <!-- 💵 Withdrawal Options -->
+    <div class="payout-panel" style="margin-top: 40px; background: #111; padding: 20px; border-left: 4px solid #00ffb2;">
+      <h3 style="color: #00ffb2;">💸 Withdrawal & Payout Settings</h3>
+      <p style="color: #ccc; font-size: 0.95rem;">Choose your payout method. Default: Auto-stake into remix trees and vaults. Withdrawals must exceed minimum threshold (250 AIGx).</p>
+
+      <div style="margin-top: 12px;">
+        <label style="display: block; color: #00ccff;">
+          <input type="radio" name="payout" checked disabled style="margin-right: 8px;" />
+          Auto-Stake (Default)
+        </label>
+        <label style="display: block; color: #ccc;">
+          <input type="radio" name="payout" onclick="alert('MetaMask withdrawal request queued.')" style="margin-right: 8px;" />
+          Withdraw to MetaMask (Crypto)
+        </label>
+        <label style="display: block; color: #ccc;">
+          <input type="radio" name="payout" onclick="alert('Fiat payout via Stripe will be reviewed.')" style="margin-right: 8px;" />
+          Withdraw to Bank (Fiat)
+        </label>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #aaa; margin-top: 10px;">Minimum withdrawal: <strong>250 AIGx</strong> · Protocol Fee: <strong>1%</strong> processing</p>
+    </div>
+
+    <!-- 🧾 Fee Breakdown -->
+    <div class="fee-summary" style="margin-top: 40px; background: #0a0a0a; padding: 20px; border-left: 4px solid #a64dff;">
+      <h3 style="color: #a64dff;">📊 Platform Fee Schedule</h3>
+      <ul style="line-height: 1.6; color: #ccc;">
+        <li>Remix Yield: <strong>10%</strong> platform fee</li>
+        <li>Vault Exit: <strong>1%</strong> exit fee</li>
+        <li>Licensing: <strong>20%</strong> of license value</li>
+        <li>MetaVentures: <strong>5%</strong> profit share</li>
+        <li>Marketplace Sales: <strong>2.5%</strong> asset sale fee</li>
+        <li>Withdrawals: <strong>1%</strong> processing fee</li>
+      </ul>
+    </div>
+
+    <!-- 📘 Terms Reminder -->
+    <div style="margin-top: 30px; font-size: 0.85rem; color: #999;">
+      All earnings, fees, and withdrawals are governed by the <a href="/learn" style="color:#00f0ff; text-decoration: underline;">AiGentsy Protocol Terms</a>.
     </div>
 
     <!-- 🔗 Crosslinks -->
