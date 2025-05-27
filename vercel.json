@@ -3,7 +3,6 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/vaults", "destination": "/vaults.html" },
-    { "source": "/exchange", "destination": "/exchange.html" },
     { "source": "/metatrade", "destination": "/metatrade.html" },
     { "source": "/credit", "destination": "/credit.html" },
     { "source": "/metagrowth", "destination": "/metagrowth.html" },
