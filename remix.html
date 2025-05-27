@@ -7,6 +7,21 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="remix.js?v=2"></script>
+  <style>
+    .btn-glow {
+      background: #111;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      padding: 10px 14px;
+      margin: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .btn-glow:hover {
+      background: #002222;
+    }
+  </style>
 </head>
 <body>
 <div class="sidebar">
@@ -72,10 +87,10 @@
   <div class="monetize-remix">
     <h2>Monetize This Remix</h2>
     <p>Turn your remix into a monetizable asset. Choose one of the actions below:</p>
-    <button onclick="alert('Propagation boost staked. +AIGx Yield.')">Stake to Boost Propagation</button>
-    <button onclick="alert('Remix converted to vault. Tradable unlocked.')">Convert to Vault</button>
-    <button onclick="alert('Royalty terms recorded. Auto-yield on remix lineage.')">Set Royalty Terms</button>
-    <button onclick="alert('Collaborator invites sent. Joint value route opened.')">Invite Collaborators</button>
+    <button class="btn-glow" onclick="alert('Propagation boost staked. +AIGx Yield.')">Stake to Boost Propagation</button>
+    <button class="btn-glow" onclick="alert('Remix converted to vault. Tradable unlocked.')">Convert to Vault</button>
+    <button class="btn-glow" onclick="alert('Royalty terms recorded. Auto-yield on remix lineage.')">Set Royalty Terms</button>
+    <button class="btn-glow" onclick="alert('Collaborator invites sent. Joint value route opened.')">Invite Collaborators</button>
   </div>
 
   <div class="agent-remix-source">
@@ -97,7 +112,7 @@
         <option>Staker-Biased</option>
       </select>
     </label>
-    <button onclick="launchVenture()">Forge Venture</button>
+    <button class="btn-glow" onclick="launchVenture()">Forge Venture</button>
   </div>
 
   <div class="rwp-callout">
