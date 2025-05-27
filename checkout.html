@@ -5,7 +5,6 @@
   <title>AiGentsy — Checkout</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="theme.css" rel="stylesheet" />
-  <script src="https://js.stripe.com/v3/"></script>
   <style>
     body {
       background: #111;
@@ -28,13 +27,6 @@
       color: #00f0ff;
       margin-bottom: 20px;
     }
-    #card-element {
-      background: #000;
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid #00f0ff;
-      margin-bottom: 20px;
-    }
     .summary {
       font-size: 0.95rem;
       color: #aaa;
@@ -54,11 +46,6 @@
     button:hover {
       background: #00d5e0;
     }
-    #card-error {
-      margin-top: 12px;
-      color: #f66;
-      font-size: 0.9rem;
-    }
   </style>
 </head>
 <body>
@@ -69,45 +56,14 @@
       <strong>Amount:</strong> Set by protocol logic or fixed AIGx equivalent<br/>
       💡 All payments are protocol-tracked and unlock downstream monetization.
     </div>
-    <form id="payment-form">
-      <div id="card-element"></div>
-      <button type="submit">Pay Now</button>
-      <p id="card-error" role="alert"></p>
-    </form>
+    <button onclick="redirectToStripe()">Pay with Stripe</button>
   </div>
 
   <script>
-    const stripe = Stripe("pk_live_51RS0YgANJN4tfcn9US4EesxBnlB3rMzoElbOYiA5seI6QFfujPNiQSiwU5esKo6Wm5buoAkijhkgUJnBAPLEhIX600uUpkP7s6");
-
-    const elements = stripe.elements();
-    const card = elements.create("card", {
-      style: {
-        base: {
-          color: "#00f0ff",
-          fontFamily: "sans-serif",
-          fontSize: "16px",
-          "::placeholder": { color: "#888" }
-        },
-        invalid: { color: "#ff3860" }
-      }
-    });
-    card.mount("#card-element");
-
-    const form = document.getElementById("payment-form");
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: "card",
-        card: card
-      });
-
-      if (error) {
-        document.getElementById("card-error").textContent = error.message;
-      } else {
-        alert("✅ Payment method created: " + paymentMethod.id);
-        // Future logic: POST paymentMethod.id to backend or trigger protocol confirmation
-      }
-    });
+    function redirectToStripe() {
+      // Replace with your actual Stripe Checkout Session URL
+      window.location.href = "https://checkout.stripe.com/c/pay/cs_test_examplecheckoutsession";
+    }
   </script>
 </body>
 </html>
