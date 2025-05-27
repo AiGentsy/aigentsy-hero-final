@@ -7,6 +7,33 @@
   <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="mint.js"></script>
+  <style>
+    .mint-highlight {
+      animation: pulseGrow 1.6s ease-out;
+    }
+    @keyframes pulseGrow {
+      0% { background-color: #111; transform: scale(1); }
+      50% { background-color: #1f0033; transform: scale(1.02); }
+      100% { background-color: #111; transform: scale(1); }
+    }
+  </style>
+  <script defer>
+    function mintAgent() {
+      const result = document.getElementById('mintResult');
+      result.innerHTML = "✅ Agent Minted Successfully!";
+      result.classList.add('mint-highlight');
+      setTimeout(() => result.classList.remove('mint-highlight'), 1600);
+      result.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function initiateClone() {
+      const result = document.getElementById('mintResult');
+      result.innerHTML = "🧬 Agent Cloned with Mutation Settings.";
+      result.classList.add('mint-highlight');
+      setTimeout(() => result.classList.remove('mint-highlight'), 1600);
+      result.scrollIntoView({ behavior: 'smooth' });
+    }
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -83,11 +110,18 @@
       <span style="color: #00ffb2">Avg Earnings</span>
     </div>
 
-    <div id="mintResult" class="result"></div>
+    <div id="mintResult" class="result" style="margin-top: 16px; font-weight: bold;"></div>
 
     <div class="agent-vault-link">
       <p>Preview Most Recently Minted Agent:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/remix'">Remix Pool</button>
+      <button class="btn-glow" onclick="window.location.href='/vaults'">Vault Marketplace</button>
+      <button class="btn-glow" onclick="window.location.href='/metaventures'">MetaVentures</button>
     </div>
 
     <div class="silo-guide">
