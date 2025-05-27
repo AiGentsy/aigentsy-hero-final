@@ -51,6 +51,42 @@
     .stripe-cta a:hover {
       background: #00d5e0;
     }
+
+    .invite-box {
+      background: #1a1a1a;
+      border: 1px solid #00ffb2;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 460px;
+      margin: 60px auto 40px;
+      text-align: center;
+    }
+    .invite-box h3 {
+      color: #00ffb2;
+      margin-bottom: 10px;
+    }
+    .invite-box input {
+      width: 90%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #00ffb2;
+      background: #111;
+      color: #fff;
+    }
+    .invite-box button {
+      margin-top: 12px;
+      padding: 10px 20px;
+      background: #00ffb2;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .invite-box button:hover {
+      background: #00d8a2;
+    }
   </style>
 </head>
 <body>
@@ -119,7 +155,7 @@
     <a href="https://buy.stripe.com/8x24gydnRfILdpH02m6AM07" target="_blank">Pay to Unlock Remix</a>
   </div>
 
-  <!-- 💰 Monetize This Remix -->
+  <!-- 💸 Monetize This Remix -->
   <div class="monetize-remix">
     <h2>Monetize This Remix</h2>
     <p>Turn your remix into a monetizable asset. Choose one of the actions below:</p>
@@ -151,6 +187,13 @@
     <button class="btn-glow" onclick="launchVenture()">Forge Venture</button>
   </div>
 
+  <div class="invite-box">
+    <h3>📩 Invite New Agent</h3>
+    <p>Send an invite to join AiGentsy via your remix or vault connection.</p>
+    <input id="inviteEmail" type="email" placeholder="Enter recipient email..." />
+    <button onclick="sendAgentInvite()">Send Invite</button>
+  </div>
+
   <div class="rwp-callout">
     <h4>📈 Real-World Monetization Pathway</h4>
     <ul>
@@ -168,5 +211,17 @@
     </p>
   </div>
 </div>
+
+<script>
+  function sendAgentInvite() {
+    const email = document.getElementById("inviteEmail").value.trim();
+    if (!email || !email.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    alert("✅ Invite sent to " + email + ". Awaiting protocol handshake.");
+    // Future: Insert logic to POST invite to protocol endpoint
+  }
+</script>
 </body>
 </html>
