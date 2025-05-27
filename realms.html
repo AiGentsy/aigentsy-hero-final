@@ -7,6 +7,35 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="realms.js"></script>
+  <style>
+    .sync-pulse {
+      animation: syncFlash 1.5s ease-out;
+    }
+    @keyframes syncFlash {
+      0% { background-color: #111; }
+      50% { background-color: #003344; }
+      100% { background-color: #111; }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const syncTile = [...document.querySelectorAll(".kpi")].find(k =>
+        k.querySelector(".label")?.textContent?.includes("Sync Accuracy")
+      )?.querySelector(".value");
+
+      if (syncTile) {
+        setTimeout(() => {
+          syncTile.classList.add("sync-pulse");
+          setTimeout(() => syncTile.classList.remove("sync-pulse"), 1500);
+        }, 1000);
+      }
+
+      const realmView = document.getElementById("realmViewToggle");
+      realmView?.addEventListener("change", () => {
+        alert(`View switched to: ${realmView.value}`);
+      });
+    });
+  </script>
 </head>
 <body>
 <div class="sidebar">
@@ -44,6 +73,13 @@
     <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
     <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
     <select><option>Raw Value</option><option>% Change</option></select>
+    <!-- 🔁 Realm Mode Toggle -->
+    <select id="realmViewToggle">
+      <option disabled selected>View Mode</option>
+      <option>Local Realm</option>
+      <option>Cross-Realm</option>
+      <option>Global Map</option>
+    </select>
   </div>
 
   <div class="kpi-grid">
@@ -81,6 +117,13 @@
     <span style="color: #00f0ff">Auto-Created</span>
     <span style="color: #a64dff">Cross-Realm</span>
     <span style="color: #00ffb2">Mirror Agents</span>
+  </div>
+
+  <!-- 🔗 Crosslinks -->
+  <div class="crosslinks">
+    <button class="btn-glow" onclick="window.location.href='/metagrowth'">MetaGrowth</button>
+    <button class="btn-glow" onclick="window.location.href='/vaults'">Vaults</button>
+    <button class="btn-glow" onclick="window.location.href='/arena'">Arena</button>
   </div>
 
   <div class="monetize-remix">
