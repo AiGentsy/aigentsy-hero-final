@@ -114,6 +114,14 @@
         This is your protocol command center. Track global agent activity, remix propagation, and protocol-level financial health in real time. View the performance of every major silo, identify new vaults or agent lineages, and navigate the full AiGentsy ecosystem from one place.
       </p>
     </div>
+
+    <!-- 🎯 Agent Invitation Engine -->
+    <div class="agent-invite">
+      <h3>📩 Invite Agents to AiGentsy</h3>
+      <input type="email" id="inviteEmail" placeholder="Enter agent email to invite" />
+      <button onclick="sendInvite()">Send Invite</button>
+      <p id="inviteStatus" style="margin-top: 8px; color: #0f0;"></p>
+    </div>
   </div>
 
   <script>
@@ -190,6 +198,19 @@
         }
       }, 16);
     });
+
+    function sendInvite() {
+      const email = document.getElementById("inviteEmail").value.trim();
+      const status = document.getElementById("inviteStatus");
+      if (email.includes("@")) {
+        localStorage.setItem("invitedAgent", email);
+        status.textContent = `✅ Invite sent to ${email}`;
+        status.style.color = "#0f0";
+      } else {
+        status.textContent = "❌ Invalid email.";
+        status.style.color = "#f66";
+      }
+    }
   </script>
 </body>
 </html>
