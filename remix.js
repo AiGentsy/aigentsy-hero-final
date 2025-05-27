@@ -1,4 +1,4 @@
-<script>
+
   document.addEventListener("DOMContentLoaded", () => {
     // Animate KPI values
     document.querySelectorAll(".value[data-count]").forEach(el => {
