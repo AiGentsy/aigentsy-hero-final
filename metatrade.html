@@ -8,21 +8,9 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="metatrade.js"></script>
   <style>
-    .market-table {
-      margin-top: 30px;
-      width: 100%;
-      border-collapse: collapse;
-      color: #ccc;
-      font-size: 0.95rem;
-    }
-    .market-table th, .market-table td {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 12px 8px;
-      text-align: left;
-    }
-    .market-table th {
-      color: #00f0ff;
-    }
+    .market-table { margin-top: 30px; width: 100%; border-collapse: collapse; color: #ccc; font-size: 0.95rem; }
+    .market-table th, .market-table td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding: 12px 8px; text-align: left; }
+    .market-table th { color: #00f0ff; }
     .buy-btn, .sell-btn {
       padding: 6px 12px;
       border: 1px solid #00f0ff;
@@ -58,15 +46,8 @@
       border: 1px solid #00f0ff;
       border-radius: 6px;
     }
-    .modal-buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .modal-buttons button {
-      flex: 1;
-      margin: 0 5px;
-    }
+    .modal-buttons { margin-top: 20px; display: flex; justify-content: space-between; }
+    .modal-buttons button { flex: 1; margin: 0 5px; }
     .overlay {
       display: none;
       position: fixed;
@@ -95,7 +76,6 @@
       <ul>
         <li><a href="/dashboard">Dashboard</a></li>
         <li><a href="/vaults">Vaults</a></li>
-        <li><a href="/exchange">Exchange</a></li>
         <li><a href="/metatrade" class="active">MetaTrade</a></li>
         <li><a href="/credit">Credit Staking</a></li>
         <li><a href="/wallet">Wallet</a></li>
@@ -243,4 +223,4 @@
     }
   </script>
 </body>
-</html
+</html>
