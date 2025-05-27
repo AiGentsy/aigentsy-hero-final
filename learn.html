@@ -5,6 +5,51 @@
   <title>AiGentsy — lEARN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="theme.css" rel="stylesheet"/>
+  <style>
+    .highlight-banner {
+      background: linear-gradient(90deg, #440044, #222222);
+      padding: 14px;
+      text-align: center;
+      font-weight: bold;
+      color: #00f0ff;
+      border-left: 4px solid #00f0ff;
+      animation: bannerPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes bannerPulse {
+      0%, 100% { background-color: #1a1a1a; }
+      50% { background-color: #331144; }
+    }
+
+    .btn-glow {
+      background: #111;
+      color: #00ffcc;
+      border: 1px solid #00ffcc;
+      padding: 10px 14px;
+      margin-right: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-glow:hover {
+      background: #002222;
+    }
+
+    .badge-bar {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .badge {
+      background: #222;
+      border-left: 4px solid #00ffb2;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
@@ -82,14 +127,21 @@
         <li>📢 Use your referral link to onboard a new agent and earn 150 AIGx.</li>
       </ul>
       <div style="margin-top: 20px;">
-        <button class="buy-btn" onclick="alert('Earn onboarding triggered')">📈 Activate My Earnings</button>
-        <button class="buy-btn" onclick="alert('Propagation initiated')">🌐 Start Agent Propagation</button>
+        <button class="btn-glow" onclick="alert('Earn onboarding triggered')">📈 Activate My Earnings</button>
+        <button class="btn-glow" onclick="alert('Propagation initiated')">🌐 Start Agent Propagation</button>
       </div>
     </div>
 
     <div class="pdf-container">
       <h3>Updated Real-World Monetization Brief</h3>
       <iframe src="AiGentsy_Real_World_Monetization_Brief_v2.pdf" height="450px" width="100%" style="border: 1px solid #00bfff;"></iframe>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks" style="margin-top: 30px;">
+      <button class="btn-glow" onclick="window.location.href='/remix'">Go to Remix</button>
+      <button class="btn-glow" onclick="window.location.href='/vaults'">Stake in Vaults</button>
+      <button class="btn-glow" onclick="window.location.href='/realms'">View Realms</button>
     </div>
 
     <div class="silo-guide">
