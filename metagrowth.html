@@ -7,6 +7,36 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="metagrowth.js"></script>
+  <style>
+    .pulse-highlight {
+      animation: pulseFlash 2s ease-out;
+    }
+    @keyframes pulseFlash {
+      0% { background-color: #111; }
+      50% { background-color: #004f4f; }
+      100% { background-color: #111; }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const surgeTarget = [...document.querySelectorAll(".kpi")].find(k =>
+        k.querySelector(".label")?.textContent?.includes("Ecosystem Multiplier")
+      )?.querySelector(".value");
+
+      if (surgeTarget) {
+        setTimeout(() => {
+          surgeTarget.classList.add("pulse-highlight");
+          setTimeout(() => surgeTarget.classList.remove("pulse-highlight"), 2000);
+        }, 1000);
+      }
+
+      const multiplierSelect = document.getElementById("growthMultiplier");
+      multiplierSelect?.addEventListener("change", () => {
+        const val = multiplierSelect.value;
+        alert(`Simulating ecosystem at ${val} growth multiplier.`);
+      });
+    });
+  </script>
 </head>
 <body>
 <div class="sidebar">
@@ -43,6 +73,13 @@
     <select><option>1H</option><option>1D</option><option>1W</option><option>1M</option><option>1Y</option></select>
     <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
     <select><option>Raw Value</option><option>% Change</option></select>
+    <!-- 🔁 Growth Multiplier Toggle -->
+    <select id="growthMultiplier">
+      <option disabled selected>Growth Multiplier</option>
+      <option>x1</option>
+      <option>x3</option>
+      <option>x10</option>
+    </select>
   </div>
 
   <div class="kpi-grid">
@@ -65,6 +102,13 @@
     <span style="color: #00f0ff">Adoption</span>
     <span style="color: #a64dff">Expansion</span>
     <span style="color: #00ffb2">Clones</span>
+  </div>
+
+  <!-- 🔗 Crosslinks -->
+  <div class="crosslinks">
+    <button class="btn-glow" onclick="window.location.href='/vaults'">Vaults</button>
+    <button class="btn-glow" onclick="window.location.href='/credit'">Credit Staking</button>
+    <button class="btn-glow" onclick="window.location.href='/realms'">View Realms</button>
   </div>
 
   <div class="silo-guide">
