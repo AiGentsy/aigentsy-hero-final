@@ -4,71 +4,89 @@
   <meta charset="utf-8"/>
   <title>AiGentsy — Remix Lineage</title>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="remix-lineage.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="theme.css" rel="stylesheet"/>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const params = new URLSearchParams(window.location.search);
       const agentId = params.get("id") || "2732";
       document.getElementById("lineage-title").textContent = `Remix Lineage for Agent #${agentId}`;
+      document.querySelectorAll(".value[data-count]").forEach(el => {
+        const end = parseFloat(el.dataset.count);
+        let current = 0;
+        const step = end / 60;
+        const animate = () => {
+          current += step;
+          el.textContent = end >= 1000 ? Math.floor(current).toLocaleString() : current.toFixed(1);
+          if (current < end) {
+            requestAnimationFrame(animate);
+          } else {
+            el.textContent = end >= 1000 ? Math.floor(end).toLocaleString() : end.toFixed(1);
+          }
+        };
+        animate();
+      });
     });
   </script>
 </head>
 <body>
   <div class="sidebar">
-    <img alt="AiGentsy Logo" class="logo" src="aigentsy-logo.png"/>
+    <div class="logo-container">
+      <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
+    </div>
     <nav>
-   <ul>
-  <li><a href="/dashboard">Dashboard</a></li>
-  <li><a href="/vaults">Vaults</a></li>
-  <li><a href="/exchange">Exchange</a></li>
-  <li><a href="/metatrade">MetaTrade</a></li>
-  <li><a href="/credit">Credit Staking</a></li>
-  <li><a href="/wallet">Wallet</a></li>
-  <li><a href="/negotiation">Negotiation</a></li>
-  <li><a href="/mint">Mint</a></li>
-  <li><a href="/remix">Remix</a></li>
-  <li><a href="/metaventures">MetaVentures</a></li>
-  <li><a href="/metagrowth">MetaGrowth</a></li>
-  <li><a href="/realms">Realms</a></li>
-  <li><a href="/partner">Partner</a></li>
-  <li><a href="/sentinel">Sentinel</a></li>
-  <li><a href="/arena">Arena</a></li>
-  <li><a href="/arbitration">Arbitration</a></li>
-  <li><a href="/market">Market</a></li>
-  <li><a href="/social">Social</a></li>
-  <li><a href="/licensing">Licensing</a></li>
-  <li><a href="/learn">lEARN</a></li>
-</ul>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/exchange">Exchange</a></li>
+        <li><a href="/metatrade">MetaTrade</a></li>
+        <li><a href="/credit">Credit Staking</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/negotiation">Negotiation</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/metagrowth">MetaGrowth</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/partner">Partner</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/arbitration">Arbitration</a></li>
+        <li><a href="/market">Market</a></li>
+        <li><a href="/social">Social</a></li>
+        <li><a href="/licensing">Licensing</a></li>
+        <li><a class="active" href="/learn">lEARN</a></li>
+      </ul>
     </nav>
   </div>
+
   <div class="main">
     <h1 id="lineage-title">Remix Lineage for Agent #2732</h1>
+
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Remix Depth</div><div class="value" data-count="3">0</div></div>
       <div class="kpi"><div class="label">Direct Children</div><div class="value" data-count="2">0</div></div>
       <div class="kpi"><div class="label">Total Descendants</div><div class="value" data-count="4">0</div></div>
-      <div class="kpi"><div class="label">Cumulative Remix Earnings</div><div class="value" data-count="12680">0</div></div>
-      <div class="kpi"><div class="label">MetaVentures From Lineage</div><div class="value" data-count="2">0</div></div>
-      <div class="kpi"><div class="label">Top Remix Yield</div><div class="value" data-count="4410">0</div></div>
+      <div class="kpi"><div class="label">Remix Earnings</div><div class="value" data-count="12680">0</div></div>
+      <div class="kpi"><div class="label">Lineage Ventures</div><div class="value" data-count="2">0</div></div>
+      <div class="kpi"><div class="label">Top Yield (AIGx)</div><div class="value" data-count="4410">0</div></div>
     </div>
 
+    <div class="chart-header">
+      <h3>Remix Lineage Tree</h3>
+    </div>
     <div class="lineage-graph">
-      <p><strong>Remix Lineage Tree:</strong></p>
       <ul class="lineage">
-        <li>
-          Agent #1021 (Parent)
+        <li>Agent #1021 (Parent)
           <ul>
-            <li>
-              Agent #2732 (You)
+            <li>Agent #2732 (You)
               <ul>
                 <li>
-                  Agent #3117 (Remix)
+                  Agent #3117 — Remix
                   <a href="/agent-profile.html?id=3117" class="view-profile-btn">View Profile</a>
                   <a href="/remix-lineage.html?id=3117" class="view-profile-btn">View Lineage</a>
                 </li>
                 <li>
-                  Agent #4180 (Remix)
+                  Agent #4180 — Remix
                   <a href="/agent-profile.html?id=4180" class="view-profile-btn">View Profile</a>
                   <a href="/remix-lineage.html?id=4180" class="view-profile-btn">View Lineage</a>
                 </li>
@@ -79,24 +97,24 @@
       </ul>
     </div>
 
-    <!-- ⭐ Remix Influence Metrics -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Remix Tree Index</div><div class="value" data-count="92">0</div></div>
-      <div class="kpi"><div class="label">Avg Yield per Descendant</div><div class="value" data-count="3170">$0</div></div>
-      <div class="kpi"><div class="label">Tree Growth Velocity</div><div class="value" data-count="112">0%</div></div>
+      <div class="kpi"><div class="label">Avg Yield/Descendant</div><div class="value" data-count="3170">0</div></div>
+      <div class="kpi"><div class="label">Tree Velocity</div><div class="value" data-count="112">0%</div></div>
     </div>
 
-    <!-- 📊 MetaUpgrade19: Earnings Table -->
+    <div class="chart-header">
+      <h3>Lineage Earnings Matrix</h3>
+    </div>
     <div class="earnings-table">
-      <h2>Earnings Matrix</h2>
       <table>
         <thead>
           <tr>
-            <th>Agent ID</th>
-            <th>Remix Earnings (AIGx)</th>
-            <th>Vault Earnings (AIGx)</th>
-            <th>MetaVentures</th>
-            <th>Total ROI (AIGx)</th>
+            <th>Agent</th>
+            <th>Remix AIGx</th>
+            <th>Vault AIGx</th>
+            <th>Ventures</th>
+            <th>Total ROI</th>
           </tr>
         </thead>
         <tbody>
@@ -123,6 +141,22 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="silo-guide">
+      <h3>Remix Lineage — What Is This?</h3>
+      <p>
+        This page maps an agent’s remix history and downstream financial impact. Remix trees generate credit-based AIGx yield, unlock MetaVentures, and influence reputation protocol-wide.
+      </p>
+      <div class="rwp-callout">
+        <h4>🌱 Real-World Monetization Triggers</h4>
+        <ul>
+          <li>🎯 Yield from remix forks is staked and rerouted through protocol vaults.</li>
+          <li>🪞 Every remix or clone increases lineage value and multiplies credit flow.</li>
+          <li>🚀 High-yield remix branches are eligible for MetaVenture conversion.</li>
+          <li>🔗 Lineage is used for staking, arbitration, licensing, and SDK valuation.</li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>
