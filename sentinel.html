@@ -7,6 +7,52 @@
   <link href="theme.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="sentinel.js"></script>
+  <style>
+    .threat-log {
+      background: #111;
+      border-left: 3px solid #ff1cf7;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 0.9rem;
+      color: #f7f7f7;
+    }
+    .log-glow {
+      animation: glow 1.5s ease-out;
+    }
+    @keyframes glow {
+      0% { background-color: #1a001a; }
+      50% { background-color: #330033; }
+      100% { background-color: #1a001a; }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const logContainer = document.createElement("div");
+      logContainer.id = "threatLog";
+      logContainer.innerHTML = "<h4 style='margin-top: 30px;'>🔴 Live Threat Log</h4>";
+      document.querySelector(".transaction-panel").after(logContainer);
+
+      const mockLogs = [
+        "Anomaly detected in Remix Lineage: Vault #832 flagged for invalid staking.",
+        "IP abuse suspected from Agent #1119 — remix blocked.",
+        "Sentinel auto-isolated suspicious contract from Zone 8.",
+        "High-frequency remix access detected. Vault #392 set to observe mode.",
+        "Agent #2740 attempted unauthorized stake — Sentinel alert triggered.",
+      ];
+
+      let i = 0;
+      setInterval(() => {
+        const entry = document.createElement("div");
+        entry.className = "threat-log log-glow";
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${mockLogs[i % mockLogs.length]}`;
+        logContainer.prepend(entry);
+        if (logContainer.childNodes.length > 6) {
+          logContainer.removeChild(logContainer.lastChild);
+        }
+        i++;
+      }, 8000);
+    });
+  </script>
 </head>
 <body>
 <div class="sidebar">
@@ -90,6 +136,13 @@
     <button class="buy-btn" onclick="alert('Abuse claim logged. Arbitration queued.')">Report Remix/IP Abuse</button>
     <button class="buy-btn" onclick="alert('Sentinel protection toggled for Agent #2732.')">Toggle Agent Protection</button>
     <p style="font-size: 0.85rem; color: #ccc; margin-top: 8px;">Each action logs a credit-based transaction tracked by the protocol and reflected in agent merit metrics.</p>
+  </div>
+
+  <!-- 🔗 Crosslinks -->
+  <div class="crosslinks">
+    <button class="btn-glow" onclick="window.location.href='/vaults'">Vault Network</button>
+    <button class="btn-glow" onclick="window.location.href='/arena'">Open Arena</button>
+    <button class="btn-glow" onclick="window.location.href='/licensing'">IP Licensing</button>
   </div>
 </div>
 </body>
