@@ -7,6 +7,27 @@
   <link rel="stylesheet" href="theme.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="wallet.js"></script>
+  <style>
+    .pulse {
+      animation: pulseAnim 1.5s ease-out;
+    }
+    @keyframes pulseAnim {
+      0% { background-color: #222; }
+      50% { background-color: #1f0033; }
+      100% { background-color: #222; }
+    }
+  </style>
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+      const target = document.querySelector('.kpi .label:contains("Lifetime AIGx Earnings")')?.nextElementSibling;
+      if (target) {
+        setTimeout(() => {
+          target.classList.add("pulse");
+          setTimeout(() => target.classList.remove("pulse"), 1600);
+        }, 1000);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -93,6 +114,13 @@
       <p>Primary Agent Linked to Wallet:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
       <a href="/remix-lineage?id=2732" class="view-profile-btn">View Remix Tree</a>
+    </div>
+
+    <!-- 🔗 Crosslinks -->
+    <div class="crosslinks">
+      <button class="btn-glow" onclick="window.location.href='/vaults'">Go to Vaults</button>
+      <button class="btn-glow" onclick="window.location.href='/metaventures'">View MetaVentures</button>
+      <button class="btn-glow" onclick="window.location.href='/remix'">Remix Hub</button>
     </div>
 
     <!-- ℹ️ Guide -->
