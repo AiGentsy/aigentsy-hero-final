@@ -128,7 +128,7 @@
 <script>
   async function fetchAndRender() {
     try {
-      const res = await fetch("/data/clone-data.json");
+      const res = await fetch("/clone-data.json"); 
       const clones = await res.json();
 
       const tbody = document.querySelector("#cloneTable tbody");
