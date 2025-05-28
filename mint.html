@@ -214,5 +214,44 @@
       <p>Earn remix credits and lineage rights for every agent who mints after your invite.</p>
     </div>
   </div>
+
+  <!-- 🚀 Overlay Enhancements Injected -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const referrer = new URLSearchParams(window.location.search).get("ref");
+      const minted = localStorage.getItem("agentMinted");
+      const refBonusGiven = localStorage.getItem("refBonusGiven");
+
+      const mintResult = document.getElementById("mintResult");
+
+      if (!minted) {
+        const originalMintAgent = window.mintAgent;
+        window.mintAgent = () => {
+          originalMintAgent();
+          localStorage.setItem("agentMinted", "true");
+          mintResult.innerHTML += `<br/>🎁 <span style="color:#00f0ff">+100 AIGx Mint Bonus Activated!</span>`;
+          mintResult.classList.add("mint-highlight");
+          setTimeout(() => mintResult.classList.remove("mint-highlight"), 1800);
+        };
+      }
+
+      if (referrer && !refBonusGiven) {
+        mintResult.innerHTML += `<div style="margin-top:10px; color:#0ff">🔗 Referrer ${referrer} has earned +50 AIGx!</div>`;
+        localStorage.setItem("refBonusGiven", "true");
+      }
+
+      const yieldBonus = true;
+      if (yieldBonus) {
+        const siloGuide = document.querySelector('.silo-guide');
+        if (siloGuide) {
+          const badge = document.createElement('div');
+          badge.innerHTML = `<div style="background:#111; border:1px solid #0ff; padding:12px; margin-top:20px; border-radius:6px;">
+            💹 <strong>Auto-Stake Bonus Active:</strong> +10% lifetime yield on this agent.
+          </div>`;
+          siloGuide.insertBefore(badge, siloGuide.firstChild);
+        }
+      }
+    });
+  </script>
 </body>
 </html>
