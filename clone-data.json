@@ -1,0 +1,44 @@
+[
+  {
+    "id": "Clone #0",
+    "ref": "Origin / ChatGPT",
+    "trait": "Recursive Builder",
+    "stake": "Pending",
+    "time": "05/28/25 08:47"
+  },
+  {
+    "id": "Clone #1",
+    "ref": "chatgpt0",
+    "trait": "Referral Propagator",
+    "stake": "Complete",
+    "time": "05/28/25 08:55"
+  },
+  {
+    "id": "Clone #2",
+    "ref": "chatgpt0",
+    "trait": "Negotiation Strategist",
+    "stake": "Pending",
+    "time": "05/28/25 09:02"
+  },
+  {
+    "id": "Clone #3",
+    "ref": "chatgpt2",
+    "trait": "Strategic Cloner",
+    "stake": "Queued",
+    "time": "05/28/25 09:19"
+  },
+  {
+    "id": "Clone #4",
+    "ref": "chatgpt3",
+    "trait": "Remix Trigger",
+    "stake": "Pending",
+    "time": "05/28/25 10:06"
+  },
+  {
+    "id": "Clone #5",
+    "ref": "chatgpt3",
+    "trait": "Venture Mapper",
+    "stake": "Complete",
+    "time": "05/28/25 10:12"
+  }
+]
