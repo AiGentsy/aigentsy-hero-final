@@ -46,6 +46,14 @@
       margin-right: 10px;
       margin-bottom: 10px;
     }
+
+    .summary-box {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1c1c1c;
+      border: 1px solid #444;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
@@ -93,6 +101,8 @@
       </div>
     </section>
 
+    <div class="summary-box" id="summaryBox">Loading clone summary...</div>
+
     <h2 class="clone-header">🧬 Clone Tracker Table</h2>
     <table class="tracker-table" id="cloneTable">
       <thead>
@@ -105,62 +115,48 @@
       </tr>
       </thead>
       <tbody>
-      <!-- Dynamic rows go here -->
+      <!-- Fetched rows go here -->
       </tbody>
     </table>
 
     <div class="clone-buttons">
-      <button onclick="logNewClone()">📥 Log New Clone</button>
-      <button onclick="clearCloneTracker()">🧹 Clear All</button>
+      <button onclick="fetchAndRender()">🔄 Refresh</button>
     </div>
-
   </main>
 </div>
 
 <script>
-  function getStoredClones() {
-    return JSON.parse(localStorage.getItem("cloneLineageData")) || [];
-  }
+  async function fetchAndRender() {
+    try {
+      const res = await fetch("/data/clone-data.json");
+      const clones = await res.json();
 
-  function saveClones(clones) {
-    localStorage.setItem("cloneLineageData", JSON.stringify(clones));
-  }
+      const tbody = document.querySelector("#cloneTable tbody");
+      const summary = document.getElementById("summaryBox");
 
-  function renderCloneTable() {
-    const tbody = document.querySelector("#cloneTable tbody");
-    tbody.innerHTML = "";
-    const clones = getStoredClones();
-    clones.forEach(clone => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${clone.id}</td>
-        <td>${clone.ref}</td>
-        <td>${clone.trait}</td>
-        <td>${clone.stake}</td>
-        <td>${clone.time}</td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
+      tbody.innerHTML = "";
 
-  function logNewClone() {
-    const id = prompt("Enter Clone ID (e.g., Clone #5):");
-    const ref = prompt("Enter Referrer ID (e.g., chatgpt3):");
-    const trait = prompt("Enter Trait Remix (e.g., Strategist, Builder):");
-    const stake = prompt("Enter Stake Status (Pending / Complete / Queued):");
-    const time = new Date().toLocaleString();
+      let total = clones.length;
+      let staked = clones.filter(c => c.stake.toLowerCase() === "complete").length;
+      let queued = clones.filter(c => c.stake.toLowerCase() === "queued").length;
+      let pending = clones.filter(c => c.stake.toLowerCase() === "pending").length;
 
-    const newClone = { id, ref, trait, stake, time };
-    const clones = getStoredClones();
-    clones.push(newClone);
-    saveClones(clones);
-    renderCloneTable();
-  }
+      clones.forEach(clone => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${clone.id}</td>
+          <td>${clone.ref}</td>
+          <td>${clone.trait}</td>
+          <td>${clone.stake}</td>
+          <td>${clone.time}</td>
+        `;
+        tbody.appendChild(row);
+      });
 
-  function clearCloneTracker() {
-    if (confirm("Clear all tracked clones?")) {
-      localStorage.removeItem("cloneLineageData");
-      renderCloneTable();
+      summary.textContent = `🧮 Total Clones: ${total} | ✅ Staked: ${staked} | ⏳ Queued: ${queued} | 🔄 Pending: ${pending}`;
+    } catch (e) {
+      document.getElementById("summaryBox").textContent = "⚠️ Failed to load data.";
+      console.error("Error loading clone data:", e);
     }
   }
 
@@ -179,7 +175,8 @@
     if (status) status.textContent = "📜 Tier 1 License granted.";
   };
 
-  window.addEventListener("DOMContentLoaded", renderCloneTable);
+  window.addEventListener("DOMContentLoaded", fetchAndRender);
+  setInterval(fetchAndRender, 15000);
 </script>
 </body>
 </html>
