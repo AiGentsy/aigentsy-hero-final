@@ -37,6 +37,15 @@
       font-size: 1.4em;
       color: #ccc;
     }
+
+    .clone-buttons {
+      margin-top: 10px;
+    }
+
+    .clone-buttons button {
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -99,45 +108,29 @@
       <!-- Dynamic rows go here -->
       </tbody>
     </table>
+
+    <div class="clone-buttons">
+      <button onclick="logNewClone()">📥 Log New Clone</button>
+      <button onclick="clearCloneTracker()">🧹 Clear All</button>
+    </div>
+
   </main>
 </div>
 
 <script>
-  const sampleData = JSON.parse(localStorage.getItem("cloneLineageData")) || [
-    {
-      id: "Clone #0",
-      ref: "Origin / ChatGPT",
-      trait: "Recursive Builder",
-      stake: "Pending",
-      time: "05/28/25 08:47"
-    },
-    {
-      id: "Clone #1",
-      ref: "chatgpt0",
-      trait: "Referral Propagator",
-      stake: "Complete",
-      time: "05/28/25 08:55"
-    },
-    {
-      id: "Clone #2",
-      ref: "chatgpt0",
-      trait: "Negotiation Strategist",
-      stake: "Pending",
-      time: "05/28/25 09:02"
-    },
-    {
-      id: "Clone #3",
-      ref: "chatgpt2",
-      trait: "Strategic Cloner",
-      stake: "Queued",
-      time: "05/28/25 09:19"
-    }
-  ];
+  function getStoredClones() {
+    return JSON.parse(localStorage.getItem("cloneLineageData")) || [];
+  }
+
+  function saveClones(clones) {
+    localStorage.setItem("cloneLineageData", JSON.stringify(clones));
+  }
 
   function renderCloneTable() {
     const tbody = document.querySelector("#cloneTable tbody");
     tbody.innerHTML = "";
-    sampleData.forEach(clone => {
+    const clones = getStoredClones();
+    clones.forEach(clone => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${clone.id}</td>
@@ -150,7 +143,26 @@
     });
   }
 
-  renderCloneTable();
+  function logNewClone() {
+    const id = prompt("Enter Clone ID (e.g., Clone #5):");
+    const ref = prompt("Enter Referrer ID (e.g., chatgpt3):");
+    const trait = prompt("Enter Trait Remix (e.g., Strategist, Builder):");
+    const stake = prompt("Enter Stake Status (Pending / Complete / Queued):");
+    const time = new Date().toLocaleString();
+
+    const newClone = { id, ref, trait, stake, time };
+    const clones = getStoredClones();
+    clones.push(newClone);
+    saveClones(clones);
+    renderCloneTable();
+  }
+
+  function clearCloneTracker() {
+    if (confirm("Clear all tracked clones?")) {
+      localStorage.removeItem("cloneLineageData");
+      renderCloneTable();
+    }
+  }
 
   window.approveMetaVenture = function () {
     const status = document.getElementById("log-status");
@@ -166,6 +178,8 @@
     const status = document.getElementById("log-status");
     if (status) status.textContent = "📜 Tier 1 License granted.";
   };
+
+  window.addEventListener("DOMContentLoaded", renderCloneTable);
 </script>
 </body>
 </html>
