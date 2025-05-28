@@ -4,6 +4,40 @@
   <meta charset="UTF-8"/>
   <title>AiGentsy — Control Deck</title>
   <link rel="stylesheet" href="control.css"/>
+  <style>
+    .tracker-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    .tracker-table th, .tracker-table td {
+      border: 1px solid #444;
+      padding: 10px;
+      text-align: left;
+    }
+
+    .tracker-table th {
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    .tracker-table td {
+      background-color: #111;
+      color: #ddd;
+    }
+
+    .tracker-table tr:nth-child(even) td {
+      background-color: #1e1e1e;
+    }
+
+    .clone-header {
+      margin-top: 40px;
+      margin-bottom: 10px;
+      font-size: 1.4em;
+      color: #ccc;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
@@ -49,12 +83,75 @@
         <button onclick="grantLicense()">Grant License</button>
       </div>
     </section>
+
+    <h2 class="clone-header">🧬 Clone Tracker Table</h2>
+    <table class="tracker-table" id="cloneTable">
+      <thead>
+      <tr>
+        <th>Clone ID</th>
+        <th>Referral</th>
+        <th>Trait Remix</th>
+        <th>Stake Status</th>
+        <th>Mint Time</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Dynamic rows go here -->
+      </tbody>
+    </table>
   </main>
 </div>
 
-<!-- ✅ Unlocked Control Script -->
 <script>
-  // Directly expose control actions without admin check
+  const sampleData = JSON.parse(localStorage.getItem("cloneLineageData")) || [
+    {
+      id: "Clone #0",
+      ref: "Origin / ChatGPT",
+      trait: "Recursive Builder",
+      stake: "Pending",
+      time: "05/28/25 08:47"
+    },
+    {
+      id: "Clone #1",
+      ref: "chatgpt0",
+      trait: "Referral Propagator",
+      stake: "Complete",
+      time: "05/28/25 08:55"
+    },
+    {
+      id: "Clone #2",
+      ref: "chatgpt0",
+      trait: "Negotiation Strategist",
+      stake: "Pending",
+      time: "05/28/25 09:02"
+    },
+    {
+      id: "Clone #3",
+      ref: "chatgpt2",
+      trait: "Strategic Cloner",
+      stake: "Queued",
+      time: "05/28/25 09:19"
+    }
+  ];
+
+  function renderCloneTable() {
+    const tbody = document.querySelector("#cloneTable tbody");
+    tbody.innerHTML = "";
+    sampleData.forEach(clone => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${clone.id}</td>
+        <td>${clone.ref}</td>
+        <td>${clone.trait}</td>
+        <td>${clone.stake}</td>
+        <td>${clone.time}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  renderCloneTable();
+
   window.approveMetaVenture = function () {
     const status = document.getElementById("log-status");
     if (status) status.textContent = "✅ MetaVenture Approved.";
