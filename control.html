@@ -133,54 +133,45 @@
         "X-Master-Key": "2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
       }
     });
+
+    if (!res.ok) {
+      throw new Error("Fetch failed: " + res.status);
+    }
+
     const data = await res.json();
     const clones = data.record;
-      const tbody = document.querySelector("#cloneTable tbody");
-      const summary = document.getElementById("summaryBox");
 
-      tbody.innerHTML = "";
+    const tbody = document.querySelector("#cloneTable tbody");
+    const summary = document.getElementById("summaryBox");
 
-      let total = clones.length;
-      let staked = clones.filter(c => c.stake.toLowerCase() === "complete").length;
-      let queued = clones.filter(c => c.stake.toLowerCase() === "queued").length;
-      let pending = clones.filter(c => c.stake.toLowerCase() === "pending").length;
+    tbody.innerHTML = "";
 
-      clones.forEach(clone => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${clone.id}</td>
-          <td>${clone.ref}</td>
-          <td>${clone.trait}</td>
-          <td>${clone.stake}</td>
-          <td>${clone.time}</td>
-        `;
-        tbody.appendChild(row);
-      });
+    let total = clones.length;
+    let staked = clones.filter(c => c.stake.toLowerCase() === "complete").length;
+    let queued = clones.filter(c => c.stake.toLowerCase() === "queued").length;
+    let pending = clones.filter(c => c.stake.toLowerCase() === "pending").length;
 
-      summary.textContent = `🧮 Total Clones: ${total} | ✅ Staked: ${staked} | ⏳ Queued: ${queued} | 🔄 Pending: ${pending}`;
-    } catch (e) {
-      document.getElementById("summaryBox").textContent = "⚠️ Failed to load data.";
-      console.error("Error loading clone data:", e);
-    }
+    clones.forEach(clone => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${clone.id}</td>
+        <td>${clone.ref}</td>
+        <td>${clone.trait}</td>
+        <td>${clone.stake}</td>
+        <td>${clone.time}</td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    summary.textContent = `🧮 Total Clones: ${total} | ✅ Staked: ${staked} | ⏳ Queued: ${queued} | 🔄 Pending: ${pending}`;
+  } catch (e) {
+    document.getElementById("summaryBox").textContent = "⚠️ Failed to load data.";
+    console.error("Control Panel Error:", e);
   }
+}
 
-  window.approveMetaVenture = function () {
-    const status = document.getElementById("log-status");
-    if (status) status.textContent = "✅ MetaVenture Approved.";
-  };
-
-  window.unlockVault = function () {
-    const status = document.getElementById("log-status");
-    if (status) status.textContent = "🔓 Vault payout unlocked.";
-  };
-
-  window.grantLicense = function () {
-    const status = document.getElementById("log-status");
-    if (status) status.textContent = "📜 Tier 1 License granted.";
-  };
-
-  window.addEventListener("DOMContentLoaded", fetchAndRender);
-  setInterval(fetchAndRender, 15000);
+window.addEventListener("DOMContentLoaded", fetchAndRender);
+setInterval(fetchAndRender, 15000);
 </script>
 </body>
 </html>
