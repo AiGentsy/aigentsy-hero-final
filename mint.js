@@ -51,14 +51,14 @@ function mintAgent() {
 
       const updatedClones = [...currentClones, newClone];
 
-      await fetch(`https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4 , {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": $2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe
-        },
-        body: JSON.stringify(updatedClones)
-      });
+      await fetch("https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4", {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
+  },
+  body: JSON.stringify(updatedClones)
+});
 
       console.log("✅ Clone Tracker updated in real-time.");
     } catch (err) {
