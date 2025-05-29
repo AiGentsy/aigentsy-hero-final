@@ -22,15 +22,50 @@ function mintAgent() {
   }
 
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     const config = reader.result;
     document.getElementById("mintResult").innerText =
       "Agent minted!\nProtocol: " + protocol + "\nVisibility: " + visibility + "\nConfig preview:\n" + config.slice(0, 200);
 
-    // 🧠 MetaUpgrade23: Log mint propagation + monetization
     console.log("[MINT EVENT] New Agent Minted — Auto-assigned to vault and remix eligibility tree");
     console.log("[MINT EVENT] Traits credentialized. Agent ready for real-world yield logic.");
+
+    // 🔁 Real-Time Clone Tracker Update (JSONBin.io)
+    const binId = "YOUR_BIN_ID";
+    const apiKey = "YOUR_API_KEY";
+
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+        headers: { "X-Master-Key": apiKey }
+      });
+      const data = await res.json();
+      const currentClones = data.record;
+
+      const newClone = {
+        id: `Clone #${currentClones.length}`,
+        ref: "chatgpt5",
+        trait: "Autonomous Mapper",
+        stake: "Pending",
+        time: new Date().toLocaleString("en-US", { hour12: false })
+      };
+
+      const updatedClones = [...currentClones, newClone];
+
+      await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": apiKey
+        },
+        body: JSON.stringify(updatedClones)
+      });
+
+      console.log("✅ Clone Tracker updated in real-time.");
+    } catch (err) {
+      console.error("⚠️ Failed to update real-time clone tracker:", err);
+    }
   };
+
   reader.readAsText(file);
 }
 
@@ -111,7 +146,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 🎯 Animate KPI counters
   document.querySelectorAll(".value[data-count]").forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
