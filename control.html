@@ -128,7 +128,11 @@
 <script>
   async function fetchAndRender() {
     try {
-      const res = await fetch("/clone-data.json"); 
+      const res = await fetch("https://api.jsonbin.io/v3/b/YOUR_BIN_ID/latest", {
+  headers: {
+    "6838d5d78561e97a501d44c4": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
+  }
+});
       const clones = await res.json();
 
       const tbody = document.querySelector("#cloneTable tbody");
