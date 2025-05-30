@@ -26,13 +26,21 @@ function mintAgent() {
     const config = reader.result;
 
     const newUser = {
-      id: `User-${Math.floor(Date.now() / 1000)}`,
-      ref: "chatgpt5",
+      id: `User #${Math.floor(Date.now() / 1000)}`,
+      wallet: "0x0",
+      referral: "chatgpt5",
       trait: "Autonomous Mapper",
-      stake: "Pending",
-      time: new Date().toLocaleString("en-US", { hour12: false }),
-      userType: "Agent",
-      intent: "Business Formation",
+      staked: false,
+      mintTime: new Date().toISOString(),
+      role: "Agent",
+      sdkAccess: false,
+      vaultAccess: true,
+      remixUnlocked: true,
+      cloneLineage: [],
+      originIP: "placeholder",
+      platform: "Desktop",
+      browser: "Chrome",
+      device: "Mac",
       protocol,
       visibility
     };
@@ -40,8 +48,8 @@ function mintAgent() {
     document.getElementById("mintResult").innerText =
       `✅ Agent Minted!\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
 
-    console.log("[MINT EVENT] New User Minted into AiGentsy protocol");
-    console.log("[TRACKING] Logging user traits and mint to JSONBin...");
+    console.log("[MINT EVENT] Agent minted + protocol traits assigned.");
+    console.log("[TRACKING] Attempting real-time JSONBin sync...");
 
     try {
       const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
@@ -63,9 +71,9 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin user tracking updated.");
+      console.log("✅ JSONBin updated with new mint data.");
     } catch (err) {
-      console.error("⚠️ Failed to update JSONBin:", err);
+      console.error("❌ JSONBin update failed:", err);
     }
   };
 
