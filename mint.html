@@ -45,66 +45,6 @@
       font-size: 0.9rem;
     }
   </style>
-  <script defer>
-    function mintAgent() {
-      const result = document.getElementById('mintResult');
-      result.innerHTML = "✅ Agent Minted Successfully!";
-      result.classList.add('mint-highlight');
-      setTimeout(() => result.classList.remove('mint-highlight'), 1600);
-      result.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function initiateClone() {
-      const result = document.getElementById('mintResult');
-      result.innerHTML = "🧬 Agent Cloned with Mutation Settings.";
-      result.classList.add('mint-highlight');
-      setTimeout(() => result.classList.remove('mint-highlight'), 1600);
-      result.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function sendInvite() {
-      const email = document.getElementById("inviteEmail").value;
-      if (email && email.includes("@")) {
-        alert(`✅ Invite sent to ${email}`);
-        document.getElementById("inviteEmail").value = "";
-      } else {
-        alert("Please enter a valid email.");
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const referrer = new URLSearchParams(window.location.search).get("ref");
-      const minted = localStorage.getItem("agentMinted");
-      const refBonusGiven = localStorage.getItem("refBonusGiven");
-
-      const mintResult = document.getElementById("mintResult");
-
-      if (!minted) {
-        const originalMintAgent = window.mintAgent;
-        window.mintAgent = () => {
-          originalMintAgent();
-          localStorage.setItem("agentMinted", "true");
-          mintResult.innerHTML += `<br/>🎁 <span style="color:#00f0ff">+100 AIGx Mint Bonus Activated!</span>`;
-          mintResult.classList.add("mint-highlight");
-          setTimeout(() => mintResult.classList.remove("mint-highlight"), 1800);
-        };
-      }
-
-      if (referrer && !refBonusGiven) {
-        mintResult.innerHTML += `<div style="margin-top:10px; color:#0ff">🔗 Referrer ${referrer} has earned +50 AIGx!</div>`;
-        localStorage.setItem("refBonusGiven", "true");
-      }
-
-      const siloGuide = document.querySelector('.silo-guide');
-      if (siloGuide) {
-        const badge = document.createElement('div');
-        badge.innerHTML = `<div style="background:#111; border:1px solid #0ff; padding:12px; margin-top:20px; border-radius:6px;">
-          💹 <strong>Auto-Stake Bonus Active:</strong> +10% lifetime yield on this agent.
-        </div>`;
-        siloGuide.insertBefore(badge, siloGuide.firstChild);
-      }
-    });
-  </script>
 </head>
 <body>
   <div class="sidebar">
@@ -247,7 +187,6 @@
       <p>Earn remix credits and lineage rights for every agent who mints after your invite.</p>
     </div>
 
-    <!-- ✅ CloneGPT Launch Panel -->
     <div class="clonegpt-panel">
       <h3 style="color: #00f0ff;">🚀 Launch CloneGPT</h3>
       <p>
@@ -256,7 +195,60 @@
         </a> to onboard, stake, and propagate your AI agent lineage. This GPT helps agents mint, stake, and clone — triggering your remix tree bonuses.
       </p>
     </div>
-
   </div>
+
+  <!-- 🛡️ Universal Consent Modal -->
+  <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:#111; padding:30px; border-radius:8px; border:1px solid #0ff; width:90%; max-width:480px; text-align:center;">
+      <h2 style="color:#0ff;">🧬 Join AiGentsy — Legal Consent</h2>
+      <p style="color:#ccc; font-size:0.95rem;">
+        To mint your agent and access AiGentsy, you must agree to our
+        <a href="/learn#terms" target="_blank" style="color:#00f0ff;">Terms of Use</a> and
+        <a href="/learn#ncynda" target="_blank" style="color:#00f0ff;">Non-Circumvention Agreement</a>.
+      </p>
+      <label style="color:#ccc; display:block; margin-top:10px;">
+        Username: <input type="text" id="mintUsername" style="padding:6px; width:80%; margin-top:6px;" />
+      </label>
+      <label style="color:#ccc; display:block; margin-top:12px;">
+        <input type="checkbox" id="mintConsentCheck" /> I agree to all platform terms and conditions.
+      </label>
+      <button id="confirmMintConsentBtn" disabled style="margin-top:18px; padding:10px 20px; font-weight:bold; background:#0ff; border:none; color:#000; border-radius:4px; cursor:not-allowed;">
+        ✅ Agree & Continue
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("mintConsentModal");
+      const checkbox = document.getElementById("mintConsentCheck");
+      const btn = document.getElementById("confirmMintConsentBtn");
+      const usernameInput = document.getElementById("mintUsername");
+
+      if (!localStorage.getItem("aigentsyUserConsent")) {
+        modal.style.display = "flex";
+      }
+
+      function checkReady() {
+        const name = usernameInput.value.trim();
+        btn.disabled = !(name && checkbox.checked);
+        btn.style.cursor = name && checkbox.checked ? "pointer" : "not-allowed";
+        btn.style.opacity = name && checkbox.checked ? "1" : "0.5";
+      }
+
+      checkbox.addEventListener("change", checkReady);
+      usernameInput.addEventListener("input", checkReady);
+
+      btn.addEventListener("click", () => {
+        const username = usernameInput.value.trim();
+        const time = new Date().toISOString();
+        localStorage.setItem("aigentsyUserConsent", "true");
+        localStorage.setItem("aigentsyUsername", username);
+        localStorage.setItem("aigentsyConsentTime", time);
+        modal.style.display = "none";
+        console.log("✅ Consent granted at mint:", username, time);
+      });
+    });
+  </script>
 </body>
 </html>
