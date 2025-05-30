@@ -12,16 +12,7 @@ async function connectWallet() {
 }
 
 function mintAgent() {
-  const file = document.getElementById("configUpload").files[0];
-  const protocol = document.getElementById("protocolSelect")?.value;
-  const visibility = document.getElementById("visibility")?.value;
-
-  if (!file || !protocol || !visibility) {
-    document.getElementById("mintResult").innerText = "Missing required fields.";
-    return;
-  }
-
-  // 🧠 Universal consent check
+  // 🧠 Universal consent check with one-time enforcement
   let username = localStorage.getItem("aigentsy_username");
   let consented = localStorage.getItem("aigentsy_consent");
 
@@ -32,8 +23,21 @@ function mintAgent() {
       alert("Minting requires agreement and username.");
       return;
     }
+
     localStorage.setItem("aigentsy_username", username);
     localStorage.setItem("aigentsy_consent", "true");
+
+    alert("✅ Consent recorded. You can now mint your agent.");
+    return; // Force one-time action, requires user to click "Mint Agent" again
+  }
+
+  const file = document.getElementById("configUpload").files[0];
+  const protocol = document.getElementById("protocolSelect")?.value;
+  const visibility = document.getElementById("visibility")?.value;
+
+  if (!file || !protocol || !visibility) {
+    document.getElementById("mintResult").innerText = "Missing required fields.";
+    return;
   }
 
   const reader = new FileReader();
@@ -88,9 +92,9 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with full agent + consent profile.");
+      console.log("✅ JSONBin updated with new agent profile.");
     } catch (err) {
-      console.error("❌ JSONBin update failed:", err);
+      console.error("❌ Failed to update JSONBin:", err);
     }
   };
 
