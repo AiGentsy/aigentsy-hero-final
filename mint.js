@@ -21,21 +21,20 @@ function mintAgent() {
     return;
   }
 
-  // 🧠 Universal consent check
+  // ✅ One-time universal consent check
   let username = localStorage.getItem("aigentsy_username");
   let consented = localStorage.getItem("aigentsy_consent");
 
   if (!username || consented !== "true") {
-    const entered = prompt("Enter a username to register:");
+    username = prompt("Enter a username to register:");
     const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-    if (!entered || !agreed) {
+    if (!username || !agreed) {
       alert("Minting requires agreement and username.");
       return;
     }
 
-    localStorage.setItem("aigentsy_username", entered);
+    localStorage.setItem("aigentsy_username", username);
     localStorage.setItem("aigentsy_consent", "true");
-    username = entered;
   }
 
   const reader = new FileReader();
@@ -68,12 +67,7 @@ function mintAgent() {
     };
 
     document.getElementById("mintResult").innerText =
-      `✅ Agent Minted!
-Username: ${username}
-Protocol: ${protocol}
-Visibility: ${visibility}
-Preview:
-${config.slice(0, 200)}`;
+      `✅ Agent Minted!\nUsername: ${username}\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
 
     try {
       const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
