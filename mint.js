@@ -21,7 +21,31 @@ function mintAgent() {
     return;
   }
 
-  const username = localStorage.getItem("aigentsy_username");
+  // ✅ One-time username + consent capture
+  let username = localStorage.getItem("aigentsy_username");
+  let consented = localStorage.getItem("aigentsy_consent");
+
+  if (!username || consented !== "true") {
+    if (!username) {
+      username = prompt("Enter a username to register:");
+      if (username) localStorage.setItem("aigentsy_username", username);
+    }
+
+    if (username && consented !== "true") {
+      const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
+      if (agreed) {
+        localStorage.setItem("aigentsy_consent", "true");
+      } else {
+        alert("Minting requires agreement.");
+        return;
+      }
+    }
+
+    if (!username || localStorage.getItem("aigentsy_consent") !== "true") {
+      alert("Minting requires username and agreement.");
+      return;
+    }
+  }
 
   const reader = new FileReader();
   reader.onload = async () => {
@@ -75,7 +99,7 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with new user and consent log.");
+      console.log("✅ JSONBin updated with new agent data.");
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
@@ -85,23 +109,6 @@ function mintAgent() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // 🧠 Universal consent logic (first time only)
-  let username = localStorage.getItem("aigentsy_username");
-  let consented = localStorage.getItem("aigentsy_consent");
-
-  if (!username || consented !== "true") {
-    username = prompt("Enter a username to register:");
-    const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-    if (!username || !agreed) {
-      alert("You must agree to mint and use the platform.");
-      window.location.href = "/terms";
-      return;
-    }
-    localStorage.setItem("aigentsy_username", username);
-    localStorage.setItem("aigentsy_consent", "true");
-  }
-
-  // Chart rendering logic
   const canvas = document.getElementById("mintChart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
@@ -170,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Animate KPIs
   document.querySelectorAll(".value[data-count]").forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
