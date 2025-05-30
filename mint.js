@@ -1,4 +1,3 @@
-
 async function connectWallet() {
   if (window.ethereum) {
     try {
@@ -25,43 +24,48 @@ function mintAgent() {
   const reader = new FileReader();
   reader.onload = async () => {
     const config = reader.result;
-    document.getElementById("mintResult").innerText =
-      "Agent minted!\nProtocol: " + protocol + "\nVisibility: " + visibility + "\nConfig preview:\n" + config.slice(0, 200);
 
-    console.log("[MINT EVENT] New Agent Minted — Auto-assigned to vault and remix eligibility tree");
-    console.log("[MINT EVENT] Traits credentialized. Agent ready for real-world yield logic.");
-
-    const newClone = {
-      id: `Clone #${Math.floor(Date.now() / 1000)}`,
+    const newUser = {
+      id: `User-${Math.floor(Date.now() / 1000)}`,
       ref: "chatgpt5",
       trait: "Autonomous Mapper",
       stake: "Pending",
-      time: new Date().toLocaleString("en-US", { hour12: false })
+      time: new Date().toLocaleString("en-US", { hour12: false }),
+      userType: "Agent",
+      intent: "Business Formation",
+      protocol,
+      visibility
     };
 
+    document.getElementById("mintResult").innerText =
+      `✅ Agent Minted!\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
+
+    console.log("[MINT EVENT] New User Minted into AiGentsy protocol");
+    console.log("[TRACKING] Logging user traits and mint to JSONBin...");
+
     try {
-      const res = await fetch("https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4/latest", {
+      const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
         headers: {
           "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
         }
       });
 
       const data = await res.json();
-      const currentClones = data.record || [];
-      const updatedClones = [...currentClones, newClone];
+      const currentUsers = data.record || [];
+      const updatedUsers = [...currentUsers, newUser];
 
-      await fetch("https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4", {
+      await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "X-Master-Key": "2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
+          "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
         },
-        body: JSON.stringify(updatedClones)
+        body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ Clone Tracker updated in real-time.");
+      console.log("✅ JSONBin user tracking updated.");
     } catch (err) {
-      console.error("⚠️ Failed to update real-time clone tracker:", err);
+      console.error("⚠️ Failed to update JSONBin:", err);
     }
   };
 
