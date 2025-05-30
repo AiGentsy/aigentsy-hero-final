@@ -42,7 +42,7 @@ function mintAgent() {
     try {
       const res = await fetch("https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4/latest", {
         headers: {
-          "X-Master-Key": "2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
+          "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
         }
       });
 
