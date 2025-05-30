@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,43 +10,35 @@
       border-collapse: collapse;
       margin-top: 30px;
     }
-
     .tracker-table th, .tracker-table td {
       border: 1px solid #444;
       padding: 10px;
       text-align: left;
     }
-
     .tracker-table th {
       background-color: #1a1a1a;
       color: #fff;
     }
-
     .tracker-table td {
       background-color: #111;
       color: #ddd;
     }
-
     .tracker-table tr:nth-child(even) td {
       background-color: #1e1e1e;
     }
-
     .clone-header {
       margin-top: 40px;
       margin-bottom: 10px;
       font-size: 1.4em;
       color: #ccc;
     }
-
     .clone-buttons {
       margin-top: 10px;
     }
-
     .clone-buttons button {
       margin-right: 10px;
       margin-bottom: 10px;
     }
-
     .summary-box {
       margin-top: 20px;
       padding: 15px;
@@ -102,17 +93,19 @@
       </div>
     </section>
 
-    <div class="summary-box" id="summaryBox">Loading clone summary...</div>
+    <div class="summary-box" id="summaryBox">Loading user mint activity...</div>
 
-    <h2 class="clone-header">🧬 Clone Tracker Table</h2>
+    <h2 class="clone-header">🧬 Minted Agent Tracker Table</h2>
     <table class="tracker-table" id="cloneTable">
       <thead>
       <tr>
-        <th>Clone ID</th>
+        <th>User ID</th>
         <th>Referral</th>
         <th>Trait Remix</th>
         <th>Stake Status</th>
         <th>Mint Time</th>
+        <th>User Type</th>
+        <th>Intent</th>
       </tr>
       </thead>
       <tbody>
@@ -129,7 +122,7 @@
 <script>
   async function fetchAndRender() {
     try {
-      const res = await fetch("https://api.jsonbin.io/v3/b/6838d5d78561e97a501d44c4/latest", {
+      const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
         headers: {
           "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
         }
@@ -138,33 +131,35 @@
       if (!res.ok) throw new Error("Fetch error: " + res.statusText);
 
       const data = await res.json();
-      const clones = data.record;
+      const users = data.record;
 
       const tbody = document.querySelector("#cloneTable tbody");
       const summary = document.getElementById("summaryBox");
 
       tbody.innerHTML = "";
 
-      let total = clones.length;
-      let staked = clones.filter(c => c.stake.toLowerCase() === "complete").length;
-      let queued = clones.filter(c => c.stake.toLowerCase() === "queued").length;
-      let pending = clones.filter(c => c.stake.toLowerCase() === "pending").length;
+      let total = users.length;
+      let staked = users.filter(u => u.stake.toLowerCase() === "complete").length;
+      let queued = users.filter(u => u.stake.toLowerCase() === "queued").length;
+      let pending = users.filter(u => u.stake.toLowerCase() === "pending").length;
 
-      clones.forEach(clone => {
+      users.forEach(user => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${clone.id}</td>
-          <td>${clone.ref}</td>
-          <td>${clone.trait}</td>
-          <td>${clone.stake}</td>
-          <td>${clone.time}</td>
+          <td>${user.id}</td>
+          <td>${user.ref}</td>
+          <td>${user.trait}</td>
+          <td>${user.stake}</td>
+          <td>${user.time}</td>
+          <td>${user.userType || "Agent"}</td>
+          <td>${user.intent || "—"}</td>
         `;
         tbody.appendChild(row);
       });
 
-      summary.textContent = `🧮 Total Clones: ${total} | ✅ Staked: ${staked} | ⏳ Queued: ${queued} | 🔄 Pending: ${pending}`;
+      summary.textContent = `🧮 Total Users: ${total} | ✅ Staked: ${staked} | ⏳ Queued: ${queued} | 🔄 Pending: ${pending}`;
     } catch (e) {
-      document.getElementById("summaryBox").textContent = "⚠️ Failed to load data.";
+      document.getElementById("summaryBox").textContent = "⚠️ Failed to load user mint data.";
       console.error("Fetch error:", e);
     }
   }
