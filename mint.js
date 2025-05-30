@@ -21,27 +21,21 @@ function mintAgent() {
     return;
   }
 
-  // ✅ One-time universal consent
-  const username = localStorage.getItem("aigentsy_username");
-  const consented = localStorage.getItem("aigentsy_consent");
+  // 🧠 Universal consent check
+  let username = localStorage.getItem("aigentsy_username");
+  let consented = localStorage.getItem("aigentsy_consent");
 
   if (!username || consented !== "true") {
-    if (!sessionStorage.getItem("aigentsy_prompted")) {
-      sessionStorage.setItem("aigentsy_prompted", "true");
-
-      const entered = prompt("Enter a username to register:");
-      const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-      if (!entered || !agreed) {
-        alert("Minting requires agreement and username.");
-        return;
-      }
-
-      localStorage.setItem("aigentsy_username", entered);
-      localStorage.setItem("aigentsy_consent", "true");
-    } else {
-      alert("You must complete username and agreement to proceed.");
+    const entered = prompt("Enter a username to register:");
+    const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
+    if (!entered || !agreed) {
+      alert("Minting requires agreement and username.");
       return;
     }
+
+    localStorage.setItem("aigentsy_username", entered);
+    localStorage.setItem("aigentsy_consent", "true");
+    username = entered;
   }
 
   const reader = new FileReader();
@@ -68,13 +62,18 @@ function mintAgent() {
       visibility,
       consent: {
         agreed: true,
-        username: localStorage.getItem("aigentsy_username"),
+        username,
         timestamp: new Date().toISOString()
       }
     };
 
     document.getElementById("mintResult").innerText =
-      `✅ Agent Minted!\nUsername: ${newUser.consent.username}\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
+      `✅ Agent Minted!
+Username: ${username}
+Protocol: ${protocol}
+Visibility: ${visibility}
+Preview:
+${config.slice(0, 200)}`;
 
     try {
       const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
