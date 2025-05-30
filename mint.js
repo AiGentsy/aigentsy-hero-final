@@ -21,6 +21,14 @@ function mintAgent() {
     return;
   }
 
+  // 🔐 Ask for username + universal agreement
+  const username = prompt("Enter a username to register:");
+  const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
+  if (!username || !agreed) {
+    alert("Minting requires agreement and username.");
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = async () => {
     const config = reader.result;
@@ -42,14 +50,19 @@ function mintAgent() {
       browser: "Chrome",
       device: "Mac",
       protocol,
-      visibility
+      visibility,
+      consent: {
+        agreed: true,
+        username: username,
+        timestamp: new Date().toISOString()
+      }
     };
 
     document.getElementById("mintResult").innerText =
-      `✅ Agent Minted!\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
+      `✅ Agent Minted!\nUsername: ${username}\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config.slice(0, 200)}`;
 
-    console.log("[MINT EVENT] Agent minted + protocol traits assigned.");
-    console.log("[TRACKING] Attempting real-time JSONBin sync...");
+    console.log("[MINT EVENT] Agent minted with consent + protocol traits.");
+    console.log("[TRACKING] Syncing with JSONBin...");
 
     try {
       const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
@@ -71,7 +84,7 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with new mint data.");
+      console.log("✅ JSONBin updated with full consented agent profile.");
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
