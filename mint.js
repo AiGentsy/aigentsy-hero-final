@@ -1,4 +1,3 @@
-// ✅ Wallet Connection
 async function connectWallet() {
   if (window.ethereum) {
     try {
@@ -12,7 +11,6 @@ async function connectWallet() {
   }
 }
 
-// ✅ Main Mint Function
 function mintAgent() {
   const file = document.getElementById("configUpload").files[0];
   const protocol = document.getElementById("protocolSelect")?.value;
@@ -77,7 +75,7 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with full agent + consent profile.");
+      console.log("✅ JSONBin updated with new user and consent log.");
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
@@ -86,24 +84,24 @@ function mintAgent() {
   reader.readAsText(file);
 }
 
-// ✅ Initial Page Load + Consent Gate
 document.addEventListener("DOMContentLoaded", () => {
-  const username = localStorage.getItem("aigentsy_username");
-  const consent = localStorage.getItem("aigentsy_consent");
+  // 🧠 Universal consent logic (first time only)
+  let username = localStorage.getItem("aigentsy_username");
+  let consented = localStorage.getItem("aigentsy_consent");
 
-  if (!username || consent !== "true") {
-    const entered = prompt("Enter your AiGentsy username to begin:");
+  if (!username || consented !== "true") {
+    username = prompt("Enter a username to register:");
     const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-    if (entered && agreed) {
-      localStorage.setItem("aigentsy_username", entered);
-      localStorage.setItem("aigentsy_consent", "true");
-      alert("✅ Consent recorded. Welcome, " + entered + ".");
-    } else {
-      alert("❌ You must accept the agreement and enter a username to proceed.");
-      window.location.href = "/";
+    if (!username || !agreed) {
+      alert("You must agree to mint and use the platform.");
+      window.location.href = "/terms";
+      return;
     }
+    localStorage.setItem("aigentsy_username", username);
+    localStorage.setItem("aigentsy_consent", "true");
   }
 
+  // Chart rendering logic
   const canvas = document.getElementById("mintChart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
@@ -150,21 +148,13 @@ document.addEventListener("DOMContentLoaded", () => {
     options: {
       responsive: true,
       plugins: {
-        legend: {
-          labels: { color: "#ccc" }
-        },
+        legend: { labels: { color: "#ccc" } },
         title: {
           display: true,
           text: "Mint Volume, Success Rate & Earnings",
           color: "#00f0ff",
-          font: {
-            size: 16,
-            weight: "bold"
-          },
-          padding: {
-            top: 10,
-            bottom: 20
-          }
+          font: { size: 16, weight: "bold" },
+          padding: { top: 10, bottom: 20 }
         }
       },
       scales: {
@@ -180,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Animate KPIs
   document.querySelectorAll(".value[data-count]").forEach(el => {
     const count = parseFloat(el.dataset.count);
     let i = 0;
