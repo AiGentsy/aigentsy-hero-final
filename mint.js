@@ -21,28 +21,26 @@ function mintAgent() {
     return;
   }
 
-  // ✅ One-time username + consent capture
+  // 🧠 Universal consent check
   let username = localStorage.getItem("aigentsy_username");
   let consented = localStorage.getItem("aigentsy_consent");
 
   if (!username || consented !== "true") {
-    if (!username) {
-      username = prompt("Enter a username to register:");
-      if (username) localStorage.setItem("aigentsy_username", username);
-    }
+    const existingPrompted = sessionStorage.getItem("aigentsy_prompted");
+    if (!existingPrompted) {
+      sessionStorage.setItem("aigentsy_prompted", "true");
 
-    if (username && consented !== "true") {
+      username = prompt("Enter a username to register:");
       const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-      if (agreed) {
-        localStorage.setItem("aigentsy_consent", "true");
-      } else {
-        alert("Minting requires agreement.");
+      if (!username || !agreed) {
+        alert("Minting requires agreement and username.");
         return;
       }
-    }
 
-    if (!username || localStorage.getItem("aigentsy_consent") !== "true") {
-      alert("Minting requires username and agreement.");
+      localStorage.setItem("aigentsy_username", username);
+      localStorage.setItem("aigentsy_consent", "true");
+    } else {
+      alert("You must complete username and agreement to proceed.");
       return;
     }
   }
@@ -99,7 +97,7 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with new agent data.");
+      console.log("✅ JSONBin updated with full agent + consent profile.");
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
@@ -155,13 +153,21 @@ document.addEventListener("DOMContentLoaded", () => {
     options: {
       responsive: true,
       plugins: {
-        legend: { labels: { color: "#ccc" } },
+        legend: {
+          labels: { color: "#ccc" }
+        },
         title: {
           display: true,
           text: "Mint Volume, Success Rate & Earnings",
           color: "#00f0ff",
-          font: { size: 16, weight: "bold" },
-          padding: { top: 10, bottom: 20 }
+          font: {
+            size: 16,
+            weight: "bold"
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
         }
       },
       scales: {
