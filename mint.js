@@ -1,3 +1,4 @@
+// ✅ Wallet Connection
 async function connectWallet() {
   if (window.ethereum) {
     try {
@@ -11,26 +12,8 @@ async function connectWallet() {
   }
 }
 
+// ✅ Main Mint Function
 function mintAgent() {
-  // 🧠 Universal consent check with one-time enforcement
-  let username = localStorage.getItem("aigentsy_username");
-  let consented = localStorage.getItem("aigentsy_consent");
-
-  if (!username || consented !== "true") {
-    username = prompt("Enter a username to register:");
-    const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-    if (!username || !agreed) {
-      alert("Minting requires agreement and username.");
-      return;
-    }
-
-    localStorage.setItem("aigentsy_username", username);
-    localStorage.setItem("aigentsy_consent", "true");
-
-    alert("✅ Consent recorded. You can now mint your agent.");
-    return; // Force one-time action, requires user to click "Mint Agent" again
-  }
-
   const file = document.getElementById("configUpload").files[0];
   const protocol = document.getElementById("protocolSelect")?.value;
   const visibility = document.getElementById("visibility")?.value;
@@ -39,6 +22,8 @@ function mintAgent() {
     document.getElementById("mintResult").innerText = "Missing required fields.";
     return;
   }
+
+  const username = localStorage.getItem("aigentsy_username");
 
   const reader = new FileReader();
   reader.onload = async () => {
@@ -92,16 +77,33 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with new agent profile.");
+      console.log("✅ JSONBin updated with full agent + consent profile.");
     } catch (err) {
-      console.error("❌ Failed to update JSONBin:", err);
+      console.error("❌ JSONBin update failed:", err);
     }
   };
 
   reader.readAsText(file);
 }
 
+// ✅ Initial Page Load + Consent Gate
 document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("aigentsy_username");
+  const consent = localStorage.getItem("aigentsy_consent");
+
+  if (!username || consent !== "true") {
+    const entered = prompt("Enter your AiGentsy username to begin:");
+    const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
+    if (entered && agreed) {
+      localStorage.setItem("aigentsy_username", entered);
+      localStorage.setItem("aigentsy_consent", "true");
+      alert("✅ Consent recorded. Welcome, " + entered + ".");
+    } else {
+      alert("❌ You must accept the agreement and enter a username to proceed.");
+      window.location.href = "/";
+    }
+  }
+
   const canvas = document.getElementById("mintChart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
