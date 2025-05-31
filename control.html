@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,43 +10,35 @@
       border-collapse: collapse;
       margin-top: 30px;
     }
-
     .tracker-table th, .tracker-table td {
       border: 1px solid #444;
       padding: 10px;
       text-align: left;
     }
-
     .tracker-table th {
       background-color: #1a1a1a;
       color: #fff;
     }
-
     .tracker-table td {
       background-color: #111;
       color: #ddd;
     }
-
     .tracker-table tr:nth-child(even) td {
       background-color: #1e1e1e;
     }
-
     .clone-header {
       margin-top: 40px;
       margin-bottom: 10px;
       font-size: 1.4em;
       color: #ccc;
     }
-
     .clone-buttons {
       margin-top: 10px;
     }
-
     .clone-buttons button {
       margin-right: 10px;
       margin-bottom: 10px;
     }
-
     .summary-box {
       margin-top: 20px;
       padding: 15px;
@@ -55,7 +46,6 @@
       border: 1px solid #444;
       color: #ccc;
     }
-
     .log-entry {
       background: #101010;
       padding: 15px;
@@ -63,11 +53,31 @@
       border-left: 4px solid #00f0ff;
       color: #eee;
     }
+    .live-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .tile {
+      background: #151515;
+      border: 1px solid #444;
+      padding: 20px;
+      color: #eee;
+      text-align: center;
+      border-radius: 10px;
+      font-size: 1.1em;
+    }
+    .tile span {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.4em;
+      color: #00f0ff;
+    }
   </style>
 </head>
 <body>
 <div class="container">
-
   <aside class="sidebar">
     <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
     <ul>
@@ -92,9 +102,12 @@
       <li><a href="/learn">lEARN</a></li>
     </ul>
   </aside>
-
   <main class="main-content">
     <h1>Protocol Control Deck</h1>
+
+    <div class="live-tiles" id="liveTiles">
+      <!-- Dynamic metric tiles will render here -->
+    </div>
 
     <section class="log-section">
       <h2>Agent Activity Feed (Live)</h2>
@@ -119,7 +132,6 @@
       </tr>
       </thead>
       <tbody>
-      <!-- Fetched rows go here -->
       </tbody>
     </table>
 
@@ -145,13 +157,31 @@
       const tbody = document.querySelector("#cloneTable tbody");
       const summary = document.getElementById("summaryBox");
       const activityLog = document.getElementById("activityLog");
+      const liveTiles = document.getElementById("liveTiles");
 
       tbody.innerHTML = "";
       activityLog.innerHTML = "";
+      liveTiles.innerHTML = "";
 
       let total = users.length;
       let staked = users.filter(u => u.staked === true).length;
       let pending = users.filter(u => u.staked === false).length;
+      let consented = users.filter(u => u.consent && u.consent.agreed === true).length;
+      let nonCompliant = total - consented;
+
+      const tiles = [
+        { label: "Total Users", value: total },
+        { label: "Consented Users", value: consented },
+        { label: "Non-Compliant Users", value: nonCompliant },
+        { label: "Last Sync Time", value: new Date().toLocaleString() }
+      ];
+
+      tiles.forEach(tile => {
+        const div = document.createElement("div");
+        div.className = "tile";
+        div.innerHTML = `${tile.label}<span>${tile.value}</span>`;
+        liveTiles.appendChild(div);
+      });
 
       users.forEach(user => {
         const row = document.createElement("tr");
