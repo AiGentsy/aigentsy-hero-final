@@ -21,20 +21,13 @@ function mintAgent() {
     return;
   }
 
-  // ✅ One-time universal consent check
-  let username = localStorage.getItem("aigentsy_username");
-  let consented = localStorage.getItem("aigentsy_consent");
+  // ✅ Consent fallback — should already exist from modal
+  const username = localStorage.getItem("aigentsy_username");
+  const consented = localStorage.getItem("aigentsy_consent");
 
   if (!username || consented !== "true") {
-    username = prompt("Enter a username to register:");
-    const agreed = confirm("Do you accept the AiGentsy User Agreement, NCNDA, and Terms of Use?");
-    if (!username || !agreed) {
-      alert("Minting requires agreement and username.");
-      return;
-    }
-
-    localStorage.setItem("aigentsy_username", username);
-    localStorage.setItem("aigentsy_consent", "true");
+    alert("Consent or username missing. Please refresh and complete onboarding.");
+    return;
   }
 
   const reader = new FileReader();
