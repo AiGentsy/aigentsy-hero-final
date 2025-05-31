@@ -12,20 +12,29 @@ async function connectWallet() {
 }
 
 function mintAgent() {
-  const file = document.getElementById("configUpload").files[0];
   const protocol = document.getElementById("protocolSelect")?.value;
   const visibility = document.getElementById("visibility")?.value;
 
-  if (!file || !protocol || !visibility) {
-    document.getElementById("mintResult").innerText = "Missing required fields.";
+  if (!protocol || !visibility) {
+    document.getElementById("mintResult").innerText = "Missing required fields: protocol or visibility.";
     return;
   }
 
-  const username = localStorage.getItem("aigentsy_username") || "";
+  // ✅ Consent fallback — should already exist from modal
+  const username = localStorage.getItem("aigentsy_username");
+  const consented = localStorage.getItem("aigentsy_consent");
 
+  if (!username || consented !== "true") {
+    alert("Consent or username missing. Please refresh and complete onboarding.");
+    return;
+  }
+
+  // ✅ Optional file read
+  const file = document.getElementById("configUpload").files[0];
   const reader = new FileReader();
+
   reader.onload = async () => {
-    const config = reader.result;
+    const config = reader.result || "{}";
 
     const newUser = {
       id: `User #${Math.floor(Date.now() / 1000)}`,
@@ -46,9 +55,9 @@ function mintAgent() {
       protocol,
       visibility,
       consent: {
-        agreed: false,
-        username: username || null,
-        timestamp: null
+        agreed: true,
+        username,
+        timestamp: new Date().toISOString()
       }
     };
 
@@ -75,27 +84,17 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with full agent profile.");
-
-      // 🆕 Post-mint consent modal trigger
-      setTimeout(() => {
-        const agreed = confirm("To unlock full platform access (yield, remix, vaults), you must agree to the AiGentsy Terms of Use and NCNDA. Do you agree?");
-        if (agreed) {
-          localStorage.setItem("aigentsy_consent", "true");
-          localStorage.setItem("aigentsy_username", username);
-          localStorage.setItem("aigentsyConsentTime", new Date().toISOString());
-          console.log("✅ Post-mint consent accepted.");
-        } else {
-          alert("Access to protocol services will remain restricted until consent is given.");
-        }
-      }, 500);
-
+      console.log("✅ JSONBin updated with full agent + consent profile.");
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
   };
 
-  reader.readAsText(file);
+  if (file) {
+    reader.readAsText(file);
+  } else {
+    reader.onload(); // trigger inline with placeholder config
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
