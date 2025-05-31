@@ -44,18 +44,16 @@
       color: #aaa;
       font-size: 0.9rem;
     }
-    /* Hide modal by default; will be shown by JavaScript post-mint */
+    /* Modal hidden by default */
     #mintConsentModal {
-      display: none;
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:#000c;
-      z-index:9999;
-      align-items:center;
-      justify-content:center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #000c;
+      z-index: 9999;
+      display: none; /* <-- start hidden */
+      align-items: center;
+      justify-content: center;
     }
   </style>
 </head>
@@ -92,41 +90,44 @@
   <div class="main">
     <h1>Mint Your AI Agent</h1>
 
-    <!-- ──────── TRAIT SELECTOR (INSERTED) ──────── -->
-    <div class="trait-selector" style="margin-bottom: 20px;">
-      <label for="traitSelect" style="color: #ccc; font-size: 0.9rem; margin-right: 8px;">Select Agent Trait:</label>
-      <select id="traitSelect">
-        <option value="">Choose Trait</option>
+    <!-- ─── 1) TRAIT SELECTION DROPDOWN ───────────────────────────────────────── -->
+    <div style="margin-bottom: 16px;">
+      <label for="traitSelect" style="color:#0ff; font-weight:bold; font-size:0.95rem;">
+        Select Agent Trait:
+      </label>
+      <select id="traitSelect" style="padding:6px; margin-left:8px; border-radius:4px;">
         <option>Recursive Builder</option>
         <option>Negotiation Strategist</option>
         <option>Referral Propagator</option>
-        <option>Autonomous Mapper</option>
         <option>Venture Synthesizer</option>
-        <option>Propagation Sentinel</option>
+        <option selected>Autonomous Mapper</option>
+        <!-- add/remove any other traits here as needed -->
       </select>
     </div>
-    <!-- ────────────────────────────────────────────── -->
 
-    <div class="chart-toggle">
-      <select id="protocolSelect">
-        <option value="">Select Base Protocol</option>
+    <!-- ─── 2) PROTOCOL & VISIBILITY DROPDOWNS ───────────────────────────────── -->
+    <div class="chart-toggle" style="margin-bottom: 24px;">
+      <select id="protocolSelect" style="padding:8px 12px; border-radius:4px; background:transparent; border:1px solid #0ff; color:#0ff; margin-right:12px;">
+        <option value="" disabled selected>Select Base Protocol</option>
         <option>Builder</option>
         <option>Operator</option>
         <option>MetaAgent</option>
       </select>
-      <select id="visibility">
-        <option value="">Visibility</option>
+      <select id="visibility" style="padding:8px 12px; border-radius:4px; background:transparent; border:1px solid #0ff; color:#0ff;">
+        <option value="" disabled selected>Visibility</option>
         <option>Public</option>
         <option>Private</option>
       </select>
     </div>
 
+    <!-- ─── 3) FORM BLOCK (Connect Wallet / Choose File / Mint Agent) ───────────── -->
     <div class="form-block" style="margin-bottom: 30px;">
       <button onclick="connectWallet()">Connect Wallet</button>
-      <input type="file" id="configUpload" accept=".json,.js" />
+      <input type="file" id="configUpload" accept=".json,.js" style="margin: 0 12px;" />
       <button onclick="mintAgent()">Mint Agent</button>
     </div>
 
+    <!-- ─── 4) KPI GRID ──────────────────────────────────────────────────────────── -->
     <div class="kpi-grid">
       <div class="kpi"><div class="label">Agents Minted</div><div class="value" data-count="1733">0</div></div>
       <div class="kpi"><div class="label">Mint Conversion %</div><div class="value" data-count="42">0</div></div>
@@ -136,6 +137,7 @@
       <div class="kpi"><div class="label">MetaVentures Created</div><div class="value" data-count="205">0</div></div>
     </div>
 
+    <!-- ─── 5) CHART HEADER & CONTAINER ──────────────────────────────────────────── -->
     <div class="chart-header">
       <h3>Mint Volume, Success Rate & Earnings</h3>
     </div>
@@ -148,19 +150,23 @@
       <span style="color: #00ffb2">Avg Earnings</span>
     </div>
 
+    <!-- ─── 6) MINT RESULT AREA ─────────────────────────────────────────────────── -->
     <div id="mintResult" class="result" style="margin-top: 16px; font-weight: bold;"></div>
 
+    <!-- ─── 7) AGENT PREVIEW LINK ───────────────────────────────────────────────── -->
     <div class="agent-vault-link">
       <p>Preview Most Recently Minted Agent:</p>
       <a href="/agent-profile.html?id=2732" class="view-profile-btn">View Profile</a>
     </div>
 
+    <!-- ─── 8) CROSSLINK BUTTONS ────────────────────────────────────────────────── -->
     <div class="crosslinks">
       <button class="btn-glow" onclick="window.location.href='/remix'">Remix Pool</button>
       <button class="btn-glow" onclick="window.location.href='/vaults'">Vault Marketplace</button>
       <button class="btn-glow" onclick="window.location.href='/metaventures'">MetaVentures</button>
     </div>
 
+    <!-- ─── 9) SILO GUIDE ───────────────────────────────────────────────────────── -->
     <div class="silo-guide">
       <h3>Mint — What Is This?</h3>
       <p>
@@ -177,6 +183,7 @@
       </div>
     </div>
 
+    <!-- ─── 10) CLONING LAB ───────────────────────────────────────────────────────── -->
     <div class="cloning-lab">
       <h2>Genetic Cloning & Mutation</h2>
       <p>Select traits to replicate or mutate for the next agent.</p>
@@ -197,6 +204,7 @@
       </div>
     </div>
 
+    <!-- ─── 11) TRANSACTION PANEL ────────────────────────────────────────────────── -->
     <div class="transaction-panel">
       <h3>🚀 Mint Monetization Hooks</h3>
       <button class="buy-btn" onclick="alert('Agent minted to protocol. Auto-assigned to propagation loop.')">Finalize Mint</button>
@@ -208,6 +216,7 @@
       </p>
     </div>
 
+    <!-- ─── 12) INVITE PANEL ─────────────────────────────────────────────────────── -->
     <div class="invite-panel">
       <h3>📨 Invite Another Agent</h3>
       <input type="email" id="inviteEmail" placeholder="agent@email.com" />
@@ -215,6 +224,7 @@
       <p>Earn remix credits and lineage rights for every agent who mints after your invite.</p>
     </div>
 
+    <!-- ─── 13) CLONEGPT PANEL ──────────────────────────────────────────────────── -->
     <div class="clonegpt-panel">
       <h3 style="color: #00f0ff;">🚀 Launch CloneGPT</h3>
       <p>
@@ -225,8 +235,8 @@
     </div>
   </div>
 
-  <!-- 🛡️ Universal Consent Modal (now hidden until post-mint) -->
-  <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:none; align-items:center; justify-content:center;">
+  <!-- ─── 14) Universal Consent Modal (hidden by default) ───────────────────────── -->
+  <div id="mintConsentModal">
     <div style="background:#111; padding:30px; border-radius:8px; border:1px solid #0ff; width:90%; max-width:480px; text-align:center;">
       <h2 style="color:#0ff;">🧬 Join AiGentsy — Legal Consent</h2>
       <p style="color:#ccc; font-size:0.95rem;">
@@ -247,39 +257,44 @@
   </div>
 
   <script>
-    // Removed the DOMContentLoaded listener for modal-on-load.
-    // Instead, provide a function to show the modal after mint:
+    // ──────────────────────────────────────────────────────────────────────────
+    // showConsentModal(): reveals the hidden modal when called from mint.js
+    // ──────────────────────────────────────────────────────────────────────────
     function showConsentModal() {
-      const modal = document.getElementById(\"mintConsentModal\");
-      const checkbox = document.getElementById(\"mintConsentCheck\");
-      const btn = document.getElementById(\"confirmMintConsentBtn\");
-      const usernameInput = document.getElementById(\"mintUsername\");
+      const modal = document.getElementById("mintConsentModal");
+      modal.style.display = "flex"; // make it visible
+    }
 
-      modal.style.display = \"flex\";
+    // ──────────────────────────────────────────────────────────────────────────
+    // Attach event listeners for “Agree & Continue” after modal is shown
+    // ──────────────────────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("mintConsentModal");
+      const checkbox = document.getElementById("mintConsentCheck");
+      const btn = document.getElementById("confirmMintConsentBtn");
+      const usernameInput = document.getElementById("mintUsername");
 
+      // Whenever user types or toggles, check if button should be enabled
       function checkReady() {
         const name = usernameInput.value.trim();
         btn.disabled = !(name && checkbox.checked);
-        btn.style.cursor = name && checkbox.checked ? \"pointer\" : \"not-allowed\";
-        btn.style.opacity = name && checkbox.checked ? \"1\" : \"0.5\";
+        btn.style.cursor = name && checkbox.checked ? "pointer" : "not-allowed";
+        btn.style.opacity = name && checkbox.checked ? "1" : "0.5";
       }
+      checkbox.addEventListener("change", checkReady);
+      usernameInput.addEventListener("input", checkReady);
 
-      checkbox.addEventListener(\"change\", checkReady);
-      usernameInput.addEventListener(\"input\", checkReady);
-
-      btn.addEventListener(\"click\", () => {
+      // When user clicks “✅ Agree & Continue”, store consent + username, then hide modal
+      btn.addEventListener("click", () => {
         const username = usernameInput.value.trim();
         const time = new Date().toISOString();
-        localStorage.setItem(\"aigentsyUserConsent\", \"true\");
-        localStorage.setItem(\"aigentsyUsername\", username);
-        localStorage.setItem(\"aigentsyConsentTime\", time);
-        modal.style.display = \"none\";
-        console.log(\"✅ Consent granted at mint:\", username, time);
+        localStorage.setItem("aigentsyUserConsent", "true");
+        localStorage.setItem("aigentsyUsername", username);
+        localStorage.setItem("aigentsyConsentTime", time);
+        modal.style.display = "none";
+        console.log("✅ Consent granted at mint:", username, time);
       });
-    }
-
-    // Expose showConsentModal to the global scope
-    window.showConsentModal = showConsentModal;
+    });
   </script>
 </body>
 </html>
