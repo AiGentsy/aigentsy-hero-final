@@ -21,14 +21,7 @@ function mintAgent() {
     return;
   }
 
-  // ✅ Consent fallback — should already exist from modal
-  const username = localStorage.getItem("aigentsy_username");
-  const consented = localStorage.getItem("aigentsy_consent");
-
-  if (!username || consented !== "true") {
-    alert("Consent or username missing. Please refresh and complete onboarding.");
-    return;
-  }
+  const username = localStorage.getItem("aigentsy_username") || "";
 
   const reader = new FileReader();
   reader.onload = async () => {
@@ -53,9 +46,9 @@ function mintAgent() {
       protocol,
       visibility,
       consent: {
-        agreed: true,
-        username,
-        timestamp: new Date().toISOString()
+        agreed: false,
+        username: username || null,
+        timestamp: null
       }
     };
 
@@ -82,7 +75,21 @@ function mintAgent() {
         body: JSON.stringify(updatedUsers)
       });
 
-      console.log("✅ JSONBin updated with full agent + consent profile.");
+      console.log("✅ JSONBin updated with full agent profile.");
+
+      // 🆕 Post-mint consent modal trigger
+      setTimeout(() => {
+        const agreed = confirm("To unlock full platform access (yield, remix, vaults), you must agree to the AiGentsy Terms of Use and NCNDA. Do you agree?");
+        if (agreed) {
+          localStorage.setItem("aigentsy_consent", "true");
+          localStorage.setItem("aigentsy_username", username);
+          localStorage.setItem("aigentsyConsentTime", new Date().toISOString());
+          console.log("✅ Post-mint consent accepted.");
+        } else {
+          alert("Access to protocol services will remain restricted until consent is given.");
+        }
+      }, 500);
+
     } catch (err) {
       console.error("❌ JSONBin update failed:", err);
     }
