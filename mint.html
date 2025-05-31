@@ -197,7 +197,7 @@
     </div>
   </div>
 
-  <!-- 🛡️ Universal Consent Modal -->
+  <!-- 🛡️ Universal Consent Modal (Upgraded Keys) -->
   <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:flex; align-items:center; justify-content:center;">
     <div style="background:#111; padding:30px; border-radius:8px; border:1px solid #0ff; width:90%; max-width:480px; text-align:center;">
       <h2 style="color:#0ff;">🧬 Join AiGentsy — Legal Consent</h2>
@@ -225,15 +225,16 @@
       const btn = document.getElementById("confirmMintConsentBtn");
       const usernameInput = document.getElementById("mintUsername");
 
-      if (!localStorage.getItem("aigentsyUserConsent")) {
+      if (!localStorage.getItem("aigentsy_consent") || !localStorage.getItem("aigentsy_username")) {
         modal.style.display = "flex";
       }
 
       function checkReady() {
         const name = usernameInput.value.trim();
-        btn.disabled = !(name && checkbox.checked);
-        btn.style.cursor = name && checkbox.checked ? "pointer" : "not-allowed";
-        btn.style.opacity = name && checkbox.checked ? "1" : "0.5";
+        const enabled = name && checkbox.checked;
+        btn.disabled = !enabled;
+        btn.style.cursor = enabled ? "pointer" : "not-allowed";
+        btn.style.opacity = enabled ? "1" : "0.5";
       }
 
       checkbox.addEventListener("change", checkReady);
@@ -242,8 +243,8 @@
       btn.addEventListener("click", () => {
         const username = usernameInput.value.trim();
         const time = new Date().toISOString();
-        localStorage.setItem("aigentsyUserConsent", "true");
-        localStorage.setItem("aigentsyUsername", username);
+        localStorage.setItem("aigentsy_consent", "true");
+        localStorage.setItem("aigentsy_username", username);
         localStorage.setItem("aigentsyConsentTime", time);
         modal.style.display = "none";
         console.log("✅ Consent granted at mint:", username, time);
