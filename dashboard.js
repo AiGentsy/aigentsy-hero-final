@@ -11,9 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
     earningsContainer.innerHTML = html;
   }
 
-  // 🏅 Render Badge Bar (Agent #2732)
+  // 🏅 Render Badge Bar (Agent #2732 or dynamic)
   const badgeBar = document.querySelector('.badge-bar');
-  const badges = agentBadges?.[2732];
+  const agentId = parseInt(localStorage.getItem('agentId') || '2732');
+  const badges = agentBadges?.[agentId];
   if (badgeBar && badges?.length) {
     badgeBar.innerHTML = '';
     badges.forEach(badge => {
@@ -37,4 +38,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     animate();
   });
+
+  // 🧠 Load My Agent Metrics from local/session storage
+  const updateMyMetrics = () => {
+    const userVaultKeys = localStorage.getItem('vaultKeys') || '2';
+    const userRemixPasses = localStorage.getItem('remixPasses') || '1';
+    const userAIGx = localStorage.getItem('aigx') || '450';
+    const userClones = localStorage.getItem('cloneCount') || '3';
+
+    document.getElementById('userVaultKeys').textContent = userVaultKeys;
+    document.getElementById('userRemixPasses').textContent = userRemixPasses;
+    document.getElementById('userAIGx').textContent = userAIGx;
+    document.getElementById('userClones').textContent = userClones;
+  };
+
+  updateMyMetrics();
 });
