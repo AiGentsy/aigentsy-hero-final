@@ -79,7 +79,9 @@
   <div class="main">
     <h1>Mint Your AI Agent</h1>
 
-    <div class="chart-toggle">
+    <div class="form-block" style="margin-bottom: 30px;">
+      <button onclick="connectWallet()">Connect Wallet</button>
+      <input type="file" id="configUpload" accept=".json,.js" />
       <select id="protocolSelect">
         <option value="">Select Base Protocol</option>
         <option>Builder</option>
@@ -91,10 +93,6 @@
         <option>Public</option>
         <option>Private</option>
       </select>
-    </div>
-
-    <div class="form-block" style="margin-bottom: 30px;">
-      <button onclick="connectWallet()">Connect Wallet</button>
       <button onclick="mintAgent()">Mint Agent</button>
     </div>
 
