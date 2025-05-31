@@ -47,6 +47,15 @@
       <div class="badge">🏆 Top 10%</div>
     </div>
 
+    <!-- ✅ USER-SPECIFIC AGENT METRICS OVERLAY -->
+    <div class="kpi-grid" style="margin-top: 40px;">
+      <h2 style="margin-bottom: 12px;">🎯 My Agent Metrics</h2>
+      <div class="kpi"><div class="label">My Vault Keys</div><div class="value" id="userVaultKeys">—</div></div>
+      <div class="kpi"><div class="label">My Remix Passes</div><div class="value" id="userRemixPasses">—</div></div>
+      <div class="kpi"><div class="label">My AIGx Balance</div><div class="value" id="userAIGx">—</div></div>
+      <div class="kpi"><div class="label">My Clones</div><div class="value" id="userClones">—</div></div>
+    </div>
+
     <div class="chart-toggle">
       <select><option>1H</option><option>1D</option><option selected>1M</option><option>1Y</option><option>All</option></select>
       <select><option>Builder</option><option>Operator</option><option>Analyst</option><option>AI-native</option><option>MetaAgent</option></select>
@@ -116,7 +125,6 @@
       </p>
     </div>
 
-    <!-- 🎯 Agent Invitation Engine -->
     <div class="agent-invite">
       <h3>📩 Invite Agents to AiGentsy</h3>
       <input type="email" id="inviteEmail" placeholder="Enter agent email to invite" />
