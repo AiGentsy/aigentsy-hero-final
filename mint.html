@@ -44,6 +44,19 @@
       color: #aaa;
       font-size: 0.9rem;
     }
+    /* Hide modal by default; will be shown by JavaScript post-mint */
+    #mintConsentModal {
+      display: none;
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:#000c;
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
+    }
   </style>
 </head>
 <body>
@@ -78,6 +91,21 @@
 
   <div class="main">
     <h1>Mint Your AI Agent</h1>
+
+    <!-- ──────── TRAIT SELECTOR (INSERTED) ──────── -->
+    <div class="trait-selector" style="margin-bottom: 20px;">
+      <label for="traitSelect" style="color: #ccc; font-size: 0.9rem; margin-right: 8px;">Select Agent Trait:</label>
+      <select id="traitSelect">
+        <option value="">Choose Trait</option>
+        <option>Recursive Builder</option>
+        <option>Negotiation Strategist</option>
+        <option>Referral Propagator</option>
+        <option>Autonomous Mapper</option>
+        <option>Venture Synthesizer</option>
+        <option>Propagation Sentinel</option>
+      </select>
+    </div>
+    <!-- ────────────────────────────────────────────── -->
 
     <div class="chart-toggle">
       <select id="protocolSelect">
@@ -197,8 +225,8 @@
     </div>
   </div>
 
-  <!-- 🛡️ Universal Consent Modal -->
-  <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:flex; align-items:center; justify-content:center;">
+  <!-- 🛡️ Universal Consent Modal (now hidden until post-mint) -->
+  <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:none; align-items:center; justify-content:center;">
     <div style="background:#111; padding:30px; border-radius:8px; border:1px solid #0ff; width:90%; max-width:480px; text-align:center;">
       <h2 style="color:#0ff;">🧬 Join AiGentsy — Legal Consent</h2>
       <p style="color:#ccc; font-size:0.95rem;">
@@ -219,38 +247,39 @@
   </div>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const modal = document.getElementById("mintConsentModal");
-      const checkbox = document.getElementById("mintConsentCheck");
-      const btn = document.getElementById("confirmMintConsentBtn");
-      const usernameInput = document.getElementById("mintUsername");
+    // Removed the DOMContentLoaded listener for modal-on-load.
+    // Instead, provide a function to show the modal after mint:
+    function showConsentModal() {
+      const modal = document.getElementById(\"mintConsentModal\");
+      const checkbox = document.getElementById(\"mintConsentCheck\");
+      const btn = document.getElementById(\"confirmMintConsentBtn\");
+      const usernameInput = document.getElementById(\"mintUsername\");
 
-      if (!localStorage.getItem("aigentsyUserConsent")) {
-        modal.style.display = "flex";
-      }
+      modal.style.display = \"flex\";
 
       function checkReady() {
         const name = usernameInput.value.trim();
         btn.disabled = !(name && checkbox.checked);
-        btn.style.cursor = name && checkbox.checked ? "pointer" : "not-allowed";
-        btn.style.opacity = name && checkbox.checked ? "1" : "0.5";
+        btn.style.cursor = name && checkbox.checked ? \"pointer\" : \"not-allowed\";
+        btn.style.opacity = name && checkbox.checked ? \"1\" : \"0.5\";
       }
 
-      checkbox.addEventListener("change", checkReady);
-      usernameInput.addEventListener("input", checkReady);
+      checkbox.addEventListener(\"change\", checkReady);
+      usernameInput.addEventListener(\"input\", checkReady);
 
-      btn.addEventListener("click", () => {
+      btn.addEventListener(\"click\", () => {
         const username = usernameInput.value.trim();
         const time = new Date().toISOString();
-        localStorage.setItem("aigentsyUserConsent", "true");
-        localStorage.setItem("aigentsyUsername", username);
-        localStorage.setItem("aigentsyConsentTime", time);
-        modal.style.display = "none";
-        console.log("✅ Consent granted at mint:", username, time);
+        localStorage.setItem(\"aigentsyUserConsent\", \"true\");
+        localStorage.setItem(\"aigentsyUsername\", username);
+        localStorage.setItem(\"aigentsyConsentTime\", time);
+        modal.style.display = \"none\";
+        console.log(\"✅ Consent granted at mint:\", username, time);
       });
-    });
+    }
+
+    // Expose showConsentModal to the global scope
+    window.showConsentModal = showConsentModal;
   </script>
 </body>
 </html>
-
-
