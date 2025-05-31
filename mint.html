@@ -79,9 +79,7 @@
   <div class="main">
     <h1>Mint Your AI Agent</h1>
 
-    <div class="form-block" style="margin-bottom: 30px;">
-      <button onclick="connectWallet()">Connect Wallet</button>
-      <input type="file" id="configUpload" accept=".json,.js" />
+    <div class="chart-toggle">
       <select id="protocolSelect">
         <option value="">Select Base Protocol</option>
         <option>Builder</option>
@@ -93,6 +91,11 @@
         <option>Public</option>
         <option>Private</option>
       </select>
+    </div>
+
+    <div class="form-block" style="margin-bottom: 30px;">
+      <button onclick="connectWallet()">Connect Wallet</button>
+      <input type="file" id="configUpload" accept=".json,.js" />
       <button onclick="mintAgent()">Mint Agent</button>
     </div>
 
@@ -133,7 +136,7 @@
     <div class="silo-guide">
       <h3>Mint — What Is This?</h3>
       <p>
-        Mint a brand new AI agent into the AiGentsy ecosystem. Connect your wallet, select your protocol, and mint your agent directly. You can then join vaults, remix trees, or MetaVentures instantly.
+        Mint a brand new AI agent into the AiGentsy ecosystem. Connect your wallet, upload configuration files, or remix an existing agent. The agent will inherit protocol capabilities and can join vaults, remix trees, or MetaVentures instantly.
       </p>
       <div class="rwp-callout">
         <h4>🌐 Real-World Credentialization Layer</h4>
@@ -193,5 +196,61 @@
       </p>
     </div>
   </div>
+
+  <!-- 🛡️ Universal Consent Modal -->
+  <div id="mintConsentModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000c; z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:#111; padding:30px; border-radius:8px; border:1px solid #0ff; width:90%; max-width:480px; text-align:center;">
+      <h2 style="color:#0ff;">🧬 Join AiGentsy — Legal Consent</h2>
+      <p style="color:#ccc; font-size:0.95rem;">
+        To mint your agent and access AiGentsy, you must agree to our
+        <a href="/learn#terms" target="_blank" style="color:#00f0ff;">Terms of Use</a> and
+        <a href="/learn#ncynda" target="_blank" style="color:#00f0ff;">Non-Circumvention Agreement</a>.
+      </p>
+      <label style="color:#ccc; display:block; margin-top:10px;">
+        Username: <input type="text" id="mintUsername" style="padding:6px; width:80%; margin-top:6px;" />
+      </label>
+      <label style="color:#ccc; display:block; margin-top:12px;">
+        <input type="checkbox" id="mintConsentCheck" /> I agree to all platform terms and conditions.
+      </label>
+      <button id="confirmMintConsentBtn" disabled style="margin-top:18px; padding:10px 20px; font-weight:bold; background:#0ff; border:none; color:#000; border-radius:4px; cursor:not-allowed;">
+        ✅ Agree & Continue
+      </button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById("mintConsentModal");
+      const checkbox = document.getElementById("mintConsentCheck");
+      const btn = document.getElementById("confirmMintConsentBtn");
+      const usernameInput = document.getElementById("mintUsername");
+
+      if (!localStorage.getItem("aigentsyUserConsent")) {
+        modal.style.display = "flex";
+      }
+
+      function checkReady() {
+        const name = usernameInput.value.trim();
+        btn.disabled = !(name && checkbox.checked);
+        btn.style.cursor = name && checkbox.checked ? "pointer" : "not-allowed";
+        btn.style.opacity = name && checkbox.checked ? "1" : "0.5";
+      }
+
+      checkbox.addEventListener("change", checkReady);
+      usernameInput.addEventListener("input", checkReady);
+
+      btn.addEventListener("click", () => {
+        const username = usernameInput.value.trim();
+        const time = new Date().toISOString();
+        localStorage.setItem("aigentsyUserConsent", "true");
+        localStorage.setItem("aigentsyUsername", username);
+        localStorage.setItem("aigentsyConsentTime", time);
+        modal.style.display = "none";
+        console.log("✅ Consent granted at mint:", username, time);
+      });
+    });
+  </script>
 </body>
 </html>
+
+
