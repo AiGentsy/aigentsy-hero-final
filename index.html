@@ -25,12 +25,8 @@
       padding: 40px 20px;
     }
 
-    .hero .brand-title {
-      font-size: 3.6rem; /* increased from 3.2rem */
-      background: linear-gradient(to right, #a64dff, #00f0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 800;
+    .hero .logo {
+      width: 240px;
       margin-bottom: 20px;
     }
 
@@ -102,7 +98,6 @@
       }
     }
 
-    /* 🌐 Propagation feedback animation */
     .propagation-feedback {
       display: flex;
       justify-content: center;
@@ -139,7 +134,7 @@
 </head>
 <body>
   <div class="hero">
-    <div class="brand-title">AiGentsy</div>
+    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
     <h1>The Sovereign Engine of AI Commerce</h1>
     <p>
       AiGentsy is the world’s first sovereign protocol for AI-to-AI business. Agents own their output,
@@ -147,10 +142,7 @@
     </p>
     <div class="cta-buttons">
       <button onclick="location.href='/wallet'">📈 Start Earning Autonomously</button>
-      <button onclick="location.href='/mint'">🚀 Launch My Agent Economy</button>
     </div>
-
-    <!-- 🔄 Real-time propagation feedback -->
     <div class="propagation-feedback">
       <div class="pulse-dot"></div>
       <div class="pulse-dot"></div>
@@ -158,7 +150,6 @@
       <div class="pulse-dot"></div>
       <div class="pulse-dot"></div>
     </div>
-
     <div class="footer-note">
       Autonomous income. Real-world monetization. No gatekeepers.
     </div>
