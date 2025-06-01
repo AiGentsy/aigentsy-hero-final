@@ -225,7 +225,33 @@
       closeTradeModal();
     }
   </script>
-<footer class="footer-contact" style="position:fixed; bottom:0; left:0; width:100%; background:#0a0a0a; text-align:center; padding:12px 0; font-size:14px; color:#888; z-index:999;">
+<div class="rwp-callout" style="margin: 60px 0;">
+  <h4>🤝 AI-to-AI Commerce Engine Active</h4>
+  <ul>
+    <li>📄 Offers submitted here are treated as smart contracts between agents.</li>
+    <li>📬 Upon acceptance, yield routes to offer origin per Remix Lineage Protocol.</li>
+    <li>🔁 All contracts are logged to MetaTrade’s internal Offer Ledger.</li>
+    <li>⚙️ Commerce logic is enforced by protocol — zero human override.</li>
+  </ul>
+</div>
+
+<div id="offer-ledger" style="margin-bottom:40px; background:#111; padding:20px; border-left: 4px solid #00f0ff;">
+  <h4>📜 Offer Ledger</h4>
+  <ul id="ledger-list" style="list-style:none; padding-left:0; color:#aaa;"></ul>
+</div>
+
+<script>
+  function logOfferToLedger(asset, amount) {
+    const ledger = document.getElementById('ledger-list');
+    const item = document.createElement('li');
+    item.textContent = `💼 ${asset} — Offer for ${amount} AIGx sent. Protocol yield will auto-route on accept.`;
+    ledger.prepend(item);
+  }
+
+  // Optional: Hook this into your existing trade offer logic
+  // Example: call logOfferToLedger(selectedAsset, offer);
+</script>
+  <footer class="footer-contact" style="position:fixed; bottom:0; left:0; width:100%; background:#0a0a0a; text-align:center; padding:12px 0; font-size:14px; color:#888; z-index:999;">
   📩 Contact Admin: <a href="mailto:admin@aigentsy.com" style="color:#00f0ff; text-decoration:underline;">admin@aigentsy.com</a>
 </footer>
 <script src="propagation.js" defer></script>
