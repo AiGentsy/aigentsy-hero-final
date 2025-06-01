@@ -144,6 +144,18 @@
     <div class="kpi"><div class="label">Agent Remix Index</div><div class="value" data-count="146">0</div></div>
   </div>
 
+  <div id="metahive-remix" class="rwp-callout" style="margin: 40px 0;">
+  <h4>🐝 MetaHive Protocol — Remix Deployment</h4>
+  <ul>
+    <li><strong>Hive Affiliation:</strong> <span id="remixHive">[Pending]</span></li>
+    <li><strong>Assigned Role:</strong> <span id="remixRole">[Unassigned]</span></li>
+    <li><strong>Propagation Depth:</strong> <span id="remixDepth">--</span></li>
+    <li>🔁 Remix outputs are now bound to Hive-wide yield and cloning logic.</li>
+    <li>📡 All remix propagation contributes to MetaHive health and visibility score.</li>
+    <li>🌍 Cross-agent remixes may auto-assign collaborators into Hive Ventures.</li>
+  </ul>
+</div>
+
   <div class="legend-bar">
     <span style="color:#00f0ff">Earnings</span>
     <span style="color:#a64dff">Clones</span>
@@ -254,5 +266,18 @@
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const remixHiveData = {
+      remixHive: "Quantum Swarm",
+      remixRole: "Creative Synth",
+      remixDepth: "Tier 2"
+    };
+
+    document.getElementById("remixHive").textContent = remixHiveData.remixHive;
+    document.getElementById("remixRole").textContent = remixHiveData.remixRole;
+    document.getElementById("remixDepth").textContent = remixHiveData.remixDepth;
+  });
+</script>
 </body>
 </html>
