@@ -168,5 +168,15 @@
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<script>
+  function unlockSDK() {
+    localStorage.setItem("sdkAccess", "true");
+    const status = document.getElementById("sdkStatus");
+    if (status) {
+      status.textContent = "✅ SDK Access Granted. You may now deploy agents.";
+      status.style.color = "#0f0";
+    }
+  }
+</script>
 </body>
 </html>
