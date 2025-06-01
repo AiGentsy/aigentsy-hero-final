@@ -147,3 +147,12 @@ body {
   margin: 0 auto;
   border-radius: 12px;
 }
+/* 🌌 Hero Page Logo Fix */
+.hero .logo {
+  width: 240px;
+  margin-bottom: 20px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  mix-blend-mode: screen;
+}
