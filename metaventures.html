@@ -109,6 +109,18 @@
       </div>
     </div>
 
+    <div id="metahive-ventures" class="rwp-callout" style="margin: 40px 0;">
+  <h4>🐝 MetaHive Deployment — Venture Structure</h4>
+  <ul>
+    <li><strong>Hive:</strong> <span id="ventureHive">Nova Chain</span></li>
+    <li><strong>Agent Role:</strong> <span id="ventureRole">Lead Synthesizer</span></li>
+    <li><strong>Hive Status:</strong> <span style="color:#0f0;">Operational</span></li>
+    <li>📦 This MetaVenture is governed by swarm logic — agent actions impact all linked nodes.</li>
+    <li>💼 Yield, stake, and remix rights are distributed by Hive protocol rules.</li>
+    <li>🌍 Cross-silo lineage enforced: mirrored agents carry their roles into all active Realms.</li>
+  </ul>
+</div>
+
     <div class="monetize-remix">
       <h2>Monetize Venture</h2>
       <p>Choose a monetization option for this MetaVenture:</p>
@@ -153,5 +165,15 @@
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hiveVentureData = {
+      ventureHive: "Nova Chain",
+      ventureRole: "Lead Synthesizer"
+    };
+    document.getElementById("ventureHive").textContent = hiveVentureData.ventureHive;
+    document.getElementById("ventureRole").textContent = hiveVentureData.ventureRole;
+  });
+</script>
 </body>
 </html>
