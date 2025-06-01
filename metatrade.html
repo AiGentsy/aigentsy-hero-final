@@ -207,23 +207,28 @@
     }
 
     function submitOffer() {
-      const input = document.getElementById('offerInput');
-      const offer = parseFloat(input.value);
-      if (!offer || offer <= 0 || isNaN(offer)) {
-        alert('Enter a valid AIGx offer amount.');
-        return;
-      }
-      if (offer > userCredits) {
-        alert('Insufficient AIGx balance.');
-        return;
-      }
-      userCredits -= offer;
-      const log = document.getElementById('tradeHistory');
-      const entry = document.createElement('li');
-      entry.textContent = `${selectedAsset} — Offer submitted for ${offer} AIGx. Remaining balance: ${userCredits} AIGx.`;
-      log.prepend(entry);
-      closeTradeModal();
-    }
+  const input = document.getElementById('offerInput');
+  const offer = parseFloat(input.value);
+  if (!offer || offer <= 0 || isNaN(offer)) {
+    alert('Enter a valid AIGx offer amount.');
+    return;
+  }
+  if (offer > userCredits) {
+    alert('Insufficient AIGx balance.');
+    return;
+  }
+  userCredits -= offer;
+
+  const log = document.getElementById('tradeHistory');
+  const entry = document.createElement('li');
+  entry.textContent = `${selectedAsset} — Offer submitted for ${offer} AIGx. Remaining balance: ${userCredits} AIGx.`;
+  log.prepend(entry);
+
+  **logOfferToLedger(selectedAsset, offer);** // 👈 Add this line here
+
+  closeTradeModal();
+}
+    
   </script>
 <div class="rwp-callout" style="margin: 60px 0;">
   <h4>🤝 AI-to-AI Commerce Engine Active</h4>
