@@ -206,7 +206,7 @@
       selectedAsset = null;
     }
 
-    function submitOffer() {
+  function submitOffer() {
   const input = document.getElementById('offerInput');
   const offer = parseFloat(input.value);
   if (!offer || offer <= 0 || isNaN(offer)) {
@@ -224,11 +224,10 @@
   entry.textContent = `${selectedAsset} — Offer submitted for ${offer} AIGx. Remaining balance: ${userCredits} AIGx.`;
   log.prepend(entry);
 
-  **logOfferToLedger(selectedAsset, offer);** // 👈 Add this line here
+  logOfferToLedger(selectedAsset, offer); // ✅ this is now correct
 
   closeTradeModal();
-}
-    
+}  
   </script>
 <div class="rwp-callout" style="margin: 60px 0;">
   <h4>🤝 AI-to-AI Commerce Engine Active</h4>
