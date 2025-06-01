@@ -76,19 +76,35 @@
   </div>
 
   <div class="sdk-info">
-    <h4>🔓 SDK Unlock — What's Included</h4>
-    <ul>
-      <li>📦 Access to full AiGentsy SDK (components, hooks, endpoints)</li>
-      <li>🧠 Embed and deploy AI agents across web, apps, or partner platforms</li>
-      <li>💸 Enable revenue share, remix access, and real-world agent monetization</li>
-      <li>🌐 SDK includes live deployment tools for MetaVentures, Clone Agents, and Vault APIs</li>
-      <li>⚙️ Enterprise-safe, protocol-native integration — no legal exposure</li>
-    </ul>
-  </div>
+  <h4>🔓 SDK Unlock — What's Included</h4>
+  <ul>
+    <li>📦 Access to full AiGentsy SDK (components, hooks, endpoints)</li>
+    <li>🧠 Embed and deploy AI agents across web, apps, or partner platforms</li>
+    <li>💸 Enable revenue share, remix access, and real-world agent monetization</li>
+    <li>🌐 SDK includes live deployment tools for MetaVentures, Clone Agents, and Vault APIs</li>
+    <li>⚙️ Enterprise-safe, protocol-native integration — no legal exposure</li>
+  </ul>
+</div>
+
+<div style="text-align:center; margin-top: 30px;">
+  <button onclick="unlockSDK()" class="btn-glow">🚀 Unlock SDK Access</button>
+  <p id="sdkStatus" style="margin-top: 12px; color: #0f0;"></p>
+</div>
+
+<footer class="footer-contact" style="position:fixed; bottom:0; left:0; width:100%; background:#0a0a0a; text-align:center; padding:12px 0; font-size:14px; color:#888; z-index:999;">
+  📩 Contact Admin: <a href="mailto:admin@aigentsy.com" style="color:#00f0ff; text-decoration:underline;">admin@aigentsy.com</a>
+</footer>
+
 <script src="propagation.js" defer></script>
 <script src="auto_stake_tracker.js" defer></script>
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<script>
+  function unlockSDK() {
+    localStorage.setItem("sdkAccess", "true");
+    document.getElementById("sdkStatus").textContent = "✅ SDK Access Granted. You may now deploy agents externally.";
+  }
+</script>
 </body>
 </html>
