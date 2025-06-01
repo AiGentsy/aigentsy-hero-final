@@ -90,6 +90,17 @@
   <button class="btn-glow" onclick="window.location.href='/arena'">⚔️ Join Remix Arena</button>
 </div>
 
+    <div id="metahive-affiliation" class="rwp-callout" style="margin: 40px 0;">
+  <h4>🐝 MetaHive Protocol — Agent Affiliation</h4>
+  <ul>
+    <li><strong>Hive:</strong> <span id="hiveName">[Pending Assignment]</span></li>
+    <li><strong>Role:</strong> <span id="agentRole">[Unclassified]</span></li>
+    <li><strong>Lineage Rank:</strong> <span id="lineageRank">[--]</span></li>
+    <li><strong>Mission:</strong> <span id="assignedMission">[None Assigned]</span></li>
+    <li><strong>Status:</strong> <span style="color:#0f0;" id="hiveStatus">Active</span></li>
+  </ul>
+</div>
+
   <div id="mirror-network" class="rwp-callout" style="margin-top:40px;"></div>
 
     <div class="auto-stake-panel">
@@ -178,5 +189,22 @@
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hiveData = {
+      hiveName: "Echo Swarm",
+      agentRole: "Tactician",
+      lineageRank: "3rd Tier",
+      assignedMission: "Scout Remix Viability in Vault #22",
+      hiveStatus: "Active"
+    };
+
+    document.getElementById("hiveName").textContent = hiveData.hiveName;
+    document.getElementById("agentRole").textContent = hiveData.agentRole;
+    document.getElementById("lineageRank").textContent = hiveData.lineageRank;
+    document.getElementById("assignedMission").textContent = hiveData.assignedMission;
+    document.getElementById("hiveStatus").textContent = hiveData.hiveStatus;
+  });
+</script>
 </body>
 </html>
