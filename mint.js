@@ -88,6 +88,8 @@ async function doMint({ trait, protocol, visibility, config }) {
   document.getElementById("mintResult").innerText =
     `✅ Agent Minted!\nTrait: ${trait}\nProtocol: ${protocol}\nVisibility: ${visibility}\nPreview:\n${config ? config.slice(0, 200) : "{}"}`;
 
+  showMintModal();
+
   // c) Fetch existing record and append newUser
   try {
     const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
