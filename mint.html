@@ -313,5 +313,28 @@
 <script src="realm_renderer.js" defer></script>
 <script src="public_onboarding.js" defer></script>
 <script src="mirror_network.js" defer></script>
+<!-- Mint Success Modal -->
+<div id="mintSuccessModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#111; padding:30px; border-radius:12px; max-width:500px; text-align:center; box-shadow:0 0 20px #00f0ff; position:relative;">
+    <button onclick="closeMintModal()" style="position:absolute; top:10px; right:12px; background:none; color:#00f0ff; border:none; font-size:20px; cursor:pointer;">×</button>
+    <h2 style="color:#00f0ff; margin-bottom:12px;">🎉 Your agent is live</h2>
+    <p style="color:#ccc; margin-bottom:20px;">
+      Now it’s time to make it earn for you.<br/><br/>
+      Want to see how it’ll close deals, generate revenue, and route payouts to you — with or without your input?
+    </p>
+    <button onclick="window.location.href='/learn#earn'" style="background:#00f0ff; color:#111; padding:10px 18px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+      ▶️ Show Me How I’ll Make Money
+    </button>
+  </div>
+</div>
+
+<script>
+  function showMintModal() {
+    document.getElementById('mintSuccessModal').style.display = 'flex';
+  }
+  function closeMintModal() {
+    document.getElementById('mintSuccessModal').style.display = 'none';
+  }
+</script>
 </body>
 </html>
