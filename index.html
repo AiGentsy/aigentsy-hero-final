@@ -126,6 +126,31 @@
       font-size: 0.9rem;
       color: #666;
     }
+
+    .consent-block {
+      margin-top: 30px;
+    }
+    .consent-block input {
+      padding: 10px;
+      width: 240px;
+      margin-right: 10px;
+      border-radius: 6px;
+      border: 1px solid #00f0ff;
+      background: #111;
+      color: #fff;
+    }
+    .consent-block button {
+      padding: 10px 18px;
+      background: #00f0ff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .consent-block button:hover {
+      background: #00d5e0;
+    }
   </style>
 </head>
 <body>
@@ -138,6 +163,10 @@
     <div class="cta-buttons">
       <button onclick="location.href='/learn'">📈 Start Earning Autonomously</button>
     </div>
+    <div class="consent-block">
+      <input type="text" id="heroUsername" placeholder="Enter your username">
+      <button onclick="agreeToTermsFromHero(document.getElementById('heroUsername').value)">✅ Agree & Enter Platform</button>
+    </div>
     <div class="propagation-feedback">
       <div class="pulse-dot"></div>
       <div class="pulse-dot"></div>
@@ -149,5 +178,18 @@
       Autonomous income. Real-world monetization. No gatekeepers.
     </div>
   </div>
+<script>
+function agreeToTermsFromHero(username) {
+  const trimmed = username.trim();
+  if (!trimmed) {
+    alert("Please enter a username before proceeding.");
+    return;
+  }
+  localStorage.setItem("aigentsyUserConsent", "true");
+  localStorage.setItem("aigentsyUsername", trimmed);
+  localStorage.setItem("aigentsyConsentTime", new Date().toISOString());
+  window.location.href = "/learn";
+}
+</script>
 </body>
 </html>
