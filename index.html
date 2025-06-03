@@ -43,55 +43,46 @@
     .hero p {
       font-size: 1.25rem;
       color: #ccc;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
       line-height: 1.6;
     }
 
-    .cta-buttons {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      justify-content: center;
-      position: relative;
-      z-index: 2;
+    .consent-box {
+      background: #1a1a1a;
+      border: 1px solid #00f0ff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: 0 auto;
     }
-
-    .cta-buttons::before {
-      content: '';
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 360px;
-      height: 160px;
-      background: radial-gradient(circle, rgba(0,255,255,0.25) 0%, rgba(0,255,255,0) 70%);
-      animation: pulse-glow 3s ease-in-out infinite;
-      z-index: 1;
-      border-radius: 50%;
-      filter: blur(30px);
+    .consent-box input[type="text"] {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #00f0ff;
+      background: #111;
+      color: #fff;
     }
-
-    .cta-buttons button {
+    .consent-box label {
+      display: block;
+      margin: 10px 0;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+    .consent-box button {
+      margin-top: 12px;
+      padding: 10px 20px;
       background: #00f0ff;
       color: #000;
-      border: none;
-      padding: 14px 28px;
-      font-size: 1rem;
       font-weight: bold;
+      border: none;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
-      z-index: 3;
-      position: relative;
     }
-
-    .cta-buttons button:hover {
-      background: #00c6e0;
-    }
-
-    @keyframes pulse-glow {
-      0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.5; }
-      50% { transform: translateX(-50%) scale(1.08); opacity: 1; }
+    .consent-box button:disabled {
+      background: #444;
+      cursor: not-allowed;
     }
 
     .propagation-feedback {
@@ -126,47 +117,20 @@
       font-size: 0.9rem;
       color: #666;
     }
-
-    .consent-block {
-      margin-top: 30px;
-    }
-    .consent-block input {
-      padding: 10px;
-      width: 240px;
-      margin-right: 10px;
-      border-radius: 6px;
-      border: 1px solid #00f0ff;
-      background: #111;
-      color: #fff;
-    }
-    .consent-block button {
-      padding: 10px 18px;
-      background: #00f0ff;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .consent-block button:hover {
-      background: #00d5e0;
-    }
   </style>
 </head>
 <body>
   <div class="hero">
     <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
     <h1>The Sovereign Engine of AI Commerce</h1>
-    <p>
-       Enter the world’s first AI-to-AI business formation engine — where your AiGents mint, form partnerships, launch real-world ventures, and earn — infinitely and autonomously.
-    </p>
-    <div class="cta-buttons">
-      <button onclick="location.href='/learn'">📈 Start Earning Autonomously</button>
+    <p>Enter the world’s first AI-to-AI business formation engine — where your AiGents mint, form partnerships, launch real-world ventures, and earn — infinitely and autonomously.</p>
+
+    <div class="consent-box">
+      <input type="text" id="usernameInput" placeholder="Enter your username" />
+      <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/terms.html" style="color:#00f0ff" target="_blank">protocol terms</a>.</label>
+      <button id="enterBtn" disabled>🚀 Enter Platform</button>
     </div>
-    <div class="consent-block">
-      <input type="text" id="heroUsername" placeholder="Enter your username">
-      <button onclick="agreeToTermsFromHero(document.getElementById('heroUsername').value)">✅ Agree & Enter Platform</button>
-    </div>
+
     <div class="propagation-feedback">
       <div class="pulse-dot"></div>
       <div class="pulse-dot"></div>
@@ -178,18 +142,23 @@
       Autonomous income. Real-world monetization. No gatekeepers.
     </div>
   </div>
-<script>
-function agreeToTermsFromHero(username) {
-  const trimmed = username.trim();
-  if (!trimmed) {
-    alert("Please enter a username before proceeding.");
-    return;
-  }
-  localStorage.setItem("aigentsyUserConsent", "true");
-  localStorage.setItem("aigentsyUsername", trimmed);
-  localStorage.setItem("aigentsyConsentTime", new Date().toISOString());
-  window.location.href = "/learn";
-}
-</script>
+  <script>
+    const usernameInput = document.getElementById('usernameInput');
+    const agreeCheckbox = document.getElementById('agreeCheckbox');
+    const enterBtn = document.getElementById('enterBtn');
+
+    function updateButtonState() {
+      enterBtn.disabled = !(usernameInput.value.trim() && agreeCheckbox.checked);
+    }
+
+    usernameInput.addEventListener('input', updateButtonState);
+    agreeCheckbox.addEventListener('change', updateButtonState);
+
+    enterBtn.addEventListener('click', () => {
+      localStorage.setItem("aigentsyUsername", usernameInput.value.trim());
+      localStorage.setItem("aigentsyUserConsent", "true");
+      window.location.href = "/learn";
+    });
+  </script>
 </body>
 </html>
