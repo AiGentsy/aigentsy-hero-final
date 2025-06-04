@@ -50,7 +50,7 @@ async function mintAgent() {
   };
 
   try {
-    const response = await fetch("https://YOUR-RUNTIME-ENDPOINT-HERE/api/trigger", {
+    const response = await fetch("https://aigentsy-runtime.up.railway.app/api/trigger", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
