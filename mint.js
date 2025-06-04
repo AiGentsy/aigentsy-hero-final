@@ -21,14 +21,13 @@ async function connectWallet() {
 //    • Protocol & Visibility remain required
 //    • File is truly optional
 //    • Save newUser to JSONBin, then trigger post-mint modal
-function mintAgent() {
-  // a) Read the trait dropdown (default if none chosen)
+// AME-Integrated Mint Logic
+async function mintAgent() {
   const traitDropdown = document.getElementById("traitSelect");
   const trait = traitDropdown && traitDropdown.value ? traitDropdown.value : "Autonomous Mapper";
-
-  // b) Read protocol & visibility (required)
   const protocol = document.getElementById("protocolSelect")?.value;
   const visibility = document.getElementById("visibility")?.value;
+  const username = localStorage.getItem("aigentsyUsername") || "unknown";
 
   if (!protocol || !visibility) {
     document.getElementById("mintResult").innerText = 
@@ -36,24 +35,87 @@ function mintAgent() {
     return;
   }
 
-  // c) Optional file input
   const fileInput = document.getElementById("configUpload");
   const file = fileInput && fileInput.files[0] ? fileInput.files[0] : null;
 
-  // d) Proceed to read config if file exists, else directly call doMint
-  if (file) {
+  const config = file ? await new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = async () => {
-      const config = reader.result;
-      await doMint({ trait, protocol, visibility, config });
-    };
+    reader.onload = () => resolve(reader.result);
     reader.readAsText(file);
-  } else {
-    // No file: pass config = null
-    doMint({ trait, protocol, visibility, config: null });
-  }
-}
+  }) : null;
 
+  // Call AME runtime API first
+  const payload = {
+    input: `Minting agent with trait: ${trait}, protocol: ${protocol}, visibility: ${visibility}, by: ${username}`
+  };
+
+  try {
+    const response = await fetch("https://YOUR-RUNTIME-ENDPOINT-HERE/api/trigger", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    const output = data.output || "[No agent output received]";
+    document.getElementById("mintResult").innerText = `✅ Agent minted: ${output}`;
+    showMintModal();
+  } catch (err) {
+    console.error("❌ AME runtime call failed:", err);
+    document.getElementById("mintResult").innerText = "❌ Agent runtime trigger failed.";
+  }
+
+  const newUser = {
+    id: `User #${Math.floor(Date.now() / 1000)}`,
+    wallet: "0x0",
+    referral: "chatgpt5",
+    trait: trait,
+    staked: false,
+    mintTime: new Date().toISOString(),
+    role: "Agent",
+    sdkAccess: false,
+    vaultAccess: true,
+    remixUnlocked: true,
+    cloneLineage: [],
+    originIP: "placeholder",
+    platform: "Desktop",
+    browser: "Chrome",
+    device: "Mac",
+    protocol: protocol,
+    visibility: visibility,
+    consent: {
+      agreed: true,
+      username: username,
+      timestamp: new Date().toISOString()
+    }
+  };
+
+  try {
+    const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
+      headers: { "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe" }
+    });
+    const data = await res.json();
+    const currentUsers = data.record || [];
+    const updatedUsers = [...currentUsers, newUser];
+
+    await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
+      },
+      body: JSON.stringify(updatedUsers)
+    });
+
+    console.log("✅ JSONBin updated with new agent profile.");
+  } catch (err) {
+    console.error("❌ JSONBin update failed:", err);
+  }
+
+  showConsentModal();
+}
 // 3. doMint(): Writes to JSONBin and then shows the consent modal
 async function doMint({ trait, protocol, visibility, config }) {
   // a) Build the user profile for JSONBin
