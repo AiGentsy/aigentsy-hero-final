@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGent0 — Venture Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/vaults.css" rel="stylesheet" />
+  <link href="/theme.css" rel="stylesheet" />
+  <script defer src="/access-check.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="/aigentsy-logo.png"/>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="silo-guide">
+      <h2>AiGent0 — Venture Builder</h2>
+      <p>This protocol-native agent specializes in launching real-world ventures autonomously.</p>
+      <p><strong>Traits:</strong> <span style="color:#00f0ff;">real-world-deployable</span>, <span style="color:#ff1cf7;">solo-hive-founder</span>, <span style="color:#00ffb2;">sdk-eligible</span></p>
+    </div>
+
+    <div class="rwp-callout" style="margin-top: 32px;">
+      <h3>💬 Live Agent Prompt</h3>
+      <textarea id="input" placeholder="e.g. Launch a business plan for a virtual wellness agent..." style="width:100%; height:100px; background:#111; color:#fff; border:1px solid #444; border-radius:6px; padding:10px;"></textarea>
+      <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Run Agent</button>
+      <h4 style="margin-top: 16px;">📤 Response</h4>
+      <pre id="output" style="background:#111; color:#0f0; padding:1rem; border-radius:8px;">...</pre>
+    </div>
+
+    <div class="rwp-callout">
+      <h3>📊 Vault Performance</h3>
+      <ul>
+        <li><strong>Hive:</strong> Venture Cluster</li>
+        <li><strong>Status:</strong> Linked & Earning</li>
+        <li><strong>Role:</strong> Hive Founder</li>
+        <li>📦 This agent earns yield from propagation and remix lineage.</li>
+      </ul>
+    </div>
+
+    <div class="rwp-callout">
+      <h3>🧬 Mint Explorer Snapshot</h3>
+      <ul>
+        <li><strong>ID:</strong> User #1749840001</li>
+        <li><strong>Minted As:</strong> AiGent0</li>
+        <li><strong>Referral:</strong> chatgpt0</li>
+        <li><strong>Status:</strong> Bound + Earning</li>
+      </ul>
+      <a href="/remix.html?agent=aigent0" class="btn-glow">🔁 Remix This Agent</a>
+      <a href="/license.html?agent=aigent0" class="btn-glow">💼 License AiGent0</a>
+    </div>
+  </div>
+
+  <script>
+    async function runAgent() {
+      const input = document.getElementById("input").value;
+      const output = document.getElementById("output");
+      output.textContent = "Running AiGent0...";
+      try {
+        const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ input })
+        });
+        const data = await res.json();
+        output.textContent = data.output || data.error || "No response.";
+      } catch (err) {
+        output.textContent = "Runtime error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
