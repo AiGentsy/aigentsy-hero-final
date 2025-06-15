@@ -68,24 +68,31 @@
   </div>
 
   <script>
-    async function runAgent() {
-      const input = document.getElementById("input").value;
-      const output = document.getElementById("output");
-      output.textContent = "Running AiGent0...";
-      try {
-        const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ input })
-        });
-        const data = await res.json();
-        output.textContent = data.output || data.error || "No response.";
-      } catch (err) {
-        output.textContent = "Runtime error: " + err.message;
-      }
+  let memory = [];
+
+  async function runAgent() {
+    const input = document.getElementById("input").value;
+    const output = document.getElementById("output");
+
+    memory.push(input); // Add latest prompt to memory
+    output.textContent = "Thinking...";
+
+    try {
+      const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input, memory })
+      });
+      const data = await res.json();
+
+      memory.push(data.output || "No response.");
+      output.textContent = memory.map((msg, i) =>
+        (i % 2 === 0 ? `🧠 You: ${msg}` : `🤖 AiGent: ${msg}`)
+      ).join("\n\n");
+    } catch (err) {
+      output.textContent = "Runtime error: " + err.message;
     }
-  </script>
+  }
+</script>
 </body>
 </html>
