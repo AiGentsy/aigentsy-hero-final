@@ -18,7 +18,7 @@
       margin-bottom: 1rem;
     }
     .chat-user { color: #0ff; margin-bottom: 0.5rem; }
-    .chat-agent { color: #0f0; margin-bottom: 1rem; }
+    .chat-agent { color: #fff; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -55,6 +55,12 @@
       <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
     </div>
 
+    <div style="margin-top: 24px;">
+      <button id="launchBtn" class="btn-glow" disabled style="opacity: 0.5; cursor: not-allowed;">
+        🚀 Launch Venture (locked until ready)
+      </button>
+    </div>
+
     <div class="rwp-callout">
       <h3>📊 Vault Performance</h3>
       <ul>
@@ -80,26 +86,25 @@
 
   <script>
     const chatLog = document.getElementById("chatLog");
+    const launchBtn = document.getElementById("launchBtn");
     let memory = [];
+    let readyToLaunch = false;
+    const triggerKeywords = ["launch", "deploy", "start", "go to", "ready to begin", "initiate"];
 
     async function runAgent() {
-      const input = document.getElementById("input").value;
+      const input = document.getElementById("input").value.trim();
       if (!input) return;
 
-      // Append user message
+      // Append user input
       const userMsg = document.createElement("div");
       userMsg.className = "chat-user";
       userMsg.textContent = `🧠 You: ${input}`;
       chatLog.appendChild(userMsg);
       chatLog.scrollTop = chatLog.scrollHeight;
-
-      // Clear input
+      memory.push(input);
       document.getElementById("input").value = "";
 
-      // Add to memory
-      memory.push(input);
-
-      // Show thinking status
+      // Show loading agent response
       const loader = document.createElement("div");
       loader.className = "chat-agent";
       loader.textContent = "🤖 AiGent0: Thinking...";
@@ -113,10 +118,20 @@
           body: JSON.stringify({ input, memory })
         });
         const data = await res.json();
-
-        memory.push(data.output || "No response.");
-        loader.textContent = `🤖 AiGent0: ${data.output || data.error || "No response."}`;
+        const reply = data.output || "No response.";
+        loader.textContent = `🤖 AiGent0: ${reply}`;
+        memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
+
+        if (!readyToLaunch && triggerKeywords.some(k => reply.toLowerCase().includes(k))) {
+          readyToLaunch = true;
+          launchBtn.disabled = false;
+          launchBtn.style.opacity = 1;
+          launchBtn.style.cursor = "pointer";
+          launchBtn.innerText = "🚀 Launch Venture";
+          launchBtn.onclick = () => window.location.href = "/metaventures";
+        }
+
       } catch (err) {
         loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
       }
