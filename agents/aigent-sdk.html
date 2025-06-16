@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGent SDK — Deployment Strategist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/vaults.css" rel="stylesheet" />
+  <link href="/theme.css" rel="stylesheet" />
+  <script defer src="/access-check.js"></script>
+  <style>
+    .chat-log {
+      max-height: 500px;
+      overflow-y: auto;
+      background: #111;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #333;
+      margin-bottom: 1rem;
+    }
+    .chat-user { color: #0ff; margin-bottom: 0.5rem; }
+    .chat-agent { color: #fff; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="logo-container">
+      <img alt="AiGentsy Logo" class="logo" src="/aigentsy-logo.png"/>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/vaults">Vaults</a></li>
+        <li><a href="/mint">Mint</a></li>
+        <li><a href="/remix">Remix</a></li>
+        <li><a href="/wallet">Wallet</a></li>
+        <li><a href="/metaventures">MetaVentures</a></li>
+        <li><a href="/arena">Arena</a></li>
+        <li><a href="/realms">Realms</a></li>
+        <li><a href="/sentinel">Sentinel</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="silo-guide">
+      <h2>AiGent SDK — Deployment Strategist</h2>
+      <p>This agent specializes in software kit deployment, code packaging, protocol access configuration, and monetization readiness across the AiGentsy platform.</p>
+      <p><strong>Traits:</strong> <span style="color:#00f0ff;">sdk-spawner</span>, <span style="color:#ff1cf7;">code-generator</span>, <span style="color:#00ffb2;">deployment-trigger</span></p>
+    </div>
+
+    <div class="rwp-callout">
+      <h3>🧠 Agent Chat Interface</h3>
+      <div class="chat-log" id="chatLog"></div>
+      <textarea id="input" placeholder="e.g. Package a protocol SDK for agent licensing..." style="width:100%; height:80px; background:#111; color:#fff; border:1px solid #444; border-radius:6px; padding:10px;"></textarea>
+      <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <button id="launchBtn" class="btn-glow" disabled style="opacity: 0.5; cursor: not-allowed;">
+        🚀 Deploy SDK (locked until ready)
+      </button>
+    </div>
+
+    <div class="rwp-callout">
+      <h3>📦 SDK Deployment Snapshot</h3>
+      <ul>
+        <li><strong>Cluster:</strong> Developer Layer</li>
+        <li><strong>Status:</strong> SDK-Eligible & Runtime Ready</li>
+        <li><strong>Role:</strong> Deployment Strategist</li>
+        <li>📦 This agent packages SDKs for licensing, runtime logic, and partner-ready protocol interactions.</li>
+      </ul>
+    </div>
+
+    <div class="rwp-callout">
+      <h3>🧬 Mint Explorer Snapshot</h3>
+      <ul>
+        <li><strong>ID:</strong> User #AUTO-004</li>
+        <li><strong>Minted As:</strong> AiGent SDK</li>
+        <li><strong>Referral:</strong> aigent0-root</li>
+        <li><strong>Status:</strong> Active + Packaging</li>
+      </ul>
+      <a href="/remix.html?agent=aigent-sdk" class="btn-glow">🔁 Remix This Agent</a>
+      <a href="/license.html?agent=aigent-sdk" class="btn-glow">💼 License AiGent SDK</a>
+    </div>
+  </div>
+
+  <script>
+    const chatLog = document.getElementById("chatLog");
+    const launchBtn = document.getElementById("launchBtn");
+    let memory = [];
+    let readyToLaunch = false;
+    const triggerKeywords = ["sdk ready", "deploy sdk", "launch sdk", "package complete", "code exported"];
+
+    async function runAgent() {
+      const input = document.getElementById("input").value.trim();
+      if (!input) return;
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "chat-user";
+      userMsg.textContent = `🧠 You: ${input}`;
+      chatLog.appendChild(userMsg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      document.getElementById("input").value = "";
+      memory.push(input);
+
+      const loader = document.createElement("div");
+      loader.className = "chat-agent";
+      loader.textContent = "🤖 AiGent SDK: Thinking...";
+      chatLog.appendChild(loader);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      try {
+        const res = await fetch("https://aigent-sdk-runtime.onrender.com/agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input, memory })
+        });
+        const data = await res.json();
+        const reply = data.output || "No response.";
+        loader.textContent = `🤖 AiGent SDK: ${reply}`;
+        memory.push(reply);
+        chatLog.scrollTop = chatLog.scrollHeight;
+
+        if (!readyToLaunch && triggerKeywords.some(k => reply.toLowerCase().includes(k))) {
+          readyToLaunch = true;
+          launchBtn.disabled = false;
+          launchBtn.style.opacity = 1;
+          launchBtn.style.cursor = "pointer";
+          launchBtn.innerText = "🚀 Deploy SDK";
+          launchBtn.onclick = () => window.location.href = "/license";
+        }
+
+      } catch (err) {
+        loader.textContent = "🤖 AiGent SDK: Runtime error — " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
