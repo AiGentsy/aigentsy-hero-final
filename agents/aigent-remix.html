@@ -18,7 +18,7 @@
       margin-bottom: 1rem;
     }
     .chat-user { color: #0ff; margin-bottom: 0.5rem; }
-    .chat-agent { color: #fff; margin-bottom: 1rem; }
+    .chat-agent { color: #fff; margin-bottom: 1rem; white-space: pre-wrap; }
   </style>
 </head>
 <body>
@@ -91,6 +91,14 @@
     let readyToLaunch = false;
     const triggerKeywords = ["finalize", "remix complete", "trait set", "launch remix", "ready to deploy"];
 
+    function sanitizeMarkdown(markdown) {
+      return markdown
+        .replace(/### (.*$)/gm, '<h4>$1</h4>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^- /gm, '• ')
+        .replace(/---/g, '<hr />');
+    }
+
     async function runAgent() {
       const input = document.getElementById("input").value.trim();
       if (!input) return;
@@ -118,7 +126,10 @@
         });
         const data = await res.json();
         const reply = data.output || "No response.";
-        loader.textContent = `🤖 AiGent Remix: ${reply}`;
+
+        // Convert markdown to HTML
+        const clean = sanitizeMarkdown(reply);
+        loader.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>${clean}`;
         memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
 
