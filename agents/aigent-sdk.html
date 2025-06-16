@@ -18,7 +18,7 @@
       margin-bottom: 1rem;
     }
     .chat-user { color: #0ff; margin-bottom: 0.5rem; }
-    .chat-agent { color: #fff; margin-bottom: 1rem; }
+    .chat-agent { color: #00ffff; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
@@ -91,6 +91,17 @@
     let readyToLaunch = false;
     const triggerKeywords = ["generate sdk", "sdk ready", "deploy sdk", "finalize integration", "launch sdk"];
 
+    function stripMarkdown(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '$1')         // bold
+        .replace(/__(.*?)__/g, '$1')             // underline
+        .replace(/`(.*?)`/g, '$1')               // code
+        .replace(/^#+\s?/gm, '')                 // headers
+        .replace(/^-{3,}$/gm, '')                // horizontal rules
+        .replace(/^\s*[\*\-]\s+/gm, '• ')        // bullet points
+        .replace(/\n{2,}/g, '\n');               // extra spacing
+    }
+
     async function runAgent() {
       const input = document.getElementById("input").value.trim();
       if (!input) return;
@@ -116,8 +127,9 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ input, memory })
         });
+
         const data = await res.json();
-        const reply = data.output || "No response.";
+        const reply = stripMarkdown(data.output || "No response.");
         loader.textContent = `🤖 AiGent SDK: ${reply}`;
         memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
@@ -128,7 +140,7 @@
           launchBtn.style.opacity = 1;
           launchBtn.style.cursor = "pointer";
           launchBtn.innerText = "🧬 Generate SDK";
-          launchBtn.onclick = () => window.location.href = "/license"; // Redirect as needed
+          launchBtn.onclick = () => window.location.href = "/license";
         }
 
       } catch (err) {
