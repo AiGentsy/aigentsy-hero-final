@@ -4,112 +4,120 @@
   <meta charset="UTF-8"/>
   <title>AiGentsy — The Sovereign Engine of AI Commerce</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="theme.css" rel="stylesheet"/>
   <style>
     body {
-      background: radial-gradient(circle at center, #111 0%, #000 100%);
-      font-family: 'Inter', sans-serif;
-      color: #fff;
       margin: 0;
-      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #101c2c, #000000);
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       text-align: center;
+      overflow: hidden;
     }
 
     .hero {
       max-width: 900px;
       padding: 40px 20px;
+      animation: fadeIn 1.5s ease-out;
+      z-index: 2;
     }
 
     .hero .logo {
       width: 280px;
       margin-bottom: 20px;
-      background: none;
-      border: none;
+      filter: drop-shadow(0 0 20px #ffffff);
     }
 
     .hero h1 {
       font-size: 2.6rem;
-      background: linear-gradient(to right, #a64dff, #00f0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #fff;
       margin-bottom: 20px;
     }
 
     .hero p {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       color: #ccc;
       margin-bottom: 30px;
       line-height: 1.6;
     }
 
     .consent-box {
-      background: #1a1a1a;
-      border: 1px solid #00f0ff;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 500px;
+      background: #0d0d0d;
+      border: 1px solid #fff;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 600px;
       margin: 0 auto;
+      box-shadow: 0 0 12px #ffffff33;
     }
+
     .consent-box input[type="text"] {
       width: 90%;
       padding: 10px;
       margin: 10px 0;
       border-radius: 6px;
-      border: 1px solid #00f0ff;
+      border: 1px solid #ffffff;
       background: #111;
       color: #fff;
     }
+
     .consent-box label {
       display: block;
       margin: 10px 0;
       font-size: 0.95rem;
       color: #ccc;
     }
+
     .consent-box button {
-      margin-top: 12px;
+      margin-top: 16px;
       padding: 10px 20px;
-      background: #00f0ff;
+      background: #fff;
       color: #000;
       font-weight: bold;
       border: none;
       border-radius: 6px;
       cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
+
+    .consent-box button:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ffffff;
+    }
+
     .consent-box button:disabled {
       background: #444;
       cursor: not-allowed;
     }
 
-    .propagation-feedback {
+    .aigent-options {
       display: flex;
-      justify-content: center;
-      margin-top: 40px;
+      flex-wrap: wrap;
       gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
     }
 
-    .pulse-dot {
-      width: 10px;
-      height: 10px;
-      background: #00f0ff;
-      border-radius: 50%;
-      animation: propagate 1.8s ease-in-out infinite;
-      opacity: 0.6;
+    .aigent-card {
+      background: #111;
+      border: 1px solid #fff;
+      color: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 250px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
     }
 
-    .pulse-dot:nth-child(2) { animation-delay: 0.2s; }
-    .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
-    .pulse-dot:nth-child(4) { animation-delay: 0.6s; }
-    .pulse-dot:nth-child(5) { animation-delay: 0.8s; }
-
-    @keyframes propagate {
-      0% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.6); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.6; }
+    .aigent-card.selected,
+    .aigent-card:hover {
+      box-shadow: 0 0 10px #ffffff;
+      background: #1a1a1a;
     }
 
     .footer-note {
@@ -117,47 +125,81 @@
       font-size: 0.9rem;
       color: #666;
     }
+
+    .bg-animation {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1;
+      background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
+      animation: bgPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bgPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.08); opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
+  <div class="bg-animation"></div>
   <div class="hero">
-    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo" />
+    <img src="aigentsy-logo-transparent.png" alt="AiGentsy Logo" class="logo" />
     <h1>The Sovereign Engine of AI Commerce</h1>
     <p>Enter the world’s first AI-to-AI business formation engine — where your AiGents mint, form partnerships, launch real-world ventures, and earn — infinitely and autonomously.</p>
 
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Enter your username" />
-      <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#00f0ff" target="_blank">protocol terms</a>.</label>
+      <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
+
+      <div class="aigent-options">
+        <div class="aigent-card" data-agent="venture">AiGent Venture<br><span style="font-size: 0.85rem;">Best for launching autonomous companies</span></div>
+        <div class="aigent-card" data-agent="growth">AiGent Growth<br><span style="font-size: 0.85rem;">Best for attracting users and growing reach</span></div>
+        <div class="aigent-card" data-agent="remix">AiGent Remix<br><span style="font-size: 0.85rem;">Best for customizing agent traits and behavior</span></div>
+        <div class="aigent-card" data-agent="sdk">AiGent SDK<br><span style="font-size: 0.85rem;">Best for licensing agent technology and APIs</span></div>
+      </div>
+
       <button id="enterBtn" disabled>🚀 Enter Platform</button>
     </div>
 
-    <div class="propagation-feedback">
-      <div class="pulse-dot"></div>
-      <div class="pulse-dot"></div>
-      <div class="pulse-dot"></div>
-      <div class="pulse-dot"></div>
-      <div class="pulse-dot"></div>
-    </div>
     <div class="footer-note">
       Autonomous income. Real-world monetization. No gatekeepers.
     </div>
   </div>
+
   <script>
     const usernameInput = document.getElementById('usernameInput');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const enterBtn = document.getElementById('enterBtn');
+    const aigentCards = document.querySelectorAll('.aigent-card');
+
+    let selectedAgent = null;
 
     function updateButtonState() {
-      enterBtn.disabled = !(usernameInput.value.trim() && agreeCheckbox.checked);
+      enterBtn.disabled = !(usernameInput.value.trim() && agreeCheckbox.checked && selectedAgent);
     }
 
     usernameInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
 
+    aigentCards.forEach(card => {
+      card.addEventListener('click', () => {
+        aigentCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedAgent = card.getAttribute('data-agent');
+        updateButtonState();
+      });
+    });
+
     enterBtn.addEventListener('click', () => {
       localStorage.setItem("aigentsyUsername", usernameInput.value.trim());
       localStorage.setItem("aigentsyUserConsent", "true");
-      window.location.href = "/learn";
+      localStorage.setItem("aigentsyUserAgent", selectedAgent);
+      window.location.href = `/dashboard.html?agent=${selectedAgent}`;
     });
   </script>
 </body>
