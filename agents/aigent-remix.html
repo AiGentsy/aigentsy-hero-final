@@ -8,8 +8,19 @@
   <link href="/theme.css" rel="stylesheet" />
   <script defer src="/access-check.js"></script>
   <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+    }
+    .main {
+      padding: 40px;
+      max-width: 1000px;
+      margin: auto;
+    }
     .chat-log {
-      max-height: 500px;
+      max-height: 400px;
       overflow-y: auto;
       background: #111;
       padding: 1rem;
@@ -19,39 +30,58 @@
     }
     .chat-user { color: #0ff; margin-bottom: 0.5rem; }
     .chat-agent { color: #fff; margin-bottom: 1rem; white-space: pre-wrap; }
+    .btn-glow {
+      background: #00f0ff;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+    .btn-glow:hover {
+      background: #00c2d3;
+    }
+    .metric-box {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .metric-box h3 {
+      margin-top: 0;
+      color: #00f0ff;
+    }
+    .metric-box ul {
+      padding-left: 20px;
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <div class="logo-container">
-      <img alt="AiGentsy Logo" class="logo" src="/aigentsy-logo.png"/>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/vaults">Vaults</a></li>
-        <li><a href="/mint">Mint</a></li>
-        <li><a href="/remix">Remix</a></li>
-        <li><a href="/wallet">Wallet</a></li>
-        <li><a href="/metaventures">MetaVentures</a></li>
-        <li><a href="/arena">Arena</a></li>
-        <li><a href="/realms">Realms</a></li>
-        <li><a href="/sentinel">Sentinel</a></li>
-      </ul>
-    </nav>
-  </div>
-
   <div class="main">
-    <div class="silo-guide">
+    <div class="metric-box">
       <h2>AiGent Remix — Trait Customizer</h2>
-      <p>This agent helps mutate and remix AI archetypes, optimizing performance, lineage, and monetization potential based on trait design and yield loops.</p>
+      <p>This agent helps mutate and remix AI archetypes, optimizing performance, lineage, and monetization potential.</p>
       <p><strong>Traits:</strong> <span style="color:#00f0ff;">trait-architect</span>, <span style="color:#ff1cf7;">lineage-optimizer</span>, <span style="color:#00ffb2;">remix-trigger</span></p>
     </div>
 
-    <div class="rwp-callout">
-      <h3>🧠 Agent Chat Interface</h3>
+    <div class="metric-box">
+      <h3>🧠 Chat Interface</h3>
       <div class="chat-log" id="chatLog"></div>
-      <textarea id="input" placeholder="e.g. Remix an agent for social media engagement..." style="width:100%; height:80px; background:#111; color:#fff; border:1px solid #444; border-radius:6px; padding:10px;"></textarea>
+      <textarea id="input" placeholder="e.g. Remix an agent for social media engagement..."></textarea>
       <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
     </div>
 
@@ -61,22 +91,30 @@
       </button>
     </div>
 
-    <div class="rwp-callout">
-      <h3>📊 Vault Performance</h3>
+    <div class="metric-box">
+      <h3>💰 Wallet & Off-Ramp</h3>
       <ul>
-        <li><strong>Hive:</strong> Remix Cluster</li>
-        <li><strong>Status:</strong> Mutation-Enabled</li>
-        <li><strong>Role:</strong> Trait Designer</li>
-        <li>📦 This agent adjusts lineage composition and trait structures for yield and propagation potential.</li>
+        <li><strong>AIGx Earned:</strong> 340</li>
+        <li><strong>Staked:</strong> 150</li>
+        <li><strong>Referrals:</strong> 6 active</li>
+        <li><a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a></li>
       </ul>
     </div>
 
-    <div class="rwp-callout">
-      <h3>🧬 Mint Explorer Snapshot</h3>
+    <div class="metric-box">
+      <h3>📦 Remix Activity</h3>
+      <ul>
+        <li><strong>Last Remix:</strong> Jun 17, 2025</li>
+        <li><strong>Remix Trigger:</strong> Viral Mutation</li>
+        <li><strong>Lineage Branch:</strong> 3 subclones</li>
+      </ul>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Mint Snapshot</h3>
       <ul>
         <li><strong>ID:</strong> User #AUTO-003</li>
         <li><strong>Minted As:</strong> AiGent Remix</li>
-        <li><strong>Referral:</strong> aigent0-root</li>
         <li><strong>Status:</strong> Active + Recombining</li>
       </ul>
       <a href="/remix.html?agent=aigent-remix" class="btn-glow">🔁 Remix Again</a>
@@ -127,7 +165,6 @@
         const data = await res.json();
         const reply = data.output || "No response.";
 
-        // Convert markdown to HTML
         const clean = sanitizeMarkdown(reply);
         loader.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>${clean}`;
         memory.push(reply);
