@@ -167,53 +167,73 @@
   </div>
 
   <script>
-    let authMode = "login"; // or "signup"
-    const usernameInput = document.getElementById('usernameInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const agreeCheckbox = document.getElementById('agreeCheckbox');
-    const enterBtn = document.getElementById('enterBtn');
-    const aigentCards = document.querySelectorAll('.aigent-card');
-    const toggleAuthText = document.querySelector('.toggle-auth');
-    let selectedAgent = null;
+  let authMode = "login";
+  const usernameInput = document.getElementById('usernameInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const agreeCheckbox = document.getElementById('agreeCheckbox');
+  const enterBtn = document.getElementById('enterBtn');
+  const aigentCards = document.querySelectorAll('.aigent-card');
+  const toggleAuthText = document.querySelector('.toggle-auth');
+  let selectedAgent = null;
 
-    aigentCards.forEach(card => {
-      card.addEventListener('click', () => {
-        aigentCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedAgent = card.getAttribute('data-agent');
-        updateButtonState();
-      });
-    });
+  // Capture referral if present in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get("ref");
+  if (refCode) {
+    localStorage.setItem("aigentsyReferral", refCode);
+  }
 
-    function updateButtonState() {
-      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-      enterBtn.disabled = !valid;
-    }
-
-    function toggleAuthMode() {
-      authMode = authMode === "login" ? "signup" : "login";
-      toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+  aigentCards.forEach(card => {
+    card.addEventListener('click', () => {
+      aigentCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAgent = card.getAttribute('data-agent');
       updateButtonState();
+    });
+  });
+
+  function updateButtonState() {
+    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+    enterBtn.disabled = !valid;
+  }
+
+  function toggleAuthMode() {
+    authMode = authMode === "login" ? "signup" : "login";
+    toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+    updateButtonState();
+  }
+
+  usernameInput.addEventListener('input', updateButtonState);
+  passwordInput.addEventListener('input', updateButtonState);
+  agreeCheckbox.addEventListener('change', updateButtonState);
+
+  enterBtn.addEventListener('click', () => {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value;
+
+    if (authMode === "login") {
+      const storedUser = localStorage.getItem(`user:${user}`);
+      const storedPass = localStorage.getItem(`pass:${user}`);
+      if (!storedUser || storedPass !== pass) {
+        alert("Incorrect username or password. Try again or sign up.");
+        return;
+      }
+    } else {
+      localStorage.setItem(`user:${user}`, user);
+      localStorage.setItem(`pass:${user}`, pass);
     }
 
-    usernameInput.addEventListener('input', updateButtonState);
-    passwordInput.addEventListener('input', updateButtonState);
-    agreeCheckbox.addEventListener('change', updateButtonState);
+    localStorage.setItem("aigentsyUsername", user);
+    localStorage.setItem("aigentsyUserConsent", "true");
+    localStorage.setItem("aigentsyUserAgent", selectedAgent);
+    localStorage.setItem("aigentsyAuthMode", authMode);
 
-    enterBtn.addEventListener('click', () => {
-      const user = usernameInput.value.trim();
-      const pass = passwordInput.value;
-      localStorage.setItem("aigentsyUsername", user);
-      localStorage.setItem("aigentsyUserConsent", "true");
-      localStorage.setItem("aigentsyUserAgent", selectedAgent);
-      localStorage.setItem("aigentsyAuthMode", authMode);
-      
-      if (authMode === "signup") {
-        window.location.href = "/start.html";
-      } else {
-        window.location.href = `/dashboard.html?agent=${selectedAgent}`;
-      }
-    });
-  </script>
+    if (authMode === "signup") {
+      window.location.href = "/start.html";
+    } else {
+      window.location.href = `/agents/aigent-${selectedAgent}.html`;
+    }
+  });
+</script>
 </body>
 </html>
