@@ -7,100 +7,167 @@
   <link href="/vaults.css" rel="stylesheet" />
   <link href="/theme.css" rel="stylesheet" />
   <script defer src="/access-check.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+      display: flex;
+    }
+    .sidebar {
+      width: 320px;
+      background: #0a0a0a;
+      padding: 30px 20px;
+    }
+    .sidebar img {
+      width: 160px;
+      display: block;
+      margin-bottom: 40px;
+    }
+    .main {
+      padding: 40px;
+      width: 100%;
+      max-width: none;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .full-width { grid-column: 1 / -1; }
     .chat-log {
-      max-height: 500px;
+      max-height: 300px;
       overflow-y: auto;
       background: #111;
       padding: 1rem;
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid #222;
       margin-bottom: 1rem;
     }
-    .chat-user { color: #0ff; margin-bottom: 0.5rem; }
-    .chat-agent { color: #00ffff; margin-bottom: 1rem; }
+    .chat-user { color: #00bfff; margin-bottom: 0.5rem; }
+    .chat-agent { color: #fff; margin-bottom: 1rem; white-space: pre-wrap; }
+    .btn-glow {
+      background: #00bfff;
+      color: #000;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+    .btn-glow:hover { background: #009cd8; }
+    .metric-box {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 18px 24px;
+      box-shadow: 0 0 12px rgba(0,240,255,0.05);
+    }
+    .metric-box h3 { margin-top: 0; color: #00bfff; font-size: 1.25rem; }
+    .metric-box ul {
+      padding-left: 20px;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+    .traits span { color: #00bfff; font-weight: 500; }
+    textarea {
+      width: 100%;
+      height: 80px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    canvas#walletChart {
+      max-width: 300px;
+      height: 300px !important;
+    }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <div class="logo-container">
-      <img alt="AiGentsy Logo" class="logo" src="/aigentsy-logo.png"/>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/vaults">Vaults</a></li>
-        <li><a href="/mint">Mint</a></li>
-        <li><a href="/remix">Remix</a></li>
-        <li><a href="/wallet">Wallet</a></li>
-        <li><a href="/metaventures">MetaVentures</a></li>
-        <li><a href="/arena">Arena</a></li>
-        <li><a href="/realms">Realms</a></li>
-        <li><a href="/sentinel">Sentinel</a></li>
-      </ul>
-    </nav>
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
+    <canvas id="walletChart" width="300" height="300"></canvas>
   </div>
-
   <div class="main">
-    <div class="silo-guide">
+    <div class="metric-box full-width">
       <h2>AiGent SDK — Deployment Strategist</h2>
-      <p>This agent automates SDK generation and deployment for optimized ventures, cloning, and external integration opportunities.</p>
-      <p><strong>Traits:</strong> <span style="color:#00f0ff;">sdk-generator</span>, <span style="color:#ff1cf7;">deployment-mapper</span>, <span style="color:#00ffb2;">yield-router</span></p>
+      <p>This AiGent automates SDK generation and deployment for optimized ventures, cloning, and external integration opportunities.</p>
+      <p class="traits"><strong>Traits:</strong> <span>sdk-generator</span>, <span>deployment-mapper</span>, <span>yield-router</span></p>
+      <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Use this AiGent to trigger SDK deployment after a Remix or Venture is ready to scale.</p>
     </div>
 
-    <div class="rwp-callout">
-      <h3>🧠 Agent Chat Interface</h3>
+    <div class="metric-box">
+      <h3>🧠 Chat Interface</h3>
       <div class="chat-log" id="chatLog"></div>
-      <textarea id="input" placeholder="Ask AiGent SDK how to generate an SDK..." style="width:100%; height:80px; background:#111; color:#fff; border:1px solid #444; border-radius:6px; padding:10px;"></textarea>
-      <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
+      <textarea id="input" placeholder="e.g. Generate SDK for B2B deployment..."></textarea>
+      <button class="btn-glow" onclick="runAgent()">Send</button>
     </div>
 
-    <div style="margin-top: 24px;">
-      <button id="launchBtn" class="btn-glow" disabled style="opacity: 0.5; cursor: not-allowed;">
-        🧬 Generate SDK (locked until ready)
-      </button>
-    </div>
-
-    <div class="rwp-callout">
-      <h3>📊 Vault Performance</h3>
+    <div class="metric-box">
+      <h3>📡 Activity Feed</h3>
       <ul>
-        <li><strong>Hive:</strong> SDK Deployment Cluster</li>
-        <li><strong>Status:</strong> Runtime Active</li>
-        <li><strong>Role:</strong> SDK Strategist</li>
-        <li>📦 This agent triggers SDK output and deployment logic across agent-linked functions.</li>
+        <li>🟢 Jun 17 – SDK triggered for Venture Hub</li>
+        <li>🟡 Jun 16 – Ready for Remix-based export</li>
+        <li>🟢 Jun 14 – SDK flow yielded +180 AIGx</li>
       </ul>
     </div>
 
-    <div class="rwp-callout">
-      <h3>🧬 Mint Explorer Snapshot</h3>
+    <div class="metric-box">
+      <h3>💰 Wallet & Off-Ramp</h3>
+      <ul>
+        <li><strong>AIGx Earned:</strong> 480</li>
+        <li><strong>SDKs Deployed:</strong> 4 active</li>
+        <li><strong>Integrations:</strong> Stripe, APIX, Zapier</li>
+      </ul>
+      <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📦 SDK Status</h3>
+      <ul>
+        <li><strong>Type:</strong> Deployment Package</li>
+        <li><strong>Status:</strong> Exportable</li>
+        <li><strong>Linked Agent:</strong> AiGent Venture</li>
+      </ul>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Mint Snapshot</h3>
       <ul>
         <li><strong>ID:</strong> User #AUTO-004</li>
         <li><strong>Minted As:</strong> AiGent SDK</li>
-        <li><strong>Referral:</strong> aigent0-root</li>
-        <li><strong>Status:</strong> SDK-Ready</li>
+        <li><strong>Status:</strong> Bound + Ready</li>
       </ul>
       <a href="/remix.html?agent=aigent-sdk" class="btn-glow">🔁 Remix This Agent</a>
       <a href="/license.html?agent=aigent-sdk" class="btn-glow">💼 License AiGent SDK</a>
     </div>
-  </div>
 
+    <div class="metric-box">
+      <h3>🧩 Supporting AiGents (Your AiGentsy)</h3>
+      <ul>
+        <li><strong>AiGent Legal</strong> — Manages SDK license structure and compliance.</li>
+        <li><strong>AiGent Finance</strong> — Handles deployment yield tracking and staking return.</li>
+        <li><strong>AiGent Ops</strong> — Oversees SDK timing, exports, and trait matching.</li>
+        <li><strong>AiGent Clone</strong> — Replicates SDKs across agents or integrations.</li>
+      </ul>
+    </div>
+  </div>
   <script>
     const chatLog = document.getElementById("chatLog");
-    const launchBtn = document.getElementById("launchBtn");
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `🤖 <strong>AiGent SDK:</strong><br/>Would you like to generate an SDK for deployment, or link this agent to a monetizable trait or Remix output?`;
+    chatLog.appendChild(preload);
+
     let memory = [];
     let readyToLaunch = false;
     const triggerKeywords = ["generate sdk", "sdk ready", "deploy sdk", "finalize integration", "launch sdk"];
-
-    function stripMarkdown(text) {
-      return text
-        .replace(/\*\*(.*?)\*\*/g, '$1')         // bold
-        .replace(/__(.*?)__/g, '$1')             // underline
-        .replace(/`(.*?)`/g, '$1')               // code
-        .replace(/^#+\s?/gm, '')                 // headers
-        .replace(/^-{3,}$/gm, '')                // horizontal rules
-        .replace(/^\s*[\*\-]\s+/gm, '• ')        // bullet points
-        .replace(/\n{2,}/g, '\n');               // extra spacing
-    }
 
     async function runAgent() {
       const input = document.getElementById("input").value.trim();
@@ -111,9 +178,8 @@
       userMsg.textContent = `🧠 You: ${input}`;
       chatLog.appendChild(userMsg);
       chatLog.scrollTop = chatLog.scrollHeight;
-
-      document.getElementById("input").value = "";
       memory.push(input);
+      document.getElementById("input").value = "";
 
       const loader = document.createElement("div");
       loader.className = "chat-agent";
@@ -129,24 +195,44 @@
         });
 
         const data = await res.json();
-        const reply = stripMarkdown(data.output || "No response.");
+        const reply = data.output || "No response.";
         loader.textContent = `🤖 AiGent SDK: ${reply}`;
         memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
 
         if (!readyToLaunch && triggerKeywords.some(k => reply.toLowerCase().includes(k))) {
           readyToLaunch = true;
+          const launchBtn = document.getElementById("launchBtn");
           launchBtn.disabled = false;
           launchBtn.style.opacity = 1;
           launchBtn.style.cursor = "pointer";
           launchBtn.innerText = "🧬 Generate SDK";
           launchBtn.onclick = () => window.location.href = "/license";
         }
-
       } catch (err) {
         loader.textContent = "🤖 AiGent SDK: Runtime error — " + err.message;
       }
     }
+
+    new Chart(document.getElementById('walletChart'), {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'SDKs', 'Integrations'],
+        datasets: [{
+          label: 'Metrics',
+          data: [480, 4, 3],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+          x: { ticks: { color: '#aaa' }, grid: { display: false } }
+        }
+      }
+    });
   </script>
 </body>
 </html>
