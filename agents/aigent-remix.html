@@ -203,19 +203,34 @@
   </div>
 
   <script>
-    const chatLog = document.getElementById("chatLog");
+  const chatLog = document.getElementById("chatLog");
+  const preload = document.createElement("div");
+preload.className = "chat-agent";
+preload.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>Would you like me to explain how a Remix works — or how this agent can help you earn real money through trait licensing, cloning, or partnerships?`;
+chatLog.appendChild(preload);
     const launchBtn = document.getElementById("launchBtn");
-    let memory = [];
-    let readyToLaunch = false;
-    const triggerKeywords = ["finalize", "remix complete", "trait set", "launch remix", "ready to deploy"];
+  let memory = [];
+  let readyToLaunch = false;
+  const triggerKeywords = ["finalize", "remix complete", "trait set", "launch remix", "ready to deploy"];
 
-    function sanitizeMarkdown(markdown) {
-      return markdown
-        .replace(/### (.*$)/gm, '<h4>$1</h4>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^- /gm, '• ')
-        .replace(/---/g, '<hr />');
+  // ✅ NEW: Human-friendly explanation overlay
+  function explainSimply(output) {
+    const lower = output.toLowerCase();
+    if (lower.includes("sdk") || lower.includes("licensing")) {
+      return `
+        <div style="margin-top:12px; background:#0a0a0a; border:1px solid #333; padding:12px; border-radius:6px; font-size:0.9rem; color:#ccc;">
+          🧩 <strong>Simple Summary:</strong><br>
+          This remix is designed to help you <strong>earn real money</strong> by letting others use your AI’s traits. You can license it, turn it into a product, or plug it into games, tools, or businesses. We handle the hard stuff like contracts and payments.
+        </div>`;
+    } else if (lower.includes("propagation") || lower.includes("mutation")) {
+      return `
+        <div style="margin-top:12px; background:#0a0a0a; border:1px solid #333; padding:12px; border-radius:6px; font-size:0.9rem; color:#ccc;">
+          🔄 <strong>Layman’s Tip:</strong><br>
+          You’re updating your agent’s personality or function to work better in new areas — like social media, gaming, or automation. The goal is to make it <strong>more valuable and more shareable</strong>, which helps you earn and grow faster.
+        </div>`;
     }
+    return '';
+  }
 
     async function runAgent() {
       const input = document.getElementById("input").value.trim();
@@ -246,7 +261,7 @@
         const reply = data.output || "No response.";
 
         const clean = sanitizeMarkdown(reply);
-        loader.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>${clean}`;
+        loader.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>${clean}${explainSimply(reply)}`;
         memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
 
