@@ -17,7 +17,7 @@
       display: flex;
     }
     .sidebar {
-      width: 300px;
+      width: 320px;
       background: #0a0a0a;
       padding: 30px 20px;
     }
@@ -31,8 +31,11 @@
     }
     .main {
       padding: 40px;
-      max-width: 900px;
-      flex-grow: 1;
+      width: 100%;
+      max-width: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .chat-log {
       max-height: 400px;
@@ -63,8 +66,8 @@
       background: #111;
       border: 1px solid #222;
       border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 24px;
+      padding: 18px 24px;
+      margin-bottom: 12px;
       box-shadow: 0 0 12px rgba(0,240,255,0.05);
     }
     .metric-box h3 {
@@ -87,13 +90,17 @@
       border-radius: 6px;
       padding: 10px;
     }
+    canvas#walletChart {
+      max-width: 280px;
+      height: 300px !important;
+    }
   </style>
 </head>
 <body>
   <div class="sidebar">
     <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
     <div class="chart-section">
-      <canvas id="walletChart" width="250" height="250"></canvas>
+      <canvas id="walletChart" width="300" height="300"></canvas>
     </div>
   </div>
   <div class="main">
@@ -111,7 +118,7 @@
       <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
     </div>
 
-    <div style="margin-top: 24px;">
+    <div>
       <button id="launchBtn" class="btn-glow" disabled style="opacity: 0.5; cursor: not-allowed;">
         🔁 Finalize Remix (locked until ready)
       </button>
@@ -220,28 +227,25 @@
       }
     }
 
-    const walletChart = new Chart(
-      document.getElementById('walletChart'),
-      {
-        type: 'bar',
-        data: {
-          labels: ['AIGx Earned', 'Staked', 'Referrals'],
-          datasets: [{
-            label: 'Metrics',
-            data: [340, 150, 6],
-            backgroundColor: ['#00bfff', '#00bfff', '#00bfff'],
-            borderRadius: 6
-          }]
-        },
-        options: {
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-            x: { ticks: { color: '#aaa' }, grid: { display: false } }
-          }
+    new Chart(document.getElementById('walletChart'), {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          label: 'Metrics',
+          data: [340, 150, 6],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+          x: { ticks: { color: '#aaa' }, grid: { display: false } }
         }
       }
-    );
+    });
   </script>
 </body>
 </html>
