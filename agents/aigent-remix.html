@@ -16,8 +16,19 @@
     }
     .main {
       padding: 40px;
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
+    }
+    .logo-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+    }
+    .logo-header img {
+      width: 180px;
+      margin-right: 20px;
+      filter: drop-shadow(0 0 20px #00f0ff);
     }
     .chat-log {
       max-height: 400px;
@@ -25,20 +36,20 @@
       background: #111;
       padding: 1rem;
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid #222;
       margin-bottom: 1rem;
     }
-    .chat-user { color: #0ff; margin-bottom: 0.5rem; }
+    .chat-user { color: #00f0ff; margin-bottom: 0.5rem; }
     .chat-agent { color: #fff; margin-bottom: 1rem; white-space: pre-wrap; }
     .btn-glow {
       background: #00f0ff;
       color: #000;
-      padding: 10px 20px;
+      padding: 10px 18px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: bold;
-      transition: 0.3s ease;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
     .btn-glow:hover {
       background: #00c2d3;
@@ -47,18 +58,21 @@
       background: #111;
       border: 1px solid #222;
       border-radius: 10px;
-      padding: 16px;
-      margin-bottom: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 12px rgba(0,240,255,0.05);
     }
     .metric-box h3 {
       margin-top: 0;
       color: #00f0ff;
+      font-size: 1.25rem;
     }
     .metric-box ul {
       padding-left: 20px;
       font-size: 0.95rem;
-      color: #ccc;
+      color: #fff;
     }
+    .traits span { color: #00f0ff; font-weight: 500; }
     textarea {
       width: 100%;
       height: 80px;
@@ -72,10 +86,14 @@
 </head>
 <body>
   <div class="main">
+    <div class="logo-header">
+      <img src="/aigentsy-logo-cyan-float.png" alt="AiGentsy Logo" />
+    </div>
+
     <div class="metric-box">
       <h2>AiGent Remix — Trait Customizer</h2>
       <p>This agent helps mutate and remix AI archetypes, optimizing performance, lineage, and monetization potential.</p>
-      <p><strong>Traits:</strong> <span style="color:#00f0ff;">trait-architect</span>, <span style="color:#ff1cf7;">lineage-optimizer</span>, <span style="color:#00ffb2;">remix-trigger</span></p>
+      <p class="traits"><strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span></p>
     </div>
 
     <div class="metric-box">
