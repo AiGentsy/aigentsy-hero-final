@@ -103,7 +103,16 @@
       </ul>
     </div>
 
-    <a href="/dashboard" class="btn-glow">🏁 Finish & Launch My AiGent</a>
+    <button class="btn-glow" onclick="
+  const agent = localStorage.getItem('aigentsyUserAgent');
+  if (agent) {
+    window.location.href = `/agents/aigent-${agent}.html`;
+  } else {
+    window.location.href = '/dashboard';
+  }
+">
+  🏁 Finish & Launch My AiGent
+</button>
   </div>
 </body>
 </html>
