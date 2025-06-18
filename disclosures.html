@@ -103,16 +103,23 @@
       </ul>
     </div>
 
-    <button class="btn-glow" onclick="
-  const agent = localStorage.getItem('aigentsyUserAgent');
-  if (agent) {
-    window.location.href = `/agents/aigent-${agent}.html`;
-  } else {
-    window.location.href = '/dashboard';
-  }
-">
-  🏁 Finish & Launch My AiGent
-</button>
+    <button class="btn-glow" onclick="finishAndLaunch()">🏁 Finish & Launch My AiGent</button>
   </div>
+
+  <script>
+    function finishAndLaunch() {
+      const agent = localStorage.getItem("aigentsyUserAgent");
+
+      const redirectMap = {
+        venture: "/agents/aigent0.html",
+        growth: "/agents/aigent-growth.html",
+        remix: "/agents/aigent-remix.html",
+        sdk: "/agents/aigent-sdk.html"
+      };
+
+      const destination = redirectMap[agent] || "/dashboard";
+      window.location.href = destination;
+    }
+  </script>
 </body>
 </html>
