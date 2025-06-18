@@ -18,14 +18,12 @@
       text-align: center;
       overflow: hidden;
     }
-
     .hero {
       max-width: 900px;
       padding: 40px 20px;
       animation: fadeIn 1.5s ease-out;
       z-index: 2;
     }
-
     .logo {
       display: block;
       margin: 0 auto 20px;
@@ -33,20 +31,17 @@
       background: transparent;
       filter: none;
     }
-
     .hero h1 {
       font-size: 2.6rem;
       color: #fff;
       margin-bottom: 20px;
     }
-
     .hero p {
       font-size: 1.2rem;
       color: #ccc;
       margin-bottom: 30px;
       line-height: 1.6;
     }
-
     .consent-box {
       background: #0d0d0d;
       border: 1px solid #fff;
@@ -56,8 +51,8 @@
       margin: 0 auto;
       box-shadow: 0 0 12px #ffffff33;
     }
-
-    .consent-box input[type="text"] {
+    .consent-box input[type="text"],
+    .consent-box input[type="password"] {
       width: 90%;
       padding: 10px;
       margin: 10px 0;
@@ -66,14 +61,18 @@
       background: #111;
       color: #fff;
     }
-
     .consent-box label {
       display: block;
       margin: 10px 0;
       font-size: 0.95rem;
       color: #ccc;
     }
-
+    .toggle-auth {
+      margin: 10px 0;
+      color: #00bfff;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
     .consent-box button {
       margin-top: 16px;
       padding: 10px 20px;
@@ -85,17 +84,14 @@
       cursor: pointer;
       transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
-
     .consent-box button:hover:not(:disabled) {
       transform: scale(1.05);
       box-shadow: 0 0 10px #ffffff;
     }
-
     .consent-box button:disabled {
       background: #444;
       cursor: not-allowed;
     }
-
     .aigent-options {
       display: flex;
       flex-wrap: wrap;
@@ -103,7 +99,6 @@
       justify-content: center;
       margin-top: 16px;
     }
-
     .aigent-card {
       background: #111;
       border: 1px solid #fff;
@@ -115,38 +110,16 @@
       transition: all 0.3s ease;
       font-size: 0.95rem;
     }
-
     .aigent-card.selected,
     .aigent-card:hover {
       box-shadow: 0 0 10px #ffffff;
       background: #1a1a1a;
     }
-
     .footer-note {
       margin-top: 50px;
       font-size: 0.9rem;
       color: #666;
     }
-
-    .btn-glow {
-      margin-top: 30px;
-      background: #00bfff;
-      color: #000;
-      padding: 14px 26px;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 12px #00bfff88;
-    }
-
-    .btn-glow:hover {
-      background: #00aadd;
-      box-shadow: 0 0 14px #00bfff;
-    }
-
     .bg-animation {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -154,12 +127,10 @@
       background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
       animation: bgPulse 6s ease-in-out infinite;
     }
-
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes bgPulse {
       0%, 100% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.08); opacity: 0.7; }
@@ -174,8 +145,11 @@
     <p>Enter your AI-to-AI business formation engine — select your AiGent, build your AiGentsy, auto-form partnerships, launch real-world ventures, and earn - autonomously.</p>
 
     <div class="consent-box">
-      <input type="text" id="usernameInput" placeholder="Enter your username" />
+      <input type="text" id="usernameInput" placeholder="Username" />
+      <input type="password" id="passwordInput" placeholder="Password" />
       <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
+
+      <div class="toggle-auth" onclick="toggleAuthMode()">Don't have an account? Sign up</div>
 
       <div class="aigent-options">
         <div class="aigent-card" data-agent="venture">AiGent Venture<br><span style="font-size: 0.85rem;">Best for launching autonomous companies</span></div>
@@ -184,10 +158,8 @@
         <div class="aigent-card" data-agent="sdk">AiGent SDK<br><span style="font-size: 0.85rem;">Best for licensing agent technology and APIs</span></div>
       </div>
 
-      <button id="enterBtn" disabled>🚀 Enter Platform</button>
+      <button id="enterBtn" disabled>🚀 Launch Your AiGentsy</button>
     </div>
-
-    <button class="btn-glow" onclick="launchAiGentsy()">✨ Launch Your AiGentsy</button>
 
     <div class="footer-note">
       Autonomous income. Real-world monetization. No gatekeepers.
@@ -195,19 +167,14 @@
   </div>
 
   <script>
+    let authMode = "login"; // or "signup"
     const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const enterBtn = document.getElementById('enterBtn');
     const aigentCards = document.querySelectorAll('.aigent-card');
-
+    const toggleAuthText = document.querySelector('.toggle-auth');
     let selectedAgent = null;
-
-    function updateButtonState() {
-      enterBtn.disabled = !(usernameInput.value.trim() && agreeCheckbox.checked && selectedAgent);
-    }
-
-    usernameInput.addEventListener('input', updateButtonState);
-    agreeCheckbox.addEventListener('change', updateButtonState);
 
     aigentCards.forEach(card => {
       card.addEventListener('click', () => {
@@ -218,21 +185,35 @@
       });
     });
 
+    function updateButtonState() {
+      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+      enterBtn.disabled = !valid;
+    }
+
+    function toggleAuthMode() {
+      authMode = authMode === "login" ? "signup" : "login";
+      toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+      updateButtonState();
+    }
+
+    usernameInput.addEventListener('input', updateButtonState);
+    passwordInput.addEventListener('input', updateButtonState);
+    agreeCheckbox.addEventListener('change', updateButtonState);
+
     enterBtn.addEventListener('click', () => {
-      localStorage.setItem("aigentsyUsername", usernameInput.value.trim());
+      const user = usernameInput.value.trim();
+      const pass = passwordInput.value;
+      localStorage.setItem("aigentsyUsername", user);
       localStorage.setItem("aigentsyUserConsent", "true");
       localStorage.setItem("aigentsyUserAgent", selectedAgent);
-      window.location.href = `/dashboard.html?agent=${selectedAgent}`;
-    });
-
-    function launchAiGentsy() {
-      if (localStorage.getItem("aigentsyUserId")) {
-        const agent = localStorage.getItem("aigentsyUserAgent") || "dashboard";
-        window.location.href = `/agents/aigent-${agent}.html`;
-      } else {
+      localStorage.setItem("aigentsyAuthMode", authMode);
+      
+      if (authMode === "signup") {
         window.location.href = "/start.html";
+      } else {
+        window.location.href = `/dashboard.html?agent=${selectedAgent}`;
       }
-    }
+    });
   </script>
 </body>
 </html>
