@@ -33,12 +33,16 @@
       padding: 40px;
       width: 100%;
       max-width: none;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
       gap: 20px;
+      align-items: start;
+    }
+    .full-width {
+      grid-column: 1 / -1;
     }
     .chat-log {
-      max-height: 400px;
+      max-height: 300px;
       overflow-y: auto;
       background: #111;
       padding: 1rem;
@@ -58,6 +62,7 @@
       font-weight: 600;
       font-size: 0.95rem;
       transition: all 0.3s ease;
+      margin-right: 10px;
     }
     .btn-glow:hover {
       background: #009cd8;
@@ -67,7 +72,6 @@
       border: 1px solid #222;
       border-radius: 10px;
       padding: 18px 24px;
-      margin-bottom: 12px;
       box-shadow: 0 0 12px rgba(0,240,255,0.05);
     }
     .metric-box h3 {
@@ -90,8 +94,33 @@
       border-radius: 6px;
       padding: 10px;
     }
+    .trait-meter {
+      font-size: 0.85rem;
+      color: #ccc;
+      margin-top: 10px;
+    }
+    .trait-meter span {
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .trait-bar {
+      display: inline-block;
+      height: 10px;
+      background: #00bfff;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .activity-feed {
+      font-size: 0.9rem;
+      color: #aaa;
+      list-style-type: none;
+      padding-left: 1em;
+    }
+    .activity-feed li {
+      margin-bottom: 4px;
+    }
     canvas#walletChart {
-      max-width: 280px;
+      max-width: 300px;
       height: 300px !important;
     }
   </style>
@@ -104,24 +133,32 @@
     </div>
   </div>
   <div class="main">
-    <div class="metric-box">
+    <div class="metric-box full-width">
       <h2>AiGent Remix — Trait Customizer</h2>
       <p>This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.</p>
       <p class="traits"><strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span></p>
-      <p style="color:#ccc; font-size:0.9rem; margin-top: 10px;">💡 <strong>Tip:</strong> Use this agent after minting to mutate trait combinations and generate new lineage forks.</p>
+      <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Use this agent after minting to mutate trait combinations and generate new lineage forks.</p>
+      <div class="trait-meter">
+        <span>Trait Architect <div class="trait-bar" style="width: 90px;"></div></span><br>
+        <span>Lineage Optimizer <div class="trait-bar" style="width: 70px;"></div></span><br>
+        <span>Remix Trigger <div class="trait-bar" style="width: 50px;"></div></span>
+      </div>
     </div>
 
     <div class="metric-box">
       <h3>🧠 Chat Interface</h3>
       <div class="chat-log" id="chatLog"></div>
       <textarea id="input" placeholder="e.g. Remix an agent for social media engagement..."></textarea>
-      <button class="btn-glow" onclick="runAgent()" style="margin-top:12px;">Send</button>
+      <button class="btn-glow" onclick="runAgent()">Send</button>
     </div>
 
-    <div>
-      <button id="launchBtn" class="btn-glow" disabled style="opacity: 0.5; cursor: not-allowed;">
-        🔁 Finalize Remix (locked until ready)
-      </button>
+    <div class="metric-box">
+      <h3>📡 Activity Feed</h3>
+      <ul class="activity-feed">
+        <li>🟢 Jun 17 – Trait remix triggered (Viral Mutation)</li>
+        <li>🟡 Jun 15 – Subclone #3 linked to new lineage</li>
+        <li>🟢 Jun 12 – AIGx earned +40 from referral</li>
+      </ul>
     </div>
 
     <div class="metric-box">
@@ -130,8 +167,8 @@
         <li><strong>AIGx Earned:</strong> 340</li>
         <li><strong>Staked:</strong> 150</li>
         <li><strong>Referrals:</strong> 6 active</li>
-        <li><a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a></li>
       </ul>
+      <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
     </div>
 
     <div class="metric-box">
