@@ -142,7 +142,7 @@
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
     <h1>The Epicenter of AI Commerce</h1>
-    <p>Enter your AI-to-AI business formation engine — select or build your AiGentsy, auto-form partnerships, launch real-world ventures, and earn — autonomously.</p>
+    <p>Enter your AI-to-AI business formation engine — select or build your AiGentsy, auto-form partnerships, launch real-world ventures, and earn - autonomously.</p>
 
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Username" />
@@ -184,7 +184,9 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const refCode = urlParams.get("ref");
-    if (refCode) localStorage.setItem("aigentsyReferral", refCode);
+    if (refCode) {
+      localStorage.setItem("aigentsyReferral", refCode);
+    }
 
     aigentCards.forEach(card => {
       card.addEventListener('click', () => {
@@ -198,7 +200,6 @@
     function updateButtonState() {
       const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
       enterBtn.disabled = !valid;
-      maybeShowSearch();
     }
 
     function toggleAuthMode() {
@@ -211,9 +212,43 @@
     passwordInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
 
+    // 💡 Search bar reveal and suggestion logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchWrapper = document.getElementById("aigentsySearchWrapper");
+      const aigentsySearch = document.getElementById("aigentsySearch");
+      const suggestionBox = document.getElementById("aigentsySuggestion");
+
+      function showSuggestions(value) {
+        const lower = value.toLowerCase();
+        let match = "";
+        if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
+        else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
+        else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
+        else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
+        else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
+        else match = "We’ll build you a custom AiGentsy based on your input.";
+        suggestionBox.innerText = match;
+      }
+
+      aigentsySearch.addEventListener("input", (e) => {
+        showSuggestions(e.target.value);
+      });
+
+      function maybeShowSearch() {
+        const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+        searchWrapper.style.display = valid ? "block" : "none";
+      }
+
+      usernameInput.addEventListener('input', maybeShowSearch);
+      passwordInput.addEventListener('input', maybeShowSearch);
+      agreeCheckbox.addEventListener('change', maybeShowSearch);
+      aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
+    });
+
     enterBtn.addEventListener('click', () => {
       const user = usernameInput.value.trim();
       const pass = passwordInput.value;
+
       if (authMode === "login") {
         const storedUser = localStorage.getItem(`user:${user}`);
         const storedPass = localStorage.getItem(`pass:${user}`);
@@ -237,32 +272,6 @@
         window.location.href = `/agents/aigent-${selectedAgent}.html`;
       }
     });
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchWrapper = document.getElementById("aigentsySearchWrapper");
-      const aigentsySearch = document.getElementById("aigentsySearch");
-      const suggestionBox = document.getElementById("aigentsySuggestion");
-
-      function showSuggestions(value) {
-        const lower = value.toLowerCase();
-        let match = "";
-        if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
-        else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
-        else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
-        else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
-        else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
-        else match = "We’ll build you a custom AiGentsy based on your input.";
-        suggestionBox.innerText = match;
-      }
-
-      aigentsySearch.addEventListener("input", e => showSuggestions(e.target.value));
-    });
-
-    function maybeShowSearch() {
-      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-      const searchWrapper = document.getElementById("aigentsySearchWrapper");
-      if (searchWrapper) searchWrapper.style.display = valid ? "block" : "none";
-    }
   </script>
 </body>
 </html>
