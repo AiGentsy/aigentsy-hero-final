@@ -142,7 +142,7 @@
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
     <h1>The Epicenter of AI Commerce</h1>
-    <p>Enter your AI-to-AI business formation engine — select or build your AiGentsy, auto-form partnerships, launch real-world ventures, and earn - autonomously.</p>
+    <p>Enter your AI-to-AI business formation engine — select or build your AiGentsy, auto-form partnerships, launch real-world ventures, and earn — autonomously.</p>
 
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Username" />
@@ -152,10 +152,16 @@
       <div class="toggle-auth" onclick="toggleAuthMode()">Don't have an account? Sign up</div>
 
       <div class="aigent-options">
-        <div class="aigent-card" data-agent="venture">AiGent Venture<br><span style="font-size: 0.85rem;">Best for launching autonomous companies</span></div>
-        <div class="aigent-card" data-agent="growth">AiGent Growth<br><span style="font-size: 0.85rem;">Best for attracting users and growing reach</span></div>
-        <div class="aigent-card" data-agent="remix">AiGent Remix<br><span style="font-size: 0.85rem;">Best for customizing agent traits and behavior</span></div>
-        <div class="aigent-card" data-agent="sdk">AiGent SDK<br><span style="font-size: 0.85rem;">Best for licensing agent technology and APIs</span></div>
+        <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
+        <div class="aigent-card" data-agent="podcast">Podcast AiGentsy<br><span style="font-size: 0.85rem;">Create, host, monetize episodes</span></div>
+        <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+        <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
+      </div>
+
+      <div id="aigentsySearchWrapper" style="margin-top: 30px; display: none;">
+        <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Tell us what type of AiGentsy to build you</label><br>
+        <input type="text" id="aigentsySearch" placeholder="e.g. podcast business, saas app, coaching brand" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
+        <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
       </div>
 
       <button id="enterBtn" disabled>🚀 Launch Your AiGentsy</button>
@@ -167,73 +173,96 @@
   </div>
 
   <script>
-  let authMode = "login";
-  const usernameInput = document.getElementById('usernameInput');
-  const passwordInput = document.getElementById('passwordInput');
-  const agreeCheckbox = document.getElementById('agreeCheckbox');
-  const enterBtn = document.getElementById('enterBtn');
-  const aigentCards = document.querySelectorAll('.aigent-card');
-  const toggleAuthText = document.querySelector('.toggle-auth');
-  let selectedAgent = null;
+    let authMode = "login";
+    const usernameInput = document.getElementById('usernameInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const agreeCheckbox = document.getElementById('agreeCheckbox');
+    const enterBtn = document.getElementById('enterBtn');
+    const aigentCards = document.querySelectorAll('.aigent-card');
+    const toggleAuthText = document.querySelector('.toggle-auth');
+    let selectedAgent = null;
 
-  // Capture referral if present in URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get("ref");
-  if (refCode) {
-    localStorage.setItem("aigentsyReferral", refCode);
-  }
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get("ref");
+    if (refCode) localStorage.setItem("aigentsyReferral", refCode);
 
-  aigentCards.forEach(card => {
-    card.addEventListener('click', () => {
-      aigentCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedAgent = card.getAttribute('data-agent');
-      updateButtonState();
+    aigentCards.forEach(card => {
+      card.addEventListener('click', () => {
+        aigentCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedAgent = card.getAttribute('data-agent');
+        updateButtonState();
+      });
     });
-  });
 
-  function updateButtonState() {
-    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-    enterBtn.disabled = !valid;
-  }
+    function updateButtonState() {
+      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+      enterBtn.disabled = !valid;
+      maybeShowSearch();
+    }
 
-  function toggleAuthMode() {
-    authMode = authMode === "login" ? "signup" : "login";
-    toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
-    updateButtonState();
-  }
+    function toggleAuthMode() {
+      authMode = authMode === "login" ? "signup" : "login";
+      toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+      updateButtonState();
+    }
 
-  usernameInput.addEventListener('input', updateButtonState);
-  passwordInput.addEventListener('input', updateButtonState);
-  agreeCheckbox.addEventListener('change', updateButtonState);
+    usernameInput.addEventListener('input', updateButtonState);
+    passwordInput.addEventListener('input', updateButtonState);
+    agreeCheckbox.addEventListener('change', updateButtonState);
 
-  enterBtn.addEventListener('click', () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value;
-
-    if (authMode === "login") {
-      const storedUser = localStorage.getItem(`user:${user}`);
-      const storedPass = localStorage.getItem(`pass:${user}`);
-      if (!storedUser || storedPass !== pass) {
-        alert("Incorrect username or password. Try again or sign up.");
-        return;
+    enterBtn.addEventListener('click', () => {
+      const user = usernameInput.value.trim();
+      const pass = passwordInput.value;
+      if (authMode === "login") {
+        const storedUser = localStorage.getItem(`user:${user}`);
+        const storedPass = localStorage.getItem(`pass:${user}`);
+        if (!storedUser || storedPass !== pass) {
+          alert("Incorrect username or password. Try again or sign up.");
+          return;
+        }
+      } else {
+        localStorage.setItem(`user:${user}`, user);
+        localStorage.setItem(`pass:${user}`, pass);
       }
-    } else {
-      localStorage.setItem(`user:${user}`, user);
-      localStorage.setItem(`pass:${user}`, pass);
-    }
 
-    localStorage.setItem("aigentsyUsername", user);
-    localStorage.setItem("aigentsyUserConsent", "true");
-    localStorage.setItem("aigentsyUserAgent", selectedAgent);
-    localStorage.setItem("aigentsyAuthMode", authMode);
+      localStorage.setItem("aigentsyUsername", user);
+      localStorage.setItem("aigentsyUserConsent", "true");
+      localStorage.setItem("aigentsyUserAgent", selectedAgent);
+      localStorage.setItem("aigentsyAuthMode", authMode);
 
-    if (authMode === "signup") {
-      window.location.href = "/start.html";
-    } else {
-      window.location.href = `/agents/aigent-${selectedAgent}.html`;
+      if (authMode === "signup") {
+        window.location.href = "/start.html";
+      } else {
+        window.location.href = `/agents/aigent-${selectedAgent}.html`;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchWrapper = document.getElementById("aigentsySearchWrapper");
+      const aigentsySearch = document.getElementById("aigentsySearch");
+      const suggestionBox = document.getElementById("aigentsySuggestion");
+
+      function showSuggestions(value) {
+        const lower = value.toLowerCase();
+        let match = "";
+        if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
+        else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
+        else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
+        else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
+        else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
+        else match = "We’ll build you a custom AiGentsy based on your input.";
+        suggestionBox.innerText = match;
+      }
+
+      aigentsySearch.addEventListener("input", e => showSuggestions(e.target.value));
+    });
+
+    function maybeShowSearch() {
+      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+      const searchWrapper = document.getElementById("aigentsySearchWrapper");
+      if (searchWrapper) searchWrapper.style.display = valid ? "block" : "none";
     }
-  });
-</script>
+  </script>
 </body>
 </html>
