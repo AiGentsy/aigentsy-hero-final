@@ -238,68 +238,83 @@
   </script>
   <script>
   const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
-  const chatLog = document.createElement("div");
-  chatLog.className = "chat-log";
-  chatLog.style.maxHeight = "240px";
-  chatLog.style.overflowY = "auto";
-  chatLog.style.marginTop = "10px";
+const chatLog = document.createElement("div");
+chatLog.className = "chat-log";
+chatLog.style.maxHeight = "240px";
+chatLog.style.overflowY = "auto";
+chatLog.style.marginTop = "10px";
 
-  if (chatContainer && chatContainer.querySelector("textarea")) {
-    chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
-  }
+if (chatContainer && chatContainer.querySelector("textarea")) {
+  chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
+}
 
-  const textarea = document.querySelector("textarea");
-  const sendBtn = document.querySelector("button.btn-glow");
+const textarea = document.querySelector("textarea");
+const sendBtn = document.querySelector("button.btn-glow");
 
-  const memory = [];
+const memory = [];
 
-    function cleanMarkdown(text) {
+// Cleans markdown artifacts and overformatted text
+function cleanMarkdown(text) {
   return text
-    .replace(/[*_~`>#-]/g, '') // remove *, _, ~, `, #, -, etc.
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // remove markdown links [text](url)
-    .replace(/\\n|\\r/g, ' ') // collapse newline escape chars
-    .replace(/\s+/g, ' ') // normalize spacing
+    .replace(/[*_~`>#-]/g, '') // remove *, _, ~, `, #, -
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip links
+    .replace(/\\n|\\r/g, ' ') // remove newline escapes
+    .replace(/\s+/g, ' ') // collapse extra space
     .trim();
 }
-  
-  async function runAgent() {
-    const input = textarea.value.trim();
-    if (!input) return;
 
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-user";
-    userMsg.textContent = `🧠 You: ${input}`;
-    chatLog.appendChild(userMsg);
+// Initial preload greeting — now C-suite aware
+const preload = document.createElement("div");
+preload.className = "chat-agent";
+preload.innerHTML = `🤖 <strong>Legal AiGentsy:</strong><br/>
+Welcome back. Your AiGentsy includes Legal, Finance, Ops, and Clone — all activated.<br/>
+Let’s launch, monetize, or optimize your AI-powered business. What do you want to focus on today?`;
+chatLog.appendChild(preload);
+
+// Runtime handler
+async function runAgent() {
+  const input = textarea.value.trim();
+  if (!input) return;
+
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `🧠 You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  textarea.value = "";
+
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 Legal AiGentsy: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, memory })
+    });
+
+    const data = await res.json();
+    let reply = cleanMarkdown(data.output || "No response.");
+
+    // Replace outdated terms dynamically
+    reply = reply
+      .replace(/hive agents?/gi, "AiGentsy members")
+      .replace(/the hive/gi, "Your AiGentsy")
+      .replace(/MetaHive/gi, "AiGentsy Group");
+
+    loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
+    memory.push(reply);
     chatLog.scrollTop = chatLog.scrollHeight;
-    memory.push(input);
-    textarea.value = "";
-
-    const loader = document.createElement("div");
-    loader.className = "chat-agent";
-    loader.textContent = "🤖 Legal AiGentsy: Thinking...";
-    chatLog.appendChild(loader);
-    chatLog.scrollTop = chatLog.scrollHeight;
-
-    try {
-      const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input, memory })
-      });
-
-      const data = await res.json();
-      const reply = cleanMarkdown(data.output || "No response.");
-      loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
-      memory.push(reply);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    } catch (err) {
-      loader.textContent = "🤖 Legal AiGentsy: Runtime error — " + err.message;
-    }
+  } catch (err) {
+    loader.textContent = "🤖 Legal AiGentsy: Runtime error — " + err.message;
   }
+}
 
-  if (sendBtn) {
-    sendBtn.onclick = runAgent;
-  }
+if (sendBtn) sendBtn.onclick = runAgent;
 </script>
 </body>
 </html>
