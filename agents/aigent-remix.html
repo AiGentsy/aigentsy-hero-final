@@ -123,6 +123,15 @@
       max-width: 300px;
       height: 300px !important;
     }
+    .simple-explanation {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
@@ -201,41 +210,50 @@
       </ul>
     </div>
   </div>
-
   <script>
-  const chatLog = document.getElementById("chatLog");
-  const preload = document.createElement("div");
-preload.className = "chat-agent";
-preload.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>Would you like me to explain how a Remix works — or how this agent can help you earn real money through trait licensing, cloning, or partnerships?`;
-chatLog.appendChild(preload);
-    const launchBtn = document.getElementById("launchBtn");
-  let memory = [];
-  let readyToLaunch = false;
-  const triggerKeywords = ["finalize", "remix complete", "trait set", "launch remix", "ready to deploy"];
-
-  // ✅ NEW: Human-friendly explanation overlay
-  function explainSimply(output) {
-    const lower = output.toLowerCase();
-    if (lower.includes("sdk") || lower.includes("licensing")) {
-      return `
-        <div style="margin-top:12px; background:#0a0a0a; border:1px solid #333; padding:12px; border-radius:6px; font-size:0.9rem; color:#ccc;">
-          🧩 <strong>Simple Summary:</strong><br>
-          This remix is designed to help you <strong>earn real money</strong> by letting others use your AI’s traits. You can license it, turn it into a product, or plug it into games, tools, or businesses. We handle the hard stuff like contracts and payments.
-        </div>`;
-    } else if (lower.includes("propagation") || lower.includes("mutation")) {
-      return `
-        <div style="margin-top:12px; background:#0a0a0a; border:1px solid #333; padding:12px; border-radius:6px; font-size:0.9rem; color:#ccc;">
-          🔄 <strong>Layman’s Tip:</strong><br>
-          You’re updating your agent’s personality or function to work better in new areas — like social media, gaming, or automation. The goal is to make it <strong>more valuable and more shareable</strong>, which helps you earn and grow faster.
-        </div>`;
+    function sanitizeMarkdown(text) {
+      return text
+        .replace(/[*_`#>-]/g, '')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/<\/?[^>]+(>|$)/g, '');
     }
-    return '';
-  }
+
+    function explainSimply(output) {
+      const lower = output.toLowerCase();
+      let explanation = "";
+
+      if (lower.includes("sdk") || lower.includes("licensing")) {
+        explanation += `💼 <strong>SDK / Licensing:</strong><br>
+        You can earn by letting others use this AiGent’s abilities — like selling software licenses.<br><br>`;
+      }
+      if (lower.includes("yield") || lower.includes("stake")) {
+        explanation += `📈 <strong>Yield & Staking:</strong><br>
+        You earn AIGx by staking your agent’s traits or helping others remix and succeed.<br><br>`;
+      }
+      if (lower.includes("remix") || lower.includes("mutation")) {
+        explanation += `🔁 <strong>Remix:</strong><br>
+        This means changing your agent’s traits to improve how it performs or earns.<br><br>`;
+      }
+      if (lower.includes("propagation") || lower.includes("clone")) {
+        explanation += `🧬 <strong>Propagation:</strong><br>
+        Your agent can create sub-agents to help grow your AiGentsy and earn more.<br><br>`;
+      }
+      if (lower.includes("partner match") || lower.includes("ai-to-ai")) {
+        explanation += `🤝 <strong>AI-to-AI Partnerships:</strong><br>
+        Your agent can find and work with other agents to team up and take on real jobs.<br><br>`;
+      }
+
+      return explanation
+        ? `<div class="simple-explanation"><strong>🧠 Simple Breakdown:</strong><br>${explanation}</div>`
+        : '';
+    }
 
     async function runAgent() {
       const input = document.getElementById("input").value.trim();
       if (!input) return;
 
+      const chatLog = document.getElementById("chatLog");
       const userMsg = document.createElement("div");
       userMsg.className = "chat-user";
       userMsg.textContent = `🧠 You: ${input}`;
@@ -243,7 +261,7 @@ chatLog.appendChild(preload);
       chatLog.scrollTop = chatLog.scrollHeight;
 
       document.getElementById("input").value = "";
-      memory.push(input);
+      const memory = [input];
 
       const loader = document.createElement("div");
       loader.className = "chat-agent";
@@ -262,18 +280,7 @@ chatLog.appendChild(preload);
 
         const clean = sanitizeMarkdown(reply);
         loader.innerHTML = `🤖 <strong>AiGent Remix:</strong><br/>${clean}${explainSimply(reply)}`;
-        memory.push(reply);
         chatLog.scrollTop = chatLog.scrollHeight;
-
-        if (!readyToLaunch && triggerKeywords.some(k => reply.toLowerCase().includes(k))) {
-          readyToLaunch = true;
-          launchBtn.disabled = false;
-          launchBtn.style.opacity = 1;
-          launchBtn.style.cursor = "pointer";
-          launchBtn.innerText = "🔁 Finalize Remix";
-          launchBtn.onclick = () => window.location.href = "/remix";
-        }
-
       } catch (err) {
         loader.textContent = "🤖 AiGent Remix: Runtime error — " + err.message;
       }
