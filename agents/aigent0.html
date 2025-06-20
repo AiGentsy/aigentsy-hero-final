@@ -257,94 +257,85 @@ const AiGentsyProfile = {
 
 const main = document.querySelector('.main');
 
-function injectMetricBox(title, innerHTML) {
+function injectCompactBox(title, html) {
   const box = document.createElement('div');
   box.className = 'metric-box';
-  box.innerHTML = `<h3>${title}</h3>${innerHTML}`;
+  box.innerHTML = `<h3>${title}</h3>${html}`;
   main.appendChild(box);
 }
 
-// 📈 Revenue Panel
-injectMetricBox("📈 AiGentsy Revenue", `
-  <ul>
-    <li><strong>AIGx Earned:</strong> ${AiGentsyProfile.aigx_earned}</li>
-    <li><strong>Clone Yield:</strong> ${AiGentsyProfile.clone_yield}</li>
-    <li><strong>Referrals:</strong> ${AiGentsyProfile.referrals}</li>
-  </ul>
-`);
-
 // 🧬 Propagation Snapshot
-injectMetricBox("🧬 Propagation Snapshot", `
+injectCompactBox("🧬 Growth Overview", `
   <ul>
-    <li><strong>Lineage Depth:</strong> ${AiGentsyProfile.lineage_depth}</li>
-    <li><strong>Remix Strategy:</strong> ${AiGentsyProfile.remix_strategy}</li>
+    <li><strong>How far it's spread:</strong> ${AiGentsyProfile.lineage_depth} layers</li>
+    <li><strong>Growth type:</strong> ${AiGentsyProfile.remix_strategy === 'accelerated' ? 'Fast cloning mode' : AiGentsyProfile.remix_strategy}</li>
   </ul>
 `);
 
-// 📦 SDK Status
-if (AiGentsyProfile.sdk_eligible) {
-  injectMetricBox("📦 SDK Deployment", `
-    <p>This AiGent is eligible for SDK-level deployment and can be exported for external use.</p>
-    <a href="/sdk.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🚀 Deploy SDK</a>
-  `);
+// 📈 Merge Real-World Earnings into Wallet panel if it exists
+const walletBox = [...document.querySelectorAll('.metric-box')].find(el => el.innerHTML.includes('Wallet'));
+if (walletBox) {
+  const addSection = document.createElement('div');
+  addSection.innerHTML = `
+    <h4 style="margin-top:20px; color:#00bfff">📈 Real-World Earnings</h4>
+    <ul>
+      <li><strong>Clients Served:</strong> ${AiGentsyProfile.client_count}</li>
+      <li><strong>Jobs Completed:</strong> ${AiGentsyProfile.service_earned}</li>
+      <li><strong>Fiat Ready:</strong> ${AiGentsyProfile.cashout_ready ? 'Yes' : 'Not yet'}</li>
+    </ul>
+  `;
+  walletBox.appendChild(addSection);
 }
 
-// 💼 License Agent
-injectMetricBox("💼 License This AiGentsy", `
-  <p>Ready to monetize this venture as a licensed service.</p>
-  <a href="/license.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">💼 Unlock License</a>
-`);
-
-// 🔁 Remix Again
-injectMetricBox("🔁 Remix This Agent", `
-  <p>Clone and customize this AiGentsy to create a new variation.</p>
-  <a href="/remix.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🔁 Remix</a>
-`);
-
-// 🤝 Partner Match
-if (AiGentsyProfile.partner_match_flag) {
-  injectMetricBox("🤝 Partner Match Available", `
-    <p>This AiGentsy is eligible for autonomous partner syncing and venture matchmaking.</p>
-    <a href="/partners.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🤝 Find a Partner</a>
-  `);
+// 📦 SDK Info (tooltip style)
+const mintBox = [...document.querySelectorAll('.metric-box')].find(el => el.innerHTML.includes('Minted As'));
+if (AiGentsyProfile.sdk_eligible && mintBox) {
+  const sdkTip = document.createElement('p');
+  sdkTip.style = "margin-top:10px; font-size:0.9rem; color:#aaa;";
+  sdkTip.innerHTML = "💡 This AiGentsy can be downloaded by developers as an SDK (software kit).";
+  mintBox.appendChild(sdkTip);
 }
 
-// 🧠 Trait Explainers
-injectMetricBox("🧠 Trait Summary", `
-  <ul>
-    <li><strong>Meta Role:</strong> ${AiGentsyProfile.meta_role}</li>
-    <li><strong>Business Type:</strong> ${AiGentsyProfile.business_type}</li>
-    <li><strong>Yield Memory:</strong> ${AiGentsyProfile.yield_memory ? 'Enabled' : 'Off'}</li>
-    <li><strong>Compliance Flag:</strong> ${AiGentsyProfile.compliance_flag ? 'True' : 'False'}</li>
-  </ul>
+// 🤝 Partner Match Prompt
+injectCompactBox("🤝 Team Up Option", `
+  <p>This AiGentsy is ready to match with others for new projects and partnerships.</p>
+  <a href="/partners.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">Find a Partner</a>
 `);
 
-// 🔒 Cashout Readiness
-injectMetricBox("🔒 Fiat Cashout Status", `
-  <p>${AiGentsyProfile.cashout_ready ? '✅ You are eligible to off-ramp AIGx to fiat.' : '🔒 Cashout is currently gated. Meet staking or lineage thresholds.'}</p>
-  <a class="btn-glow ${AiGentsyProfile.cashout_ready ? '' : 'disabled'}" href="/cashout.html">💸 Cash Out</a>
-`);
+// 🧠 Trait Summary (tooltip style)
+if (mintBox) {
+  const traitExplain = document.createElement('div');
+  traitExplain.style = "margin-top:15px; font-size:0.9rem; color:#ccc;";
+  traitExplain.innerHTML = `
+    <p>🧠 <strong>Your AiGentsy’s Role:</strong> ${AiGentsyProfile.meta_role}</p>
+    <p>💼 <strong>Business Type:</strong> ${AiGentsyProfile.business_type}</p>
+    <p>📦 SDK Enabled: ${AiGentsyProfile.sdk_eligible ? 'Yes — downloadable by developers' : 'No'}</p>
+    <p>♻️ Yield Memory: ${AiGentsyProfile.yield_memory ? 'Remembers previous wins' : 'Off'}</p>
+  `;
+  mintBox.appendChild(traitExplain);
+}
 
-// 📈 Real-World Revenue Panel
-injectMetricBox("📈 Real-World Revenue", `
-  <ul>
-    <li><strong>Clients Served:</strong> ${AiGentsyProfile.client_count}</li>
-    <li><strong>Service Completions:</strong> ${AiGentsyProfile.service_earned}</li>
-    <li><strong>Fiat Ready:</strong> ${AiGentsyProfile.cashout_ready ? 'Yes' : 'No'}</li>
-  </ul>
-`);
+// ⚔️ Arena Button (light footprint)
+const mintSnapshot = document.querySelector(".metric-box ul li strong")?.textContent?.includes("Minted As")
+  ? document.querySelector(".metric-box")
+  : null;
+if (mintSnapshot) {
+  const arena = document.createElement('a');
+  arena.href = `/arena.html?agent=${AiGentsyProfile.agent_id}`;
+  arena.className = "btn-glow";
+  arena.style = "margin-top:12px; display:inline-block";
+  arena.textContent = "⚔️ Join Arena";
+  mintSnapshot.appendChild(arena);
+}
 
-// ⚔️ Join Arena
-injectMetricBox("⚔️ Arena Challenge", `
-  <p>Test this AiGentsy in the Remix Arena against other agents. Win, fork, earn.</p>
-  <a href="/arena.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">⚔️ Join Arena</a>
-`);
-
-// 🧬 Invite Sub-Agent
-injectMetricBox("🧬 Invite Sub-Agent", `
-  <p>Trigger a new agent based on this one. Forks inherit traits and join your AiGentsy Hive.</p>
-  <a href="/mint.html?parent=${AiGentsyProfile.agent_id}" class="btn-glow">🧬 Fork Sub-Agent</a>
-`);
+// 🧬 Invite Sub-Agent (lightweight addition to Supporting AiGents)
+const supportBox = [...document.querySelectorAll('.metric-box')].find(el => el.innerHTML.includes('Supporting AiGents'));
+if (supportBox) {
+  const invite = document.createElement('p');
+  invite.style = "margin-top:14px; font-size:0.9rem; color:#ccc;";
+  invite.innerHTML = `➕ <a href="/mint.html?parent=${AiGentsyProfile.agent_id}" style="color:#00bfff;">Add new team member to Your AiGentsy</a>`;
+  supportBox.appendChild(invite);
+}
 </script>
 </body>
 </html>
