@@ -274,10 +274,11 @@ function injectBoxFixed(title, html, row, col) {
   box.style.gridRow = row;
   box.innerHTML = `<h3>${title}</h3>${html}`;
   main.appendChild(box);
+  return box;
 }
 
 function appendToBox(headerText, html) {
-  const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
+  const box = boxes.find(el => el.querySelector('h2,h3')?.textContent.includes(headerText));
   if (box) {
     const div = document.createElement('div');
     div.innerHTML = html;
@@ -286,18 +287,26 @@ function appendToBox(headerText, html) {
   }
 }
 
+// Force Launcher box to top full width
+const launcherBox = [...document.querySelectorAll('.metric-box')].find(el => el.innerHTML.includes('Business Launcher'));
+if (launcherBox) {
+  launcherBox.style.gridColumn = '1 / 3';
+  launcherBox.style.gridRow = '1';
+  main.insertBefore(launcherBox, main.firstChild);
+}
+
 // LEFT COLUMN
-forcePlaceBox("Chat Interface", 1, '1 / 2');
-forcePlaceBox("Wallet", 2, '1 / 2');
-forcePlaceBox("Mint Snapshot", 3, '1 / 2');
+forcePlaceBox("Chat Interface", 2, '1 / 2');
+forcePlaceBox("Wallet", 3, '1 / 2');
+forcePlaceBox("Mint Snapshot", 4, '1 / 2');
 injectBoxFixed("⚔️ Remix Arena Challenge", `
   <p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
   <a href="/arena.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">Join the Arena</a>
-`, 4, '1 / 2');
+`, 5, '1 / 2');
 
 // RIGHT COLUMN
-forcePlaceBox("Activity Feed", 1, '2 / 3');
-forcePlaceBox("Venture Status", 2, '2 / 3');
+forcePlaceBox("Activity Feed", 2, '2 / 3');
+forcePlaceBox("Venture Status", 3, '2 / 3');
 injectBoxFixed("🧠 Your AiGentsy Intelligence", `
   <ul>
     <li><strong>Role:</strong> ${AiGentsyProfile.meta_role}</li>
@@ -306,7 +315,7 @@ injectBoxFixed("🧠 Your AiGentsy Intelligence", `
     <li><strong>Dev-Ready:</strong> ${AiGentsyProfile.sdk_eligible ? 'Yes — downloadable kit' : 'No'}</li>
   </ul>
   <p style='font-size:0.9rem;color:#aaa;'>💡 This AiGentsy adapts, learns, and can be cloned or downloaded to scale.</p>
-`, 3, '2 / 3');
+`, 4, '2 / 3');
 
 injectBoxFixed("🧬 Propagation Metrics", `
   <ul>
@@ -314,11 +323,11 @@ injectBoxFixed("🧬 Propagation Metrics", `
     <li><strong>Strategy:</strong> ${AiGentsyProfile.remix_strategy === 'accelerated' ? 'Auto-Clone Enabled' : AiGentsyProfile.remix_strategy}</li>
   </ul>
   <p style='font-size:0.9rem;color:#aaa;'>Your AiGentsy grows when others remix or fork your ideas.</p>
-`, 4, '2 / 3');
+`, 5, '2 / 3');
 
-forcePlaceBox("Supporting AiGents", 5, '2 / 3');
+forcePlaceBox("Supporting AiGents", 6, '2 / 3');
 
-// Append Self-Expanding to Business Launcher
+// Append Self-Expanding note into launcher
 appendToBox("Business Launcher", `
   <div style='margin-top:16px;'>
     <p style='color:#00bfff'><strong>Self-Expanding</strong></p>
