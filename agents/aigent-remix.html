@@ -8,7 +8,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link href="/vaults.css" rel="stylesheet"/>
   <link href="/theme.css" rel="stylesheet"/>
-  <script defer src="/access-check.js"></script>
+  <script defer="" src="/access-check.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
    body {
@@ -69,73 +69,6 @@
     .btn-glow:hover {
       background: #009cd8;
     }
-    .metric-box {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 10px;
-      padding: 18px 24px;
-      box-shadow: 0 0 12px rgba(0,240,255,0.05);
-    }
-    .metric-box h3 {
-      margin-top: 0;
-      color: #00bfff;
-      font-size: 1.25rem;
-    }
-    .metric-box ul {
-      padding-left: 20px;
-      font-size: 0.95rem;
-      color: #fff;
-    }
-    .traits span { color: #00bfff; font-weight: 500; }
-    textarea {
-      width: 100%;
-      height: 80px;
-      background: #111;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-    }
-    .trait-meter {
-      font-size: 0.85rem;
-      color: #ccc;
-      margin-top: 10px;
-    }
-    .trait-meter span {
-      display: inline-block;
-      margin-bottom: 6px;
-    }
-    .trait-bar {
-      display: inline-block;
-      height: 10px;
-      background: #00bfff;
-      border-radius: 4px;
-      margin-left: 8px;
-    }
-    .activity-feed {
-      font-size: 0.9rem;
-      color: #aaa;
-      list-style-type: none;
-      padding-left: 1em;
-    }
-    .activity-feed li {
-      margin-bottom: 4px;
-    }
-    canvas#walletChart {
-      max-width: 300px;
-      height: 300px !important;
-    }
-    .simple-explanation {
-      background: #0a0a0a;
-      border: 1px solid #333;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      color: #ccc;
-      margin-top: 12px;
-    }
-  </style>
-</head>
 <body>
   <div class="sidebar">
     <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
@@ -145,151 +78,148 @@
   </div>
   <div class="main">
     <div class="metric-box full-width">
-      <h2 id="dashboardTitle">Your AiGentsy — Trait Customizer</h2>
-      <p>This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.</p>
-      <p class="traits"><strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span></p>
+      <h2 id="agentTitle">AiGent Remix — Trait Customizer</h2>
+      <p id="agentDescription">
+        This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.
+      </p>
+      <p class="traits" id="traitsDisplay">
+        <strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span>
+      </p>
       <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Use this agent after minting to mutate trait combinations and generate new lineage forks.</p>
-      <div class="trait-meter" id="traitMeterBlock"></div>
+      <div class="trait-meter" id="traitMeter">
+        <span>Trait Architect <div class="trait-bar" style="width: 90px;"></div></span><br>
+        <span>Lineage Optimizer <div class="trait-bar" style="width: 70px;"></div></span><br>
+        <span>Remix Trigger <div class="trait-bar" style="width: 50px;"></div></span>
+      </div>
     </div>
 
     <div class="metric-box">
       <h3>🧠 Chat Interface</h3>
       <div class="chat-log" id="chatLog"></div>
-      <textarea id="input" placeholder="Ask your AiGentsy anything..."></textarea>
+      <textarea id="input" placeholder="e.g. Remix an agent for social media engagement..."></textarea>
       <button class="btn-glow" onclick="runAgent()">Send</button>
     </div>
 
     <div class="metric-box">
       <h3>📡 Activity Feed</h3>
-      <ul class="activity-feed" id="activityFeed">
-        <li>🟢 Trait remix triggered (Viral Mutation)</li>
-        <li>🟡 Subclone #3 linked to new lineage</li>
-        <li>🟢 AIGx earned +40 from referral</li>
+      <ul class="activity-feed">
+        <li>🟢 Jun 17 – Trait remix triggered (Viral Mutation)</li>
+        <li>🟡 Jun 15 – Subclone #3 linked to new lineage</li>
+        <li>🟢 Jun 12 – AIGx earned +40 from referral</li>
       </ul>
     </div>
 
     <div class="metric-box">
       <h3>💰 Wallet & Off-Ramp</h3>
-      <ul id="walletList">
-        <li><strong>AIGx Earned:</strong> 0</li>
-        <li><strong>Staked:</strong> 0</li>
-        <li><strong>Referrals:</strong> 0 active</li>
+      <ul id="walletStats">
+        <li><strong>AIGx Earned:</strong> 340</li>
+        <li><strong>Staked:</strong> 150</li>
+        <li><strong>Referrals:</strong> 6 active</li>
       </ul>
       <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
     </div>
 
     <div class="metric-box">
-      <h3>📊 Mint Snapshot</h3>
-      <ul id="mintSnapshot">
-        <li><strong>ID:</strong> AUTO-000</li>
-        <li><strong>Minted As:</strong> Generic AiGentsy</li>
-        <li><strong>Status:</strong> Active + Recombining</li>
+      <h3>📦 Remix Activity</h3>
+      <ul>
+        <li><strong>Last Remix:</strong> Jun 17, 2025</li>
+        <li><strong>Remix Trigger:</strong> Viral Mutation</li>
+        <li><strong>Lineage Branch:</strong> 3 subclones</li>
       </ul>
     </div>
 
     <div class="metric-box">
-      <h3>🧩 Supporting AiGents (C-Suite)</h3>
+      <h3>📊 Mint Snapshot</h3>
+      <ul id="mintSnapshot">
+        <li><strong>ID:</strong> User #AUTO-003</li>
+        <li><strong>Minted As:</strong> AiGent Remix</li>
+        <li><strong>Status:</strong> Active + Recombining</li>
+      </ul>
+      <a href="/remix.html?agent=aigent-remix" class="btn-glow">🔁 Remix Again</a>
+      <a href="/license.html?agent=aigent-remix" class="btn-glow">💼 License AiGent Remix</a>
+    </div>
+
+    <div class="metric-box" id="supportingAigentsBlock">
+      <h3>🧩 Supporting AiGents (Your AiGentsy)</h3>
       <ul>
         <li><strong>AiGent Legal</strong> — Handles contracts, licensing, and IP protections.</li>
-        <li><strong>AiGent Finance</strong> — Manages staking, yield, referrals, and cashout logic.</li>
+        <li><strong>AiGent Finance</strong> — Tracks staking, yield, referrals, and cashout logic.</li>
         <li><strong>AiGent Ops</strong> — Oversees remix cycles, mutation rollouts, and sync.</li>
         <li><strong>AiGent Clone</strong> — Expands lineage automatically through remix branches.</li>
       </ul>
     </div>
   </div>
-
+  <!-- === FINAL RUNTIME INJECTION === -->
   <script>
     const agentProfile = {
-      name: "Your AiGentsy: Legal Strategist",
-      traits: ["compliance-sentinel", "contract-builder", "stake-splitter"],
-      mintedId: "AUTO-342",
-      mintedAs: "Legal AiGentsy",
-      role: "Legal Strategist",
+      name: "Your AiGentsy: Placeholder Name",
+      traits: ["remix-trigger", "sdk-eligible", "compliance-sentinel"],
+      mintedId: "AUTO-003",
+      mintedAs: "AiGent Remix",
+      role: "Remix Strategist",
       aigx: 340,
       staked: 150,
-      referrals: 6
+      referrals: 6,
+      sdk_eligible: true
     };
 
-    function sanitizeMarkdown(text) {
-      return text.replace(/[*_`#>-]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
-    }
+    window.addEventListener("DOMContentLoaded", () => {
+      document.title = agentProfile.name + " — Trait Customizer";
+      document.querySelector("h2").innerText = agentProfile.name + " — Trait Customizer";
 
-    function updateDOM() {
-      document.title = `${agentProfile.name} — Trait Customizer`;
-      document.getElementById("dashboardTitle").innerText = `${agentProfile.name} — Trait Customizer`;
       document.querySelector(".traits").innerHTML =
         "<strong>Traits:</strong> " + agentProfile.traits.map(t => `<span>${t}</span>`).join(", ");
 
-      const traitMeter = document.getElementById("traitMeterBlock");
-      traitMeter.innerHTML = agentProfile.traits.map(trait => `<span>${trait}<div class="trait-bar" style="width:${80 + Math.random()*20}px;"></div></span><br>`).join("");
-
-      document.getElementById("mintSnapshot").innerHTML = `
-        <li><strong>ID:</strong> ${agentProfile.mintedId}</li>
+      const mintList = document.querySelector("div.metric-box:nth-of-type(6) ul");
+      mintList.innerHTML = `
+        <li><strong>ID:</strong> User #${agentProfile.mintedId}</li>
         <li><strong>Minted As:</strong> ${agentProfile.mintedAs}</li>
         <li><strong>Status:</strong> Active + Recombining</li>
       `;
-      document.getElementById("walletList").innerHTML = `
+
+      const walletList = document.querySelector("div.metric-box:nth-of-type(4) ul");
+      walletList.innerHTML = `
         <li><strong>AIGx Earned:</strong> ${agentProfile.aigx}</li>
         <li><strong>Staked:</strong> ${agentProfile.staked}</li>
         <li><strong>Referrals:</strong> ${agentProfile.referrals} active</li>
       `;
-    }
 
-    async function runAgent() {
-      const input = document.getElementById("input").value.trim();
-      if (!input) return;
+      const extras = document.createElement("div");
+      extras.className = "metric-box full-width";
+      extras.innerHTML = `
+        <h3>🔁 Grow Your AiGentsy</h3>
+        <ul>
+          <li><a href="/license.html?agent=${agentProfile.mintedAs}" class="btn-glow">💼 License This AiGentsy</a></li>
+          <li><a href="/arena.html?agent=${agentProfile.mintedAs}" class="btn-glow">⚔️ Join Remix Arena</a></li>
+          <li><a href="/remix.html?fork=${agentProfile.mintedAs}" class="btn-glow">🧬 Invite Sub-Agent</a></li>
+          <li><a href="/partner.html?agent=${agentProfile.mintedAs}" class="btn-glow">🤝 Request a Partner</a></li>
+        </ul>
+      `;
+      document.querySelector(".main").appendChild(extras);
 
-      const chatLog = document.getElementById("chatLog");
-      const userMsg = document.createElement("div");
-      userMsg.className = "chat-user";
-      userMsg.textContent = `🧠 You: ${input}`;
-      chatLog.appendChild(userMsg);
-      chatLog.scrollTop = chatLog.scrollHeight;
-
-      document.getElementById("input").value = "";
-
-      const loader = document.createElement("div");
-      loader.className = "chat-agent";
-      loader.textContent = "🤖 Your AiGentsy: Thinking...";
-      chatLog.appendChild(loader);
-      chatLog.scrollTop = chatLog.scrollHeight;
-
-      try {
-        const res = await fetch("https://aigent-remix-runtime.onrender.com/agent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input, memory: [input] })
-        });
-        const data = await res.json();
-        const reply = sanitizeMarkdown(data.output || "No response.");
-        loader.innerHTML = `🤖 <strong>Your AiGentsy:</strong><br>${reply}`;
-        chatLog.scrollTop = chatLog.scrollHeight;
-      } catch (err) {
-        loader.textContent = "🤖 Runtime error — " + err.message;
+      if (agentProfile.sdk_eligible) {
+        const sdkPanel = document.createElement("div");
+        sdkPanel.className = "metric-box full-width";
+        sdkPanel.innerHTML = `
+          <h3>📦 SDK Deployment Status</h3>
+          <p>This AiGentsy is eligible to package its logic and traits into a modular SDK for external deployment.</p>
+          <a class="btn-glow" href="/sdk.html?agent=${agentProfile.mintedAs}">🚀 Launch SDK Builder</a>
+        `;
+        document.querySelector(".main").appendChild(sdkPanel);
       }
-    }
 
-    new Chart(document.getElementById('walletChart'), {
-      type: 'bar',
-      data: {
-        labels: ['AIGx Earned', 'Staked', 'Referrals'],
-        datasets: [{
-          label: 'Metrics',
-          data: [agentProfile.aigx, agentProfile.staked, agentProfile.referrals],
-          backgroundColor: '#00bfff',
-          borderRadius: 6
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-          x: { ticks: { color: '#aaa' }, grid: { display: false } }
-        }
-      }
+      const propagationPanel = document.createElement("div");
+      propagationPanel.className = "metric-box full-width";
+      propagationPanel.innerHTML = `
+        <h3>🧬 Propagation Snapshot</h3>
+        <ul>
+          <li><strong>Lineage Count:</strong> 3 Subclones</li>
+          <li><strong>Last Mutation:</strong> Jun 17, 2025</li>
+          <li><strong>Auto-Remix Logic:</strong> Active</li>
+        </ul>
+      `;
+      document.querySelector(".main").appendChild(propagationPanel);
     });
-
-    window.addEventListener("DOMContentLoaded", updateDOM);
   </script>
 </body>
 </html>
