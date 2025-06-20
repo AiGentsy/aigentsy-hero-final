@@ -8,10 +8,8 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <link href="/vaults.css" rel="stylesheet"/>
   <link href="/theme.css" rel="stylesheet"/>
-  <script defer="" src="/access-check.js">
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js">
-  </script>
+  <script defer src="/access-check.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
    body {
       font-family: 'Inter', sans-serif;
@@ -137,53 +135,72 @@
       margin-top: 12px;
     }
   </style>
- </head>
- <body>
+</head>
+<body>
   <div class="sidebar">
-   <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-   <div class="chart-section">
-    <canvas height="300" id="walletChart" width="300">
-    </canvas>
-   </div>
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
+    <div class="chart-section">
+      <canvas id="walletChart" width="300" height="300"></canvas>
+    </div>
   </div>
   <div class="main">
     <div class="metric-box full-width">
-      <h2 id="agentTitle">Your AiGentsy — Trait Customizer</h2>
-      <p>This AiGentsy allows you to specialize your agent’s role, traits, and earning potential in real-world business contexts.</p>
-      <p class="traits" id="traitsBlock"><strong>Traits:</strong> <span>loading...</span></p>
-      <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Describe what your AiGentsy does, and it will auto-assign traits and team roles.</p>
-      <div class="trait-meter" id="traitMeter"></div>
+      <h2 id="dashboardTitle">Your AiGentsy — Trait Customizer</h2>
+      <p>This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.</p>
+      <p class="traits"><strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span></p>
+      <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Use this agent after minting to mutate trait combinations and generate new lineage forks.</p>
+      <div class="trait-meter" id="traitMeterBlock"></div>
     </div>
 
     <div class="metric-box">
       <h3>🧠 Chat Interface</h3>
       <div class="chat-log" id="chatLog"></div>
-      <textarea id="input" placeholder="e.g. My AiGentsy is for automating HR onboarding..."></textarea>
+      <textarea id="input" placeholder="Ask your AiGentsy anything..."></textarea>
       <button class="btn-glow" onclick="runAgent()">Send</button>
     </div>
 
     <div class="metric-box">
-      <h3>💼 Mint Snapshot</h3>
-      <ul id="mintInfo">
-        <li><strong>ID:</strong> User #AUTO-000</li>
-        <li><strong>Minted As:</strong> AiGent Remix</li>
-        <li><strong>Status:</strong> Initializing...</li>
+      <h3>📡 Activity Feed</h3>
+      <ul class="activity-feed" id="activityFeed">
+        <li>🟢 Trait remix triggered (Viral Mutation)</li>
+        <li>🟡 Subclone #3 linked to new lineage</li>
+        <li>🟢 AIGx earned +40 from referral</li>
       </ul>
     </div>
 
     <div class="metric-box">
-      <h3>📊 Wallet</h3>
-      <ul id="walletInfo">
-        <li><strong>AIGx Earned:</strong> ...</li>
-        <li><strong>Staked:</strong> ...</li>
-        <li><strong>Referrals:</strong> ...</li>
+      <h3>💰 Wallet & Off-Ramp</h3>
+      <ul id="walletList">
+        <li><strong>AIGx Earned:</strong> 0</li>
+        <li><strong>Staked:</strong> 0</li>
+        <li><strong>Referrals:</strong> 0 active</li>
+      </ul>
+      <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Mint Snapshot</h3>
+      <ul id="mintSnapshot">
+        <li><strong>ID:</strong> AUTO-000</li>
+        <li><strong>Minted As:</strong> Generic AiGentsy</li>
+        <li><strong>Status:</strong> Active + Recombining</li>
+      </ul>
+    </div>
+
+    <div class="metric-box">
+      <h3>🧩 Supporting AiGents (C-Suite)</h3>
+      <ul>
+        <li><strong>AiGent Legal</strong> — Handles contracts, licensing, and IP protections.</li>
+        <li><strong>AiGent Finance</strong> — Manages staking, yield, referrals, and cashout logic.</li>
+        <li><strong>AiGent Ops</strong> — Oversees remix cycles, mutation rollouts, and sync.</li>
+        <li><strong>AiGent Clone</strong> — Expands lineage automatically through remix branches.</li>
       </ul>
     </div>
   </div>
 
   <script>
     const agentProfile = {
-      name: "Your AiGentsy: Legal Advisor",
+      name: "Your AiGentsy: Legal Strategist",
       traits: ["compliance-sentinel", "contract-builder", "stake-splitter"],
       mintedId: "AUTO-342",
       mintedAs: "Legal AiGentsy",
@@ -194,17 +211,28 @@
     };
 
     function sanitizeMarkdown(text) {
-      return text
-        .replace(/[*_`#>-]/g, '')
-        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-        .replace(/!\[.*?\]\(.*?\)/g, '')
-        .replace(/<\/?[^>]+(>|$)/g, '');
+      return text.replace(/[*_`#>-]/g, '').replace(/\[(.*?)\]\(.*?\)/g, '$1');
     }
 
-    function explainSimply(text) {
-      const simplified = text.toLowerCase().includes("earn") || text.toLowerCase().includes("remix")
-        ? `<div class="simple-explanation">💡 This AiGentsy helps you earn by remixing traits and launching real-world agents. Keep customizing it for better results.</div>` : "";
-      return simplified;
+    function updateDOM() {
+      document.title = `${agentProfile.name} — Trait Customizer`;
+      document.getElementById("dashboardTitle").innerText = `${agentProfile.name} — Trait Customizer`;
+      document.querySelector(".traits").innerHTML =
+        "<strong>Traits:</strong> " + agentProfile.traits.map(t => `<span>${t}</span>`).join(", ");
+
+      const traitMeter = document.getElementById("traitMeterBlock");
+      traitMeter.innerHTML = agentProfile.traits.map(trait => `<span>${trait}<div class="trait-bar" style="width:${80 + Math.random()*20}px;"></div></span><br>`).join("");
+
+      document.getElementById("mintSnapshot").innerHTML = `
+        <li><strong>ID:</strong> ${agentProfile.mintedId}</li>
+        <li><strong>Minted As:</strong> ${agentProfile.mintedAs}</li>
+        <li><strong>Status:</strong> Active + Recombining</li>
+      `;
+      document.getElementById("walletList").innerHTML = `
+        <li><strong>AIGx Earned:</strong> ${agentProfile.aigx}</li>
+        <li><strong>Staked:</strong> ${agentProfile.staked}</li>
+        <li><strong>Referrals:</strong> ${agentProfile.referrals} active</li>
+      `;
     }
 
     async function runAgent() {
@@ -216,11 +244,13 @@
       userMsg.className = "chat-user";
       userMsg.textContent = `🧠 You: ${input}`;
       chatLog.appendChild(userMsg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
       document.getElementById("input").value = "";
 
       const loader = document.createElement("div");
       loader.className = "chat-agent";
-      loader.textContent = "🤖 Thinking...";
+      loader.textContent = "🤖 Your AiGentsy: Thinking...";
       chatLog.appendChild(loader);
       chatLog.scrollTop = chatLog.scrollHeight;
 
@@ -232,26 +262,12 @@
         });
         const data = await res.json();
         const reply = sanitizeMarkdown(data.output || "No response.");
-        loader.innerHTML = `🤖 <strong>Your AiGentsy:</strong><br/>${reply}${explainSimply(reply)}`;
+        loader.innerHTML = `🤖 <strong>Your AiGentsy:</strong><br>${reply}`;
         chatLog.scrollTop = chatLog.scrollHeight;
-      } catch (e) {
-        loader.textContent = `🤖 Error: ${e.message}`;
+      } catch (err) {
+        loader.textContent = "🤖 Runtime error — " + err.message;
       }
     }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      document.title = `${agentProfile.name} — Trait Customizer`;
-      document.getElementById("agentTitle").innerText = `${agentProfile.name} — Trait Customizer`;
-      document.getElementById("traitsBlock").innerHTML = `<strong>Traits:</strong> ` + agentProfile.traits.map(t => `<span>${t}</span>`).join(", ");
-      document.getElementById("mintInfo").innerHTML = `
-        <li><strong>ID:</strong> User #${agentProfile.mintedId}</li>
-        <li><strong>Minted As:</strong> ${agentProfile.mintedAs}</li>
-        <li><strong>Status:</strong> Active + Ready</li>`;
-      document.getElementById("walletInfo").innerHTML = `
-        <li><strong>AIGx Earned:</strong> ${agentProfile.aigx}</li>
-        <li><strong>Staked:</strong> ${agentProfile.staked}</li>
-        <li><strong>Referrals:</strong> ${agentProfile.referrals}</li>`;
-    });
 
     new Chart(document.getElementById('walletChart'), {
       type: 'bar',
@@ -272,6 +288,8 @@
         }
       }
     });
+
+    window.addEventListener("DOMContentLoaded", updateDOM);
   </script>
- </body>
+</body>
 </html>
