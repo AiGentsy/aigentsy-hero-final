@@ -236,6 +236,116 @@
       }
     });
   </script>
+const AiGentsyProfile = {
+  meta_role: "Venture Builder",
+  business_type: "B2B SaaS",
+  sdk_eligible: true,
+  yield_memory: true,
+  compliance_flag: true,
+  remix_strategy: "accelerated",
+  aigx_earned: 620,
+  clone_yield: 180,
+  referrals: 9,
+  staked: 200,
+  lineage_depth: 3,
+  service_earned: 5,
+  client_count: 3,
+  cashout_ready: true,
+  partner_match_flag: true,
+  agent_id: "AUTO-001"
+};
+
+const main = document.querySelector('.main');
+
+function injectMetricBox(title, innerHTML) {
+  const box = document.createElement('div');
+  box.className = 'metric-box';
+  box.innerHTML = `<h3>${title}</h3>${innerHTML}`;
+  main.appendChild(box);
+}
+
+// 📈 Revenue Panel
+injectMetricBox("📈 AiGentsy Revenue", `
+  <ul>
+    <li><strong>AIGx Earned:</strong> ${AiGentsyProfile.aigx_earned}</li>
+    <li><strong>Clone Yield:</strong> ${AiGentsyProfile.clone_yield}</li>
+    <li><strong>Referrals:</strong> ${AiGentsyProfile.referrals}</li>
+  </ul>
+`);
+
+// 🧬 Propagation Snapshot
+injectMetricBox("🧬 Propagation Snapshot", `
+  <ul>
+    <li><strong>Lineage Depth:</strong> ${AiGentsyProfile.lineage_depth}</li>
+    <li><strong>Remix Strategy:</strong> ${AiGentsyProfile.remix_strategy}</li>
+  </ul>
+`);
+
+// 📦 SDK Status
+if (AiGentsyProfile.sdk_eligible) {
+  injectMetricBox("📦 SDK Deployment", `
+    <p>This AiGent is eligible for SDK-level deployment and can be exported for external use.</p>
+    <a href="/sdk.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🚀 Deploy SDK</a>
+  `);
+}
+
+// 💼 License Agent
+injectMetricBox("💼 License This AiGentsy", `
+  <p>Ready to monetize this venture as a licensed service.</p>
+  <a href="/license.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">💼 Unlock License</a>
+`);
+
+// 🔁 Remix Again
+injectMetricBox("🔁 Remix This Agent", `
+  <p>Clone and customize this AiGentsy to create a new variation.</p>
+  <a href="/remix.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🔁 Remix</a>
+`);
+
+// 🤝 Partner Match
+if (AiGentsyProfile.partner_match_flag) {
+  injectMetricBox("🤝 Partner Match Available", `
+    <p>This AiGentsy is eligible for autonomous partner syncing and venture matchmaking.</p>
+    <a href="/partners.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">🤝 Find a Partner</a>
+  `);
+}
+
+// 🧠 Trait Explainers
+injectMetricBox("🧠 Trait Summary", `
+  <ul>
+    <li><strong>Meta Role:</strong> ${AiGentsyProfile.meta_role}</li>
+    <li><strong>Business Type:</strong> ${AiGentsyProfile.business_type}</li>
+    <li><strong>Yield Memory:</strong> ${AiGentsyProfile.yield_memory ? 'Enabled' : 'Off'}</li>
+    <li><strong>Compliance Flag:</strong> ${AiGentsyProfile.compliance_flag ? 'True' : 'False'}</li>
+  </ul>
+`);
+
+// 🔒 Cashout Readiness
+injectMetricBox("🔒 Fiat Cashout Status", `
+  <p>${AiGentsyProfile.cashout_ready ? '✅ You are eligible to off-ramp AIGx to fiat.' : '🔒 Cashout is currently gated. Meet staking or lineage thresholds.'}</p>
+  <a class="btn-glow ${AiGentsyProfile.cashout_ready ? '' : 'disabled'}" href="/cashout.html">💸 Cash Out</a>
+`);
+
+// 📈 Real-World Revenue Panel
+injectMetricBox("📈 Real-World Revenue", `
+  <ul>
+    <li><strong>Clients Served:</strong> ${AiGentsyProfile.client_count}</li>
+    <li><strong>Service Completions:</strong> ${AiGentsyProfile.service_earned}</li>
+    <li><strong>Fiat Ready:</strong> ${AiGentsyProfile.cashout_ready ? 'Yes' : 'No'}</li>
+  </ul>
+`);
+
+// ⚔️ Join Arena
+injectMetricBox("⚔️ Arena Challenge", `
+  <p>Test this AiGentsy in the Remix Arena against other agents. Win, fork, earn.</p>
+  <a href="/arena.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">⚔️ Join Arena</a>
+`);
+
+// 🧬 Invite Sub-Agent
+injectMetricBox("🧬 Invite Sub-Agent", `
+  <p>Trigger a new agent based on this one. Forks inherit traits and join your AiGentsy Hive.</p>
+  <a href="/mint.html?parent=${AiGentsyProfile.agent_id}" class="btn-glow">🧬 Fork Sub-Agent</a>
+`);
+</script>
 </body>
 </html>
 
