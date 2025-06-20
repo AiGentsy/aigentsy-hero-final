@@ -253,6 +253,15 @@
 
   const memory = [];
 
+    function cleanMarkdown(text) {
+  return text
+    .replace(/[*_~`>#-]/g, '') // remove *, _, ~, `, #, -, etc.
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // remove markdown links [text](url)
+    .replace(/\\n|\\r/g, ' ') // collapse newline escape chars
+    .replace(/\s+/g, ' ') // normalize spacing
+    .trim();
+}
+  
   async function runAgent() {
     const input = textarea.value.trim();
     if (!input) return;
@@ -279,7 +288,7 @@
       });
 
       const data = await res.json();
-      const reply = data.output || "No response.";
+      const reply = cleanMarkdown(data.output || "No response.");
       loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
       memory.push(reply);
       chatLog.scrollTop = chatLog.scrollHeight;
