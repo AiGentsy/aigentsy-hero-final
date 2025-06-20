@@ -253,14 +253,35 @@ const sendBtn = document.querySelector("button.btn-glow");
 
 const memory = [];
 
-// Cleans markdown artifacts and overformatted text
-function cleanMarkdown(text) {
-  return text
-    .replace(/[*_~`>#-]/g, '') // remove *, _, ~, `, #, -
+function formatResponse(text) {
+  // Strip markdown
+  let cleaned = text
+    .replace(/[*_~`>#-]/g, '') // remove markdown
     .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip links
-    .replace(/\\n|\\r/g, ' ') // remove newline escapes
-    .replace(/\s+/g, ' ') // collapse extra space
-    .trim();
+    .replace(/\n+/g, ' ') // flatten line breaks
+    .replace(/\s+/g, ' ') // normalize spaces
+
+  // Bold key terms
+  const highlights = [
+    'Revenue Sharing',
+    'Whitelabel Licensing',
+    'SDK-as-a-Service',
+    'Your AiGentsy',
+    'Remix Agent Licensing',
+    'Real-World Monetization',
+    'Yield Memory',
+    'C-Suite',
+    'Partner Match'
+  ];
+  highlights.forEach(term => {
+    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+    cleaned = cleaned.replace(regex, '**$1**');
+  });
+
+  // Soft wrap at ~90 chars
+  const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
+
+  return wrapped.trim();
 }
 
 // Initial preload greeting — now C-suite aware
@@ -298,7 +319,7 @@ async function runAgent() {
     });
 
     const data = await res.json();
-    let reply = cleanMarkdown(data.output || "No response.");
+    let reply = formatResponse(data.output || "No response.");
 
     // Replace outdated terms dynamically
     reply = reply
