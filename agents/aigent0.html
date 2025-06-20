@@ -235,8 +235,8 @@
         }
       }
     });
-  
-const AiGentsyProfile = {
+ 
+  const AiGentsyProfile = {
   meta_role: "Venture Builder",
   business_type: "B2B SaaS",
   sdk_eligible: true,
@@ -258,44 +258,58 @@ const AiGentsyProfile = {
 const main = document.querySelector('.main');
 const boxes = [...document.querySelectorAll('.metric-box')];
 
-function moveBoxByHeaderText(headerText, insertBeforeIndex) {
-  const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
-  if (box && boxes[insertBeforeIndex]) {
-    main.insertBefore(box, boxes[insertBeforeIndex]);
+function moveBoxByHeader(header, toIndex, col) {
+  const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(header));
+  if (box) {
+    box.style.gridColumn = col;
+    const ref = main.children[toIndex];
+    main.insertBefore(box, ref);
   }
 }
 
-function injectBoxBelow(referenceText, title, html) {
-  const referenceBox = boxes.find(el => el.querySelector('h3')?.textContent.includes(referenceText));
-  if (referenceBox) {
+function insertBoxAfter(referenceText, title, html, col = '1 / 2') {
+  const refBox = boxes.find(el => el.querySelector('h3')?.textContent.includes(referenceText));
+  if (refBox) {
     const box = document.createElement('div');
     box.className = 'metric-box';
+    box.style.gridColumn = col;
     box.innerHTML = `<h3>${title}</h3>${html}`;
-    main.insertBefore(box, referenceBox.nextSibling);
+    main.insertBefore(box, refBox.nextSibling);
   }
 }
 
 function appendToBox(headerText, html) {
   const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
   if (box) {
-    const addition = document.createElement('div');
-    addition.innerHTML = html;
-    addition.style.marginTop = '10px';
-    box.appendChild(addition);
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.style.marginTop = '10px';
+    box.appendChild(div);
   }
 }
 
-// Reorder as instructed
-moveBoxByHeaderText("Venture Status", 0); // move Venture Status to top right
-moveBoxByHeaderText("Supporting AiGents", 1); // move Supporting AiGents under it
-moveBoxByHeaderText("Your AiGentsy Intelligence", 2); // under Supporting
-moveBoxByHeaderText("Remix Arena Challenge", boxes.findIndex(b => b.querySelector('h3')?.textContent.includes("Mint Snapshot")) + 1);
+// Set column positioning
+moveBoxByHeader("Chat Interface", 1, '1 / 2');
+moveBoxByHeader("Wallet", 2, '1 / 2');
+moveBoxByHeader("Mint Snapshot", 3, '1 / 2');
+moveBoxByHeader("Remix Arena Challenge", 4, '1 / 2');
+moveBoxByHeader("Activity Feed", 1, '2 / 3');
+moveBoxByHeader("Venture Status", 2, '2 / 3');
+moveBoxByHeader("Your AiGentsy Intelligence", 3, '2 / 3');
 
-// Merge Self-Expanding explanation into Business Launcher box
+// Insert Propagation Metrics box below Intelligence
+insertBoxAfter("Your AiGentsy Intelligence", "🧬 Propagation Metrics", `
+  <ul>
+    <li><strong>Spread Depth:</strong> ${AiGentsyProfile.lineage_depth} generations</li>
+    <li><strong>Strategy:</strong> ${AiGentsyProfile.remix_strategy === 'accelerated' ? 'Auto-Clone Enabled' : AiGentsyProfile.remix_strategy}</li>
+  </ul>
+`, '2 / 3');
+
+// Merge Self-Expanding into Launcher box
 appendToBox("Business Launcher", `
   <div style='margin-top:16px;'>
     <p style='color:#00bfff'><strong>Self-Expanding</strong></p>
-    <p style='font-size:0.9rem; color:#ccc;'>This AiGentsy can automatically create new team members when needed — no manual setup required. It's like your business grows new arms on its own.</p>
+    <p style='font-size:0.9rem; color:#ccc;'>This AiGentsy automatically builds new agents when needed — your business grows itself.</p>
   </div>
 `);
 </script>
