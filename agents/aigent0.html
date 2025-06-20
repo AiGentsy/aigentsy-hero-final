@@ -323,11 +323,19 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
 
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input, memory })
-    });
+    // Condition short confirmations to reference last memory
+let conditionedInput = input;
+const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "let’s do it"];
+if (shortConfirm.includes(input.toLowerCase())) {
+  const lastTurn = memory[memory.length - 1] || "";
+  conditionedInput = `${lastTurn}\nPlease continue.`;
+}
+
+const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ input: conditionedInput, memory })
+});
 
     const data = await res.json();
     let reply = formatResponseEnhanced(data.output || "No response.");
