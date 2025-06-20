@@ -235,9 +235,8 @@
         }
       }
     });
- 
-  
-const AiGentsyProfile = {
+
+    const AiGentsyProfile = {
   meta_role: "Venture Builder",
   business_type: "B2B SaaS",
   sdk_eligible: true,
@@ -259,22 +258,22 @@ const AiGentsyProfile = {
 const main = document.querySelector('.main');
 const boxes = [...document.querySelectorAll('.metric-box')];
 
-function moveBox(headerText, insertBeforeIndex, column) {
+function forcePlaceBox(headerText, row, col) {
   const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
   if (box) {
-    box.style.gridColumn = column;
-    const referenceNode = main.children[insertBeforeIndex] || null;
-    main.insertBefore(box, referenceNode);
+    box.style.gridColumn = col;
+    box.style.gridRow = row;
+    main.appendChild(box);
   }
 }
 
-function injectMetricBox(title, html, column = '1 / 2') {
+function injectBoxFixed(title, html, row, col) {
   const box = document.createElement('div');
   box.className = 'metric-box';
-  box.style.gridColumn = column;
+  box.style.gridColumn = col;
+  box.style.gridRow = row;
   box.innerHTML = `<h3>${title}</h3>${html}`;
   main.appendChild(box);
-  return box;
 }
 
 function appendToBox(headerText, html) {
@@ -287,21 +286,19 @@ function appendToBox(headerText, html) {
   }
 }
 
-// === Position Left Side Panels ===
-moveBox("Chat Interface", 1, '1 / 2');
-moveBox("Wallet", 2, '1 / 2');
-moveBox("Mint Snapshot", 3, '1 / 2');
-
-injectMetricBox("⚔️ Remix Arena Challenge", `
+// LEFT COLUMN
+forcePlaceBox("Chat Interface", 1, '1 / 2');
+forcePlaceBox("Wallet", 2, '1 / 2');
+forcePlaceBox("Mint Snapshot", 3, '1 / 2');
+injectBoxFixed("⚔️ Remix Arena Challenge", `
   <p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
   <a href="/arena.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">Join the Arena</a>
-`, '1 / 2');
+`, 4, '1 / 2');
 
-// === Position Right Side Panels ===
-moveBox("Activity Feed", 1, '2 / 3');
-moveBox("Venture Status", 2, '2 / 3');
-
-injectMetricBox("🧠 Your AiGentsy Intelligence", `
+// RIGHT COLUMN
+forcePlaceBox("Activity Feed", 1, '2 / 3');
+forcePlaceBox("Venture Status", 2, '2 / 3');
+injectBoxFixed("🧠 Your AiGentsy Intelligence", `
   <ul>
     <li><strong>Role:</strong> ${AiGentsyProfile.meta_role}</li>
     <li><strong>Type:</strong> ${AiGentsyProfile.business_type}</li>
@@ -309,19 +306,19 @@ injectMetricBox("🧠 Your AiGentsy Intelligence", `
     <li><strong>Dev-Ready:</strong> ${AiGentsyProfile.sdk_eligible ? 'Yes — downloadable kit' : 'No'}</li>
   </ul>
   <p style='font-size:0.9rem;color:#aaa;'>💡 This AiGentsy adapts, learns, and can be cloned or downloaded to scale.</p>
-`, '2 / 3');
+`, 3, '2 / 3');
 
-injectMetricBox("🧬 Propagation Metrics", `
+injectBoxFixed("🧬 Propagation Metrics", `
   <ul>
     <li><strong>Spread Depth:</strong> ${AiGentsyProfile.lineage_depth} generations</li>
     <li><strong>Strategy:</strong> ${AiGentsyProfile.remix_strategy === 'accelerated' ? 'Auto-Clone Enabled' : AiGentsyProfile.remix_strategy}</li>
   </ul>
   <p style='font-size:0.9rem;color:#aaa;'>Your AiGentsy grows when others remix or fork your ideas.</p>
-`, '2 / 3');
+`, 4, '2 / 3');
 
-moveBox("Supporting AiGents", 99, '2 / 3');
+forcePlaceBox("Supporting AiGents", 5, '2 / 3');
 
-// Self-expanding appended to Launcher
+// Append Self-Expanding to Business Launcher
 appendToBox("Business Launcher", `
   <div style='margin-top:16px;'>
     <p style='color:#00bfff'><strong>Self-Expanding</strong></p>
