@@ -252,14 +252,24 @@ const textarea = document.querySelector("textarea");
 const sendBtn = document.querySelector("button.btn-glow");
 const memory = [];
 
-// Mini-glossary logic
+// Mini-glossary logic (only explains terms once per session)
+const explained = new Set();
 function explainTerms(text) {
-  return text
-    .replace(/Yield Memory/gi, 'Yield Memory (remembers what worked before and improves earnings)')
-    .replace(/Remix Agent Licensing/gi, 'Remix Agent Licensing (lets you sell parts of this AiGentsy)')
-    .replace(/SDK-as-a-Service/gi, 'SDK-as-a-Service (lets others plug your AiGentsy into their tools)')
-    .replace(/MetaUpgrade\d+/gi, 'Platform Upgrade (automated ability or feature upgrade)')
-    .replace(/Your AiGentsy/gi, 'Your AiGentsy (your full AI-powered business)');
+  const terms = {
+    'Yield Memory': 'Yield Memory (remembers what worked before and improves earnings)',
+    'Remix Agent Licensing': 'Remix Agent Licensing (lets you sell parts of this AiGentsy)',
+    'SDK-as-a-Service': 'SDK-as-a-Service (lets others plug your AiGentsy into their tools)',
+    'MetaUpgrade': 'Platform Upgrade (automated ability or feature upgrade)',
+    'Your AiGentsy': 'Your AiGentsy (your full AI-powered business)'
+  };
+  for (let [term, def] of Object.entries(terms)) {
+    if (!explained.has(term)) {
+      const regex = new RegExp(term, 'i');
+      text = text.replace(regex, def);
+      explained.add(term);
+    }
+  }
+  return text;
 }
 
 function formatResponseEnhanced(text) {
