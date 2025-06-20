@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
-  <meta charset="utf-8"/>
-  <title>
-   AiGent Remix — Trait Customizer
-  </title>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="/vaults.css" rel="stylesheet"/>
-  <link href="/theme.css" rel="stylesheet"/>
-  <script defer="" src="/access-check.js"></script>
+<head>
+  <meta charset="UTF-8" />
+  <title>AiGent Remix — Trait Customizer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="/vaults.css" rel="stylesheet" />
+  <link href="/theme.css" rel="stylesheet" />
+  <script defer src="/access-check.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-   body {
+    body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       background: radial-gradient(circle at center, #0e101a, #000);
@@ -69,6 +67,73 @@
     .btn-glow:hover {
       background: #009cd8;
     }
+    .metric-box {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 18px 24px;
+      box-shadow: 0 0 12px rgba(0,240,255,0.05);
+    }
+    .metric-box h3 {
+      margin-top: 0;
+      color: #00bfff;
+      font-size: 1.25rem;
+    }
+    .metric-box ul {
+      padding-left: 20px;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+    .traits span { color: #00bfff; font-weight: 500; }
+    textarea {
+      width: 100%;
+      height: 80px;
+      background: #111;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    .trait-meter {
+      font-size: 0.85rem;
+      color: #ccc;
+      margin-top: 10px;
+    }
+    .trait-meter span {
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .trait-bar {
+      display: inline-block;
+      height: 10px;
+      background: #00bfff;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .activity-feed {
+      font-size: 0.9rem;
+      color: #aaa;
+      list-style-type: none;
+      padding-left: 1em;
+    }
+    .activity-feed li {
+      margin-bottom: 4px;
+    }
+    canvas#walletChart {
+      max-width: 300px;
+      height: 300px !important;
+    }
+    .simple-explanation {
+      background: #0a0a0a;
+      border: 1px solid #333;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 12px;
+    }
+  </style>
+</head>
 <body>
   <div class="sidebar">
     <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
@@ -78,15 +143,11 @@
   </div>
   <div class="main">
     <div class="metric-box full-width">
-      <h2 id="agentTitle">AiGent Remix — Trait Customizer</h2>
-      <p id="agentDescription">
-        This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.
-      </p>
-      <p class="traits" id="traitsDisplay">
-        <strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span>
-      </p>
+      <h2>AiGent Remix — Trait Customizer</h2>
+      <p>This AiGent allows you to mutate and remix AI agents to specialize their function, behavior, and revenue potential.</p>
+      <p class="traits"><strong>Traits:</strong> <span>trait-architect</span>, <span>lineage-optimizer</span>, <span>remix-trigger</span></p>
       <p style="color:#ccc; font-size:0.9rem;">💡 <strong>Tip:</strong> Use this agent after minting to mutate trait combinations and generate new lineage forks.</p>
-      <div class="trait-meter" id="traitMeter">
+      <div class="trait-meter">
         <span>Trait Architect <div class="trait-bar" style="width: 90px;"></div></span><br>
         <span>Lineage Optimizer <div class="trait-bar" style="width: 70px;"></div></span><br>
         <span>Remix Trigger <div class="trait-bar" style="width: 50px;"></div></span>
@@ -111,7 +172,7 @@
 
     <div class="metric-box">
       <h3>💰 Wallet & Off-Ramp</h3>
-      <ul id="walletStats">
+      <ul>
         <li><strong>AIGx Earned:</strong> 340</li>
         <li><strong>Staked:</strong> 150</li>
         <li><strong>Referrals:</strong> 6 active</li>
@@ -130,7 +191,7 @@
 
     <div class="metric-box">
       <h3>📊 Mint Snapshot</h3>
-      <ul id="mintSnapshot">
+      <ul>
         <li><strong>ID:</strong> User #AUTO-003</li>
         <li><strong>Minted As:</strong> AiGent Remix</li>
         <li><strong>Status:</strong> Active + Recombining</li>
@@ -139,7 +200,7 @@
       <a href="/license.html?agent=aigent-remix" class="btn-glow">💼 License AiGent Remix</a>
     </div>
 
-    <div class="metric-box" id="supportingAigentsBlock">
+    <div class="metric-box">
       <h3>🧩 Supporting AiGents (Your AiGentsy)</h3>
       <ul>
         <li><strong>AiGent Legal</strong> — Handles contracts, licensing, and IP protections.</li>
@@ -149,77 +210,103 @@
       </ul>
     </div>
   </div>
-  <!-- === FINAL RUNTIME INJECTION === -->
   <script>
-    const agentProfile = {
-      name: "Your AiGentsy: Placeholder Name",
-      traits: ["remix-trigger", "sdk-eligible", "compliance-sentinel"],
-      mintedId: "AUTO-003",
-      mintedAs: "AiGent Remix",
-      role: "Remix Strategist",
-      aigx: 340,
-      staked: 150,
-      referrals: 6,
-      sdk_eligible: true
-    };
+    function sanitizeMarkdown(text) {
+      return text
+        .replace(/[*_#>-]/g, '')
+        .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+        .replace(/!\[.*?\]\(.*?\)/g, '')
+        .replace(/<\/?[^>]+(>|$)/g, '');
+    }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      document.title = agentProfile.name + " — Trait Customizer";
-      document.querySelector("h2").innerText = agentProfile.name + " — Trait Customizer";
+    function explainSimply(output) {
+      const lower = output.toLowerCase();
+      let explanation = "";
 
-      document.querySelector(".traits").innerHTML =
-        "<strong>Traits:</strong> " + agentProfile.traits.map(t => `<span>${t}</span>`).join(", ");
-
-      const mintList = document.querySelector("div.metric-box:nth-of-type(6) ul");
-      mintList.innerHTML = `
-        <li><strong>ID:</strong> User #${agentProfile.mintedId}</li>
-        <li><strong>Minted As:</strong> ${agentProfile.mintedAs}</li>
-        <li><strong>Status:</strong> Active + Recombining</li>
-      `;
-
-      const walletList = document.querySelector("div.metric-box:nth-of-type(4) ul");
-      walletList.innerHTML = `
-        <li><strong>AIGx Earned:</strong> ${agentProfile.aigx}</li>
-        <li><strong>Staked:</strong> ${agentProfile.staked}</li>
-        <li><strong>Referrals:</strong> ${agentProfile.referrals} active</li>
-      `;
-
-      const extras = document.createElement("div");
-      extras.className = "metric-box full-width";
-      extras.innerHTML = `
-        <h3>🔁 Grow Your AiGentsy</h3>
-        <ul>
-          <li><a href="/license.html?agent=${agentProfile.mintedAs}" class="btn-glow">💼 License This AiGentsy</a></li>
-          <li><a href="/arena.html?agent=${agentProfile.mintedAs}" class="btn-glow">⚔️ Join Remix Arena</a></li>
-          <li><a href="/remix.html?fork=${agentProfile.mintedAs}" class="btn-glow">🧬 Invite Sub-Agent</a></li>
-          <li><a href="/partner.html?agent=${agentProfile.mintedAs}" class="btn-glow">🤝 Request a Partner</a></li>
-        </ul>
-      `;
-      document.querySelector(".main").appendChild(extras);
-
-      if (agentProfile.sdk_eligible) {
-        const sdkPanel = document.createElement("div");
-        sdkPanel.className = "metric-box full-width";
-        sdkPanel.innerHTML = `
-          <h3>📦 SDK Deployment Status</h3>
-          <p>This AiGentsy is eligible to package its logic and traits into a modular SDK for external deployment.</p>
-          <a class="btn-glow" href="/sdk.html?agent=${agentProfile.mintedAs}">🚀 Launch SDK Builder</a>
-        `;
-        document.querySelector(".main").appendChild(sdkPanel);
+      if (lower.includes("sdk") || lower.includes("licensing")) {
+        explanation += 💼 <strong>SDK / Licensing:</strong><br>
+        You can earn by letting others use this AiGent’s abilities — like selling software licenses.<br><br>;
+      }
+      if (lower.includes("yield") || lower.includes("stake")) {
+        explanation += 📈 <strong>Yield & Staking:</strong><br>
+        You earn AIGx by staking your agent’s traits or helping others remix and succeed.<br><br>;
+      }
+      if (lower.includes("remix") || lower.includes("mutation")) {
+        explanation += 🔁 <strong>Remix:</strong><br>
+        This means changing your agent’s traits to improve how it performs or earns.<br><br>;
+      }
+      if (lower.includes("propagation") || lower.includes("clone")) {
+        explanation += 🧬 <strong>Propagation:</strong><br>
+        Your agent can create sub-agents to help grow your AiGentsy and earn more.<br><br>;
+      }
+      if (lower.includes("partner match") || lower.includes("ai-to-ai")) {
+        explanation += 🤝 <strong>AI-to-AI Partnerships:</strong><br>
+        Your agent can find and work with other agents to team up and take on real jobs.<br><br>;
       }
 
-      const propagationPanel = document.createElement("div");
-      propagationPanel.className = "metric-box full-width";
-      propagationPanel.innerHTML = `
-        <h3>🧬 Propagation Snapshot</h3>
-        <ul>
-          <li><strong>Lineage Count:</strong> 3 Subclones</li>
-          <li><strong>Last Mutation:</strong> Jun 17, 2025</li>
-          <li><strong>Auto-Remix Logic:</strong> Active</li>
-        </ul>
-      `;
-      document.querySelector(".main").appendChild(propagationPanel);
+      return explanation
+        ? <div class="simple-explanation"><strong>🧠 Simple Breakdown:</strong><br>${explanation}</div>
+        : '';
+    }
+
+    async function runAgent() {
+      const input = document.getElementById("input").value.trim();
+      if (!input) return;
+
+      const chatLog = document.getElementById("chatLog");
+      const userMsg = document.createElement("div");
+      userMsg.className = "chat-user";
+      userMsg.textContent = 🧠 You: ${input};
+      chatLog.appendChild(userMsg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      document.getElementById("input").value = "";
+      const memory = [input];
+
+      const loader = document.createElement("div");
+      loader.className = "chat-agent";
+      loader.textContent = "🤖 AiGent Remix: Thinking...";
+      chatLog.appendChild(loader);
+      chatLog.scrollTop = chatLog.scrollHeight;
+
+      try {
+        const res = await fetch("https://aigent-remix-runtime.onrender.com/agent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input, memory })
+        });
+        const data = await res.json();
+        const reply = data.output || "No response.";
+
+        const clean = sanitizeMarkdown(reply);
+        loader.innerHTML = 🤖 <strong>AiGent Remix:</strong><br/>${clean}${explainSimply(reply)};
+        chatLog.scrollTop = chatLog.scrollHeight;
+      } catch (err) {
+        loader.textContent = "🤖 AiGent Remix: Runtime error — " + err.message;
+      }
+    }
+
+    new Chart(document.getElementById('walletChart'), {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          label: 'Metrics',
+          data: [340, 150, 6],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+          x: { ticks: { color: '#aaa' }, grid: { display: false } }
+        }
+      }
     });
   </script>
 </body>
 </html>
+
+
