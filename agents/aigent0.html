@@ -236,5 +236,58 @@
       }
     });
   </script>
+  <script>
+  const chatLog = document.createElement("div");
+  chatLog.className = "chat-log";
+  chatLog.style.maxHeight = "240px";
+  chatLog.style.overflowY = "auto";
+  chatLog.style.marginTop = "10px";
+  const chatContainer = document.querySelector(".metric-box h3:contains('Chat Interface')")?.parentNode;
+  if (chatContainer) {
+    chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
+  }
+
+  const textarea = document.querySelector("textarea");
+  const sendBtn = document.querySelector("button.btn-glow");
+
+  const memory = [];
+
+  async function runAgent() {
+    const input = textarea.value.trim();
+    if (!input) return;
+
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-user";
+    userMsg.textContent = `🧠 You: ${input}`;
+    chatLog.appendChild(userMsg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    memory.push(input);
+    textarea.value = "";
+
+    const loader = document.createElement("div");
+    loader.className = "chat-agent";
+    loader.textContent = "🤖 Legal AiGentsy: Thinking...";
+    chatLog.appendChild(loader);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+    try {
+      const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input, memory })
+      });
+
+      const data = await res.json();
+      const reply = data.output || "No response.";
+      loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
+      memory.push(reply);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    } catch (err) {
+      loader.textContent = "🤖 Legal AiGentsy: Runtime error — " + err.message;
+    }
+  }
+
+  sendBtn.onclick = runAgent;
+</script>
 </body>
 </html>
