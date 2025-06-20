@@ -256,66 +256,48 @@ const AiGentsyProfile = {
 };
 
 const main = document.querySelector('.main');
+const boxes = [...document.querySelectorAll('.metric-box')];
 
-function injectBoxRightAligned(title, html) {
-  const box = document.createElement('div');
-  box.className = 'metric-box';
-  box.style.gridColumn = '2 / 3';
-  box.innerHTML = `<h3>${title}</h3>${html}`;
-  main.appendChild(box);
+function moveBoxByHeaderText(headerText, insertBeforeIndex) {
+  const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
+  if (box && boxes[insertBeforeIndex]) {
+    main.insertBefore(box, boxes[insertBeforeIndex]);
+  }
 }
 
-function injectCompactBox(title, html) {
-  const box = document.createElement('div');
-  box.className = 'metric-box';
-  box.innerHTML = `<h3>${title}</h3>${html}`;
-  main.appendChild(box);
+function injectBoxBelow(referenceText, title, html) {
+  const referenceBox = boxes.find(el => el.querySelector('h3')?.textContent.includes(referenceText));
+  if (referenceBox) {
+    const box = document.createElement('div');
+    box.className = 'metric-box';
+    box.innerHTML = `<h3>${title}</h3>${html}`;
+    main.insertBefore(box, referenceBox.nextSibling);
+  }
 }
 
-// === RIGHT SIDE FILLERS === //
+function appendToBox(headerText, html) {
+  const box = boxes.find(el => el.querySelector('h3')?.textContent.includes(headerText));
+  if (box) {
+    const addition = document.createElement('div');
+    addition.innerHTML = html;
+    addition.style.marginTop = '10px';
+    box.appendChild(addition);
+  }
+}
 
-// 🧠 AiGentsy Intelligence Summary
-injectBoxRightAligned("🧠 Your AiGentsy Intelligence", `
-  <ul>
-    <li><strong>Role:</strong> ${AiGentsyProfile.meta_role}</li>
-    <li><strong>Type:</strong> ${AiGentsyProfile.business_type}</li>
-    <li><strong>Memory:</strong> ${AiGentsyProfile.yield_memory ? 'Yes — remembers what works' : 'No'}</li>
-    <li><strong>Dev-Ready:</strong> ${AiGentsyProfile.sdk_eligible ? 'Yes — downloadable kit' : 'No'}</li>
-  </ul>
-  <p style='font-size:0.9rem;color:#aaa;'>💡 This AiGentsy adapts, learns, and can be cloned or downloaded to scale.</p>
+// Reorder as instructed
+moveBoxByHeaderText("Venture Status", 0); // move Venture Status to top right
+moveBoxByHeaderText("Supporting AiGents", 1); // move Supporting AiGents under it
+moveBoxByHeaderText("Your AiGentsy Intelligence", 2); // under Supporting
+moveBoxByHeaderText("Remix Arena Challenge", boxes.findIndex(b => b.querySelector('h3')?.textContent.includes("Mint Snapshot")) + 1);
+
+// Merge Self-Expanding explanation into Business Launcher box
+appendToBox("Business Launcher", `
+  <div style='margin-top:16px;'>
+    <p style='color:#00bfff'><strong>Self-Expanding</strong></p>
+    <p style='font-size:0.9rem; color:#ccc;'>This AiGentsy can automatically create new team members when needed — no manual setup required. It's like your business grows new arms on its own.</p>
+  </div>
 `);
-
-// ⚔️ Remix Arena Panel
-injectBoxRightAligned("⚔️ Remix Arena Challenge", `
-  <p>Want to see how your AiGentsy stacks up? Compete with others in the Arena, remix ideas, and evolve.</p>
-  <a href="/arena.html?agent=${AiGentsyProfile.agent_id}" class="btn-glow">Join the Arena</a>
-`);
-
-// 🔁 Auto-Propagation Logic (MetaUpgrade25/26 Visual Cue)
-if (AiGentsyProfile.remix_strategy === 'accelerated') {
-  injectBoxRightAligned("🔄 Self-Expanding", `
-    <p>This AiGentsy can automatically spawn new agents when a task or role is needed. No manual work required.</p>
-    <p style='color:#aaa; font-size:0.9rem;'>It’s like hiring a new teammate… instantly.</p>
-  `);
-}
-
-// 🧬 Growth Overview box stays in main flow but pushed up in order
-const growthBox = document.querySelector('div.metric-box h3')?.textContent?.includes("Growth Overview")
-  ? document.querySelector('div.metric-box')
-  : null;
-if (growthBox) {
-  growthBox.style.gridColumn = '2 / 3';
-  main.insertBefore(growthBox, document.querySelector('.metric-box:nth-child(6)'));
-}
-
-// 🧬 Invite Sub-Agent (Already optimized; move upward if needed)
-const supportBox = [...document.querySelectorAll('.metric-box')].find(el => el.innerHTML.includes('Supporting AiGents'));
-if (supportBox && !supportBox.innerHTML.includes('Add new team member')) {
-  const invite = document.createElement('p');
-  invite.style = "margin-top:14px; font-size:0.9rem; color:#ccc;";
-  invite.innerHTML = `➕ <a href="/mint.html?parent=${AiGentsyProfile.agent_id}" style="color:#00bfff;">Add new team member to Your AiGentsy</a>`;
-  supportBox.appendChild(invite);
-}
 </script>
 </body>
 </html>
