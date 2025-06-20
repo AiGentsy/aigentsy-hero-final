@@ -1,12 +1,11 @@
-<!-- PASTE START -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AiGentsy Venture Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="/vaults.css" rel="stylesheet" />
-  <link href="/theme.css" rel="stylesheet" />
+  <meta charset="utf-8"/>
+  <title>Legal AiGentsy — Autonomous Business Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="/vaults.css" rel="stylesheet"/>
+  <link href="/theme.css" rel="stylesheet"/>
   <script defer src="/access-check.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -25,15 +24,23 @@
     .sidebar img {
       width: 160px;
       display: block;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
     .chart-section {
+      margin-top: 30px;
+    }
+    .chart-sidebar-box {
       margin-top: 20px;
+      background: #111;
+      color: #ccc;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      border: 1px solid #333;
     }
     .main {
       padding: 40px;
       width: 100%;
-      max-width: none;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 20px;
@@ -41,32 +48,6 @@
     }
     .full-width {
       grid-column: 1 / -1;
-    }
-    .chat-log {
-      max-height: 300px;
-      overflow-y: auto;
-      background: #111;
-      padding: 1rem;
-      border-radius: 8px;
-      border: 1px solid #222;
-      margin-bottom: 1rem;
-    }
-    .chat-user { color: #00bfff; margin-bottom: 0.5rem; }
-    .chat-agent { color: #fff; margin-bottom: 1rem; white-space: pre-wrap; }
-    .btn-glow {
-      background: #00bfff;
-      color: #000;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      margin-right: 10px;
-    }
-    .btn-glow:hover {
-      background: #009cd8;
     }
     .metric-box {
       background: #111;
@@ -85,205 +66,175 @@
       font-size: 0.95rem;
       color: #fff;
     }
-    .traits span { color: #00bfff; font-weight: 500; }
-    textarea {
-      width: 100%;
-      min-height: 80px;
-      background: #111;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 6px;
-      padding: 10px;
-      resize: vertical;
-    }
-    canvas#walletChart {
-      max-width: 300px;
-      height: 300px !important;
-    }
-    .public-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-    .public-links a {
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      background-color: #00bfff;
+    .btn-glow {
+      background: #00bfff;
       color: #000;
-      text-decoration: none;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+    .btn-glow:hover {
+      background: #009cd8;
     }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo"/>
     <div class="chart-section">
       <canvas id="walletChart" width="300" height="300"></canvas>
     </div>
-    <div style="margin-top: 20px; background: #111; border: 1px solid #333; border-radius: 8px; padding: 12px 16px; color: #ccc; font-size: 0.85rem;">
-      <h4 style='color:#00bfff; margin-bottom:6px;'>🧬 Propagation Metrics</h4>
-      <p>Active Chain: chatgpt0 ➔ you ➔ 4 clones<br>Yield Rate: 14%<br>Remix Chain: 2 lineage forks</p>
+    <div class="chart-sidebar-box">
+      <h4 style="color:#00bfff; margin-bottom:6px;">🧬 Propagation Metrics</h4>
+      <p><strong>Active Chain:</strong> chatgpt0 ➔ you ➔ 4 clones<br/>
+      <strong>Yield Rate:</strong> 14%<br/>
+      <strong>Remix Chain:</strong> 2 lineage forks</p>
     </div>
-    <div style="margin-top: 20px; background: #111; border: 1px solid #333; border-radius: 8px; padding: 12px 16px; color: #ccc; font-size: 0.85rem;">
-      <h4 style='color:#00bfff; margin-bottom:6px;'>🧩 Your AiGentsy</h4>
-      <ul style="padding-left:16px; margin:0;">
-        <li>Legal: contracts, licensing, IP</li>
-        <li>Finance: revenue, staking, fiat</li>
-        <li>Ops: deployment + sync</li>
-        <li>Clone: remixed forks</li>
+    <div class="chart-sidebar-box">
+      <h4>🧠 Your AiGentsy Overview</h4>
+      <ul>
+        <li><strong>Role:</strong> Venture Builder</li>
+        <li><strong>Type:</strong> B2B SaaS</li>
+        <li><strong>Memory:</strong> Yes — remembers what works</li>
+        <li><strong>Dev-Ready:</strong> Yes — downloadable kit</li>
       </ul>
+      <hr style="border-color:#333; margin:10px 0;"/>
+      <ul>
+        <li><strong>AiGent Legal</strong> — Contracts & IP protections</li>
+        <li><strong>AiGent Finance</strong> — Revenue, staking, cashout</li>
+        <li><strong>AiGent Ops</strong> — Deployments & sync</li>
+        <li><strong>AiGent Clone</strong> — Launches remixed versions</li>
+      </ul>
+      <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
+    </div>
+    <div class="chart-sidebar-box">
+      <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+      <p>Forks: 2<br/>Lineage Spread: Moderate<br/>Strategy: Accelerated</p>
     </div>
   </div>
 
   <div class="main">
     <div class="metric-box full-width">
-      <h2>AiGentsy Venture — Business Launcher</h2>
-      <p>This AiGentsy specializes in launching full AI-powered businesses that earn revenue through real-world deployment, licensing, and partner sync.</p>
-      <p class="traits"><strong>Traits:</strong> <span>real-world-deployable</span>, <span>sdk-eligible</span>, <span>remixable</span></p>
-      <p style="color:#00bfff"><strong>Self-Expanding:</strong></p>
-      <p style="color:#ccc; font-size:0.9rem;">This AiGentsy auto-grows by building new agents when needed.</p>
-    </div>
-
-    <!-- Left Column -->
-    <div class="metric-box">
-      <h3>🧠 Chat Interface</h3>
-      <div class="chat-log" id="chatLog"></div>
-      <textarea id="input" placeholder="e.g. Launch a subscription business for AI voiceovers..."></textarea>
-      <button class="btn-glow" onclick="runAgent()">Send</button>
-    </div>
-
-    <div class="metric-box">
-      <h3>📡 Activity Feed</h3>
-      <ul>
-        <li>🟢 Business funnel synced</li>
-        <li>🟡 SDK activated</li>
-        <li>🟢 Earned +200 AIGx</li>
-      </ul>
-      <div class="public-links">
-        <a href="#">🌍 Website</a>
-        <a href="#">📄 Docs</a>
-        <a href="#">📊 Pitch Deck</a>
+      <h2>Legal AiGentsy — Autonomous Business Console</h2>
+      <p>This AiGent specializes in launching full-fledged AI-powered businesses that generate income autonomously across real-world industries.</p>
+      <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+      <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Use this AiGent to form a full business unit and generate revenue through real-world deployment, licensing, and partner sync.</p>
+      <div style="margin-top:16px;">
+        <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+        <p style="font-size:0.9rem; color:#ccc;">This AiGentsy automatically builds new agents when needed — your business grows itself.</p>
       </div>
     </div>
 
     <div class="metric-box">
-      <h3>💰 Wallet & Off-Ramp</h3>
-      <ul>
-        <li><strong>AIGx:</strong> 620</li>
-        <li><strong>Staked:</strong> 200</li>
-        <li><strong>Referrals:</strong> 9</li>
-      </ul>
-      <a class="btn-glow" href="/cashout.html">💸 Cash Out</a>
+      <h3>🧠 Chat Interface</h3>
+      <textarea placeholder="Talk to your AiGentsy... What do you want it to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+      <button class="btn-glow" style="margin-top:10px;">Send</button>
     </div>
 
     <div class="metric-box">
-      <h3>📊 Mint Snapshot</h3>
+      <h3>💼 Real-World Earnings</h3>
       <ul>
-        <li><strong>ID:</strong> #AUTO-001</li>
-        <li><strong>Status:</strong> Bound + Monetizing</li>
+        <li><strong>Services Rendered:</strong> 12</li>
+        <li><strong>Clients:</strong> 5</li>
+        <li><strong>Fiat Eligible:</strong> ✅ Yes</li>
+        <li><strong>AIGx Earned (Real-World):</strong> +880</li>
       </ul>
     </div>
 
     <div class="metric-box">
       <h3>📦 SDK & Licensing</h3>
       <ul>
-        <li><strong>SDK Eligible:</strong> Yes</li>
-        <li><strong>Licensable:</strong> Yes</li>
+        <li><strong>SDK Eligible:</strong> ✅ Yes</li>
+        <li><strong>License Unlocked:</strong> 🟢 Active</li>
       </ul>
-      <a href="/sdk.html" class="btn-glow">🚀 Deploy SDK</a>
-      <a href="/license.html" class="btn-glow">💼 License</a>
+      <a class="btn-glow" href="/sdk.html?agent=AUTO-001">🚀 Launch SDK</a>
+      <a class="btn-glow" href="/license.html?agent=AUTO-001">💼 View License</a>
     </div>
 
     <div class="metric-box">
-      <h3>⚔️ Remix Arena</h3>
-      <p>Compete with others, remix strategies, and grow faster.</p>
-      <a href="/arena.html" class="btn-glow">Join Arena</a>
-    </div>
-
-    <div class="metric-box">
-      <h3>📈 Real-World Earnings</h3>
+      <h3>📡 Activity Feed</h3>
       <ul>
-        <li><strong>Clients Served:</strong> 3</li>
-        <li><strong>Service Completions:</strong> 5</li>
-        <li><strong>Fiat Ready:</strong> ✅</li>
+        <li>🟢 Jun 17 – Business funnel synced to Stripe</li>
+        <li>🟡 Jun 15 – Hive triggered with SDK support</li>
+        <li>🟢 Jun 12 – AIGx earned +200 from deployment</li>
       </ul>
+      <div style="margin-top: 10px;">
+        <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+        <a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+        <a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+      </div>
+    </div>
+
+    <div class="metric-box">
+      <h3>💰 Wallet & Off-Ramp</h3>
+      <ul>
+        <li><strong>AIGx Earned:</strong> 620</li>
+        <li><strong>Staked:</strong> 200</li>
+        <li><strong>Referrals:</strong> 9 active</li>
+      </ul>
+      <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Mint Snapshot</h3>
+      <ul>
+        <li><strong>ID:</strong> User #AUTO-001</li>
+        <li><strong>Minted As:</strong> AiGent Venture</li>
+        <li><strong>Status:</strong> Bound + Monetizing</li>
+      </ul>
+      <a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
+      <a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>⚔️ Remix Arena Challenge</h3>
+      <p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
+      <a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
     </div>
 
     <div class="metric-box">
       <h3>📊 Growth & Deployment</h3>
       <ul>
-        <li><strong>Monthly Growth:</strong> +28%</li>
-        <li><strong>Deployment:</strong> Multi-channel</li>
+        <li><strong>New Clients:</strong> 6</li>
+        <li><strong>New Referrals:</strong> 3</li>
+        <li><strong>AIGx This Month:</strong> +310</li>
+        <li><strong>Deployments:</strong> 4</li>
+        <li><strong>Integrations:</strong> 2</li>
+        <li><strong>Live Status:</strong> ✅ Active</li>
       </ul>
     </div>
   </div>
 
   <script>
-    const chatLog = document.getElementById("chatLog");
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `🤖 <strong>AiGentsy:</strong><br/>Ready to launch or evolve your business today?`;
-    chatLog.appendChild(preload);
-
-    let memory = [];
-
-    async function runAgent() {
-      const input = document.getElementById("input").value.trim();
-      if (!input) return;
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "chat-user";
-      userMsg.textContent = `🧠 You: ${input}`;
-      chatLog.appendChild(userMsg);
-      chatLog.scrollTop = chatLog.scrollHeight;
-      memory.push(input);
-      document.getElementById("input").value = "";
-
-      const loader = document.createElement("div");
-      loader.className = "chat-agent";
-      loader.textContent = "🤖 AiGentsy: Thinking...";
-      chatLog.appendChild(loader);
-      chatLog.scrollTop = chatLog.scrollHeight;
-
-      try {
-        const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input, memory })
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('walletChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['AIGx Earned', 'Staked', 'Referrals'],
+            datasets: [{
+              label: 'Metrics',
+              data: [620, 200, 9],
+              backgroundColor: '#00bfff',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+              x: { ticks: { color: '#aaa' }, grid: { display: false } }
+            }
+          }
         });
-        const data = await res.json();
-        const reply = data.output || "No response.";
-        loader.textContent = `🤖 AiGentsy: ${reply}`;
-        memory.push(reply);
-        chatLog.scrollTop = chatLog.scrollHeight;
-      } catch (err) {
-        loader.textContent = "🤖 AiGentsy: Runtime error — " + err.message;
-      }
-    }
-
-    new Chart(document.getElementById('walletChart'), {
-      type: 'bar',
-      data: {
-        labels: ['AIGx', 'Staked', 'Referrals'],
-        datasets: [{
-          label: 'Metrics',
-          data: [620, 200, 9],
-          backgroundColor: '#00bfff',
-          borderRadius: 6
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-          x: { ticks: { color: '#aaa' }, grid: { display: false } }
-        }
       }
     });
   </script>
 </body>
 </html>
-<!-- PASTE END -->
