@@ -264,10 +264,12 @@ function explainTerms(text) {
 
 function formatResponseEnhanced(text) {
   let cleaned = text
-    .replace(/[*_~`>#-]/g, '')
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-    .replace(/\n+/g, ' ')
-    .replace(/\s+/g, ' ');
+    .replace(/[*_~`>#-]/g, '') // remove basic markdown
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip markdown links
+    .replace(/\n+/g, ' ') // flatten newlines
+    .replace(/\s+/g, ' ') // normalize spacing
+    .replace(/\[\s?\]/g, '•') // convert checklist boxes to bullets
+    .replace(/\[\s?[xX]\s?\]/g, '✓'); // convert checked boxes to checkmarks
 
   const highlights = [
     'Revenue Sharing', 'Whitelabel Licensing', 'SDK-as-a-Service',
@@ -276,13 +278,13 @@ function formatResponseEnhanced(text) {
   ];
   highlights.forEach(term => {
     const regex = new RegExp(`\\b(${term})\\b`, 'gi');
-    cleaned = cleaned.replace(regex, '**$1**');
+    cleaned = cleaned.replace(regex, '$1'); // remove bolding (no markdown)
   });
 
   const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
   return explainTerms(wrapped.trim());
 }
-
+  
 // Preload greeting
 const preload = document.createElement("div");
 preload.className = "chat-agent";
