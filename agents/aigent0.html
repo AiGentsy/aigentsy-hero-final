@@ -236,55 +236,54 @@
       }
     });
   </script>
-  <script>
-  const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
+  <!-- PATCH: AiGentsy Simplified Runtime Injection -->
+<script>
+const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
 const chatLog = document.createElement("div");
 chatLog.className = "chat-log";
 chatLog.style.maxHeight = "240px";
 chatLog.style.overflowY = "auto";
 chatLog.style.marginTop = "10px";
-
 if (chatContainer && chatContainer.querySelector("textarea")) {
   chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
 }
 
 const textarea = document.querySelector("textarea");
 const sendBtn = document.querySelector("button.btn-glow");
-
 const memory = [];
 
-function formatResponse(text) {
-  // Strip markdown
-  let cleaned = text
-    .replace(/[*_~`>#-]/g, '') // remove markdown
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip links
-    .replace(/\n+/g, ' ') // flatten line breaks
-    .replace(/\s+/g, ' ') // normalize spaces
+// Mini-glossary logic
+function explainTerms(text) {
+  return text
+    .replace(/Yield Memory/gi, 'Yield Memory (remembers what worked before and improves earnings)')
+    .replace(/Remix Agent Licensing/gi, 'Remix Agent Licensing (lets you sell parts of this AiGentsy)')
+    .replace(/SDK-as-a-Service/gi, 'SDK-as-a-Service (lets others plug your AiGentsy into their tools)')
+    .replace(/MetaUpgrade\d+/gi, 'Platform Upgrade (automated ability or feature upgrade)')
+    .replace(/Your AiGentsy/gi, 'Your AiGentsy (your full AI-powered business)');
+}
 
-  // Bold key terms
+function formatResponseEnhanced(text) {
+  let cleaned = text
+    .replace(/[*_~`>#-]/g, '')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ');
+
   const highlights = [
-    'Revenue Sharing',
-    'Whitelabel Licensing',
-    'SDK-as-a-Service',
-    'Your AiGentsy',
-    'Remix Agent Licensing',
-    'Real-World Monetization',
-    'Yield Memory',
-    'C-Suite',
-    'Partner Match'
+    'Revenue Sharing', 'Whitelabel Licensing', 'SDK-as-a-Service',
+    'Your AiGentsy', 'Remix Agent Licensing', 'Real-World Monetization',
+    'Yield Memory', 'C-Suite', 'Partner Match'
   ];
   highlights.forEach(term => {
     const regex = new RegExp(`\\b(${term})\\b`, 'gi');
     cleaned = cleaned.replace(regex, '**$1**');
   });
 
-  // Soft wrap at ~90 chars
   const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
-
-  return wrapped.trim();
+  return explainTerms(wrapped.trim());
 }
 
-// Initial preload greeting — now C-suite aware
+// Preload greeting
 const preload = document.createElement("div");
 preload.className = "chat-agent";
 preload.innerHTML = `🤖 <strong>Legal AiGentsy:</strong><br/>
@@ -292,7 +291,7 @@ Welcome back. Your AiGentsy includes Legal, Finance, Ops, and Clone — all acti
 Let’s launch, monetize, or optimize your AI-powered business. What do you want to focus on today?`;
 chatLog.appendChild(preload);
 
-// Runtime handler
+// Runtime send logic
 async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
@@ -319,15 +318,19 @@ async function runAgent() {
     });
 
     const data = await res.json();
-    let reply = formatResponse(data.output || "No response.");
-
-    // Replace outdated terms dynamically
-    reply = reply
-      .replace(/hive agents?/gi, "AiGentsy members")
-      .replace(/the hive/gi, "Your AiGentsy")
-      .replace(/MetaHive/gi, "AiGentsy Group");
+    let reply = formatResponseEnhanced(data.output || "No response.");
 
     loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
+
+    // Add visual action triggers
+    const buttons = document.createElement("div");
+    buttons.style.marginTop = "12px";
+    buttons.innerHTML = `
+      <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
+      <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
+      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+    loader.appendChild(buttons);
+
     memory.push(reply);
     chatLog.scrollTop = chatLog.scrollHeight;
   } catch (err) {
