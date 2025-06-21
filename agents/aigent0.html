@@ -261,24 +261,27 @@ const textarea = document.querySelector("textarea");
 const sendBtn = document.querySelector("button.btn-glow");
 const memory = [];
 
+// Mini-glossary logic (clean, conversational, once per term)
 const explained = new Set();
+
 function explainTerms(text) {
   const terms = {
-    'Yield Memory': 'Yield Memory (remembers what worked before and helps improve how your AiGentsy earns)',
-    'Remix Agent Licensing': 'Remix Licensing (lets you offer or sell a version of your AiGentsy’s tools)',
-    'SDK-as-a-Service': 'SDK-as-a-Service (a way for others to plug your AiGentsy into their tools or platform)',
-    'MetaUpgrade': 'a platform upgrade (a behind-the-scenes feature or logic improvement)',
-    'MetaHive': 'a shared version of your AiGentsy for teams or small businesses to use together',
-    'Your AiGentsy': 'your full AI-powered business',
-    'RealWorld B2B Offer Matching': 'automatic matching with real businesses that need your AiGentsy’s help'
+    'Yield Memory': 'remembers what worked before and improves earnings',
+    'Remix Agent Licensing': 'lets you sell parts of this AiGentsy like plug-and-play tools',
+    'SDK-as-a-Service': 'lets other businesses plug your AiGentsy into their own systems',
+    'MetaUpgrade': 'platform upgrades that unlock new capabilities for your AiGentsy',
+    'Your AiGentsy': 'your AI-powered business that can earn, grow, and operate autonomously'
   };
 
-  for (let [term, def] of Object.entries(terms)) {
-    if (!explained.has(term)) {
-      const regex = new RegExp(`\\b${term}\\b`, 'g');
-      text = text.replace(regex, def);
-      explained.add(term);
-    }
+  for (const [term, simpleExplanation] of Object.entries(terms)) {
+    const pattern = new RegExp(`\\b(${term}\\d*?)\\b`, 'gi'); // handles MetaUpgrade23, etc.
+    text = text.replace(pattern, (match) => {
+      if (!explained.has(match)) {
+        explained.add(match);
+        return `${match} (${simpleExplanation})`;
+      }
+      return match;
+    });
   }
 
   return text;
