@@ -261,27 +261,21 @@ const textarea = document.querySelector("textarea");
 const sendBtn = document.querySelector("button.btn-glow");
 const memory = [];
 
-// Mini-glossary logic (clean, conversational, once per term)
-const explained = new Set();
-
+// Global explainer override (friendly tone, avoids jargon)
 function explainTerms(text) {
   const terms = {
-    'Yield Memory': 'remembers what worked before and improves earnings',
-    'Remix Agent Licensing': 'lets you sell parts of this AiGentsy like plug-and-play tools',
-    'SDK-as-a-Service': 'lets other businesses plug your AiGentsy into their own systems',
-    'MetaUpgrade': 'platform upgrades that unlock new capabilities for your AiGentsy',
-    'Your AiGentsy': 'your AI-powered business that can earn, grow, and operate autonomously'
+    'SDK': 'SDK (a developer toolkit you can plug into other apps)',
+    'SDK-as-a-Service': 'SDK-as-a-Service (a toolkit you can license to developers or businesses)',
+    'Remix Agent Licensing': 'Remix Licensing (lets others use or rebrand parts of your AiGentsy)',
+    'Yield Memory': 'Yield Memory (your AiGentsy remembers what worked best and builds on it)',
+    'MetaHive': 'Your AiGentsy Team (a group of smart agents working together)',
+    'C-Suite': 'C-Suite (the key roles inside your business, like CEO or Legal Officer)',
+    'Your AiGentsy': 'Your AiGentsy (your full AI-powered business that you can grow and earn from)'
   };
 
-  for (const [term, simpleExplanation] of Object.entries(terms)) {
-    const pattern = new RegExp(`\\b(${term}\\d*?)\\b`, 'gi'); // handles MetaUpgrade23, etc.
-    text = text.replace(pattern, (match) => {
-      if (!explained.has(match)) {
-        explained.add(match);
-        return `${match} (${simpleExplanation})`;
-      }
-      return match;
-    });
+  for (const [term, casual] of Object.entries(terms)) {
+    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+    text = text.replace(regex, casual);
   }
 
   return text;
