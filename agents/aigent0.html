@@ -8,80 +8,89 @@
   <link href="/theme.css" rel="stylesheet"/>
   <script defer src="/access-check.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: radial-gradient(circle at center, #0e101a, #000);
-      color: #fff;
-      display: flex;
-    }
-    .sidebar {
-      width: 320px;
-      background: #0a0a0a;
-      padding: 30px 20px;
-    }
-    .sidebar img {
-      width: 160px;
-      display: block;
-      margin-bottom: 40px;
-    }
-    .chart-section {
-      margin-top: 30px;
-    }
-    .chart-sidebar-box {
-      margin-top: 20px;
-      background: #111;
-      color: #ccc;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      border: 1px solid #333;
-    }
-    .main {
-      padding: 40px;
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-    .full-width {
-      grid-column: 1 / -1;
-    }
-    .metric-box {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 10px;
-      padding: 18px 24px;
-      box-shadow: 0 0 12px rgba(0,240,255,0.05);
-    }
-    .metric-box h3 {
-      margin-top: 0;
-      color: #00bfff;
-      font-size: 1.25rem;
-    }
-    .metric-box ul {
-      padding-left: 20px;
-      font-size: 0.95rem;
-      color: #fff;
-    }
-    .btn-glow {
-      background: #00bfff;
-      color: #000;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      margin-right: 10px;
-    }
-    .btn-glow:hover {
-      background: #009cd8;
-    }
-  </style>
+ <style>
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: radial-gradient(circle at center, #0e101a, #000);
+    color: #fff;
+    display: flex;
+  }
+  .sidebar {
+    width: 320px;
+    background: #0a0a0a;
+    padding: 30px 20px;
+  }
+  .sidebar img {
+    width: 160px;
+    display: block;
+    margin-bottom: 40px;
+  }
+  .chart-section {
+    margin-top: 30px;
+  }
+  .chart-sidebar-box {
+    margin-top: 20px;
+    background: #111;
+    color: #ccc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #333;
+  }
+  .main {
+    padding: 40px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  .metric-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 18px 24px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.05);
+  }
+  .metric-box h3 {
+    margin-top: 0;
+    color: #00bfff;
+    font-size: 1.25rem;
+  }
+  .metric-box ul {
+    padding-left: 20px;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+  .btn-glow {
+    background: #00bfff;
+    color: #000;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+  }
+  .btn-glow:hover {
+    background: #009cd8;
+  }
+  .chat-user {
+    color: #00B3FF; /* Your logo blue */
+    font-weight: 500;
+  }
+  .chat-agent {
+    color: #FFFFFF; /* Keep AiGent response white */
+    font-weight: 500;
+  }
+</style>
+
 </head>
 <body>
   <div class="sidebar">
