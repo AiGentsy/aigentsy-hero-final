@@ -385,6 +385,7 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
+    textarea.focus();
   } catch (err) {
     loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
   }
