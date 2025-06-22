@@ -339,12 +339,25 @@ async function runAgent() {
   }
 
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: conditionedInput, memory })
-    });
+    // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
+let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default to AiGent0
 
+const lower = conditionedInput.toLowerCase();
+if (lower.includes("sdk")) {
+  endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
+} else if (lower.includes("growth") || lower.includes("scale")) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+} else if (lower.includes("remix") || lower.includes("clone") || lower.includes("license")) {
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent";
+}
+
+// 🔁 Post to selected agent runtime
+const res = await fetch(endpoint, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ input: conditionedInput, memory })
+});
+    
     const data = await res.json();
     let reply = formatResponseEnhanced(data.output || "No response.");
 
