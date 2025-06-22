@@ -261,21 +261,25 @@ const textarea = document.querySelector("textarea");
 const sendBtn = document.querySelector("button.btn-glow");
 const memory = [];
 
-// Global explainer override (friendly tone, avoids jargon)
 function explainTerms(text) {
   const terms = {
     'SDK': 'SDK (a developer toolkit you can plug into other apps)',
     'SDK-as-a-Service': 'SDK-as-a-Service (a toolkit you can license to developers or businesses)',
     'Remix Agent Licensing': 'Remix Licensing (lets others use or rebrand parts of your AiGentsy)',
     'Yield Memory': 'Yield Memory (your AiGentsy remembers what worked best and builds on it)',
-    'MetaHive': 'Your AiGentsy Team (a group of smart agents working together)',
+    'MetaHive': 'MetaHive (a group of smart agents working together)',
     'C-Suite': 'C-Suite (the key roles inside your business, like CEO or Legal Officer)',
     'Your AiGentsy': 'Your AiGentsy (your full AI-powered business that you can grow and earn from)'
   };
 
   for (const [term, casual] of Object.entries(terms)) {
-    const regex = new RegExp(`\\b${term}\\b`, 'gi');
-    text = text.replace(regex, casual);
+    const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
+    const alreadyExplainedRegex = new RegExp(`${term} \\(.*?\\)`, 'g');
+
+    // Only replace plain terms that haven't already been explained
+    text = text.replace(plainRegex, match => {
+      return alreadyExplainedRegex.test(text) ? match : casual;
+    });
   }
 
   return text;
