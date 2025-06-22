@@ -129,7 +129,7 @@
 
   <div class="main">
     <div class="metric-box full-width">
-      <h2>Legal AiGentsy — Autonomous Business Console</h2>
+      <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
       <p>This AiGent specializes in launching full-fledged AI-powered businesses that generate income autonomously across real-world industries.</p>
       <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
       <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Use this AiGent to form a full business unit and generate revenue through real-world deployment, licensing, and partner sync.</p>
@@ -141,7 +141,7 @@
 
     <div class="metric-box">
       <h3>🧠 Chat Interface</h3>
-      <textarea placeholder="Talk to your AiGentsy... What do you want it to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+      <textarea placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
       <button class="btn-glow" style="margin-top:10px;">Send</button>
     </div>
 
@@ -304,14 +304,6 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
-// Preload greeting
-const preload = document.createElement("div");
-preload.className = "chat-agent";
-preload.innerHTML = `🤖 🤖 <strong>Autonomous AiGentsy:</strong><br/>
-Welcome back. Your AiGentsy includes Legal, Finance, Ops, and Clone — all activated.<br/>
-Let’s launch, monetize, or optimize your AI-powered business. What do you want to focus on today?`;
-chatLog.appendChild(preload);
-
 async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
@@ -326,7 +318,7 @@ async function runAgent() {
 
   const loader = document.createElement("div");
   loader.className = "chat-agent";
-  loader.textContent = "🤖 Autonomous AiGentsy: Thinking...";
+  loader.textContent = "🤖 Your AiGentsy: Thinking...";
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
 
@@ -370,16 +362,17 @@ if (
   endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
 }
     
-const res = await fetch(endpoint, {
+    const res = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ input: conditionedInput, memory })
 });
-    
+
     const data = await res.json();
     let reply = formatResponseEnhanced(data.output || "No response.");
 
-    loader.textContent = `🤖 Legal AiGentsy: ${reply}`;
+    const agentRole = getAgentRoleFromEndpoint(endpoint);
+loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
     // Optional: Add visual buttons again
     const buttons = document.createElement("div");
@@ -393,20 +386,12 @@ const res = await fetch(endpoint, {
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
   } catch (err) {
-    loader.textContent = "🤖 Legal AiGentsy: Runtime error — " + err.message;
+    loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
   }
 }
 
 if (sendBtn) sendBtn.onclick = runAgent;
-</script>
-  // PATCH: Updated preload label and ensured role-agnostic flexibility
-const preload = document.createElement("div");
-preload.className = "chat-agent";
-preload.innerHTML = `🤖 <strong>Autonomous AiGentsy:</strong><br/>
-Welcome back. Your AiGentsy includes Legal, Finance, Ops, and Clone — all activated.<br/>
-Let’s launch, monetize, or optimize your AI-powered business. What do you want to focus on today?`;
-chatLog.appendChild(preload);
-
+ 
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
@@ -414,17 +399,6 @@ function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("remix")) return "AiGentsy CLO";
   return "Autonomous AiGentsy";
 }
-
-// PATCHED FETCH BLOCK
-const res = await fetch(endpoint, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ input: conditionedInput, memory })
-});
-const data = await res.json();
-let reply = formatResponseEnhanced(data.output || "No response.");
-const agentRole = getAgentRoleFromEndpoint(endpoint);
-loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 </script>
 </body>
 </html>
