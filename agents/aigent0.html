@@ -361,7 +361,16 @@ if (
 ) {
   endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
 }
-    
+  else if (
+  lower.includes("legal") || lower.includes("contract") || lower.includes("ip") || lower.includes("compliance")
+) {
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO also handles Legal
+} else if (
+  lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
+) {
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
+}
+  
     const res = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
