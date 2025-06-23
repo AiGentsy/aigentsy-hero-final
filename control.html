@@ -105,6 +105,8 @@
     <div class="log-entry">Loading activity...</div>
   </div>
 
+  <div id="lineageTree" style="margin-top: 40px; text-align: left;"></div>
+
 <script>
 const BIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";
 const BIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
@@ -146,6 +148,35 @@ async function fetchAndRender() {
       tiles.appendChild(div);
     });
 
+    function renderLineageTree(users) {
+  const lineageBox = document.getElementById("lineageTree");
+  lineageBox.innerHTML = "<h3>👁 Lineage Tracker</h3>";
+
+  // Build mapping: username -> children
+  const tree = {};
+  const userMap = {};
+
+  users.forEach(u => {
+    userMap[u.username] = u;
+    const ref = u.referral || "origin/hero";
+    if (!tree[ref]) tree[ref] = [];
+    tree[ref].push(u.username);
+  });
+
+  // Recursive tree builder
+  function buildTreeHTML(root, depth = 0) {
+    const children = tree[root] || [];
+    let html = "";
+    children.forEach(child => {
+      html += `<div style="margin-left: ${depth * 20}px">↳ <strong>${child}</strong> (${userMap[child]?.meta_role || "—"})</div>`;
+      html += buildTreeHTML(child, depth + 1);
+    });
+    return html;
+  }
+
+  const root = "origin/hero";
+  lineageBox.innerHTML += buildTreeHTML(root);
+}
     users.forEach(u => {
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -175,6 +206,7 @@ async function fetchAndRender() {
     });
 
     summary.textContent = `Users: ${total} | Earnings: ${earningsEnabled} | SDK: ${sdkReady} | Partners: ${partnerable}`;
+    renderLineageTree(users);
   } catch (err) {
     console.error("Error:", err);
     document.getElementById("summaryBox").textContent = "⚠ Error loading protocol data.";
