@@ -429,7 +429,53 @@ async function injectUserDashboard() {
     const user = data.record.find(u => u.username === username);
     if (!user) return;
 
-    // === Sidebar ===
+    const boxes = document.querySelectorAll(".metric-box");
+
+    boxes.forEach(box => {
+      const title = box.querySelector("h3")?.textContent || "";
+      const ul = box.querySelector("ul");
+      if (!ul) return;
+
+      if (title.includes("Real-World Earnings")) {
+        ul.innerHTML = `
+          <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
+          <li><strong>Clients:</strong> ${user.clients || 0}</li>
+          <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.earnings || 0}</li>`;
+      }
+
+      if (title.includes("SDK & Licensing")) {
+        ul.innerHTML = `
+          <li><strong>SDK Eligible:</strong> ${user.sdk_eligible ? "✅ Yes" : "—"}</li>
+          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Wallet")) {
+        ul.innerHTML = `
+          <li><strong>AIGx Earned:</strong> ${user.earnings || 0}</li>
+          <li><strong>Staked:</strong> ${user.staked || 0}</li>
+          <li><strong>Referrals:</strong> ${user.referrals?.length || 0} active</li>`;
+      }
+
+      if (title.includes("Growth & Deployment")) {
+        ul.innerHTML = `
+          <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.referrals?.length || 0}</li>
+          <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
+          <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
+          <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
+          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Mint Snapshot")) {
+        ul.innerHTML = `
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.earningsEnabled ? "Monetizing" : "Idle"}</li>`;
+      }
+    });
+
+    // Update overview sidebar
     const overviewBox = document.querySelector(".chart-sidebar-box ul");
     if (overviewBox) {
       overviewBox.innerHTML = `
@@ -439,31 +485,10 @@ async function injectUserDashboard() {
         <li><strong>Dev-Ready:</strong> ${user.sdk_eligible ? "Yes — downloadable kit" : "No"}</li>`;
     }
 
-    // === Mint Snapshot ===
-    document.querySelector(".metric-box ul")?.insertAdjacentHTML("afterbegin", `
-      <li><strong>ID:</strong> ${user.id}</li>
-      <li><strong>Minted As:</strong> AiGent Venture</li>
-      <li><strong>Status:</strong> Bound + ${user.earningsEnabled ? "Monetizing" : "Idle"}</li>`);
-
-    // === SDK & Licensing ===
-    const sdkBox = document.querySelectorAll(".metric-box ul")[2];
-    if (sdkBox) {
-      sdkBox.innerHTML = `
-        <li><strong>SDK Eligible:</strong> ${user.sdk_eligible ? "✅ Yes" : "—"}</li>
-        <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
-    }
-
-    // === Wallet + Chart ===
-    const walletBox = document.querySelectorAll(".metric-box ul")[4];
-    if (walletBox) {
-      walletBox.innerHTML = `
-        <li><strong>AIGx Earned:</strong> ${user.earnings || 0}</li>
-        <li><strong>Staked:</strong> ${user.staked || 0}</li>
-        <li><strong>Referrals:</strong> ${user.referrals?.length || 0} active</li>`;
-    }
-
-    if (Chart && document.getElementById('walletChart')) {
-      new Chart(document.getElementById('walletChart'), {
+    // Render wallet chart
+    const walletChart = document.getElementById('walletChart');
+    if (Chart && walletChart) {
+      new Chart(walletChart, {
         type: 'bar',
         data: {
           labels: ['AIGx Earned', 'Staked', 'Referrals'],
@@ -482,30 +507,8 @@ async function injectUserDashboard() {
       });
     }
 
-    // === Real-World Earnings ===
-    const earningsBox = document.querySelectorAll(".metric-box ul")[1];
-    if (earningsBox) {
-      earningsBox.innerHTML = `
-        <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
-        <li><strong>Clients:</strong> ${user.clients || 0}</li>
-        <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
-        <li><strong>AIGx Earned (Real-World):</strong> +${user.earnings || 0}</li>`;
-    }
-
-    // === Growth & Deployment ===
-    const growthBox = document.querySelectorAll(".metric-box ul")[6];
-    if (growthBox) {
-      growthBox.innerHTML = `
-        <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
-        <li><strong>New Referrals:</strong> ${user.referrals?.length || 0}</li>
-        <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
-        <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
-        <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
-        <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
-    }
-
   } catch (e) {
-    console.error("AiGent0 dynamic load error:", e);
+    console.error("injectUserDashboard error:", e);
   }
 }
 
