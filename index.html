@@ -256,24 +256,25 @@ const JSONBIN_SECRET = "Bearer $2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/C
       "marketing": "CMO"
     };
 
-    const entry = {
-      id: crypto.randomUUID(),
-      ventureID: `aigent0-${username.toLowerCase()}`,
-      username,
-      created: now,
-      customInput: customDescription || "",
-      meta_role: roleMap[selectedAgent] || "CEO",
-      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-      referral: referralCode || "origin/hero",
-      lineage_depth: 0,
-      yield_memory: true,
-      compliance_flag: false,
-      partner_ready: true,
-      sdk_eligible: selectedAgent === "saas",
-      earningsEnabled: true,
-      listingStatus: "active",
-      traits: [selectedAgent, "founder", "autonomous", "aigentsy"]
-    };
+   const entry = {
+  id: crypto.randomUUID(),
+  ventureID: `aigent0-${username.toLowerCase()}`,
+  username,
+  created: now,
+  mintTime: now,
+  customInput: customDescription || "",
+  meta_role: roleMap[selectedAgent] || "CEO",
+  runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+  referral: referralCode || "origin/hero",
+  lineage_depth: 0,
+  yield_memory: true,
+  compliance_flag: false,
+  partner_ready: true,
+  sdk_eligible: selectedAgent === "saas",
+  earningsEnabled: true,
+  listingStatus: "active",
+  traits: [selectedAgent, "founder", "autonomous", "aigentsy"]
+};
 
     try {
       const response = await fetch(JSONBIN_URL, {
