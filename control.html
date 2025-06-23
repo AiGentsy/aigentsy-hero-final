@@ -2,9 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>AiGentsy — Control Deck</title>
-  <link rel="stylesheet" href="control.css"/>
+  <title>AiGentsy — Protocol Control Deck</title>
   <style>
+    body {
+      background: #0e0e0e;
+      font-family: 'Inter', sans-serif;
+      color: #eee;
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #00f0ff;
+    }
+    .summary-box, .tile, .log-entry {
+      background: #151515;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .live-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .tile {
+      text-align: center;
+    }
+    .tile span {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.6em;
+      color: #00f0ff;
+    }
     .tracker-table {
       width: 100%;
       border-collapse: collapse;
@@ -17,203 +48,141 @@
     }
     .tracker-table th {
       background-color: #1a1a1a;
-      color: #fff;
     }
     .tracker-table td {
       background-color: #111;
-      color: #ddd;
     }
     .tracker-table tr:nth-child(even) td {
-      background-color: #1e1e1e;
-    }
-    .clone-header {
-      margin-top: 40px;
-      margin-bottom: 10px;
-      font-size: 1.4em;
-      color: #ccc;
-    }
-    .clone-buttons {
-      margin-top: 10px;
-    }
-    .clone-buttons button {
-      margin-right: 10px;
-      margin-bottom: 10px;
-    }
-    .summary-box {
-      margin-top: 20px;
-      padding: 15px;
-      background: #1c1c1c;
-      border: 1px solid #444;
-      color: #ccc;
+      background-color: #1c1c1c;
     }
     .log-entry {
-      background: #101010;
-      padding: 15px;
-      margin-bottom: 10px;
       border-left: 4px solid #00f0ff;
-      color: #eee;
     }
-    .live-tiles {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
+    .action-buttons button {
+      margin-right: 6px;
+      margin-bottom: 4px;
+      padding: 6px 10px;
+      background: #00f0ff;
+      border: none;
+      border-radius: 4px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
     }
-    .tile {
-      background: #151515;
-      border: 1px solid #444;
-      padding: 20px;
-      color: #eee;
-      text-align: center;
-      border-radius: 10px;
-      font-size: 1.1em;
-    }
-    .tile span {
-      display: block;
-      margin-top: 8px;
-      font-size: 1.4em;
-      color: #00f0ff;
+    .action-buttons button:hover {
+      background: #00d0cc;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <aside class="sidebar">
-    <img src="aigentsy-logo.png" alt="AiGentsy Logo" class="logo"/>
-    <ul>
-      <li><a href="/dashboard">Dashboard</a></li>
-      <li><a href="/vaults">Vaults</a></li>
-      <li><a href="/metatrade">MetaTrade</a></li>
-      <li><a href="/credit">Credit Staking</a></li>
-      <li><a href="/wallet">Wallet</a></li>
-      <li><a href="/negotiation">Negotiation</a></li>
-      <li><a href="/mint">Mint</a></li>
-      <li><a href="/remix">Remix</a></li>
-      <li><a href="/metaventures">MetaVentures</a></li>
-      <li><a href="/metagrowth">MetaGrowth</a></li>
-      <li><a href="/realms">Realms</a></li>
-      <li><a href="/partner">Partner</a></li>
-      <li><a href="/sentinel">Sentinel</a></li>
-      <li><a href="/arena">Arena</a></li>
-      <li><a href="/arbitration">Arbitration</a></li>
-      <li><a href="/market">Market</a></li>
-      <li><a href="/social">Social</a></li>
-      <li><a href="/licensing">Licensing</a></li>
-      <li><a href="/learn">lEARN</a></li>
-    </ul>
-  </aside>
-  <main class="main-content">
-    <h1>Protocol Control Deck</h1>
+  <h1>AiGentsy Protocol Control Deck</h1>
 
-    <div class="live-tiles" id="liveTiles">
-      <!-- Dynamic metric tiles will render here -->
-    </div>
+  <div class="live-tiles" id="liveTiles"></div>
 
-    <section class="log-section">
-      <h2>Agent Activity Feed (Live)</h2>
-      <div id="activityLog">
-        <div class="log-entry">Loading recent activity...</div>
-      </div>
-    </section>
+  <div class="summary-box" id="summaryBox">Loading stats...</div>
 
-    <div class="summary-box" id="summaryBox">Loading user mint activity...</div>
+  <h2>🧬 Minted Agents</h2>
+  <table class="tracker-table" id="cloneTable">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Role</th>
+      <th>Runtime</th>
+      <th>Referral</th>
+      <th>Created</th>
+      <th>Earnings</th>
+      <th>Partner</th>
+      <th>SDK</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-    <h2 class="clone-header">🧬 Minted Agent Tracker Table</h2>
-    <table class="tracker-table" id="cloneTable">
-      <thead>
-      <tr>
-        <th>User ID</th>
-        <th>Referral</th>
-        <th>Trait Remix</th>
-        <th>Stake Status</th>
-        <th>Mint Time</th>
-        <th>User Type</th>
-        <th>Intent</th>
-      </tr>
-      </thead>
-      <tbody>
-      </tbody>
-    </table>
-
-    <div class="clone-buttons">
-      <button onclick="fetchAndRender()">🔄 Refresh</button>
-    </div>
-  </main>
-</div>
+  <h2>📡 Recent Activity</h2>
+  <div id="activityLog">
+    <div class="log-entry">Loading activity...</div>
+  </div>
 
 <script>
-  async function fetchAndRender() {
-    try {
-      const res = await fetch("https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest", {
-        headers: {
-          "X-Master-Key": "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe"
-        }
-      });
+const BIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest";
+const BIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
 
-      if (!res.ok) throw new Error("Fetch error: " + res.statusText);
+async function fetchAndRender() {
+  try {
+    const res = await fetch(BIN_URL, {
+      headers: {
+        "X-Master-Key": BIN_SECRET
+      }
+    });
+    if (!res.ok) throw new Error("Failed to fetch");
 
-      const data = await res.json();
-      const users = data.record;
-      const tbody = document.querySelector("#cloneTable tbody");
-      const summary = document.getElementById("summaryBox");
-      const activityLog = document.getElementById("activityLog");
-      const liveTiles = document.getElementById("liveTiles");
+    const data = await res.json();
+    const users = data.record;
+    const tbody = document.querySelector("#cloneTable tbody");
+    const summary = document.getElementById("summaryBox");
+    const log = document.getElementById("activityLog");
+    const tiles = document.getElementById("liveTiles");
 
-      tbody.innerHTML = "";
-      activityLog.innerHTML = "";
-      liveTiles.innerHTML = "";
+    tbody.innerHTML = "";
+    log.innerHTML = "";
+    tiles.innerHTML = "";
 
-      let total = users.length;
-      let staked = users.filter(u => u.staked === true).length;
-      let pending = users.filter(u => u.staked === false).length;
-      let consented = users.filter(u => u.consent && u.consent.agreed === true).length;
-      let nonCompliant = total - consented;
+    const total = users.length;
+    const earningsEnabled = users.filter(u => u.earningsEnabled).length;
+    const sdkReady = users.filter(u => u.sdk_eligible).length;
+    const partnerable = users.filter(u => u.partner_ready).length;
 
-      const tiles = [
-        { label: "Total Users", value: total },
-        { label: "Consented Users", value: consented },
-        { label: "Non-Compliant Users", value: nonCompliant },
-        { label: "Last Sync Time", value: new Date().toLocaleString() }
-      ];
+    [
+      { label: "Total Users", value: total },
+      { label: "Earnings Enabled", value: earningsEnabled },
+      { label: "SDK Eligible", value: sdkReady },
+      { label: "Partnership Ready", value: partnerable }
+    ].forEach(stat => {
+      const div = document.createElement("div");
+      div.className = "tile";
+      div.innerHTML = `${stat.label}<span>${stat.value}</span>`;
+      tiles.appendChild(div);
+    });
 
-      tiles.forEach(tile => {
-        const div = document.createElement("div");
-        div.className = "tile";
-        div.innerHTML = `${tile.label}<span>${tile.value}</span>`;
-        liveTiles.appendChild(div);
-      });
+    users.forEach(u => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${u.id}</td>
+        <td>${u.username}</td>
+        <td>${u.meta_role || "—"}</td>
+        <td><a href="${u.runtimeURL}" style="color: #00f0ff" target="_blank">🔗</a></td>
+        <td>${u.referral || "—"}</td>
+        <td>${new Date(u.created).toLocaleString()}</td>
+        <td>${u.earningsEnabled ? "✅" : "—"}</td>
+        <td>${u.partner_ready ? "✅" : "—"}</td>
+        <td>${u.sdk_eligible ? "✅" : "—"}</td>
+        <td class="action-buttons">
+          <button onclick="alert('Approve Licensing for ${u.username}')">✔ Approve</button>
+          <button onclick="alert('Toggle Earnings for ${u.username}')">💸 Toggle</button>
+          <button onclick="alert('Flag for Compliance Review: ${u.username}')">⚠ Flag</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
 
-      users.forEach(user => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${user.id}</td>
-          <td>${user.ref || "—"}</td>
-          <td>${user.trait}</td>
-          <td>${user.staked ? "Complete" : "Pending"}</td>
-          <td>${new Date(user.mintTime).toLocaleString()}</td>
-          <td>${user.userType || "Agent"}</td>
-          <td>${user.intent || "—"}</td>
-        `;
-        tbody.appendChild(row);
-      });
+    users.slice(-5).reverse().forEach(u => {
+      const div = document.createElement("div");
+      div.className = "log-entry";
+      div.innerHTML = `<strong>${u.username}</strong> launched as <code>${u.meta_role}</code> via ${u.referral || "origin"} at ${new Date(u.created).toLocaleTimeString()}`;
+      log.appendChild(div);
+    });
 
-      const lastFive = users.slice(-5).reverse();
-      lastFive.forEach(user => {
-        const log = document.createElement("div");
-        log.className = "log-entry";
-        log.innerHTML = `<strong>${user.id}</strong> minted with <em>${user.trait}</em> via referral <code>${user.ref}</code> — intent: ${user.intent || "N/A"}`;
-        activityLog.appendChild(log);
-      });
-
-      summary.textContent = `🧮 Total Users: ${total} | ✅ Staked: ${staked} | 🔄 Pending: ${pending}`;
-    } catch (e) {
-      document.getElementById("summaryBox").textContent = "⚠️ Failed to load user mint data.";
-      console.error("Fetch error:", e);
-    }
+    summary.textContent = `Users: ${total} | Earnings: ${earningsEnabled} | SDK: ${sdkReady} | Partners: ${partnerable}`;
+  } catch (err) {
+    console.error("Error:", err);
+    document.getElementById("summaryBox").textContent = "⚠ Error loading protocol data.";
   }
+}
 
-  window.addEventListener("DOMContentLoaded", fetchAndRender);
-  setInterval(fetchAndRender, 15000);
+window.addEventListener("DOMContentLoaded", fetchAndRender);
+setInterval(fetchAndRender, 20000);
 </script>
 </body>
 </html>
