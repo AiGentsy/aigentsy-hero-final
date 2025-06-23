@@ -75,44 +75,38 @@
   </style>
 </head>
 <body>
-  <h1>AiGentsy Protocol Control Deck</h1>
-
-  <div class="live-tiles" id="liveTiles"></div>
-  <div class="summary-box" id="summaryBox">Loading stats...</div>
-
-  <h2>🧼 Minted Agents</h2>
-  <table class="tracker-table" id="cloneTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Runtime</th>
-        <th>Referral</th>
-        <th>Created</th>
-        <th>Licensing</th>
-        <th>Stripe</th>
-        <th>Teach</th>
-        <th>Compliance</th>
-        <th>Flags</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <h2>🛁 Recent Activity</h2>
-  <div id="activityLog">
-    <div class="log-entry">Loading activity...</div>
-  </div>
-
-  <h2>📁 Vault + Remix Threads</h2>
-  <div id="activityThreads">
-    <div class="log-entry">Loading user thread history...</div>
-  </div>
-
-  <div id="lineageTree" style="margin-top: 40px; text-align: left;"></div>
-
+<h1>AiGentsy Protocol Control Deck</h1>
+<div class="live-tiles" id="liveTiles"></div>
+<div class="summary-box" id="summaryBox">Loading stats...</div>
+<h2>🧼 Minted Agents</h2>
+<table class="tracker-table" id="cloneTable">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Username</th>
+    <th>Role</th>
+    <th>Runtime</th>
+    <th>Referral</th>
+    <th>Created</th>
+    <th>Licensing</th>
+    <th>Stripe</th>
+    <th>Teach</th>
+    <th>Compliance</th>
+    <th>Flags</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<h2>🛁 Recent Activity</h2>
+<div id="activityLog">
+  <div class="log-entry">Loading activity...</div>
+</div>
+<h2>📁 Vault + Remix Threads</h2>
+<div id="activityThreads">
+  <div class="log-entry">Loading user thread history...</div>
+</div>
+<div id="lineageTree" style="margin-top: 40px; text-align: left;"></div>
 <script>
 const BIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";
 const BIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
@@ -120,9 +114,7 @@ const BIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe
 async function fetchAndRender() {
   try {
     const res = await fetch(BIN_URL, {
-      headers: {
-        "X-Master-Key": BIN_SECRET
-      }
+      headers: { "X-Master-Key": BIN_SECRET }
     });
     if (!res.ok) throw new Error("Failed to fetch");
 
@@ -158,12 +150,13 @@ async function fetchAndRender() {
       const threadBox = document.getElementById("activityThreads");
       threadBox.innerHTML = "";
       users.forEach(user => {
+        const username = user.username || `Auto-${user.id?.split(" ").pop() || "Spawn"}`;
         const vaults = user.vaultsClaimed?.join(", ") || "—";
         const remixes = user.remixHistory?.map(r => `from ${r.source}`).join(", ") || "—";
         const last = new Date(user.mintTime || user.created).toLocaleString();
         const div = document.createElement("div");
         div.className = "log-entry";
-        div.innerHTML = `<strong>${user.username}</strong> — 🔐 Vaults: <code>${vaults}</code> | ♻️ Remix: <code>${remixes}</code> | 🕒 <span style="color:#aaa">${last}</span>`;
+        div.innerHTML = `<strong>${username}</strong> — 🔐 Vaults: <code>${vaults}</code> | ♻️ Remix: <code>${remixes}</code> | 🕒 <span style="color:#aaa">${last}</span>`;
         threadBox.appendChild(div);
       });
     }
@@ -174,10 +167,11 @@ async function fetchAndRender() {
       const tree = {};
       const userMap = {};
       users.forEach(u => {
-        userMap[u.username] = u;
+        const username = u.username || `Auto-${u.id?.split(" ").pop() || "Spawn"}`;
+        userMap[username] = u;
         const ref = u.referral || "origin/hero";
         if (!tree[ref]) tree[ref] = [];
-        tree[ref].push(u.username);
+        tree[ref].push(username);
       });
       function buildTreeHTML(root, depth = 0) {
         const children = tree[root] || [];
@@ -192,11 +186,12 @@ async function fetchAndRender() {
     }
 
     users.forEach(u => {
+      const username = u.username || `Auto-${u.id?.split(" ").pop() || "Spawn"}`;
       const flags = u.runtimeFlags || {};
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${u.id}</td>
-        <td>${u.username || "—"}</td>
+        <td>${username}</td>
         <td>${u.meta_role || u.role || "—"}</td>
         <td><a href="${u.runtimeURL}" style="color: #00f0ff" target="_blank">🔗</a></td>
         <td>${u.referral || "—"}</td>
@@ -207,18 +202,19 @@ async function fetchAndRender() {
         <td>${u.complianceReviewed ? "✅" : "—"}</td>
         <td>${flags.flagged ? "⚠️" : flags.eligibleForAudit ? "🕵️" : flags.needsReview ? "❓" : "—"}</td>
         <td class="action-buttons">
-          <button onclick="alert('Approve Licensing for ${u.username}')">✔ Approve</button>
-          <button onclick="alert('Toggle Earnings for ${u.username}')">💸 Toggle</button>
-          <button onclick="alert('Flag for Review: ${u.username}')">⚠ Flag</button>
+          <button onclick="alert('Approve Licensing for ${username}')">✔ Approve</button>
+          <button onclick="alert('Toggle Earnings for ${username}')">💸 Toggle</button>
+          <button onclick="alert('Flag for Review: ${username}')">⚠ Flag</button>
         </td>
       `;
       tbody.appendChild(row);
     });
 
     users.slice(-5).reverse().forEach(u => {
+      const username = u.username || `Auto-${u.id?.split(" ").pop() || "Spawn"}`;
       const div = document.createElement("div");
       div.className = "log-entry";
-      div.innerHTML = `<strong>${u.username}</strong> launched as <code>${u.meta_role || u.role}</code> via ${u.referral || "origin"} at ${new Date(u.created || u.mintTime).toLocaleTimeString()}`;
+      div.innerHTML = `<strong>${username}</strong> launched as <code>${u.meta_role || u.role}</code> via ${u.referral || "origin"} at ${new Date(u.created || u.mintTime).toLocaleTimeString()}`;
       log.appendChild(div);
     });
 
