@@ -78,37 +78,38 @@
   <h1>AiGentsy Protocol Control Deck</h1>
 
   <div class="live-tiles" id="liveTiles"></div>
-
   <div class="summary-box" id="summaryBox">Loading stats...</div>
 
-  <h2>🧬 Minted Agents</h2>
+  <h2>🧼 Minted Agents</h2>
   <table class="tracker-table" id="cloneTable">
     <thead>
-    <tr>
-      <th>ID</th>
-      <th>Username</th>
-      <th>Role</th>
-      <th>Runtime</th>
-      <th>Referral</th>
-      <th>Created</th>
-      <th>Earnings</th>
-      <th>Partner</th>
-      <th>SDK</th>
-      <th>Actions</th>
-    </tr>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Role</th>
+        <th>Runtime</th>
+        <th>Referral</th>
+        <th>Created</th>
+        <th>Licensing</th>
+        <th>Stripe</th>
+        <th>Teach</th>
+        <th>Compliance</th>
+        <th>Flags</th>
+        <th>Actions</th>
+      </tr>
     </thead>
     <tbody></tbody>
   </table>
 
-  <h2>📡 Recent Activity</h2>
+  <h2>🛁 Recent Activity</h2>
   <div id="activityLog">
     <div class="log-entry">Loading activity...</div>
   </div>
 
   <h2>📁 Vault + Remix Threads</h2>
-<div id="activityThreads">
-  <div class="log-entry">Loading user thread history...</div>
-</div>
+  <div id="activityThreads">
+    <div class="log-entry">Loading user thread history...</div>
+  </div>
 
   <div id="lineageTree" style="margin-top: 40px; text-align: left;"></div>
 
@@ -152,71 +153,63 @@ async function fetchAndRender() {
       div.innerHTML = `${stat.label}<span>${stat.value}</span>`;
       tiles.appendChild(div);
     });
-function renderActivityThreads(users) {
-  const threadBox = document.getElementById("activityThreads");
-  threadBox.innerHTML = "";
 
-  users.forEach(user => {
-    const vaults = user.vaultsClaimed?.join(", ") || "—";
-    const remixes = user.remixHistory?.map(r => `from ${r.source}`).join(", ") || "—";
-    const last = new Date(user.mintTime || user.created).toLocaleString();
+    function renderActivityThreads(users) {
+      const threadBox = document.getElementById("activityThreads");
+      threadBox.innerHTML = "";
+      users.forEach(user => {
+        const vaults = user.vaultsClaimed?.join(", ") || "—";
+        const remixes = user.remixHistory?.map(r => `from ${r.source}`).join(", ") || "—";
+        const last = new Date(user.mintTime || user.created).toLocaleString();
+        const div = document.createElement("div");
+        div.className = "log-entry";
+        div.innerHTML = `<strong>${user.username}</strong> — 🔐 Vaults: <code>${vaults}</code> | ♻️ Remix: <code>${remixes}</code> | 🕒 <span style="color:#aaa">${last}</span>`;
+        threadBox.appendChild(div);
+      });
+    }
 
-    const div = document.createElement("div");
-    div.className = "log-entry";
-    div.innerHTML = `
-      <strong>${user.username}</strong> — 
-      🔐 Vaults: <code>${vaults}</code> | 
-      ♻️ Remix: <code>${remixes}</code> | 
-      🕒 <span style="color:#aaa">${last}</span>
-    `;
-    threadBox.appendChild(div);
-  });
-}
     function renderLineageTree(users) {
-  const lineageBox = document.getElementById("lineageTree");
-  lineageBox.innerHTML = "<h3>👁 Lineage Tracker</h3>";
+      const lineageBox = document.getElementById("lineageTree");
+      lineageBox.innerHTML = "<h3>👁 Lineage Tracker</h3>";
+      const tree = {};
+      const userMap = {};
+      users.forEach(u => {
+        userMap[u.username] = u;
+        const ref = u.referral || "origin/hero";
+        if (!tree[ref]) tree[ref] = [];
+        tree[ref].push(u.username);
+      });
+      function buildTreeHTML(root, depth = 0) {
+        const children = tree[root] || [];
+        let html = "";
+        children.forEach(child => {
+          html += `<div style="margin-left: ${depth * 20}px">↳ <strong>${child}</strong> (${userMap[child]?.meta_role || "—"})</div>`;
+          html += buildTreeHTML(child, depth + 1);
+        });
+        return html;
+      }
+      lineageBox.innerHTML += buildTreeHTML("origin/hero");
+    }
 
-  // Build mapping: username -> children
-  const tree = {};
-  const userMap = {};
-
-  users.forEach(u => {
-    userMap[u.username] = u;
-    const ref = u.referral || "origin/hero";
-    if (!tree[ref]) tree[ref] = [];
-    tree[ref].push(u.username);
-  });
-
-  // Recursive tree builder
-  function buildTreeHTML(root, depth = 0) {
-    const children = tree[root] || [];
-    let html = "";
-    children.forEach(child => {
-      html += `<div style="margin-left: ${depth * 20}px">↳ <strong>${child}</strong> (${userMap[child]?.meta_role || "—"})</div>`;
-      html += buildTreeHTML(child, depth + 1);
-    });
-    return html;
-  }
-
-  const root = "origin/hero";
-  lineageBox.innerHTML += buildTreeHTML(root);
-}
     users.forEach(u => {
+      const flags = u.runtimeFlags || {};
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${u.id}</td>
-        <td>${u.username}</td>
-        <td>${u.meta_role || "—"}</td>
+        <td>${u.username || "—"}</td>
+        <td>${u.meta_role || u.role || "—"}</td>
         <td><a href="${u.runtimeURL}" style="color: #00f0ff" target="_blank">🔗</a></td>
         <td>${u.referral || "—"}</td>
-        <td>${new Date(u.created).toLocaleString()}</td>
-        <td>${u.earningsEnabled ? "✅" : "—"}</td>
-        <td>${u.partner_ready ? "✅" : "—"}</td>
-        <td>${u.sdk_eligible ? "✅" : "—"}</td>
+        <td>${new Date(u.created || u.mintTime).toLocaleString()}</td>
+        <td>${u.licensingApproved ? "✅" : "—"}</td>
+        <td>${u.stripeUnlocked ? "✅" : "—"}</td>
+        <td>${u.teachInComplete ? "✅" : `Stage ${u.teachStage || 0}`}</td>
+        <td>${u.complianceReviewed ? "✅" : "—"}</td>
+        <td>${flags.flagged ? "⚠️" : flags.eligibleForAudit ? "🕵️" : flags.needsReview ? "❓" : "—"}</td>
         <td class="action-buttons">
           <button onclick="alert('Approve Licensing for ${u.username}')">✔ Approve</button>
           <button onclick="alert('Toggle Earnings for ${u.username}')">💸 Toggle</button>
-          <button onclick="alert('Flag for Compliance Review: ${u.username}')">⚠ Flag</button>
+          <button onclick="alert('Flag for Review: ${u.username}')">⚠ Flag</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -225,13 +218,13 @@ function renderActivityThreads(users) {
     users.slice(-5).reverse().forEach(u => {
       const div = document.createElement("div");
       div.className = "log-entry";
-      div.innerHTML = `<strong>${u.username}</strong> launched as <code>${u.meta_role}</code> via ${u.referral || "origin"} at ${new Date(u.created).toLocaleTimeString()}`;
+      div.innerHTML = `<strong>${u.username}</strong> launched as <code>${u.meta_role || u.role}</code> via ${u.referral || "origin"} at ${new Date(u.created || u.mintTime).toLocaleTimeString()}`;
       log.appendChild(div);
     });
 
     summary.textContent = `Users: ${total} | Earnings: ${earningsEnabled} | SDK: ${sdkReady} | Partners: ${partnerable}`;
     renderLineageTree(users);
-renderActivityThreads(users);  // ✅ NEW
+    renderActivityThreads(users);
   } catch (err) {
     console.error("Error:", err);
     document.getElementById("summaryBox").textContent = "⚠ Error loading protocol data.";
