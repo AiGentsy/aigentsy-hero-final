@@ -173,105 +173,155 @@
   </div>
 
   <script>
-    let authMode = "login";
-    const usernameInput = document.getElementById('usernameInput');
-    const passwordInput = document.getElementById('passwordInput');
-    const agreeCheckbox = document.getElementById('agreeCheckbox');
-    const enterBtn = document.getElementById('enterBtn');
-    const aigentCards = document.querySelectorAll('.aigent-card');
-    const toggleAuthText = document.querySelector('.toggle-auth');
-    let selectedAgent = null;
+  let authMode = "login";
+  const usernameInput = document.getElementById('usernameInput');
+  const passwordInput = document.getElementById('passwordInput');
+  const agreeCheckbox = document.getElementById('agreeCheckbox');
+  const enterBtn = document.getElementById('enterBtn');
+  const aigentCards = document.querySelectorAll('.aigent-card');
+  const toggleAuthText = document.querySelector('.toggle-auth');
+  const aigentsySearch = document.getElementById("aigentsySearch");
+  let selectedAgent = null;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const refCode = urlParams.get("ref");
-    if (refCode) {
-      localStorage.setItem("aigentsyReferral", refCode);
-    }
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get("ref");
+  if (refCode) localStorage.setItem("aigentsyReferral", refCode);
 
-    aigentCards.forEach(card => {
-      card.addEventListener('click', () => {
-        aigentCards.forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedAgent = card.getAttribute('data-agent');
-        updateButtonState();
-      });
-    });
-
-    function updateButtonState() {
-      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-      enterBtn.disabled = !valid;
-    }
-
-    function toggleAuthMode() {
-      authMode = authMode === "login" ? "signup" : "login";
-      toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+  aigentCards.forEach(card => {
+    card.addEventListener('click', () => {
+      aigentCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAgent = card.getAttribute('data-agent');
       updateButtonState();
+    });
+  });
+
+  function updateButtonState() {
+    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+    enterBtn.disabled = !valid;
+  }
+
+  function toggleAuthMode() {
+    authMode = authMode === "login" ? "signup" : "login";
+    toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
+    updateButtonState();
+  }
+
+  usernameInput.addEventListener('input', updateButtonState);
+  passwordInput.addEventListener('input', updateButtonState);
+  agreeCheckbox.addEventListener('change', updateButtonState);
+
+  // 💡 Search suggestion logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchWrapper = document.getElementById("aigentsySearchWrapper");
+    const suggestionBox = document.getElementById("aigentsySuggestion");
+
+    function showSuggestions(value) {
+      const lower = value.toLowerCase();
+      let match = "";
+      if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
+      else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
+      else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
+      else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
+      else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
+      else match = "We’ll build you a custom AiGentsy based on your input.";
+      suggestionBox.innerText = match;
     }
 
-    usernameInput.addEventListener('input', updateButtonState);
-    passwordInput.addEventListener('input', updateButtonState);
-    agreeCheckbox.addEventListener('change', updateButtonState);
+    aigentsySearch.addEventListener("input", (e) => {
+      showSuggestions(e.target.value);
+    });
 
-    // 💡 Search bar reveal and suggestion logic
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchWrapper = document.getElementById("aigentsySearchWrapper");
-      const aigentsySearch = document.getElementById("aigentsySearch");
-      const suggestionBox = document.getElementById("aigentsySuggestion");
+    function maybeShowSearch() {
+      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
+      searchWrapper.style.display = valid ? "block" : "none";
+    }
 
-      function showSuggestions(value) {
-        const lower = value.toLowerCase();
-        let match = "";
-        if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
-        else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
-        else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
-        else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
-        else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
-        else match = "We’ll build you a custom AiGentsy based on your input.";
-        suggestionBox.innerText = match;
-      }
+    usernameInput.addEventListener('input', maybeShowSearch);
+    passwordInput.addEventListener('input', maybeShowSearch);
+    agreeCheckbox.addEventListener('change', maybeShowSearch);
+    aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
+  });
 
-      aigentsySearch.addEventListener("input", (e) => {
-        showSuggestions(e.target.value);
+  // === JSONBin Configuration ===
+  const JSONBIN_URL = "https://api.jsonbin.io/v3/b/https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";       // 🔁 Replace
+  const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";                     // 🔁 Replace
+
+  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+    const now = new Date().toISOString();
+    const roleMap = {
+      "legal": "CLO",
+      "podcast": "CMO",
+      "saas": "CTO",
+      "marketing": "CMO"
+    };
+
+    const entry = {
+      id: crypto.randomUUID(),
+      ventureID: `aigent0-${username.toLowerCase()}`,
+      username,
+      created: now,
+      customInput: customDescription || "",
+      meta_role: roleMap[selectedAgent] || "CEO",
+      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+      referral: referralCode || "origin/hero",
+      lineage_depth: 0,
+      yield_memory: true,
+      compliance_flag: false,
+      partner_ready: true,
+      sdk_eligible: selectedAgent === "saas",
+      earningsEnabled: true,
+      listingStatus: "active",
+      traits: [selectedAgent, "founder", "autonomous", "aigentsy"]
+    };
+
+    try {
+      const response = await fetch(JSONBIN_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": JSONBIN_SECRET
+        },
+        body: JSON.stringify(entry)
       });
 
-      function maybeShowSearch() {
-        const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-        searchWrapper.style.display = valid ? "block" : "none";
-      }
-
-      usernameInput.addEventListener('input', maybeShowSearch);
-      passwordInput.addEventListener('input', maybeShowSearch);
-      agreeCheckbox.addEventListener('change', maybeShowSearch);
-      aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
-    });
-
-    enterBtn.addEventListener('click', () => {
-      const user = usernameInput.value.trim();
-      const pass = passwordInput.value;
-
-      if (authMode === "login") {
-        const storedUser = localStorage.getItem(`user:${user}`);
-        const storedPass = localStorage.getItem(`pass:${user}`);
-        if (!storedUser || storedPass !== pass) {
-          alert("Incorrect username or password. Try again or sign up.");
-          return;
-        }
+      if (!response.ok) {
+        console.error("JSONBin write failed:", await response.text());
       } else {
-        localStorage.setItem(`user:${user}`, user);
-        localStorage.setItem(`pass:${user}`, pass);
+        console.log("User registered to JSONBin:", username);
       }
+    } catch (err) {
+      console.error("JSONBin error:", err);
+    }
+  }
 
-      localStorage.setItem("aigentsyUsername", user);
-      localStorage.setItem("aigentsyUserConsent", "true");
-      localStorage.setItem("aigentsyUserAgent", selectedAgent);
-      localStorage.setItem("aigentsyAuthMode", authMode);
+  enterBtn.addEventListener('click', async () => {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value;
 
-      if (authMode === "signup") {
-        window.location.href = "/start.html";
-      } else {
-        window.location.href = `/agents/aigent-${selectedAgent}.html`;
+    if (authMode === "login") {
+      const storedUser = localStorage.getItem(`user:${user}`);
+      const storedPass = localStorage.getItem(`pass:${user}`);
+      if (!storedUser || storedPass !== pass) {
+        alert("Incorrect username or password. Try again or sign up.");
+        return;
       }
-    });
+    } else {
+      localStorage.setItem(`user:${user}`, user);
+      localStorage.setItem(`pass:${user}`, pass);
+
+      // ✅ Register new user to JSONBin
+      await registerUserToJSONBin(user, selectedAgent, aigentsySearch.value, localStorage.getItem("aigentsyReferral"));
+    }
+
+    localStorage.setItem("aigentsyUsername", user);
+    localStorage.setItem("aigentsyUserConsent", "true");
+    localStorage.setItem("aigentsyUserAgent", selectedAgent);
+    localStorage.setItem("aigentsyAuthMode", authMode);
+
+    // ✅ Always go to AiGent0 (central dashboard)
+    window.location.href = "/start.html";
+  });
   </script>
 </body>
 </html>
