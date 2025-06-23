@@ -244,9 +244,9 @@
   });
 
   // === JSONBin Configuration ===
-  const JSONBIN_URL = "https://api.jsonbin.io/v3/b/https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";       // 🔁 Replace
-  const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";                     // 🔁 Replace
-
+  const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";
+const JSONBIN_SECRET = "Bearer $2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
+    
   async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
     const now = new Date().toISOString();
     const roleMap = {
