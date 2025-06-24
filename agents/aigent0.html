@@ -459,25 +459,42 @@ console.log("📡 Fetching data from JSONBin...");
 
     // === Wallet Chart ===
     const walletChart = document.getElementById('walletChart');
-    if (Chart && walletChart) {
-      new Chart(walletChart, {
-        type: 'bar',
-        data: {
-          labels: ['AIGx Earned', 'Staked', 'Referrals'],
-          datasets: [{
-            data: [user.earnings || 0, user.staked || 0, user.referrals?.length || 0],
-            backgroundColor: '#00bfff', borderRadius: 6
-          }]
+if (Chart && walletChart) {
+  const existingChart = Chart.getChart(walletChart);
+  if (existingChart) {
+    existingChart.destroy(); // ✅ Clean up previous chart instance
+  }
+
+  new Chart(walletChart, {
+    type: 'bar',
+    data: {
+      labels: ['AIGx Earned', 'Staked', 'Referrals'],
+      datasets: [{
+        data: [
+          user.earnings || 0,
+          user.staked || 0,
+          user.referrals?.length || 0
+        ],
+        backgroundColor: '#00bfff',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#888' },
+          grid: { color: '#222' }
         },
-        options: {
-          plugins: { legend: { display: false } },
-          scales: {
-            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-            x: { ticks: { color: '#aaa' }, grid: { display: false } }
-          }
+        x: {
+          ticks: { color: '#aaa' },
+          grid: { display: false }
         }
-      });
+      }
     }
+  });
+}
 
     // === Propagation Metrics ===
     const propagationBox = document.getElementById("propagationBox");
