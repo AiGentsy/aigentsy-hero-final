@@ -392,6 +392,7 @@ async function injectUserDashboard() {
 
   const username = localStorage.getItem("aigentsyUsername");
   console.log("📌 Username from localStorage:", username);
+console.log("📡 Fetching data from JSONBin...");
 
   if (!username) {
     console.warn("⚠️ No username found. Skipping user injection.");
@@ -403,7 +404,9 @@ async function injectUserDashboard() {
       headers: { "X-Master-Key": JSONBIN_SECRET }
     });
     const data = await res.json();
+    console.log("📦 All records from JSONBin:", data.record);
     const user = data.record.find(u => u.username === username);
+    console.log("🔍 Matched user record:", user);
     if (!user) return;
 
     const boxes = document.querySelectorAll(".metric-box");
