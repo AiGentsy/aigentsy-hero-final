@@ -123,6 +123,10 @@
   <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
   <p>Loading executive roles...</p>
 </div>
+    <div class="chart-sidebar-box">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
+  <canvas id="propagationChart" width="300" height="220"></canvas>
+</div>
     <div class="chart-sidebar-box" id="remixSnapshotBox">
   <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
   <p>Loading remix metrics...</p>
@@ -524,7 +528,65 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdk_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-// === Remix Snapshot ===
+    // === Dynamic C-Suite Mapping ===
+const csuiteBox = document.getElementById("csuiteBox");
+if (csuiteBox) {
+  const cSuiteRoles = [
+    { role: "CEO", name: `${username} (You)` },
+    { role: "CTO", name: "AiGent SDK" },
+    { role: "CMO", name: "AiGent Growth" },
+    { role: "CLO", name: "AiGent Remix" },
+    { role: "CFO", name: "AiGent0" }
+  ];
+
+  csuiteBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;">${
+      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
+    }</ul>
+    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+  `;
+}
+
+    // === Propagation Chart (Dynamic Remix/Yield Data) ===
+const propagationCanvas = document.getElementById("propagationChart");
+if (Chart && propagationCanvas) {
+  const remixCount = user.remix?.remixCount || 0;
+  const remixCredits = user.remix?.remixCredits || 0;
+  const vaultYield = user.yield?.vaultYield || 0;
+  const remixYield = user.yield?.remixYield || 0;
+
+  const existing = Chart.getChart(propagationCanvas);
+  if (existing) existing.destroy();
+
+  new Chart(propagationCanvas, {
+    type: 'bar',
+    data: {
+      labels: ['Remixes', 'Credits', 'Vault Yield', 'Remix Yield'],
+      datasets: [{
+        data: [remixCount, remixCredits, vaultYield, remixYield],
+        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#888' },
+          grid: { color: '#222' }
+        },
+        x: {
+          ticks: { color: '#aaa' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+
+    // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
 if (remixBox) {
   const forks = user.remixForks || 0;
