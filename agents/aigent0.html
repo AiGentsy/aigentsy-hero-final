@@ -98,34 +98,28 @@
     <div class="chart-section">
       <canvas id="walletChart" width="300" height="300"></canvas>
     </div>
-    <div class="chart-sidebar-box" id="propagationBox">
-  <h4 style="color:#00bfff; margin-bottom:6px;">🧬 Propagation Metrics</h4>
-  <p>Loading propagation data...</p>
+    <div class="chart-sidebar-box">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
+  <canvas id="propagationChart" width="300" height="220"></canvas>
 </div>
     <div class="chart-sidebar-box" id="overviewBox">
-      <h4>🧠 Your AiGentsy Overview</h4>
-      <ul>
-        <hr style="border-color:#333; margin:10px 0;"/>
-  <p style="font-size:0.85rem; color:#888;">
-  Core functions are now managed by your C-Suite team.
-  </p>
-      </ul>
-      <hr style="border-color:#333; margin:10px 0;"/>
-      <ul>
-        <li><strong>AiGent Legal</strong> — Contracts & IP protections</li>
-        <li><strong>AiGent Finance</strong> — Revenue, staking, cashout</li>
-        <li><strong>AiGent Ops</strong> — Deployments & sync</li>
-        <li><strong>AiGent Clone</strong> — Launches remixed versions</li>
-      </ul>
+  <h4>🧠 Your AiGentsy Overview</h4>
+  <ul>
+    <li><strong>Role:</strong> Venture Builder</li>
+    <li><strong>Type:</strong> B2B</li>
+    <li><strong>Memory:</strong> Yes — remembers what works</li>
+    <li><strong>Dev-Ready:</strong> Yes — downloadable kit</li>
+  </ul>
+  <hr style="border-color:#333; margin:10px 0;"/>
+ <p style="font-size:0.85rem; color:#888;">
+  Executive functions like Legal, Growth, and SDK are now handled by your C-Suite agents.
+</p>
+</div>
       <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
     </div>
    <div class="chart-sidebar-box" id="csuiteBox">
   <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
   <p>Loading executive roles...</p>
-</div>
-    <div class="chart-sidebar-box">
-  <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
-  <canvas id="propagationChart" width="300" height="220"></canvas>
 </div>
     <div class="chart-sidebar-box" id="remixSnapshotBox">
   <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
@@ -503,20 +497,6 @@ if (Chart && walletChart) {
     }
   });
 }
-
-    // === Propagation Metrics ===
-    const propagationBox = document.getElementById("propagationBox");
-    if (propagationBox) {
-      const activeChain = user.activeChain || "origin ➔ you";
-      const yieldRate = user.yieldRate != null ? `${user.yieldRate}%` : "—";
-      const remixChain = user.remixChain || "—";
-
-      propagationBox.innerHTML = `
-        <h4 style="color:#00bfff; margin-bottom:6px;">🧬 Propagation Metrics</h4>
-        <p><strong>Active Chain:</strong> ${activeChain}<br/>
-        <strong>Yield Rate:</strong> ${yieldRate}<br/>
-        <strong>Remix Chain:</strong> ${remixChain}</p>`;
-  }
     
 // === Overview Sidebar ===
 const overviewBox = document.querySelector("#overviewBox ul");
