@@ -405,7 +405,9 @@ console.log("📡 Fetching data from JSONBin...");
     });
     const data = await res.json();
     console.log("📦 All records from JSONBin:", data.record);
-    const user = data.record.find(u => u.username === username);
+    const user = data.record.find(u => 
+  u.username === username || u.consent?.username === username
+);
     console.log("🔍 Matched user record:", user);
     if (!user) return;
 
