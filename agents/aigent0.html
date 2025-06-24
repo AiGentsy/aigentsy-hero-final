@@ -388,8 +388,15 @@ const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest
 const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
 
 async function injectUserDashboard() {
+  console.log("👀 injectUserDashboard() called");
+
   const username = localStorage.getItem("aigentsyUsername");
-  if (!username) return;
+  console.log("📌 Username from localStorage:", username);
+
+  if (!username) {
+    console.warn("⚠️ No username found. Skipping user injection.");
+    return;
+  }
 
   try {
     const res = await fetch(JSONBIN_URL, {
