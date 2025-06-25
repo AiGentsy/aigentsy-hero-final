@@ -579,8 +579,94 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
+async function autoMatchEngine(username) {
+  const res = await fetch(JSONBIN_URL, {
+    headers: { "X-Master-Key": JSONBIN_SECRET }
+  });
+  const data = await res.json();
+  const user = data.record.find(u => u.username === username || u.consent?.username === username);
+  if (!user) return;
 
-window.addEventListener("DOMContentLoaded", injectUserDashboard);
+  const { traits = [], role = '', business_type = '', unlocked = [] } = user;
+  const offers = [];
+
+  if (!unlocked.includes("SDK") && (traits.includes("builder") || role === "CTO" || user.sdk_eligible)) {
+    offers.push({
+      id: "SDK",
+      label: "SDK Unlock",
+      stripeLink: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+    });
+  }
+
+  if (!unlocked.includes("Legal") && (traits.includes("legal") || role === "CLO")) {
+    offers.push({
+      id: "Legal",
+      label: "Legal Kit Unlock",
+      stripeLink: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+    });
+  }
+
+  if (!unlocked.includes("Remix") && (traits.includes("creator") || business_type === "media")) {
+    offers.push({
+      id: "Remix",
+      label: "Remix Unlock",
+      stripeLink: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+    });
+  }
+
+  const sdkBox = Array.from(document.querySelectorAll(".metric-box"))
+    .find(box => box.querySelector("h3")?.textContent.includes("SDK"));
+  if (!sdkBox) return;
+
+  const ul = sdkBox.querySelector("ul");
+  if (!ul) return;
+
+  offers.forEach(o => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span style="color:#00bfff;font-weight:600;">${o.label}</span>
+      <button class="btn-glow" style="margin-left:10px;" onclick="unlockOffering('${username}', '${o.id}', '${o.stripeLink}')">Unlock</button>
+    `;
+    ul.appendChild(li);
+  });
+}
+
+async function unlockOffering(username, offeringId, stripeLink) {
+  window.open(stripeLink, "_blank");
+  setTimeout(async () => {
+    if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
+
+    const res = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+    const data = await res.json();
+    const index = data.record.findIndex(u => u.username === username || u.consent?.username === username);
+    if (index === -1) return;
+
+    const user = data.record[index];
+    if (!user.unlocked) user.unlocked = [];
+    if (!user.unlocked.includes(offeringId)) user.unlocked.push(offeringId);
+
+    await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_SECRET
+      },
+      body: JSON.stringify(data.record)
+    });
+
+    alert(`${offeringId} unlocked and logged. Reloading UI...`);
+    window.location.reload();
+  }, 3000);
+}
+
+// 🔁 Run on page load
+window.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username) {
+    injectUserDashboard();
+    autoMatchEngine(username);
+  }
+});
 </script>
 </body>
 </html>
