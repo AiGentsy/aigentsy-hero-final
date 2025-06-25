@@ -717,10 +717,11 @@ function openModal(type) {
   if (!o) return;
 
   document.getElementById("modalContent").innerHTML = `
-    <h2 style="margin-bottom:1rem;">${o.title}</h2>
-    <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
-    <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
-  `;
+  <h2 style="margin-bottom:1rem;">${o.title}</h2>
+  <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
+  <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
+`;
+
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
