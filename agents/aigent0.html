@@ -586,42 +586,56 @@ if (activityBox) {
     });
     const data = await res.json();
     const user = data.record.find(u =>
-      u.consent?.username === username || u.username === username
+      u.username === username || u.consent?.username === username
     );
     if (!user) return;
+
+    const { traits = "", role = "", business_type = "", sdk_eligible, remixUnlocked, vaultAccess, sdkAccess } = user;
+    const traitList = typeof traits === "string" ? traits.split(",").map(t => t.trim()) : [];
 
     const list = document.getElementById("autoMatchOfferings");
     if (!list) return;
 
-    const offerings = [
-      {
+    const offerings = [];
+
+    if (!sdkAccess && (traitList.includes("builder") || role === "CTO" || sdk_eligible)) {
+      offerings.push({
         id: "SDK",
         label: "SDK Access",
         accessKey: "sdkAccess",
         stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
-      },
-      {
+      });
+    }
+
+    if (!vaultAccess && (traitList.includes("legal") || role === "CLO")) {
+      offerings.push({
         id: "Vault",
         label: "Vault License",
         accessKey: "vaultAccess",
         stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
-      },
-      {
+      });
+    }
+
+    if (!remixUnlocked && (traitList.includes("creator") || business_type === "media")) {
+      offerings.push({
         id: "Remix",
         label: "Remix Unlock",
         accessKey: "remixUnlocked",
         stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-      }
-    ];
+      });
+    }
+
+    if (offerings.length === 0) {
+      list.innerHTML = `<li>No unlocks available at this time. ✅</li>`;
+      return;
+    }
 
     offerings.forEach(offering => {
       const li = document.createElement("li");
-      const unlocked = user[offering.accessKey];
-
-      li.innerHTML = unlocked
-        ? `✅ <strong>${offering.label}</strong> already unlocked`
-        : `<button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">🔓 Unlock ${offering.label}</button>`;
-
+      li.innerHTML = `
+        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
+          🔓 Unlock ${offering.label}
+        </button>`;
       list.appendChild(li);
     });
   } catch (err) {
