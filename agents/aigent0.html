@@ -586,49 +586,69 @@ if (activityBox) {
   }
 }
   async function autoMatchEngine(username) {
-  try {
-  const res = await fetch(JSONBIN_URL, {
-    headers: { "X-Master-Key": JSONBIN_SECRET }
-  });
-  const data = await res.json();
-  const user = data.record.find(u =>
-    u.consent?.username === username || u.username === username
-  );
-  if (!user) return;
-
-  const list = document.getElementById("autoMatchOfferings");
-  if (!list) return;
-
-  const offerings = [];
-
-  if (!user.remixUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
-    offerings.push({
-      id: "Remix",
-      label: "Remix Unlock",
-      accessKey: "remixUnlocked",
-      stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+  ry {
+    const res = await fetch(JSONBIN_URL, {
+      headers: { "X-Master-Key": JSONBIN_SECRET }
     });
-  }
+    const data = await res.json();
+    const user = data.record.find(u =>
+      u.username === username || u.consent?.username === username
+    );
+    if (!user) return;
 
-  // ✅ Check before appending anything
-  if (offerings.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No unlocks available at this time. ✅";
-    list.appendChild(li);
-    return;
-  }
+    const { traits = "", role = "", business_type = "", sdk_eligible, remixUnlocked, vaultAccess, sdkAccess } = user;
+    const traitList = typeof traits === "string" ? traits.split(",").map(t => t.trim()) : [];
 
-  offerings.forEach(offering => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-        🔓 Unlock ${offering.label}
-      </button>`;
-    list.appendChild(li);
-  });
-} catch (err) {
-  console.error("AutoMatch Engine Error:", err);
+    const list = document.getElementById("autoMatchOfferings");
+    if (!list) return;
+
+    const offerings = [];
+
+    if (!sdkAccess && (traitList.includes("builder") || role === "CTO" || sdk_eligible)) {
+      offerings.push({
+        id: "SDK",
+        label: "SDK Access",
+        accessKey: "sdkAccess",
+        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+      });
+    }
+
+    if (!vaultAccess && (traitList.includes("legal") || role === "CLO")) {
+      offerings.push({
+        id: "Vault",
+        label: "Vault License",
+        accessKey: "vaultAccess",
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      });
+    }
+
+    if (!remixUnlocked && (traitList.includes("creator") || business_type === "media")) {
+      offerings.push({
+        id: "Remix",
+        label: "Remix Unlock",
+        accessKey: "remixUnlocked",
+        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+      });
+    }
+
+    if (!list.hasChildNodes()) {
+  const li = document.createElement("li");
+  li.textContent = "No unlocks available at this time. ✅";
+  list.appendChild(li);
 }
+    }
+
+    offerings.forEach(offering => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
+          🔓 Unlock ${offering.label}
+        </button>`;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    console.error("AutoMatch Engine Error:", err);
+  }
   
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
