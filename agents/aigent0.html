@@ -236,7 +236,7 @@ function explainTerms(text) {
   };
 
   for (const [term, casual] of Object.entries(terms)) {
-    const plainRegex = new RegExp(\\b${term}\\b, 'g');
+    const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
     const alreadyExplainedRegex = new RegExp(${term} \\(.*?\\), 'g');
 
     // Only replace plain terms that haven't already been explained
