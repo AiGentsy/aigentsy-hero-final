@@ -579,7 +579,9 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
-async function autoMatchEngine(username) {
+  async function autoMatchEngine(username) {
+  console.log("🎯 AutoMatch running for:", username);
+
   const res = await fetch(JSONBIN_URL, {
     headers: { "X-Master-Key": JSONBIN_SECRET }
   });
@@ -587,7 +589,15 @@ async function autoMatchEngine(username) {
   const user = data.record.find(u => u.username === username || u.consent?.username === username);
   if (!user) return;
 
-  const { traits = [], role = '', business_type = '', unlocked = [] } = user;
+  // ✅ Safe parsing of traits
+  const traitsRaw = user.traits || "";
+  const traits = Array.isArray(traitsRaw)
+    ? traitsRaw
+    : traitsRaw.split(',').map(t => t.trim());
+
+  const { role = '', business_type = '', unlocked = [] } = user;
+  console.log("Traits:", traits, "Unlocked:", unlocked);
+
   const offers = [];
 
   if (!unlocked.includes("SDK") && (traits.includes("builder") || role === "CTO" || user.sdk_eligible)) {
