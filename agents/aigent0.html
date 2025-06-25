@@ -141,7 +141,7 @@
 
     <div class="metric-box">
       <h3>📦 SDK & Licensing</h3>
-      <ul></ul>
+        <ul id="autoMatchOfferings"></ul>
       <a class="btn-glow" href="/sdk.html?agent=AUTO-001">🚀 Launch SDK</a>
       <a class="btn-glow" href="/license.html?agent=AUTO-001">💼 View License</a>
     </div>
@@ -580,67 +580,55 @@ if (activityBox) {
   }
 }
   async function autoMatchEngine(username) {
-  console.log("🎯 AutoMatch running for:", username);
-
-  const res = await fetch(JSONBIN_URL, {
-    headers: { "X-Master-Key": JSONBIN_SECRET }
-  });
-  const data = await res.json();
-  const user = data.record.find(u => u.username === username || u.consent?.username === username);
-  if (!user) return;
-
-  // ✅ Safe parsing of traits
-  const traitsRaw = user.traits || "";
-  const traits = Array.isArray(traitsRaw)
-    ? traitsRaw
-    : traitsRaw.split(',').map(t => t.trim());
-
-  const { role = '', business_type = '', unlocked = [] } = user;
-  console.log("Traits:", traits, "Unlocked:", unlocked);
-
-  const offers = [];
-
-  if (!unlocked.includes("SDK") && (traits.includes("builder") || role === "CTO" || user.sdk_eligible)) {
-    offers.push({
-      id: "SDK",
-      label: "SDK Unlock",
-      stripeLink: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+  try {
+    const res = await fetch(JSONBIN_URL, {
+      headers: { "X-Master-Key": JSONBIN_SECRET }
     });
-  }
+    const data = await res.json();
+    const user = data.record.find(u =>
+      u.consent?.username === username || u.username === username
+    );
+    if (!user) return;
 
-  if (!unlocked.includes("Legal") && (traits.includes("legal") || role === "CLO")) {
-    offers.push({
-      id: "Legal",
-      label: "Legal Kit Unlock",
-      stripeLink: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+    const list = document.getElementById("autoMatchOfferings");
+    if (!list) return;
+
+    const offerings = [
+      {
+        id: "SDK",
+        label: "SDK Access",
+        accessKey: "sdkAccess",
+        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+      },
+      {
+        id: "Vault",
+        label: "Vault License",
+        accessKey: "vaultAccess",
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "Remix",
+        label: "Remix Unlock",
+        accessKey: "remixUnlocked",
+        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+      }
+    ];
+
+    offerings.forEach(offering => {
+      const li = document.createElement("li");
+      const unlocked = user[offering.accessKey];
+
+      li.innerHTML = unlocked
+        ? `✅ <strong>${offering.label}</strong> already unlocked`
+        : `<button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">🔓 Unlock ${offering.label}</button>`;
+
+      list.appendChild(li);
     });
+  } catch (err) {
+    console.error("AutoMatch Engine Error:", err);
   }
-
-  if (!unlocked.includes("Remix") && (traits.includes("creator") || business_type === "media")) {
-    offers.push({
-      id: "Remix",
-      label: "Remix Unlock",
-      stripeLink: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-    });
-  }
-
-  const sdkBox = Array.from(document.querySelectorAll(".metric-box"))
-    .find(box => box.querySelector("h3")?.textContent.includes("SDK"));
-  if (!sdkBox) return;
-
-  const ul = sdkBox.querySelector("ul");
-  if (!ul) return;
-
-  offers.forEach(o => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <span style="color:#00bfff;font-weight:600;">${o.label}</span>
-      <button class="btn-glow" style="margin-left:10px;" onclick="unlockOffering('${username}', '${o.id}', '${o.stripeLink}')">Unlock</button>
-    `;
-    ul.appendChild(li);
-  });
 }
-
+  
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
   setTimeout(async () => {
