@@ -237,7 +237,7 @@ function explainTerms(text) {
 
   for (const [term, casual] of Object.entries(terms)) {
     const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
-    const alreadyExplainedRegex = new RegExp(${term} \\(.*?\\), 'g');
+   const alreadyExplainedRegex = new RegExp(`${term} \\(.*?\\)`, 'g');
 
     // Only replace plain terms that haven't already been explained
     text = text.replace(plainRegex, match => {
@@ -277,7 +277,7 @@ async function runAgent() {
 
   const userMsg = document.createElement("div");
   userMsg.className = "chat-user";
-  userMsg.textContent = 🧠 You: ${input};
+ userMsg.textContent = `🧠 You: ${input}`;
   chatLog.appendChild(userMsg);
   chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
