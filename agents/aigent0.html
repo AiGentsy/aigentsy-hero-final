@@ -126,7 +126,7 @@
 </div>
 <div class="metric-box">
 <h3>🧠 Chat Interface</h3>
-<textarea id="agentInput" name placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+<textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
 <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button></div>
 <div class="metric-box">
 <h3>💼 Real-World Earnings</h3>
@@ -169,10 +169,8 @@
 </div>
 <div class="metric-box">
 <h3>📊 Growth &amp; Deployment</h3>
-
 </div>
 </div>
-
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -395,26 +393,26 @@ console.log("📡 Fetching data from JSONBin...");
           <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
           <li><strong>Clients:</strong> ${user.clients || 0}</li>
           <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
-          <li><strong>AIGx Earned (Real-World):</strong> +${user.earnings || 0}</li>`;
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.yield?.aigxEarned || 0}</li>`;
       }
 
       if (title.includes("SDK & Licensing")) {
         ul.innerHTML = `
-          <li><strong>SDK Eligible:</strong> ${user.sdk_eligible ? "✅ Yes" : "—"}</li>
+          <li><strong>SDK Eligible:</strong> ${user.traits?.sdk_spawner ? "✅ Yes" : "—"}</li>
           <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
       }
 
-      if (title.includes("Wallet")) {
+if (title.includes("Wallet")) {
         ul.innerHTML = `
-          <li><strong>AIGx Earned:</strong> ${user.earnings || 0}</li>
-          <li><strong>Staked:</strong> ${user.staked || 0}</li>
-          <li><strong>Referrals:</strong> ${user.referrals?.length || 0} active</li>`;
+          <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
+          <li><strong>Staked:</strong> ${user.staked ? 1 : 0 ? "✅ Yes" : "—"}</li>
+          <li><strong>Referrals:</strong> ${user.referrals?.length || 0 || 0} active</li>`;
       }
 
       if (title.includes("Growth & Deployment")) {
         ul.innerHTML = `
           <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
-          <li><strong>New Referrals:</strong> ${user.referrals?.length || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.referrals?.length || 0 || 0}</li>
           <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
           <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
           <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
@@ -425,7 +423,7 @@ console.log("📡 Fetching data from JSONBin...");
         ul.innerHTML = `
           <li><strong>ID:</strong> ${user.id}</li>
           <li><strong>Minted As:</strong> AiGent Venture</li>
-          <li><strong>Status:</strong> Bound + ${user.earningsEnabled ? "Monetizing" : "Idle"}</li>`;
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
       }
     });
 
@@ -443,9 +441,9 @@ if (Chart && walletChart) {
       labels: ['AIGx Earned', 'Staked', 'Referrals'],
       datasets: [{
         data: [
-          user.earnings || 0,
-          user.staked || 0,
-          user.referrals?.length || 0
+          user.yield?.aigxEarned || 0,
+          user.staked ? 1 : 0 ? 1 : 0,
+          user.referrals?.length || 0 || 0
         ],
         backgroundColor: '#00bfff',
         borderRadius: 6
@@ -475,7 +473,7 @@ if (overviewBox) {
     <li><strong>Role:</strong> ${user.meta_role || "—"}</li>
     <li><strong>Type:</strong> ${user.customInput || "B2B SaaS"}</li>
     <li><strong>Memory:</strong> ${user.yield_memory ? "Yes — remembers what works" : "—"}</li>
-    <li><strong>Dev-Ready:</strong> ${user.sdk_eligible ? "Yes — downloadable kit" : "No"}</li>`;
+    <li><strong>Dev-Ready:</strong> ${user.traits?.sdk_spawner ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
     // === Dynamic C-Suite Mapping ===
@@ -583,7 +581,7 @@ if (activityBox) {
 
   const offerings = [];
 
-  if (!user.remixUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
+  if (!user.remix?.remixCount > 0 && (user.traits?.includes("creator") || user.business_type === "media")) {
     offerings.push({
       id: "Remix",
       label: "Remix Unlock",
@@ -659,17 +657,14 @@ async function unlockOffering(username, offeringId, stripeLink) {
       injectUserDashboard();
       autoMatchEngine(username);
     }
-  });
-</script>
-
+  });</script>
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
-  <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
-    <button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
-    <div id="modalContent"></div>
-  </div>
+<div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+<button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+<div id="modalContent"></div>
 </div>
-
+</div>
 <script>
   function openModal(type) {
     const username = localStorage.getItem("aigentsyUsername");
