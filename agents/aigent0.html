@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<title>Autonomous AiGentsy Launchpad</title>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="/vaults.css" rel="stylesheet"/>
-<link href="/theme.css" rel="stylesheet"/>
-<script defer="" src="/access-check.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
+  <meta charset="utf-8"/>
+  <title>Autonomous AiGentsy Launchpad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="/vaults.css" rel="stylesheet"/>
+  <link href="/theme.css" rel="stylesheet"/>
+  <script defer src="/access-check.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
@@ -94,85 +93,95 @@
   </style>
 </head>
 <body>
-<div class="sidebar">
-<img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-<div class="chart-section">
-<canvas height="300" id="walletChart" width="300"></canvas>
-</div>
-<div class="chart-sidebar-box">
-<h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
-<canvas height="220" id="propagationChart" width="300"></canvas>
-</div>
-<div class="chart-sidebar-box" id="csuiteBox">
-<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-<p>Loading executive roles...</p>
-</div>
-<div class="chart-sidebar-box" id="remixSnapshotBox">
-<h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-<p>Loading remix metrics...</p>
-<p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
-</div>
-</div> <!-- ✅ CLOSE sidebar -->
-<div class="main">
-<div class="metric-box full-width">
-<h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
-<p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
-<p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
-<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.</p>
-<div style="margin-top:16px;">
-<p style="color:#00bfff"><strong>Self-Expanding</strong></p>
-<p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
-</div>
-</div>
-<div class="metric-box">
-<h3>🧠 Chat Interface</h3>
-<textarea id="agentInput" name placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-<button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button></div>
-<div class="metric-box">
-<h3>💼 Real-World Earnings</h3>
-<ul></ul>
-</div>
-<div class="metric-box">
-<h3>📦 SDK &amp; Licensing</h3>
-<!-- Injected by autoMatchEngine -->
-<ul id="autoMatchOfferings"></ul>
-<!-- Modal-triggering buttons -->
-<button class="btn-glow" onclick="openModal('sdk')">🚀 Unlock SDK</button>
-<button class="btn-glow" onclick="openModal('vault')">💼 Unlock Vault</button>
-<button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
-<button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
-</div>
-<div class="metric-box">
-<h3>📡 Activity Feed</h3>
-<ul></ul>
-<div style="margin-top: 10px;">
-<h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
-<a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
-</div>
-</div>
-<div class="metric-box">
-<h3>💰 Wallet &amp; Off-Ramp</h3>
-<ul> </ul>
-<a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
-</div>
-<div class="metric-box">
-<h3>📊 Mint Snapshot</h3>
-<ul></ul>
-<a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
-<a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
-</div>
-<div class="metric-box">
-<h3>⚔️ Remix Arena Challenge</h3>
-<p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
-<a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
-</div>
-<div class="metric-box">
-<h3>📊 Growth &amp; Deployment</h3>
+  <div class="sidebar">
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo"/>
+    <div class="chart-section">
+      <canvas id="walletChart" width="300" height="300"></canvas>
+    </div>
 
-</div>
-</div>
-<script>
+    <div class="chart-sidebar-box">
+      <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
+      <canvas id="propagationChart" width="300" height="220"></canvas>
+    </div>
+
+    <div class="chart-sidebar-box" id="csuiteBox">
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <p>Loading executive roles...</p>
+    </div>
+
+    <div class="chart-sidebar-box" id="remixSnapshotBox">
+      <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+      <p>Loading remix metrics...</p>
+      <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
+    </div>
+  </div> <!-- ✅ CLOSE sidebar -->
+
+  <div class="main">
+    <div class="metric-box full-width">
+      <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
+      <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
+      <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+      <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.</p>
+      <div style="margin-top:16px;">
+        <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+        <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+      </div>
+    </div>
+
+    <div class="metric-box">
+      <h3>🧠 Chat Interface</h3>
+      <textarea placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+      <button class="btn-glow" style="margin-top:10px;">Send</button>
+    </div>
+
+    <div class="metric-box">
+      <h3>💼 Real-World Earnings</h3>
+      <ul></ul>
+    </div>
+
+    <div class="metric-box">
+      <h3>📦 SDK & Licensing</h3>
+      <ul></ul>
+      <a class="btn-glow" href="/sdk.html?agent=AUTO-001">🚀 Launch SDK</a>
+      <a class="btn-glow" href="/license.html?agent=AUTO-001">💼 View License</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📡 Activity Feed</h3>
+      <ul></ul>
+      <div style="margin-top: 10px;">
+        <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+        <a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+        <a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+      </div>
+    </div>
+
+    <div class="metric-box">
+      <h3>💰 Wallet & Off-Ramp</h3>
+      <ul> </ul>
+      <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Mint Snapshot</h3>
+      <ul></ul>
+      <a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
+      <a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>⚔️ Remix Arena Challenge</h3>
+      <p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
+      <a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
+    </div>
+
+    <div class="metric-box">
+      <h3>📊 Growth & Deployment</h3>
+      </ul></ul>
+    </div>
+  </div>
+
+  <script>
     window.addEventListener('DOMContentLoaded', () => {
       const ctx = document.getElementById('walletChart');
       if (ctx) {
@@ -197,7 +206,7 @@
       }
     });
   </script>
-<!-- PATCH: AiGentsy Simplified Runtime Injection -->
+  <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
 const chatLog = document.createElement("div");
@@ -225,8 +234,8 @@ function explainTerms(text) {
   };
 
   for (const [term, casual] of Object.entries(terms)) {
-    const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
-    const alreadyExplainedRegex = new RegExp(`${term} \\(.*?\\)`, 'g');
+    const plainRegex = new RegExp(\\b${term}\\b, 'g');
+    const alreadyExplainedRegex = new RegExp(${term} \\(.*?\\), 'g');
 
     // Only replace plain terms that haven't already been explained
     text = text.replace(plainRegex, match => {
@@ -239,7 +248,7 @@ function explainTerms(text) {
 
 function formatResponseEnhanced(text) {
   let cleaned = text
-    .replace(/[*_~`>#-]/g, '') // remove basic markdown
+    .replace(/[*_~>#-]/g, '') // remove basic markdown
     .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip markdown links
     .replace(/\n+/g, ' ') // flatten newlines
     .replace(/\s+/g, ' ') // normalize spacing
@@ -252,7 +261,7 @@ function formatResponseEnhanced(text) {
     'Yield Memory', 'C-Suite', 'Partner Match'
   ];
   highlights.forEach(term => {
-    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+    const regex = new RegExp(\\b(${term})\\b, 'gi');
     cleaned = cleaned.replace(regex, '$1'); // remove bolding (no markdown)
   });
 
@@ -266,7 +275,7 @@ async function runAgent() {
 
   const userMsg = document.createElement("div");
   userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
+  userMsg.textContent = 🧠 You: ${input};
   chatLog.appendChild(userMsg);
   chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
@@ -283,7 +292,7 @@ async function runAgent() {
   const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let’s do it"];
   const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
   if (shortConfirm.includes(input.toLowerCase()) && lastAgentTurn) {
-    conditionedInput = `${lastAgentTurn.replace("🤖 Legal AiGentsy:", "").trim()}\n\nPlease continue based on this.`;
+    conditionedInput = ${lastAgentTurn.replace("🤖 Legal AiGentsy:", "").trim()}\n\nPlease continue based on this.;
   }
 
   try {
@@ -333,29 +342,22 @@ if (
   body: JSON.stringify({ input: conditionedInput, memory })
 });
 
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ Invalid JSON from endpoint:", text);
-      throw new Error("Server returned non-JSON. Check endpoint or network.");
-    }
+    const data = await res.json();
     let reply = formatResponseEnhanced(data.output || "No response.");
 
     const agentRole = getAgentRoleFromEndpoint(endpoint);
-loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+loader.textContent = 🤖 ${agentRole}:\n${reply};
 
     // Optional: Add visual buttons again
     const buttons = document.createElement("div");
     buttons.style.marginTop = "12px";
-    buttons.innerHTML = `
+    buttons.innerHTML = 
       <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
       <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>;
     loader.appendChild(buttons);
 
-    memory.push(`🤖 ${reply}`);
+    memory.push(🤖 ${reply});
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
   } catch (err) {
@@ -392,14 +394,7 @@ console.log("📡 Fetching data from JSONBin...");
     const res = await fetch(JSONBIN_URL, {
       headers: { "X-Master-Key": JSONBIN_SECRET }
     });
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ Invalid JSON from endpoint:", text);
-      throw new Error("Server returned non-JSON. Check endpoint or network.");
-    }
+    const data = await res.json();
     console.log("📦 All records from JSONBin:", data.record);
     const user = data.record.find(u => 
   u.username === username || u.consent?.username === username
@@ -415,41 +410,41 @@ console.log("📡 Fetching data from JSONBin...");
       if (!ul) return;
 
       if (title.includes("Real-World Earnings")) {
-        ul.innerHTML = `
+        ul.innerHTML = 
           <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
           <li><strong>Clients:</strong> ${user.clients || 0}</li>
           <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
-          <li><strong>AIGx Earned (Real-World):</strong> +${user.earnings || 0}</li>`;
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.earnings || 0}</li>;
       }
 
       if (title.includes("SDK & Licensing")) {
-        ul.innerHTML = `
+        ul.innerHTML = 
           <li><strong>SDK Eligible:</strong> ${user.sdk_eligible ? "✅ Yes" : "—"}</li>
-          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
+          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>;
       }
 
       if (title.includes("Wallet")) {
-        ul.innerHTML = `
+        ul.innerHTML = 
           <li><strong>AIGx Earned:</strong> ${user.earnings || 0}</li>
           <li><strong>Staked:</strong> ${user.staked || 0}</li>
-          <li><strong>Referrals:</strong> ${user.referrals?.length || 0} active</li>`;
+          <li><strong>Referrals:</strong> ${user.referrals?.length || 0} active</li>;
       }
 
       if (title.includes("Growth & Deployment")) {
-        ul.innerHTML = `
+        ul.innerHTML = 
           <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
           <li><strong>New Referrals:</strong> ${user.referrals?.length || 0}</li>
           <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
           <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
           <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
-          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
+          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>;
       }
 
       if (title.includes("Mint Snapshot")) {
-        ul.innerHTML = `
+        ul.innerHTML = 
           <li><strong>ID:</strong> ${user.id}</li>
           <li><strong>Minted As:</strong> AiGent Venture</li>
-          <li><strong>Status:</strong> Bound + ${user.earningsEnabled ? "Monetizing" : "Idle"}</li>`;
+          <li><strong>Status:</strong> Bound + ${user.earningsEnabled ? "Monetizing" : "Idle"}</li>;
       }
     });
 
@@ -495,31 +490,31 @@ if (Chart && walletChart) {
 // === Overview Sidebar ===
 const overviewBox = document.querySelector("#overviewBox ul");
 if (overviewBox) {
-  overviewBox.innerHTML = `
+  overviewBox.innerHTML = 
     <li><strong>Role:</strong> ${user.meta_role || "—"}</li>
     <li><strong>Type:</strong> ${user.customInput || "B2B SaaS"}</li>
     <li><strong>Memory:</strong> ${user.yield_memory ? "Yes — remembers what works" : "—"}</li>
-    <li><strong>Dev-Ready:</strong> ${user.sdk_eligible ? "Yes — downloadable kit" : "No"}</li>`;
+    <li><strong>Dev-Ready:</strong> ${user.sdk_eligible ? "Yes — downloadable kit" : "No"}</li>;
 }
 
     // === Dynamic C-Suite Mapping ===
 const csuiteBox = document.getElementById("csuiteBox");
 if (csuiteBox) {
   const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
+    { role: "CEO", name: ${username} (You) },
     { role: "CTO", name: "AiGent SDK" },
     { role: "CMO", name: "AiGent Growth" },
     { role: "CLO", name: "AiGent Remix" },
     { role: "CFO", name: "AiGent0" }
   ];
 
-  csuiteBox.innerHTML = `
+  csuiteBox.innerHTML = 
     <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
     <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
+      cSuiteRoles.map(({ role, name }) => <li><strong>${role}:</strong> ${name}</li>).join("")
     }</ul>
     <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
+  ;
 }
 
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
@@ -566,9 +561,9 @@ if (remixBox) {
   const forks = user.remixForks || 0;
   const spread = user.lineageSpread || "—";
   const strategy = user.remixStrategy || "—";
-  remixBox.innerHTML = `
+  remixBox.innerHTML = 
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
+    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>;
 }
    
     // === Activity Feed ===
@@ -576,7 +571,7 @@ const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textConte
 if (activityBox) {
   const feedUl = activityBox.querySelector("ul");
   if (feedUl && user.activity && user.activity.length) {
-    feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
+    feedUl.innerHTML = user.activity.map(entry => <li>${entry}</li>).join('');
   }
 }
  
@@ -584,106 +579,8 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
-  async function autoMatchEngine(username) {
-  try {
-  const res = await fetch(JSONBIN_URL, {
-    headers: { "X-Master-Key": JSONBIN_SECRET }
-  });
-  const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ Invalid JSON from endpoint:", text);
-      throw new Error("Server returned non-JSON. Check endpoint or network.");
-    }
-  const user = data.record.find(u =>
-    u.consent?.username === username || u.username === username
-  );
-  if (!user) return;
 
-  const list = document.getElementById("autoMatchOfferings");
-  if (!list) return;
-
-  const offerings = [];
-
-  if (!user.remixUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
-    offerings.push({
-      id: "Remix",
-      label: "Remix Unlock",
-      accessKey: "remixUnlocked",
-      stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-    });
-  }
-
-  // ✅ Check before appending anything
-  if (offerings.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No unlocks available at this time. ✅";
-    list.appendChild(li);
-    return;
-  }
-
-  offerings.forEach(offering => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-        🔓 Unlock ${offering.label}
-      </button>`;
-    list.appendChild(li);
-  });
-} catch (err) {
-  console.error("AutoMatch Engine Error:", err);
-}
-  
-async function unlockOffering(username, offeringId, stripeLink) {
-  window.open(stripeLink, "_blank");
-  setTimeout(async () => {
-    if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
-
-    const res = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      console.error("❌ Invalid JSON from endpoint:", text);
-      throw new Error("Server returned non-JSON. Check endpoint or network.");
-    }
-    const index = data.record.findIndex(u => u.username === username || u.consent?.username === username);
-    if (index === -1) return;
-
-    const user = data.record[index];
-    if (!user.unlocked) user.unlocked = [];
-    if (!user.unlocked.includes(offeringId)) user.unlocked.push(offeringId);
-
-    await fetch(JSONBIN_URL, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Master-Key": JSONBIN_SECRET
-      },
-      body: JSON.stringify(data.record)
-    });
-
-    alert(`${offeringId} unlocked and logged. Reloading UI...`);
-    window.location.reload();
-  }, 3000);
-}
-
-// 🔁 Run on page load
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
-
-  try {
-    injectUserDashboard();
-    autoMatchEngine(username);
-  } catch (e) {
-    console.error("🚨 injectUserDashboard or autoMatchEngine error:", e);
-  }
-});
-
+window.addEventListener("DOMContentLoaded", injectUserDashboard);
 </script>
 </body>
 </html>
