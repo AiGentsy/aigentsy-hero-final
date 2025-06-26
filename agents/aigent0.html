@@ -738,6 +738,164 @@ async function unlockOffering(username, offeringId, stripeLink) {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+    <script>
+// === INJECT USER DASHBOARD FROM JSONBIN ===
+async function injectUserDashboard() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+
+  try {
+    const res = await fetch(window?.env?.JSONBIN_URL || "", {
+      headers: { "X-Master-Key": window?.env?.JSONBIN_SECRET || "" }
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
+    const user = data.record.find(u => 
+      u.username === username || u.consent?.username === username
+    );
+    if (!user) return;
+
+    const boxes = document.querySelectorAll(".metric-box");
+
+    boxes.forEach(box => {
+      const title = box.querySelector("h3")?.textContent || "";
+      const ul = box.querySelector("ul");
+      if (!ul) return;
+
+      if (title.includes("Real-World Earnings")) {
+        ul.innerHTML = `
+          <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
+          <li><strong>Clients:</strong> ${user.clients || 0}</li>
+          <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.yield?.aigxEarned || 0}</li>`;
+      }
+
+      if (title.includes("SDK & Licensing")) {
+        ul.innerHTML = `
+          <li><strong>SDK Eligible:</strong> ${user.sdkAccess_eligible ? "✅ Yes" : "—"}</li>
+          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Wallet")) {
+        ul.innerHTML = `
+          <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
+          <li><strong>Staked:</strong> ${user.staked || 0}</li>
+          <li><strong>Referrals:</strong> ${user.cloneLineage?.length || 0} active</li>`;
+      }
+
+      if (title.includes("Growth & Deployment")) {
+        ul.innerHTML = `
+          <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0}</li>
+          <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
+          <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
+          <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
+          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Mint Snapshot")) {
+        ul.innerHTML = `
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
+      }
+    });
+
+    // === Wallet Chart ===
+    const walletChart = document.getElementById('walletChart');
+    if (Chart && walletChart) {
+      const existingChart = Chart.getChart(walletChart);
+      if (existingChart) existingChart.destroy();
+
+      new Chart(walletChart, {
+        type: 'bar',
+        data: {
+          labels: ['AIGx Earned', 'Staked', 'Referrals'],
+          datasets: [{
+            data: [
+              user.yield?.aigxEarned || 0,
+              user.staked || 0,
+              user.cloneLineage?.length || 0
+            ],
+            backgroundColor: '#00bfff',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+            x: { ticks: { color: '#aaa' }, grid: { display: false } }
+          }
+        }
+      });
+    }
+
+  } catch (err) {
+    console.error("❌ injectUserDashboard() error:", err);
+  }
+}
+
+// === AUTO-MATCH ENGINE — OFFERINGS LOGIC ===
+async function autoMatchEngine(username) {
+  try {
+    const res = await fetch(window?.env?.JSONBIN_URL || "", {
+      headers: { "X-Master-Key": window?.env?.JSONBIN_SECRET || "" }
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
+    const user = data.record.find(u => 
+      u.username === username || u.consent?.username === username
+    );
+    if (!user) return;
+
+    const list = document.getElementById("autoMatchOfferings");
+    if (!list) return;
+
+    const offerings = [];
+
+    if (!user.remix?.remixUnlocked && (user.traits?.creator || user.business_type === "media")) {
+      offerings.push({
+        id: "Remix",
+        label: "Remix Unlock",
+        accessKey: "remixUnlocked",
+        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+      });
+    }
+
+    if (offerings.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "No unlocks available at this time. ✅";
+      list.appendChild(li);
+      return;
+    }
+
+    offerings.forEach(offering => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
+          🔓 Unlock ${offering.label}
+        </button>`;
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("❌ autoMatchEngine() error:", err);
+  }
+}
+
+// === STARTUP HOOK ===
+window.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("aigentsyUsername")) {
+    localStorage.setItem("aigentsyUsername", "admin4");
+  }
+
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username) {
+    injectUserDashboard();
+    autoMatchEngine(username);
+  }
+});
 </script>
 </body>
 </html>
