@@ -671,20 +671,19 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 3000);
 }
 
-<!-- 🔁 Run on page load -->
 <script>
-window.addEventListener("DOMContentLoaded", () => {
-  // If not already set, initialize the username
-  if (!localStorage.getItem("aigentsyUsername")) {
-    localStorage.setItem("aigentsyUsername", "admin4");
-  }
+  // Make sure this is the final standalone block
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("aigentsyUsername")) {
+      localStorage.setItem("aigentsyUsername", "admin4");
+    }
 
-  const username = localStorage.getItem("aigentsyUsername");
-  if (username) {
-    injectUserDashboard();
-    autoMatchEngine(username);
-  }
-});
+    const username = localStorage.getItem("aigentsyUsername");
+    if (username) {
+      injectUserDashboard();
+      autoMatchEngine(username);
+    }
+  });
 </script>
 
 <!-- 🔒 Modal Container -->
@@ -696,53 +695,52 @@ window.addEventListener("DOMContentLoaded", () => {
 </div>
 
 <script>
-function openModal(type) {
-  const username = localStorage.getItem("aigentsyUsername");
-  if (!username) return alert("No user found.");
+  function openModal(type) {
+    const username = localStorage.getItem("aigentsyUsername");
+    if (!username) return alert("No user found.");
 
-  const offerings = {
-    sdk: {
-      title: "SDK Access Unlock",
-      price: "$40",
-      link: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
-      id: "SDK"
-    },
-    vault: {
-      title: "Vault License Unlock",
-      price: "$25",
-      link: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
-      id: "Vault"
-    },
-    remix: {
-      title: "Remix Feature Unlock",
-      price: "$15",
-      link: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
-      id: "Remix"
-    },
-    clone: {
-      title: "Clone License Unlock",
-      price: "$30",
-      link: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
-      id: "Clone"
-    }
-  };
+    const offerings = {
+      sdk: {
+        title: "SDK Access Unlock",
+        price: "$40",
+        link: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+        id: "SDK"
+      },
+      vault: {
+        title: "Vault License Unlock",
+        price: "$25",
+        link: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+        id: "Vault"
+      },
+      remix: {
+        title: "Remix Feature Unlock",
+        price: "$15",
+        link: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+        id: "Remix"
+      },
+      clone: {
+        title: "Clone License Unlock",
+        price: "$30",
+        link: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+        id: "Clone"
+      }
+    };
 
-  const o = offerings[type];
-  if (!o) return;
+    const o = offerings[type];
+    if (!o) return;
 
-  document.getElementById("modalContent").innerHTML = `
-    <h2 style="margin-bottom:1rem;">${o.title}</h2>
-    <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
-    <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
-  `;
+    document.getElementById("modalContent").innerHTML = `
+      <h2 style="margin-bottom:1rem;">${o.title}</h2>
+      <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
+      <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
+    `;
 
-  document.getElementById("modalOverlay").style.display = "flex";
-}
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
 
-function closeModal() {
-  document.getElementById("modalOverlay").style.display = "none";
-}
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+  }
 </script>
-
 </body>
 </html>
