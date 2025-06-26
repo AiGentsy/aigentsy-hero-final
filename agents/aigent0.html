@@ -606,7 +606,7 @@ if (activityBox) {
 
   const offerings = [];
 
-  if (!user.remixUnlockedUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
+  if (!user.remixUnlocked&& (user.traits?.includes("creator") || user.business_type === "media")) {
     offerings.push({
       id: "Remix",
       label: "Remix Unlock",
@@ -649,6 +649,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
       console.error("❌ Invalid JSON from endpoint:", text);
       throw new Error("Server returned non-JSON. Check endpoint or network.");
     }
+
     const index = data.record.findIndex(u => u.username === username || u.consent?.username === username);
     if (index === -1) return;
 
@@ -669,6 +670,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
     window.location.reload();
   }, 3000);
 }
+</script> <!-- ✅ Close script BEFORE modal -->
 
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
@@ -724,7 +726,9 @@ async function unlockOffering(username, offeringId, stripeLink) {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
-    <script>
+</script> <!-- ✅ Correctly ends the open script block -->
+    
+  <script>  
 // === INJECT USER DASHBOARD FROM JSONBIN ===
 async function injectUserDashboard() {
   const username = localStorage.getItem("aigentsyUsername");
@@ -840,7 +844,9 @@ async function autoMatchEngine(username) {
 
     const offerings = [];
 
-    if (!user.remix?.remixUnlocked && (user.traits?.creator || user.business_type === "media")) {
+      if (
+  (!user.remixUnlocked && (user.traits?.includes?.("creator") || user.business_type === "media"))
+) {
       offerings.push({
         id: "Remix",
         label: "Remix Unlock",
