@@ -172,57 +172,32 @@
 </div>
 </div>
 <script>
-(async function() {
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
-
-  const userRes = await fetch(`/api/userdata?username=${username}`);
-  const user = await userRes.json();
-
-  if (!user || user.error) {
-    console.error("User not found or relay failed.");
-    return;
-  }
-
- const walletChart = document.getElementById("walletChart");
-if (Chart && walletChart) {
-  const existingChart = Chart.getChart(walletChart);
-  if (existingChart) existingChart.destroy();
-
-  new Chart(walletChart, {
-    type: 'bar',
-    data: {
-      labels: ['AIGx Earned', 'Vault Yield', 'Remix Yield'],
-      datasets: [{
-        label: 'Wallet Metrics',
-        data: [
-          user.yield?.aigxEarned || 0,
-          user.yield?.vaultYield || 0,
-          user.yield?.remixYield || 0
-        ],
-        backgroundColor: ['#00bfff', '#7b5bff', '#ff55b0'],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#888' },
-          grid: { color: '#222' }
-        },
-        x: {
-          ticks: { color: '#aaa' },
-          grid: { display: false }
-        }
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('walletChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['AIGx Earned', 'Staked', 'Referrals'],
+            datasets: [{
+              label: 'Metrics',
+              backgroundColor: '#00bfff',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+              x: { ticks: { color: '#aaa' }, grid: { display: false } }
+            }
+          }
+        });
       }
-    }
-  });
-}
-</script>
-
-    <!-- PATCH: AiGentsy Simplified Runtime Injection -->
-    <script>
+    });
+  </script>
+<!-- PATCH: AiGentsy Simplified Runtime Injection -->
+<script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
 const chatLog = document.createElement("div");
 chatLog.className = "chat-log";
@@ -252,6 +227,7 @@ function explainTerms(text) {
     const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
     const alreadyExplainedRegex = new RegExp(`${term} \\(.*?\\)`, 'g');
 
+    // Only replace plain terms that haven't already been explained
     text = text.replace(plainRegex, match => {
       return alreadyExplainedRegex.test(text) ? match : casual;
     });
@@ -262,12 +238,13 @@ function explainTerms(text) {
 
 function formatResponseEnhanced(text) {
   let cleaned = text
-    .replace(/[*_~`>#-]/g, '')
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-    .replace(/\n+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/\[\s?\]/g, '•')
-    .replace(/\[\s?[xX]\s?\]/g, '✓');
+    .replace(/[*_~`>#-]/g, '') // remove basic markdown
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip markdown links
+    .replace(/\n+/g, ' ') // flatten newlines
+    .replace(/\s+/g, ' ') // normalize spacing
+    .replace(/\[\s?\]/g, '•') // convert checklist boxes to bullets
+    .replace(/\[\s?[xX]\s?\]/g, '✓'); // convert checked boxes to checkmarks
+
   const highlights = [
     'Revenue Sharing', 'Whitelabel Licensing', 'SDK-as-a-Service',
     'Your AiGentsy', 'Remix Agent Licensing', 'Real-World Monetization',
@@ -275,12 +252,13 @@ function formatResponseEnhanced(text) {
   ];
   highlights.forEach(term => {
     const regex = new RegExp(`\\b(${term})\\b`, 'gi');
-    cleaned = cleaned.replace(regex, '$1');
+    cleaned = cleaned.replace(regex, '$1'); // remove bolding (no markdown)
   });
+
   const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
   return explainTerms(wrapped.trim());
 }
-
+  
 async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
@@ -299,6 +277,7 @@ async function runAgent() {
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
 
+  // ✅ Continuity patch: recall last AiGent response if input is a short confirm
   let conditionedInput = input;
   const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let’s do it"];
   const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
@@ -307,29 +286,51 @@ async function runAgent() {
   }
 
   try {
-    let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
-    const lower = conditionedInput.toLowerCase();
-    if (lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech")) {
-      endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
-    } else if (lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") || lower.includes("outreach") || lower.includes("campaigns")) {
-      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
-    } else if (lower.includes("remix") || lower.includes("clone") || lower.includes("license") || lower.includes("ip") || lower.includes("branding")) {
-      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
-    } else if (lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") || lower.includes("budget")) {
-      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
-    } else if (lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")) {
-      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
-    } else if (lower.includes("legal") || lower.includes("contract") || lower.includes("compliance")) {
-      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
-    } else if (lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")) {
-      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
-    }
 
+// 🔁 Post to selected agent runtime
+    // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
+let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = AiGent0 (CEO)
+
+const lower = conditionedInput.toLowerCase();
+if (
+  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech")
+) {
+  endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
+} else if (
+  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") ||
+  lower.includes("outreach") || lower.includes("campaigns")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
+} else if (
+  lower.includes("remix") || lower.includes("clone") || lower.includes("license") ||
+  lower.includes("ip") || lower.includes("branding")
+) {
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / IP
+} else if (
+  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") ||
+  lower.includes("budget")
+) {
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO (fallback to CEO/AiGent0)
+} else if (
+  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
+}
+  else if (
+  lower.includes("legal") || lower.includes("contract") || lower.includes("ip") || lower.includes("compliance")
+) {
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO also handles Legal
+} else if (
+  lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
+) {
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
+}
+  
     const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input: conditionedInput, memory })
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ input: conditionedInput, memory })
+});
 
     const text = await res.text();
     let data;
@@ -339,11 +340,12 @@ async function runAgent() {
       console.error("❌ Invalid JSON from endpoint:", text);
       throw new Error("Server returned non-JSON. Check endpoint or network.");
     }
-
     let reply = formatResponseEnhanced(data.output || "No response.");
-    const agentRole = getAgentRoleFromEndpoint(endpoint);
-    loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
+    const agentRole = getAgentRoleFromEndpoint(endpoint);
+loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+
+    // Optional: Add visual buttons again
     const buttons = document.createElement("div");
     buttons.style.marginTop = "12px";
     buttons.innerHTML = `
@@ -361,7 +363,8 @@ async function runAgent() {
 }
 
 if (sendBtn) sendBtn.onclick = runAgent;
-
+ 
+// PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
   if (endpoint.includes("growth")) return "AiGentsy CMO";
@@ -369,13 +372,15 @@ function getAgentRoleFromEndpoint(endpoint) {
   return "Autonomous AiGentsy";
 }
 
-// 🛡️ PATCH: Secure user injection via Render relay (no exposed secret)
+const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest";
+const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
+
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
 
   const username = localStorage.getItem("aigentsyUsername");
   console.log("📌 Username from localStorage:", username);
-  console.log("📡 Fetching user from secure relay...");
+console.log("📡 Fetching data from JSONBin...");
 
   if (!username) {
     console.warn("⚠️ No username found. Skipping user injection.");
@@ -383,73 +388,77 @@ async function injectUserDashboard() {
   }
 
   try {
-    const response = await fetch(`/api/userdata?username=${username}`);
-    const userData = await response.json();
-
-    if (!userData || userData.error) {
-      console.error("❌ Failed to fetch user data");
-      return;
+    const res = await fetch(JSONBIN_URL, {
+      headers: { "X-Master-Key": JSONBIN_SECRET }
+    });
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
     }
-
-    console.log("📦 Relay returned:", userData);
-    const user = userData.record.find(u =>
-      u.username === username || u.consent?.username === username
-    );
-      
+    console.log("📦 All records from JSONBin:", data.record);
+    const user = data.record.find(u => 
+  u.username === username || u.consent?.username === username
+);
     console.log("🔍 Matched user record:", user);
-if (!user) return;
+    if (!user) return;
 
-const boxes = document.querySelectorAll(".metric-box");
+    const boxes = document.querySelectorAll(".metric-box");
 
-boxes.forEach(box => {
-  const title = box.querySelector("h3")?.textContent || "";
-  const ul = box.querySelector("ul");
-  if (!ul) return;
+    boxes.forEach(box => {
+      const title = box.querySelector("h3")?.textContent || "";
+      const ul = box.querySelector("ul");
+      if (!ul) return;
 
-  if (title.includes("Real-World Earnings")) {
-    ul.innerHTML = `
-      <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
-      <li><strong>Clients:</strong> ${user.clients || 0}</li>
-      <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
-      <li><strong>AIGx Earned (Real-World):</strong> +${user.yield?.aigxEarned || 0}</li>`;
-  }
+      if (title.includes("Real-World Earnings")) {
+        ul.innerHTML = `
+          <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
+          <li><strong>Clients:</strong> ${user.clients || 0}</li>
+          <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.yield?.aigxEarned || 0}</li>`;
+      }
 
-  if (title.includes("SDK & Licensing")) {
-    ul.innerHTML = `
-      <li><strong>SDK Eligible:</strong> ${user.sdkAccess_eligible ? "✅ Yes" : "—"}</li>
-      <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
-  }
+      if (title.includes("SDK & Licensing")) {
+        ul.innerHTML = `
+          <li><strong>SDK Eligible:</strong> ${user.sdkAccess_eligible ? "✅ Yes" : "—"}</li>
+          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
+      }
 
-  if (title.includes("Wallet")) {
-    ul.innerHTML = `
-      <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
-      <li><strong>Staked:</strong> ${user.staked || 0}</li>
-      <li><strong>Referrals:</strong> ${user.cloneLineage?.length || 0} active</li>`;
-  }
+      if (title.includes("Wallet")) {
+        ul.innerHTML = `
+          <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
+          <li><strong>Staked:</strong> ${user.staked || 0}</li>
+          <li><strong>Referrals:</strong> ${user.cloneLineage?.length || 0 || 0} active</li>`;
+      }
 
-  if (title.includes("Growth & Deployment")) {
-    ul.innerHTML = `
-      <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
-      <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0}</li>
-      <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
-      <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
-      <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
-      <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
-  }
+      if (title.includes("Growth & Deployment")) {
+        ul.innerHTML = `
+          <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0 || 0}</li>
+          <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
+          <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
+          <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
+          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
+      }
 
-  if (title.includes("Mint Snapshot")) {
-    ul.innerHTML = `
-      <li><strong>ID:</strong> ${user.id}</li>
-      <li><strong>Minted As:</strong> AiGent Venture</li>
-      <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
-  }
-});
+      if (title.includes("Mint Snapshot")) {
+        ul.innerHTML = `
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
+      }
+    });
 
-// === Wallet Chart ===
-const walletChart = document.getElementById('walletChart');
+    // === Wallet Chart ===
+    const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   const existingChart = Chart.getChart(walletChart);
-  if (existingChart) existingChart.destroy();
+  if (existingChart) {
+    existingChart.destroy(); // ✅ Clean up previous chart instance
+  }
 
   new Chart(walletChart, {
     type: 'bar',
@@ -459,7 +468,7 @@ if (Chart && walletChart) {
         data: [
           user.yield?.aigxEarned || 0,
           user.staked || 0,
-          user.cloneLineage?.length || 0
+          user.cloneLineage?.length || 0 || 0
         ],
         backgroundColor: '#00bfff',
         borderRadius: 6
@@ -481,7 +490,7 @@ if (Chart && walletChart) {
     }
   });
 }
-
+    
 // === Overview Sidebar ===
 const overviewBox = document.querySelector("#overviewBox ul");
 if (overviewBox) {
@@ -492,7 +501,7 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-// === Dynamic C-Suite Mapping ===
+    // === Dynamic C-Suite Mapping ===
 const csuiteBox = document.getElementById("csuiteBox");
 if (csuiteBox) {
   const cSuiteRoles = [
@@ -512,7 +521,7 @@ if (csuiteBox) {
   `;
 }
 
-// === Propagation Chart ===
+    // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
   const remixCount = user.remixUnlocked?.remixCount || 0;
@@ -549,86 +558,186 @@ if (Chart && propagationCanvas) {
     }
   });
 }
-<!-- PATCHED: AiGentsy Secure Runtime Injection with Dynamic Agent, Charts, and Offerings -->
-<script>
-(async function() {
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
 
-  const userRes = await fetch(`/api/userdata?username=${username}`);
-  const user = await userRes.json();
-
-  if (!user || user.error) return;
-
-  // === Remix Snapshot ===
-  const remixBox = document.getElementById("remixSnapshotBox");
-  if (remixBox) {
-    const forks = user.remixUnlockedForks || 0;
-    const spread = user.cloneLineageSpread || "—";
-    const strategy = user.remixUnlockedStrategy || "—";
-    remixBox.innerHTML = `
-      <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-      <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
+    // === Remix Snapshot ===
+const remixBox = document.getElementById("remixSnapshotBox");
+if (remixBox) {
+  const forks = user.remixUnlockedForks || 0;
+  const spread = user.cloneLineageSpread || "—";
+  const strategy = user.remixUnlockedStrategy || "—";
+  remixBox.innerHTML = `
+    <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
+}
+   
+    // === Activity Feed ===
+const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
+if (activityBox) {
+  const feedUl = activityBox.querySelector("ul");
+  if (feedUl && user.activity && user.activity.length) {
+    feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
   }
-
-  // === Activity Feed ===
-  const boxes = document.querySelectorAll(".metric-box");
-  const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
-  if (activityBox) {
-    const feedUl = activityBox.querySelector("ul");
-    if (feedUl && user.activity && user.activity.length) {
-      feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
+}
+ 
+  } catch (e) {
+    console.error("injectUserDashboard error:", e);
+  }
+}
+  async function autoMatchEngine(username) {
+  try {
+  const res = await fetch(JSONBIN_URL, {
+    headers: { "X-Master-Key": JSONBIN_SECRET }
+  });
+  const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
     }
-  }
+  const user = data.record.find(u =>
+    u.consent?.username === username || u.username === username
+  );
+  if (!user) return;
 
-  // === Auto-Match Engine ===
   const list = document.getElementById("autoMatchOfferings");
-  if (list) {
-    const offerings = [];
-    if (!user.remixUnlockedUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
-      offerings.push({
-        id: "Remix",
-        label: "Remix Unlock",
-        accessKey: "remixUnlocked",
-        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-      });
-    }
-    if (offerings.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "No unlocks available at this time. ✅";
-      list.appendChild(li);
-    } else {
-      offerings.forEach(offering => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-            🔓 Unlock ${offering.label}
-          </button>`;
-        list.appendChild(li);
-      });
-    }
-  }
-})();
+  if (!list) return;
 
+  const offerings = [];
+
+  if (!user.remixUnlockedUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
+    offerings.push({
+      id: "Remix",
+      label: "Remix Unlock",
+      accessKey: "remixUnlocked",
+      stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+    });
+  }
+
+  // ✅ Check before appending anything
+  if (offerings.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No unlocks available at this time. ✅";
+    list.appendChild(li);
+    return;
+  }
+
+  offerings.forEach(offering => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
+        🔓 Unlock ${offering.label}
+      </button>`;
+    list.appendChild(li);
+  });
+} catch (err) {
+  console.error("AutoMatch Engine Error:", err);
+}
+  
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
   setTimeout(async () => {
     if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
-    const res = await fetch(`/api/userdata?username=${username}`);
-    const user = await res.json();
-    if (!user || user.error) return;
+
+    const res = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
+    }
+    const index = data.record.findIndex(u => u.username === username || u.consent?.username === username);
+    if (index === -1) return;
+
+    const user = data.record[index];
     if (!user.unlocked) user.unlocked = [];
     if (!user.unlocked.includes(offeringId)) user.unlocked.push(offeringId);
 
-    await fetch(`/api/updateuser`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user)
+    await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_SECRET
+      },
+      body: JSON.stringify(data.record)
     });
 
     alert(`${offeringId} unlocked and logged. Reloading UI...`);
     window.location.reload();
   }, 3000);
 }
+
+<!-- 🔁 Run on page load -->
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("aigentsyUsername")) {
+      localStorage.setItem("aigentsyUsername", "admin4");
+    }
+
+    const username = localStorage.getItem("aigentsyUsername");
+    if (username) {
+      injectUserDashboard();
+      autoMatchEngine(username);
+    }
+  });
+</script>
+<!-- 🔒 Modal Container -->
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+<div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+<button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+<div id="modalContent"></div>
+</div>
+</div>
+<script>
+  function openModal(type) {
+    const username = localStorage.getItem("aigentsyUsername");
+    if (!username) return alert("No user found.");
+
+    const offerings = {
+      sdk: {
+        title: "SDK Access Unlock",
+        price: "$40",
+        link: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+        id: "SDK"
+      },
+      vault: {
+        title: "Vault License Unlock",
+        price: "$25",
+        link: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+        id: "Vault"
+      },
+      remix: {
+        title: "Remix Feature Unlock",
+        price: "$15",
+        link: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+        id: "Remix"
+      },
+      clone: {
+        title: "Clone License Unlock",
+        price: "$30",
+        link: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+        id: "Clone"
+      }
+    };
+
+    const o = offerings[type];
+    if (!o) return;
+
+    document.getElementById("modalContent").innerHTML = `
+      <h2 style="margin-bottom:1rem;">${o.title}</h2>
+      <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
+      <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
+    `;
+
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+  }
 </script>
 </body>
 </html>
