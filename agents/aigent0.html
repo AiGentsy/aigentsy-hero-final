@@ -670,20 +670,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 3000);
 }
 
-<!-- 🔁 Run on page load -->
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    if (!localStorage.getItem("aigentsyUsername")) {
-      localStorage.setItem("aigentsyUsername", "admin4");
-    }
-
-    const username = localStorage.getItem("aigentsyUsername");
-    if (username) {
-      injectUserDashboard();
-      autoMatchEngine(username);
-    }
-  });
-</script>
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
 <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
