@@ -91,6 +91,14 @@
       white-space: pre-line;
     }
   </style>
+
+<script>
+if (!localStorage.getItem("aigentsyUsername")) {
+  localStorage.setItem("aigentsyUsername", "admin4"); // Default for debugging
+  console.warn("⚠️ Username not found — defaulted to admin4 for testing");
+}
+</script>
+
 </head>
 <body>
   <div class="sidebar">
