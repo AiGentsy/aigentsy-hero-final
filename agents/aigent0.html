@@ -671,15 +671,23 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 3000);
 }
 
-// 🔁 Run on page load
+<!-- 🔁 Run on page load -->
+<script>
 window.addEventListener("DOMContentLoaded", () => {
+  // If not already set, initialize the username
+  if (!localStorage.getItem("aigentsyUsername")) {
+    localStorage.setItem("aigentsyUsername", "admin4");
+  }
+
   const username = localStorage.getItem("aigentsyUsername");
   if (username) {
     injectUserDashboard();
     autoMatchEngine(username);
   }
 });
-  <!-- 🔒 Modal Container -->
+</script>
+
+<!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
   <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
     <button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
@@ -723,10 +731,10 @@ function openModal(type) {
   if (!o) return;
 
   document.getElementById("modalContent").innerHTML = `
-  <h2 style="margin-bottom:1rem;">${o.title}</h2>
-  <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
-  <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
-`;
+    <h2 style="margin-bottom:1rem;">${o.title}</h2>
+    <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
+    <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
+  `;
 
   document.getElementById("modalOverlay").style.display = "flex";
 }
@@ -734,17 +742,7 @@ function openModal(type) {
 function closeModal() {
   document.getElementById("modalOverlay").style.display = "none";
 }
-<script>
-window.addEventListener("DOMContentLoaded", () => {
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
-
-  try {
-    injectUserDashboard();
-    autoMatchEngine(username);
-  } catch (e) {
-    console.error("🚨 injectUserDashboard or autoMatchEngine error:", e);
-  }
-});
 </script>
+
 </body>
 </html>
