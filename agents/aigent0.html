@@ -671,8 +671,8 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 3000);
 }
 
+<!-- 🔁 Run on page load -->
 <script>
-  // Make sure this is the final standalone block
   window.addEventListener("DOMContentLoaded", () => {
     if (!localStorage.getItem("aigentsyUsername")) {
       localStorage.setItem("aigentsyUsername", "admin4");
@@ -744,3 +744,4 @@ async function unlockOffering(username, offeringId, stripeLink) {
 </script>
 </body>
 </html>
+
