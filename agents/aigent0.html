@@ -372,8 +372,8 @@ function getAgentRoleFromEndpoint(endpoint) {
   return "Autonomous AiGentsy";
 }
 
-const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest";
-const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
+const JSONBIN_URL = window?.env?.JSONBIN_URL || "";
+const JSONBIN_SECRET = window?.env?.JSONBIN_SECRET || "";
 
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
@@ -637,7 +637,7 @@ if (activityBox) {
   
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
-  setTimeout(async () => {
+  setTimeout(async function() {
     if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
 
     const res = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
