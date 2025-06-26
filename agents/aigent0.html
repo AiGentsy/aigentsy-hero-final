@@ -333,7 +333,14 @@ if (
   body: JSON.stringify({ input: conditionedInput, memory })
 });
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
+    }
     let reply = formatResponseEnhanced(data.output || "No response.");
 
     const agentRole = getAgentRoleFromEndpoint(endpoint);
@@ -385,7 +392,14 @@ console.log("📡 Fetching data from JSONBin...");
     const res = await fetch(JSONBIN_URL, {
       headers: { "X-Master-Key": JSONBIN_SECRET }
     });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
+    }
     console.log("📦 All records from JSONBin:", data.record);
     const user = data.record.find(u => 
   u.username === username || u.consent?.username === username
@@ -575,7 +589,14 @@ if (activityBox) {
   const res = await fetch(JSONBIN_URL, {
     headers: { "X-Master-Key": JSONBIN_SECRET }
   });
-  const data = await res.json();
+  const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
+    }
   const user = data.record.find(u =>
     u.consent?.username === username || u.username === username
   );
@@ -621,7 +642,14 @@ async function unlockOffering(username, offeringId, stripeLink) {
     if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
 
     const res = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("❌ Invalid JSON from endpoint:", text);
+      throw new Error("Server returned non-JSON. Check endpoint or network.");
+    }
     const index = data.record.findIndex(u => u.username === username || u.consent?.username === username);
     if (index === -1) return;
 
