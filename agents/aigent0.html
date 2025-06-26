@@ -172,31 +172,7 @@
 
 </div>
 </div>
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const ctx = document.getElementById('walletChart');
-      if (ctx) {
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['AIGx Earned', 'Staked', 'Referrals'],
-            datasets: [{
-              label: 'Metrics',
-              backgroundColor: '#00bfff',
-              borderRadius: 6
-            }]
-          },
-          options: {
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-              x: { ticks: { color: '#aaa' }, grid: { display: false } }
-            }
-          }
-        });
-      }
-    });
-  </script>
+
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -744,4 +720,3 @@ async function unlockOffering(username, offeringId, stripeLink) {
 </script>
 </body>
 </html>
-
