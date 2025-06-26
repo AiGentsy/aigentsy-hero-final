@@ -888,52 +888,51 @@ window.addEventListener("DOMContentLoaded", () => {
     autoMatchEngine(username);
   }
 });
-      
-<script>
-    const chatLog = document.getElementById("chatLog");
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-    chatLog.appendChild(preload);
 
-    let memory = [];
-    const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
+const chatLog = document.getElementById("chatLog");
+const preload = document.createElement("div");
+preload.className = "chat-agent";
+preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+chatLog.appendChild(preload);
 
-    async function runAgent() {
-      const input = document.getElementById("input").value.trim();
-      if (!input) return;
+let memory = [];
+const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
-      const userMsg = document.createElement("div");
-      userMsg.className = "chat-user";
-      userMsg.textContent = `🧠 You: ${input}`;
-      chatLog.appendChild(userMsg);
-      chatLog.scrollTop = chatLog.scrollHeight;
-      memory.push(input);
-      document.getElementById("input").value = "";
+async function runAgent() {
+  const input = document.getElementById("input").value.trim();
+  if (!input) return;
 
-      const loader = document.createElement("div");
-      loader.className = "chat-agent";
-      loader.textContent = "🤖 AiGent0: Thinking...";
-      chatLog.appendChild(loader);
-      chatLog.scrollTop = chatLog.scrollHeight;
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `🧠 You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  document.getElementById("input").value = "";
 
-      try {
-        const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input, memory })
-        });
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 AiGent0: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
 
-        const data = await res.json();
-        const reply = data.output || "No response.";
-        loader.textContent = `🤖 AiGent0: ${reply}`;
-        memory.push(reply);
-        chatLog.scrollTop = chatLog.scrollHeight;
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, memory })
+    });
 
-      } catch (err) {
-        loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
-      }
-    }
-  </script>
+    const data = await res.json();
+    const reply = data.output || "No response.";
+    loader.textContent = `🤖 AiGent0: ${reply}`;
+    memory.push(reply);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+  } catch (err) {
+    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
+  }
+}
+</script>
 </body>
 </html>
