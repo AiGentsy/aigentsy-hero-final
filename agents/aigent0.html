@@ -171,6 +171,31 @@
 <h3>📊 Growth &amp; Deployment</h3>
 </div>
 </div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('walletChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['AIGx Earned', 'Staked', 'Referrals'],
+            datasets: [{
+              label: 'Metrics',
+              backgroundColor: '#00bfff',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+              x: { ticks: { color: '#aaa' }, grid: { display: false } }
+            }
+          }
+        });
+      }
+    });
+  </script>
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -398,21 +423,21 @@ console.log("📡 Fetching data from JSONBin...");
 
       if (title.includes("SDK & Licensing")) {
         ul.innerHTML = `
-          <li><strong>SDK Eligible:</strong> ${user.traits?.sdk_spawner ? "✅ Yes" : "—"}</li>
+          <li><strong>SDK Eligible:</strong> ${user.sdkAccess_eligible ? "✅ Yes" : "—"}</li>
           <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
       }
 
-if (title.includes("Wallet")) {
+      if (title.includes("Wallet")) {
         ul.innerHTML = `
           <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
-          <li><strong>Staked:</strong> ${user.staked ? 1 : 0 ? "✅ Yes" : "—"}</li>
-          <li><strong>Referrals:</strong> ${user.referrals?.length || 0 || 0} active</li>`;
+          <li><strong>Staked:</strong> ${user.staked || 0}</li>
+          <li><strong>Referrals:</strong> ${user.cloneLineage?.length || 0 || 0} active</li>`;
       }
 
       if (title.includes("Growth & Deployment")) {
         ul.innerHTML = `
           <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
-          <li><strong>New Referrals:</strong> ${user.referrals?.length || 0 || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0 || 0}</li>
           <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
           <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
           <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
@@ -442,8 +467,8 @@ if (Chart && walletChart) {
       datasets: [{
         data: [
           user.yield?.aigxEarned || 0,
-          user.staked ? 1 : 0 ? 1 : 0,
-          user.referrals?.length || 0 || 0
+          user.staked || 0,
+          user.cloneLineage?.length || 0 || 0
         ],
         backgroundColor: '#00bfff',
         borderRadius: 6
@@ -473,7 +498,7 @@ if (overviewBox) {
     <li><strong>Role:</strong> ${user.meta_role || "—"}</li>
     <li><strong>Type:</strong> ${user.customInput || "B2B SaaS"}</li>
     <li><strong>Memory:</strong> ${user.yield_memory ? "Yes — remembers what works" : "—"}</li>
-    <li><strong>Dev-Ready:</strong> ${user.traits?.sdk_spawner ? "Yes — downloadable kit" : "No"}</li>`;
+    <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
     // === Dynamic C-Suite Mapping ===
@@ -499,8 +524,8 @@ if (csuiteBox) {
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
-  const remixCount = user.remix?.remixCount || 0;
-  const remixCredits = user.remix?.remixCredits || 0;
+  const remixCount = user.remixUnlocked?.remixCount || 0;
+  const remixCredits = user.remixUnlocked?.remixCredits || 0;
   const vaultYield = user.yield?.vaultYield || 0;
   const remixYield = user.yield?.remixYield || 0;
 
@@ -537,9 +562,9 @@ if (Chart && propagationCanvas) {
     // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
 if (remixBox) {
-  const forks = user.remixForks || 0;
-  const spread = user.lineageSpread || "—";
-  const strategy = user.remixStrategy || "—";
+  const forks = user.remixUnlockedForks || 0;
+  const spread = user.cloneLineageSpread || "—";
+  const strategy = user.remixUnlockedStrategy || "—";
   remixBox.innerHTML = `
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
@@ -581,7 +606,7 @@ if (activityBox) {
 
   const offerings = [];
 
-  if (!user.remix?.remixCount > 0 && (user.traits?.includes("creator") || user.business_type === "media")) {
+  if (!user.remixUnlockedUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
     offerings.push({
       id: "Remix",
       label: "Remix Unlock",
@@ -648,9 +673,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
 <!-- 🔁 Run on page load -->
 <script>
   window.addEventListener("DOMContentLoaded", () => {
-
-  localStorage.setItem("aigentsyUsername", "admin4");
-
     if (!localStorage.getItem("aigentsyUsername")) {
       localStorage.setItem("aigentsyUsername", "admin4");
     }
@@ -660,7 +682,8 @@ async function unlockOffering(username, offeringId, stripeLink) {
       injectUserDashboard();
       autoMatchEngine(username);
     }
-  });</script>
+  });
+</script>
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
 <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
