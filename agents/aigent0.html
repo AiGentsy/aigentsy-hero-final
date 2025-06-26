@@ -125,15 +125,25 @@
 </div>
 </div>
 <div class="metric-box">
-<h3>🧠 Chat Interface</h3>
-<textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-<button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button></div>
-<div class="metric-box">
-<h3>💼 Real-World Earnings</h3>
-<ul></ul>
+  <h3>🧠 Chat Interface</h3>
+
+  <textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+
+  <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
+
+  <!-- ✅ Place chatLog INSIDE the metric-box -->
+  <div id="chatLog" class="chat-log" style="margin-top: 10px; max-height: 240px; overflow-y: auto;"></div>
 </div>
+
+<!-- Other metric-boxes continue here -->
 <div class="metric-box">
-<h3>📦 SDK &amp; Licensing</h3>
+  <h3>💼 Real-World Earnings</h3>
+  <ul></ul>
+</div>
+
+<div class="metric-box">
+  <h3>📦 SDK &amp; Licensing</h3>
+  </div>
 <!-- Injected by autoMatchEngine -->
 <ul id="autoMatchOfferings"></ul>
 <!-- Modal-triggering buttons -->
@@ -259,34 +269,67 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
-async function runAgent() {
-  const input = textarea.value.trim();
-  if (!input) return;
+<script>
+  async function runAgent() {
+    const input = document.getElementById("agentInput").value.trim();
+    if (!input) return;
 
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  memory.push(input);
-  textarea.value = "";
+    const chatLog = document.getElementById("chatLog");
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-user";
+    userMsg.textContent = `🧠 You: ${input}`;
+    chatLog.appendChild(userMsg);
+    chatLog.scrollTop = chatLog.scrollHeight;
 
-  const loader = document.createElement("div");
-  loader.className = "chat-agent";
-  loader.textContent = "🤖 Your AiGentsy: Thinking...";
-  chatLog.appendChild(loader);
-  chatLog.scrollTop = chatLog.scrollHeight;
+    const loader = document.createElement("div");
+    loader.className = "chat-agent";
+    loader.textContent = "🤖 Your AiGentsy: Thinking...";
+    chatLog.appendChild(loader);
+    chatLog.scrollTop = chatLog.scrollHeight;
 
-  // ✅ Continuity patch: recall last AiGent response if input is a short confirm
-  let conditionedInput = input;
-  const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let’s do it"];
-  const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
-  if (shortConfirm.includes(input.toLowerCase()) && lastAgentTurn) {
-    conditionedInput = `${lastAgentTurn.replace("🤖 Legal AiGentsy:", "").trim()}\n\nPlease continue based on this.`;
+    const memory = window.chatMemory || [];
+    memory.push(input);
+    document.getElementById("agentInput").value = "";
+
+    // Dynamic routing by keywords
+    let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // Default
+    const lower = input.toLowerCase();
+
+    if (lower.includes("sdk") || lower.includes("developer") || lower.includes("api")) {
+      endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
+    } else if (lower.includes("growth") || lower.includes("scale") || lower.includes("campaign")) {
+      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+    } else if (lower.includes("remix") || lower.includes("license") || lower.includes("ip")) {
+      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
+    } else if (lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout")) {
+      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
+    }
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input, memory })
+      });
+
+      const data = await res.json();
+      const reply = data.output || "No response.";
+      loader.textContent = `🤖 Your AiGentsy: ${reply}`;
+      memory.push(reply);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    } catch (err) {
+      loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
+    }
+
+    window.chatMemory = memory;
   }
 
-  try {
-
+  document.addEventListener("DOMContentLoaded", () => {
+    const sendBtn = document.getElementById("sendBtn");
+    if (sendBtn) sendBtn.addEventListener("click", runAgent);
+  });
+</script>
+    
 // 🔁 Post to selected agent runtime
     // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
 let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = AiGent0 (CEO)
