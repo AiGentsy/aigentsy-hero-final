@@ -420,23 +420,21 @@ if (!user) return;
     });
 
     // === Wallet Chart ===
-    const walletChart = document.getElementById('walletChart');
+const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   const existingChart = Chart.getChart(walletChart);
-  if (existingChart) {
-    existingChart.destroy(); // ✅ Clean up previous chart instance
-  }
+  if (existingChart) existingChart.destroy(); // Clean up
+
+  const aigx = user.yield?.aigxEarned ?? 0;
+  const staked = user.staked ?? 0;
+  const referrals = user.cloneLineage?.length ?? 0;
 
   new Chart(walletChart, {
     type: 'bar',
     data: {
       labels: ['AIGx Earned', 'Staked', 'Referrals'],
       datasets: [{
-        data: [
-          user.yield?.aigxEarned || 0,
-          user.staked || 0,
-          user.cloneLineage?.length || 0 || 0
-        ],
+        data: [aigx, staked, referrals],
         backgroundColor: '#00bfff',
         borderRadius: 6
       }]
