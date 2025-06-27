@@ -750,7 +750,8 @@ let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
 async function runAgent() {
-  const input = document.getElementById("input").value.trim();
+  const textarea = document.querySelector("textarea"); // ✅ REQUIRED
+  const input = textarea.value.trim();
   if (!input) return;
 
   const userMsg = document.createElement("div");
@@ -759,7 +760,7 @@ async function runAgent() {
   chatLog.appendChild(userMsg);
   chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
-  document.getElementById("input").value = "";
+  textarea.value = "";
 
   const loader = document.createElement("div");
   loader.className = "chat-agent";
