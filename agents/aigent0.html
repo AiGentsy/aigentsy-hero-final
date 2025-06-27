@@ -365,10 +365,29 @@ console.log("📡 Fetching data from JSONBin...");
 });
 
 const data = await res.json();
-const user = data.record || data.user || null;
 
-console.log("📦 User from AME runtime:", user);
-if (!user) return;
+let user = null;
+
+// Case 1: JSONBin-style array
+if (Array.isArray(data.users)) {
+  user = data.users.find(u => (u.consent?.username || "").toLowerCase() === username.toLowerCase());
+}
+
+// Case 2: Direct runtime response
+if (!user && data.user) {
+  user = data.user;
+}
+
+// Case 3: Legacy fallback
+if (!user && data.record) {
+  user = data.record;
+}
+
+console.log("📦 Matched user from runtime/JSONBin:", user);
+if (!user) {
+  console.warn("⚠️ No matching user found for:", username);
+  return;
+}
 
     console.log("🔍 Matched user record:", user);
     if (!user) return;
