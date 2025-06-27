@@ -672,7 +672,29 @@ window.addEventListener("DOMContentLoaded", () => {
   // Trigger chat send
   const sendBtn = document.querySelector("button.btn-glow");
   if (sendBtn) sendBtn.onclick = runAgent;
-
+  // Draw wallet chart placeholder if canvas is present
+  const walletCanvas = document.getElementById("walletChart");
+  if (walletCanvas && Chart) {
+    new Chart(walletCanvas, {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          label: 'Metrics',
+          data: [0, 0, 0], // Placeholder — will update later via injectUserDashboard
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+          x: { ticks: { color: '#aaa' }, grid: { display: false } }
+        }
+      }
+    });
+  }
 });
 
 </script> <!-- ✅ closes this final script block -->
