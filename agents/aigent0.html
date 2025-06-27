@@ -583,26 +583,6 @@ if (activityBox) {
   });
   return await res.json();
 }
-
-  // ✅ Check before appending anything
-  if (offerings.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No unlocks available at this time. ✅";
-    list.appendChild(li);
-    return;
-  }
-
-  offerings.forEach(offering => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-        🔓 Unlock ${offering.label}
-      </button>`;
-    list.appendChild(li);
-  });
-} catch (err) {
-  console.error("AutoMatch Engine Error:", err);
-}
   
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
