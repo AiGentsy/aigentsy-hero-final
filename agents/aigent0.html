@@ -575,11 +575,14 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
+  async function fetchAgentData(username) {
   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ username })
-});
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+  return await res.json();
+}
 const data = await res.json();
 const user = data.record || data.user || null;
 
@@ -709,9 +712,10 @@ async function unlockOffering(username, offeringId, stripeLink) {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
-</script> <!-- ✅ Correctly ends the open script block -->
-    
-  <script>  
+</script>
+
+<script>
+
 // === INJECT USER DASHBOARD FROM JSONBIN ===
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
@@ -875,11 +879,14 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-const chatLog = document.getElementById("chatLog");
-const preload = document.createElement("div");
-preload.className = "chat-agent";
-preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-chatLog.appendChild(preload);
+window.addEventListener("DOMContentLoaded", () => {
+  const chatLog = document.getElementById("chatLog");
+  if (!chatLog) return;
+  const preload = document.createElement("div");
+  preload.className = "chat-agent";
+  preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+  chatLog.appendChild(preload);
+});
 
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
