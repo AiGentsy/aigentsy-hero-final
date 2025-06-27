@@ -524,15 +524,17 @@ if (Chart && propagationCanvas) {
   });
 }
 
-    // === Remix Snapshot ===
+   // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
 if (remixBox) {
-  const forks = user.remixUnlockedForks || 0;
-  const spread = user.cloneLineageSpread || "—";
-  const strategy = user.remixUnlockedStrategy || "—";
+  const forks = user.remixUnlockedForks ?? 0;
+  const spread = user.cloneLineageSpread ?? "—";
+  const strategy = user.remixUnlockedStrategy ?? "—";
+
   remixBox.innerHTML = `
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
+    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>
+    <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>`;
 }
    
     // === Activity Feed ===
