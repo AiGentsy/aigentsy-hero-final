@@ -583,7 +583,6 @@ if (activityBox) {
   });
   return await res.json();
 }
-const data = await res.json();
 const user = data.record || data.user || null;
 
 if (!user) return;
