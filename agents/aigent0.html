@@ -583,23 +583,6 @@ if (activityBox) {
   });
   return await res.json();
 }
-const user = data.record || data.user || null;
-
-if (!user) return;
-
-const list = document.getElementById("autoMatchOfferings");
-if (!list) return;
-
-const offerings = [];
-
-if (!user.remixUnlocked && (user.traits?.includes("creator") || user.business_type === "media")) {
-  offerings.push({
-    id: "Remix",
-    label: "Remix Unlock",
-    accessKey: "remixUnlocked",
-    stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-  });
-}
 
   // ✅ Check before appending anything
   if (offerings.length === 0) {
