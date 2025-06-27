@@ -601,7 +601,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
 
       if (result.success) {
         alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500);
+        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
@@ -614,10 +614,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 1500);
 }
 
-    alert(`${offeringId} unlocked and logged. Reloading UI...`);
-    window.location.reload();
-  }, 3000);
-}
 </script> <!-- ✅ Close script BEFORE modal -->
 
 <!-- 🔒 Modal Container -->
