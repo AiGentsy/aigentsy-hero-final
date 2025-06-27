@@ -486,13 +486,13 @@ if (csuiteBox) {
   `;
 }
 
-    // === Propagation Chart (Dynamic Remix/Yield Data) ===
+    // === Propagation Chart ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
-  const remixCount = user.remixUnlocked?.remixCount || 0;
-  const remixCredits = user.remixUnlocked?.remixCredits || 0;
-  const vaultYield = user.yield?.vaultYield || 0;
-  const remixYield = user.yield?.remixYield || 0;
+  const remixCount = user.remixUnlocked?.remixCount ?? 0;
+  const remixCredits = user.remixUnlocked?.remixCredits ?? 0;
+  const vaultYield = user.yield?.vaultYield ?? 0;
+  const remixYield = user.yield?.remixYield ?? 0;
 
   const existing = Chart.getChart(propagationCanvas);
   if (existing) existing.destroy();
