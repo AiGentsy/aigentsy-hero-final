@@ -170,56 +170,9 @@
 <h3>📊 Growth &amp; Deployment</h3>
 </div>
 </div>
-<script>
-   window.addEventListener("DOMContentLoaded", () => {
-  // Ensure default username is set
-  if (!localStorage.getItem("aigentsyUsername")) {
-    localStorage.setItem("aigentsyUsername", "admin4");
-  }
-
-  const username = localStorage.getItem("aigentsyUsername");
-
-  if (username) {
-    injectUserDashboard();
-    autoMatchEngine(username);
-  }
-
-  // Inject preload message into chat log
-  const chatLog = document.getElementById("chatLog");
-  if (chatLog) {
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-    chatLog.appendChild(preload);
-  }
-
-  // Draw wallet chart if the canvas is present
-  const ctx = document.getElementById("walletChart");
-  if (ctx && Chart) {
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['AIGx Earned', 'Staked', 'Referrals'],
-        datasets: [{
-          label: 'Metrics',
-          data: [0, 0, 0], // placeholder — will be replaced by injectUserDashboard
-          backgroundColor: '#00bfff',
-          borderRadius: 6
-        }]
-      },
-      options: {
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-          x: { ticks: { color: '#aaa' }, grid: { display: false } }
-        }
-      }
-    });
-  }
-});
-    
+ <script>
+ 
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
-<script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
 const chatLog = document.createElement("div");
 chatLog.className = "chat-log";
@@ -391,7 +344,6 @@ function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("remix")) return "AiGentsy CLO";
   return "Autonomous AiGentsy";
 }
-
 
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
@@ -693,7 +645,58 @@ async function unlockOffering(username, offeringId, stripeLink) {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+</script> <!-- ← this closes the previous script block -->
 
-</script>
+<script>  <!-- ✅ NEW script block starts -->
+// ✅ FINAL DOM LOAD PATCH — MUST BE LAST
+window.addEventListener("DOMContentLoaded", () => {
+  if (!localStorage.getItem("aigentsyUsername")) {
+    localStorage.setItem("aigentsyUsername", "admin4");
+  }
+
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username) {
+    injectUserDashboard();
+    autoMatchEngine(username);
+  }
+
+  // Preload chat
+  const chatLog = document.getElementById("chatLog");
+  if (chatLog) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    chatLog.appendChild(preload);
+  }
+
+  // Trigger chat send
+  const sendBtn = document.querySelector("button.btn-glow");
+  if (sendBtn) sendBtn.onclick = runAgent;
+
+  // Render chart placeholder
+  const ctx = document.getElementById("walletChart");
+  if (ctx && Chart) {
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          label: 'Metrics',
+          data: [0, 0, 0],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+          x: { ticks: { color: '#aaa' }, grid: { display: false } }
+        }
+      }
+    });
+  }
+});
+</script> <!-- ✅ closes this final script block -->
 </body>
 </html>
