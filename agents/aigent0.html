@@ -639,7 +639,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
 
       if (result.success) {
         alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500); // Optional: refresh the UI
+        setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
@@ -649,7 +649,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
       console.error("❌ unlockOffering() error:", err);
       alert("Error unlocking offering.");
     }
-  }, 1500); // Delay to give user time to complete Stripe
+  }, 1500);
 }
 
     alert(`${offeringId} unlocked and logged. Reloading UI...`);
