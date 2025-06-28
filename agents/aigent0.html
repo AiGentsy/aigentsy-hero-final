@@ -438,15 +438,15 @@ if (!user) {
       }
     });
 
-    // === Wallet Chart ===
+  // === Wallet Chart ===
 const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   const existingChart = Chart.getChart(walletChart);
-  if (existingChart) existingChart.destroy(); // Clean up
+  if (existingChart) existingChart.destroy();
 
   const aigx = user.yield?.aigxEarned ?? 0;
-  const staked = user.staked ?? 0;
-  const referrals = user.cloneLineage?.length ?? 0;
+  const staked = user.staked ? 1 : 0; // ✅ Boolean to 0/1
+  const referrals = (user.cloneLineage && Array.isArray(user.cloneLineage)) ? user.cloneLineage.length : 0;
 
   new Chart(walletChart, {
     type: 'bar',
@@ -459,6 +459,8 @@ if (Chart && walletChart) {
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
         y: {
