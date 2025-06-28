@@ -397,7 +397,21 @@ if (!user) return;
 
     console.log("🔍 Matched user record:", user);
     if (!user) return;
+const ctx = document.getElementById('walletChart');
+if (Chart && ctx && user) {
+  const aigx = user.yield?.aigxEarned || 0;
+  const staked = user.staked ? 1 : 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
 
+  const chartInstance = Chart.getChart(ctx);
+  if (chartInstance) {
+    chartInstance.data.datasets[0].data = [aigx, staked, referrals];
+    chartInstance.update();
+    console.log("✅ Wallet chart updated dynamically:", { aigx, staked, referrals });
+  } else {
+    console.warn("⚠️ Chart not found at runtime. Static fallback in place.");
+  }
+}
     const boxes = document.querySelectorAll(".metric-box");
 
     boxes.forEach(box => {
