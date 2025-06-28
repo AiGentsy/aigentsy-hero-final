@@ -420,15 +420,15 @@ if (!user) return;
       }
     });
 
-   console.log("📊 Injecting Wallet Chart Data:", {
+  const walletChart = document.getElementById('walletChart');
+
+console.log("✅ Rendering wallet chart with:", {
   aigx: user.yield?.aigxEarned,
   staked: user.staked,
   referrals: user.cloneLineage
 });
 
-const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
-  // Safely destroy previous chart if it exists
   if (walletChart.chartInstance) {
     walletChart.chartInstance.destroy();
   }
