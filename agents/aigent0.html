@@ -7,7 +7,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="/vaults.css" rel="stylesheet"/>
 <link href="/theme.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -170,7 +170,31 @@
 <h3>📊 Growth &amp; Deployment</h3>
 </div>
 </div>
-
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const ctx = document.getElementById('walletChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['AIGx Earned', 'Staked', 'Referrals'],
+            datasets: [{
+              label: 'Metrics',
+              backgroundColor: '#00bfff',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+              x: { ticks: { color: '#aaa' }, grid: { display: false } }
+            }
+          }
+        });
+      }
+    });
+  </script>
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -420,14 +444,13 @@ if (!user) return;
       }
     });
 
-  const walletChart = document.getElementById('walletChart');
-
-console.log("✅ Rendering wallet chart with:", {
+    console.log("📊 Injecting Wallet Chart Data:", {
   aigx: user.yield?.aigxEarned,
   staked: user.staked,
   referrals: user.cloneLineage
 });
 
+const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   if (walletChart.chartInstance) {
     walletChart.chartInstance.destroy();
