@@ -420,48 +420,58 @@ if (!user) return;
       }
     });
 
-    console.log("📊 Injecting Wallet Chart Data:", {
-  aigx: user.yield?.aigxEarned,
-  staked: user.staked,
-  referrals: user.cloneLineage
-});
 
 const walletChart = document.getElementById('walletChart');
-if (Chart && walletChart) {
+
+console.log("🧪 Diagnostic Check");
+console.log("📦 user:", user);
+console.log("📦 Chart exists?", typeof Chart);
+console.log("📦 walletChart element:", walletChart);
+
+if (Chart && walletChart && user) {
   const existingChart = Chart.getChart(walletChart);
   if (existingChart) existingChart.destroy();
 
-  new Chart(walletChart, {
-    type: 'bar',
-    data: {
-      labels: ['AIGx Earned', 'Staked', 'Referrals'],
-      datasets: [{
-        data: [
-          user.yield?.aigxEarned || 0,
-          user.staked ? 1 : 0,
-          Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
-        ],
-        backgroundColor: '#00bfff',
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#888' },
-          grid: { color: '#222' }
-        },
-        x: {
-          ticks: { color: '#aaa' },
-          grid: { display: false }
+  const aigx = user.yield?.aigxEarned || 0;
+  const staked = user.staked ? 1 : 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
+
+  console.log("📊 Injecting Wallet Chart Data:", { aigx, staked, referrals });
+
+  try {
+    new Chart(walletChart, {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          data: [aigx, staked, referrals],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#888' },
+            grid: { color: '#222' }
+          },
+          x: {
+            ticks: { color: '#aaa' },
+            grid: { display: false }
+          }
         }
       }
-    }
-  });
+    });
+    console.log("✅ Chart rendered!");
+  } catch (e) {
+    console.error("❌ Chart rendering failed:", e);
+  }
+} else {
+  console.warn("⚠️ Missing Chart.js, walletChart, or user data");
 }
     
 // === Overview Sidebar ===
