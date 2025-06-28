@@ -97,6 +97,51 @@
 <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
 <div class="chart-section">
 <canvas height="300" id="walletChart" width="300"></canvas>
+<script>
+  // This will be dynamically populated later from injectUserDashboard()
+  window.renderWalletChart = function(user) {
+    const walletChart = document.getElementById('walletChart');
+    if (!Chart || !walletChart || !user) return;
+
+    const existingChart = Chart.getChart(walletChart);
+    if (existingChart) existingChart.destroy();
+
+    const aigx = user.yield?.aigxEarned || 0;
+    const staked = user.staked ? 1 : 0;
+    const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
+
+    console.log("📊 Injecting Wallet Chart Data (inline):", { aigx, staked, referrals });
+
+    new Chart(walletChart, {
+      type: 'bar',
+      data: {
+        labels: ['AIGx Earned', 'Staked', 'Referrals'],
+        datasets: [{
+          data: [aigx, staked, referrals],
+          backgroundColor: '#00bfff',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#888' },
+            grid: { color: '#222' }
+          },
+          x: {
+            ticks: { color: '#aaa' },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+  };
+</script>
+
 </div>
 <div class="chart-sidebar-box">
 <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
@@ -421,59 +466,10 @@ if (!user) return;
     });
 
 
-const walletChart = document.getElementById('walletChart');
-
-console.log("🧪 Diagnostic Check");
-console.log("📦 user:", user);
-console.log("📦 Chart exists?", typeof Chart);
-console.log("📦 walletChart element:", walletChart);
-
-if (Chart && walletChart && user) {
-  const existingChart = Chart.getChart(walletChart);
-  if (existingChart) existingChart.destroy();
-
-  const aigx = user.yield?.aigxEarned || 0;
-  const staked = user.staked ? 1 : 0;
-  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
-
-  console.log("📊 Injecting Wallet Chart Data:", { aigx, staked, referrals });
-
-  try {
-    new Chart(walletChart, {
-      type: 'bar',
-      data: {
-        labels: ['AIGx Earned', 'Staked', 'Referrals'],
-        datasets: [{
-          data: [aigx, staked, referrals],
-          backgroundColor: '#00bfff',
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#888' },
-            grid: { color: '#222' }
-          },
-          x: {
-            ticks: { color: '#aaa' },
-            grid: { display: false }
-          }
-        }
-      }
-    });
-    console.log("✅ Chart rendered!");
-  } catch (e) {
-    console.error("❌ Chart rendering failed:", e);
-  }
-} else {
-  console.warn("⚠️ Missing Chart.js, walletChart, or user data");
+if (typeof window.renderWalletChart === 'function') {
+  window.renderWalletChart(user);
 }
-    
+
 // === Overview Sidebar ===
 const overviewBox = document.querySelector("#overviewBox ul");
 if (overviewBox) {
