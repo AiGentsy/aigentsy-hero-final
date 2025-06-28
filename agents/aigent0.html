@@ -428,10 +428,12 @@ if (!user) return;
 
 const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
-  const existingChart = Chart.getChart(walletChart);
-  if (existingChart) existingChart.destroy();
+  // Safely destroy previous chart if it exists
+  if (walletChart.chartInstance) {
+    walletChart.chartInstance.destroy();
+  }
 
-  new Chart(walletChart, {
+  walletChart.chartInstance = new Chart(walletChart, {
     type: 'bar',
     data: {
       labels: ['AIGx Earned', 'Staked', 'Referrals'],
