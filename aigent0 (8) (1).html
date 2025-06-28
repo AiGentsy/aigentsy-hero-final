@@ -444,29 +444,35 @@ if (!user) return;
       }
     });
 
-    // === Wallet Chart ===
-    const walletChart = document.getElementById('walletChart');
+    console.log("📊 Injecting Wallet Chart Data:", {
+  aigx: user.yield?.aigxEarned,
+  staked: user.staked,
+  referrals: user.cloneLineage
+});
+
+const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
-  const existingChart = Chart.getChart(walletChart);
-  if (existingChart) {
-    existingChart.destroy(); // ✅ Clean up previous chart instance
+  if (walletChart.chartInstance) {
+    walletChart.chartInstance.destroy();
   }
 
-  new Chart(walletChart, {
+  walletChart.chartInstance = new Chart(walletChart, {
     type: 'bar',
     data: {
       labels: ['AIGx Earned', 'Staked', 'Referrals'],
       datasets: [{
         data: [
           user.yield?.aigxEarned || 0,
-          user.staked || 0,
-          user.cloneLineage?.length || 0 || 0
+          user.staked ? 1 : 0,
+          Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
         ],
         backgroundColor: '#00bfff',
         borderRadius: 6
       }]
     },
     options: {
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
         y: {
