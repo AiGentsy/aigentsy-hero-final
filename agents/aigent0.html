@@ -513,24 +513,29 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-    // === Dynamic C-Suite Mapping ===
+// === MetaMatch C-Suite Injector ===
 const csuiteBox = document.getElementById("csuiteBox");
-if (csuiteBox) {
+if (csuiteBox && user) {
   const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: "AiGent SDK" },
-    { role: "CMO", name: "AiGent Growth" },
-    { role: "CLO", name: "AiGent Remix" },
-    { role: "CFO", name: "AiGent0" }
+    { role: "CEO", source: "user", label: "👤 You (CEO)" },
+    { role: "CLO", trait: "legal", label: "📜 CLO – Legal Ops" },
+    { role: "CMO", trait: "marketing", label: "📣 CMO – Marketing & Growth" },
+    { role: "CTO", trait: "technical", label: "💻 CTO – Tech & AI" },
+    { role: "CFO", trait: "finance", label: "💰 CFO – Financial Ops" }
   ];
 
+  const injectedRoles = cSuiteRoles.map(({ role, source, trait, label }) => {
+    if (source === "user") return `<li><strong>${role}:</strong> ${label}</li>`;
+    const hasTrait = user.traits?.some(t => t.toLowerCase().includes(trait));
+    return hasTrait
+      ? `<li><strong>${role}:</strong> ${label}</li>`
+      : `<li><strong>${role}:</strong> 🔍 Matching... (Add via Invite)</li>`;
+  }).join("");
+
   csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-    }</ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
+    <h4 style="color:#00bfff;margin-bottom:6px;">🏢 Executive Team</h4>
+    <ul>${injectedRoles}</ul>
+    <p style="font-size:0.85rem; color:#00bfff;">Each role can be cloned, licensed, or remixed</p>`;
 }
 
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
