@@ -401,6 +401,26 @@ const user = data.record || data.user || null;
 console.log("📦 User from AME runtime:", user);
 if (!user) return;
 
+      // ✅ Inject "Your AiGentsy Includes" business summary
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
+
+  const rendered = summaryItems.map(item => {
+    const hasAccess = item.accessKey ? user[item.accessKey] : false;
+    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
+    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
+  }).join("");
+
+  summaryBox.innerHTML = rendered;
+}
     console.log("🔍 Matched user record:", user);
     if (!user) return;
 const ctx = document.getElementById('walletChart');
