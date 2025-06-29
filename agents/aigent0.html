@@ -621,8 +621,14 @@ async function unlockOffering(username, offeringId, stripeLink) {
       const result = await res.json();
 
       if (result.success) {
-        alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
+        // ✅ Show toast
+const toast = document.getElementById("toast");
+toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
+toast.style.display = "block";
+setTimeout(() => toast.style.display = "none", 3000);
+
+alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
+setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
