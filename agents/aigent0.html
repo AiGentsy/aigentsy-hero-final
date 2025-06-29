@@ -517,22 +517,28 @@ if (overviewBox) {
 const csuiteBox = document.getElementById("csuiteBox");
 if (csuiteBox && user) {
   const cSuiteRoles = [
-    { role: "CEO", label: "👤 You (CEO)" },
-    { role: "CLO", label: "📜 CLO – Legal Ops" },
-    { role: "CMO", label: "📣 CMO – Marketing & Growth" },
-    { role: "CTO", label: "💻 CTO – Tech & AI" },
-    { role: "CFO", label: "💰 CFO – Financial Ops" }
+    { role: "CEO", source: "user", label: "👤 You (CEO)" },
+    { role: "CLO", trait: "legal", label: "📜 CLO – Legal Ops" },
+    { role: "CMO", trait: "marketing", label: "📣 CMO – Marketing & Growth" },
+    { role: "CTO", trait: "technical", label: "💻 CTO – Tech & AI" },
+    { role: "CFO", trait: "finance", label: "💰 CFO – Financial Ops" }
   ];
 
-  const rendered = cSuiteRoles.map(({ role, label }) =>
-    `<li><strong>${role}:</strong> ${label}</li>`
-  ).join("");
+  const injectedRoles = cSuiteRoles.map(({ role, source, trait, label }) => {
+    if (source === "user") return `<li><strong>${role}:</strong> ${label}</li>`;
+    const hasTrait = user.traits?.some(t => t.toLowerCase().includes(trait));
+    return hasTrait
+      ? `<li><strong>${role}:</strong> ${label}</li>`
+      : `<li><strong>${role}:</strong> 🔍 Matching... (Add via Invite)</li>`;
+  }).join("");
 
   csuiteBox.innerHTML = `
     <h4 style="color:#00bfff;margin-bottom:6px;">🏢 Your C-Suite</h4>
-    <ul>${rendered}</ul>
-    <p style="font-size:0.85rem; color:#00bfff;">This is your fully staffed AiGentsy business team.</p>`;
+    <ul style="padding-left: 18px; font-size: 0.9rem;">${injectedRoles}</ul>
+    <p style="font-size:0.85rem; color:#00bfff;">This is your fully staffed AiGentsy business team.</p>
+  `;
 }
+
 
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
