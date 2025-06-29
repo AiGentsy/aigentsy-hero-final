@@ -719,56 +719,59 @@ async function autoMatchEngine(username) {
 
     const offerings = [
       {
-        id: "SDK",
+        id: "sdk",
         label: "SDK Toolkit",
-        accessKey: "sdkUnlocked",
+        accessKey: "sdkAccess_eligible",
+        condition: !user.sdkAccess_eligible,
         stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
       },
       {
-        id: "Vault",
-        label: "Vault Access",
-        accessKey: "vaultAccess",
+        id: "legal",
+        label: "Legal Kit",
+        accessKey: "legalUnlocked",
+        condition: !(user.traits || []).includes("legal"),
         stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
       },
       {
-        id: "License",
-        label: "Clone License",
-        accessKey: "cloneLicense",
+        id: "branding",
+        label: "Branding Pack",
+        accessKey: "brandingUnlocked",
+        condition: !(user.traits || []).includes("marketing"),
         stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
       },
       {
-        id: "Remix",
-        label: "Remix Unlock",
+        id: "remix",
+        label: "Remix License",
         accessKey: "remixUnlocked",
+        condition: !user.remixUnlocked,
         stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
       },
       {
-        id: "Legal",
-        label: "Legal Kit",
-        accessKey: "legalUnlocked",
-        stripe: "https://buy.stripe.com/test-legal-kit-link"
-      },
-      {
-        id: "Brand",
-        label: "Branding Pack",
-        accessKey: "brandUnlocked",
-        stripe: "https://buy.stripe.com/test-brand-pack"
+        id: "clone",
+        label: "Clone License",
+        accessKey: "cloneLicenseUnlocked",
+        condition: !user.cloneLicenseUnlocked,
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
       }
     ];
 
-    offerings.forEach(offering => {
-      const alreadyUnlocked = user[offering.accessKey];
+    offerings.forEach(({ id, label, accessKey, condition, stripe }) => {
       const li = document.createElement("li");
-      li.style.marginBottom = "10px";
-      li.innerHTML = alreadyUnlocked
-        ? `✅ ${offering.label} Unlocked`
-        : `<button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">🔓 Unlock ${offering.label}</button>`;
+      if (user[accessKey] === true || condition === false) {
+        li.innerHTML = `✅ ${label} Unlocked`;
+      } else {
+        li.innerHTML = `
+          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
+            🔓 Unlock ${label}
+          </button>`;
+      }
       list.appendChild(li);
     });
 
   } catch (err) {
     console.error("❌ autoMatchEngine() error:", err);
   }
+}
 // === STARTUP HOOK ===
 window.addEventListener("DOMContentLoaded", () => {
   if (!localStorage.getItem("aigentsyUsername")) {
