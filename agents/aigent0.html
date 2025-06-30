@@ -3,7 +3,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <title>Autonomous AiGentsy Launchpad</title>
-<script defer src="/access-check.js"></script>
+<script defer="" src="/access-check.js"></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="/vaults.css" rel="stylesheet"/>
 <link href="/theme.css" rel="stylesheet"/>
@@ -91,7 +91,7 @@
       white-space: pre-line;
     }
   </style>
-</head>
+
 <body>
 <div class="sidebar">
 <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
@@ -113,7 +113,7 @@
 </div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
-<div class="metric-box full-width">
+<div class="metric-box"><h3>📌 Your AiGentsy Includes</h3><ul id="businessSummaryList"></ul></div><div class="metric-box full-width">
 <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
 <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
 <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
@@ -131,12 +131,6 @@
 <h3>💼 Real-World Earnings</h3>
 <ul></ul>
 </div>
-    <div class="metric-box">
-  <h3>📦 Your AiGentsy Includes</h3>
-  <ul id="businessSummaryList">
-    <li>Loading your AiGentsy bundle...</li>
-  </ul>
-</div>
 <div class="metric-box">
 <h3>📦 SDK &amp; Licensing</h3>
 <!-- Injected by autoMatchEngine -->
@@ -146,12 +140,6 @@
 <button class="btn-glow" onclick="openModal('vault')">💼 Unlock Vault</button>
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
-</div>
-    <div class="metric-box">
-  <h3>📈 Activity Feed</h3>
-  <ul id="activityFeedList">
-    <li>Loading recent activity...</li>
-  </ul>
 </div>
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
@@ -270,6 +258,23 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
+async function runAgent() {
+  const input = textarea.value.trim();
+  if (!input) return;
+
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `🧠 You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  textarea.value = "";
+
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 Your AiGentsy: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
 
   // ✅ Continuity patch: recall last AiGent response if input is a short confirm
   let conditionedInput = input;
@@ -358,10 +363,10 @@ if (sendBtn) sendBtn.onclick = runAgent;
  
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "CTO – Tech & AI";
-  if (endpoint.includes("growth")) return "CMO – Growth";
-  if (endpoint.includes("remix")) return "CLO – Legal & Licensing";
-  return "Your AiGentsy";
+  if (endpoint.includes("sdk")) return "AiGentsy CTO";
+  if (endpoint.includes("growth")) return "AiGentsy CMO";
+  if (endpoint.includes("remix")) return "AiGentsy CLO";
+  return "Autonomous AiGentsy";
 }
 
 
@@ -390,43 +395,9 @@ const user = data.record || data.user || null;
 console.log("📦 User from AME runtime:", user);
 if (!user) return;
 
-      // ✅ Inject "Your AiGentsy Includes" business summary
-const summaryBox = document.getElementById("businessSummaryList");
-if (summaryBox && user) {
-  const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess" },
-    { label: "Vault Access", accessKey: "vaultAccess" },
-    { label: "Remix License", accessKey: "remixUnlocked" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
-    { label: "Legal Kit", trait: "legal" },
-    { label: "Branding Pack", trait: "marketing" }
-  ];
-
-  const rendered = summaryItems.map(item => {
-    const hasAccess = item.accessKey ? user[item.accessKey] : false;
-    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
-    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
-  }).join("");
-
-  summaryBox.innerHTML = rendered;
-}
     console.log("🔍 Matched user record:", user);
     if (!user) return;
-const ctx = document.getElementById('walletChart');
-if (Chart && ctx && user) {
-  const aigx = user.yield?.aigxEarned || 0;
-  const staked = user.staked ? 1 : 0;
-  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
 
-  const chartInstance = Chart.getChart(ctx);
-  if (chartInstance) {
-    chartInstance.data.datasets[0].data = [aigx, staked, referrals];
-    chartInstance.update();
-    console.log("✅ Wallet chart updated dynamically:", { aigx, staked, referrals });
-  } else {
-    console.warn("⚠️ Chart not found at runtime. Static fallback in place.");
-  }
-}
     const boxes = document.querySelectorAll(".metric-box");
 
     boxes.forEach(box => {
@@ -528,28 +499,25 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-// === MetaMatch C-Suite Injector ===
+    // === Dynamic C-Suite Mapping ===
 const csuiteBox = document.getElementById("csuiteBox");
 if (csuiteBox) {
   const cSuiteRoles = [
-    { role: "CEO", label: "👤 You (CEO)" },
-    { role: "CLO", label: "📜 CLO – Legal Ops" },
-    { role: "CMO", label: "📣 CMO – Marketing & Growth" },
-    { role: "CTO", label: "💻 CTO – Tech & AI" },
-    { role: "CFO", label: "💰 CFO – Financial Ops" }
+    { role: "CEO", name: `${username} (You)` },
+    { role: "CTO", name: "AiGent SDK" },
+    { role: "CMO", name: "AiGent Growth" },
+    { role: "CLO", name: "AiGent Remix" },
+    { role: "CFO", name: "AiGent0" }
   ];
 
-  const rendered = cSuiteRoles.map(({ role, label }) =>
-    `<li><strong>${role}:</strong> ${label}</li>`
-  ).join("");
-
   csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff;margin-bottom:6px;">🏢 Your C-Suite</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${rendered}</ul>
-    <p style="font-size:0.85rem; color:#00bfff;">This is your fully staffed AiGentsy business team.</p>
+    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;">${
+      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
+    }</ul>
+    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
   `;
 }
-
 
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
@@ -599,31 +567,7 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
- // ✅ Activity Feed Renderer
-const activityBox = document.getElementById("activityFeedList");
-if (activityBox) {
-  try {
-    const activityRes = await fetch("https://aigentsy-ame-runtime.onrender.com/log-feed", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-
-    const activityData = await activityRes.json();
-    const logs = activityData?.logs || [];
-
-    if (logs.length === 0) {
-      activityBox.innerHTML = "<li>No recent activity yet.</li>";
-    } else {
-      activityBox.innerHTML = logs.slice(0, 5).map(log => {
-        return `<li>• ${log.buyer || "Someone"} unlocked ${log.offeringId} from ${log.seller || "AiGentsy Protocol"}</li>`;
-      }).join("");
-    }
-  } catch (err) {
-    console.error("❌ Activity Feed error:", err);
-    activityBox.innerHTML = "<li>Error loading feed</li>";
-  }
-}  
+   
     // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
@@ -662,28 +606,8 @@ async function unlockOffering(username, offeringId, stripeLink) {
       const result = await res.json();
 
       if (result.success) {
-        // ✅ Toast UI
-        const toast = document.getElementById("toast");
-        toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
-        toast.style.display = "block";
-        setTimeout(() => toast.style.display = "none", 3000);
-
-        // ✅ Log to backend (JSONBin safe)
-        await fetch("https://aigentsy-ame-runtime.onrender.com/log-purchase", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            username,                      // buyer
-            offeringId,
-            action: "unlock",
-            source: "dashboard",
-            timestamp: new Date().toISOString(),
-            buyer: username,
-            seller: user?.source || "AiGentsy Protocol"
-          })
-        });
-
-        setTimeout(() => window.location.reload(), 1500);
+        alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
+        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
@@ -697,7 +621,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
 }
 
 </script> <!-- ✅ Close script BEFORE modal -->
-
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
 <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
@@ -753,7 +676,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
     document.getElementById("modalOverlay").style.display = "none";
   }
 </script>
-
 <script>
 
 
@@ -772,56 +694,33 @@ async function autoMatchEngine(username) {
 
     const list = document.getElementById("autoMatchOfferings");
     if (!list) return;
-    list.innerHTML = ""; // Clear old contents
 
-    const offerings = [
-      {
-        id: "sdk",
-        label: "SDK Toolkit",
-        accessKey: "sdkAccess_eligible",
-        condition: !user.sdkAccess_eligible,
-        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
-      },
-      {
-        id: "legal",
-        label: "Legal Kit",
-        accessKey: "legalUnlocked",
-        condition: !(user.traits || []).includes("legal"),
-        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
-      },
-      {
-        id: "branding",
-        label: "Branding Pack",
-        accessKey: "brandingUnlocked",
-        condition: !(user.traits || []).includes("marketing"),
-        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
-      },
-      {
-        id: "remix",
-        label: "Remix License",
+    const offerings = [];
+
+    if (
+      (!user.remixUnlocked && (user.traits?.includes?.("creator") || user.business_type === "media"))
+    ) {
+      offerings.push({
+        id: "Remix",
+        label: "Remix Unlock",
         accessKey: "remixUnlocked",
-        condition: !user.remixUnlocked,
         stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-      },
-      {
-        id: "clone",
-        label: "Clone License",
-        accessKey: "cloneLicenseUnlocked",
-        condition: !user.cloneLicenseUnlocked,
-        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
-      }
-    ];
+      });
+    }
 
-    offerings.forEach(({ id, label, accessKey, condition, stripe }) => {
+    if (offerings.length === 0) {
       const li = document.createElement("li");
-      if (user[accessKey] === true || condition === false) {
-        li.innerHTML = `✅ ${label} Unlocked`;
-      } else {
-        li.innerHTML = `
-          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
-            🔓 Unlock ${label}
-          </button>`;
-      }
+      li.textContent = "No unlocks available at this time. ✅";
+      list.appendChild(li);
+      return;
+    }
+
+    offerings.forEach(offering => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
+          🔓 Unlock ${offering.label}
+        </button>`;
       list.appendChild(li);
     });
 
@@ -890,21 +789,6 @@ async function runAgent() {
     loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
   }
 }
-   </script>
-    <div id="toast" class="toast" style="
-  display: none;
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #00bfff;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px #000;
-  font-size: 0.95rem;
-  z-index: 9999;
-"></div>
-
+</script>
 </body>
 </html>
