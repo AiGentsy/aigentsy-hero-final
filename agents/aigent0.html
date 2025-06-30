@@ -616,7 +616,31 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
-   
+ // ✅ Activity Feed Renderer
+const activityBox = document.getElementById("activityFeedList");
+if (activityBox) {
+  try {
+    const activityRes = await fetch("https://aigentsy-ame-runtime.onrender.com/log-feed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const activityData = await activityRes.json();
+    const logs = activityData?.logs || [];
+
+    if (logs.length === 0) {
+      activityBox.innerHTML = "<li>No recent activity yet.</li>";
+    } else {
+      activityBox.innerHTML = logs.slice(0, 5).map(log => {
+        return `<li>• ${log.buyer || "Someone"} unlocked ${log.offeringId} from ${log.seller || "AiGentsy Protocol"}</li>`;
+      }).join("");
+    }
+  } catch (err) {
+    console.error("❌ Activity Feed error:", err);
+    activityBox.innerHTML = "<li>Error loading feed</li>";
+  }
+}  
     // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
