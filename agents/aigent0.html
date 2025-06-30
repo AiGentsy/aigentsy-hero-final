@@ -1,19 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
- <head>
-  <meta charset="utf-8"/>
-  <title>
-   Autonomous AiGentsy Launchpad
-  </title>
-  <script defer="" src="/access-check.js">
-  </script>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <link href="/vaults.css" rel="stylesheet"/>
-  <link href="/theme.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js">
-  </script>
-  <style>
-   body {
+<meta charset="utf-8"/>
+<title>Autonomous AiGentsy Launchpad</title>
+<script defer src="/access-check.js"></script>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="/vaults.css" rel="stylesheet"/>
+<link href="/theme.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       background: radial-gradient(circle at center, #0e101a, #000);
@@ -95,178 +91,99 @@
       white-space: pre-line;
     }
   </style>
- </head>
- <body>
-  <div class="sidebar">
-   <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-   <div class="chart-section">
-    <canvas height="300" id="walletChart" width="300">
-    </canvas>
-   </div>
-   <div class="chart-sidebar-box">
-    <h4 style="color:#00bfff; margin-bottom:6px;">
-     📊 Propagation Graph
-    </h4>
-    <canvas height="220" id="propagationChart" width="300">
-    </canvas>
-   </div>
-   <div class="chart-sidebar-box" id="csuiteBox">
-    <h4 style="color:#00bfff; margin-bottom:6px;">
-     🏢 C-Suite Team
-    </h4>
-    <p>
-     Loading executive roles...
-    </p>
-   </div>
-   <div class="chart-sidebar-box" id="remixSnapshotBox">
-    <h4 style="color:#00bfff;margin-bottom:6px;">
-     🔁 Remix Snapshot
-    </h4>
-    <p>
-     Loading remix metrics...
-    </p>
-    <p style="font-size:0.9rem; color:#00bfff;">
-     + Add new team member to Your AiGentsy
-    </p>
-   </div>
-  </div>
-  <!-- ✅ CLOSE sidebar -->
-  <div class="main">
-   <div class="metric-box">
-    <h3>
-     📌 Your AiGentsy Includes
-    </h3>
-    <ul id="businessSummaryList">
-    </ul>
-   </div>
-   <div class="metric-box full-width">
-    <h2>
-     Your AiGentsy — Autonomous AiGentsy Launchpad
-    </h2>
-    <p>
-     You've now launched your own AI-powered business that can generate income autonomously across real-world industries.
-    </p>
-    <p style="color:#ccc; font-size:0.9rem;">
-     Traits:
-     <span style="color:#00bfff;">
-      real-world-deployable, solo-hive-founder, sdk-eligible
-     </span>
-    </p>
-    <p style="color:#aaa; font-size:0.85rem;">
-     💡
-     <strong>
-      Tip:
-     </strong>
-     Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.
-    </p>
-    <div style="margin-top:16px;">
-     <p style="color:#00bfff">
-      <strong>
-       Self-Expanding
-      </strong>
-     </p>
-     <p style="font-size:0.9rem; color:#ccc;">
-      Your AiGentsy automatically builds new agents when needed — your business grows itself.
-     </p>
-    </div>
-   </div>
-   <div class="metric-box">
-    <h3>
-     🧠 Chat Interface
-    </h3>
-    <textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-    <button class="btn-glow" id="sendBtn" style="margin-top:10px;">
-     Send
-    </button>
-   </div>
-   <div class="metric-box">
-    <h3>
-     💼 Real-World Earnings
-    </h3>
-    <ul>
-    </ul>
-   </div>
-   <div class="metric-box">
-    <h3>
-     📦 SDK &amp; Licensing
-    </h3>
-    <!-- Injected by autoMatchEngine -->
-    <ul id="autoMatchOfferings">
-    </ul>
-    <!-- Modal-triggering buttons -->
-    <button class="btn-glow" onclick="openModal('sdk')">
-     🚀 Unlock SDK
-    </button>
-    <button class="btn-glow" onclick="openModal('vault')">
-     💼 Unlock Vault
-    </button>
-    <button class="btn-glow" onclick="openModal('remix')">
-     🎨 Unlock Remix
-    </button>
-    <button class="btn-glow" onclick="openModal('clone')">
-     🧬 Unlock Clone
-    </button>
-   </div>
-   <div class="metric-box">
-    <h3>
-     📡 Activity Feed
-    </h3>
-    <ul>
-    </ul>
-    <div style="margin-top: 10px;">
-     <h4 style="color:#00bfff; margin-bottom:6px;">
-      🌐 Public Links
-     </h4>
-     <a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">
-      🔗 Agent Page
-     </a>
-     <a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">
-      📤 Share Link
-     </a>
-    </div>
-   </div>
-   <div class="metric-box">
-    <h3>
-     💰 Wallet &amp; Off-Ramp
-    </h3>
-    <ul>
-    </ul>
-    <a class="btn-glow" href="/cashout.html">
-     💸 Cash Out to Fiat
-    </a>
-   </div>
-   <div class="metric-box">
-    <h3>
-     📊 Mint Snapshot
-    </h3>
-    <ul>
-    </ul>
-    <a class="btn-glow" href="/remix.html?agent=aigent-venture">
-     🔁 Remix Again
-    </a>
-    <a class="btn-glow" href="/license.html?agent=aigent-venture">
-     💼 License This Venture
-    </a>
-   </div>
-   <div class="metric-box">
-    <h3>
-     ⚔️ Remix Arena Challenge
-    </h3>
-    <p>
-     Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.
-    </p>
-    <a class="btn-glow" href="/arena.html?agent=AUTO-001">
-     Join the Arena
-    </a>
-   </div>
-   <div class="metric-box">
-    <h3>
-     📊 Growth &amp; Deployment
-    </h3>
-   </div>
-  </div>
-  <script>
-   window.addEventListener('DOMContentLoaded', () => {
+</head>
+<body>
+<div class="sidebar">
+<img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
+<div class="chart-section">
+<canvas height="300" id="walletChart" width="300"></canvas>
+</div>
+<div class="chart-sidebar-box">
+<h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
+<canvas height="220" id="propagationChart" width="300"></canvas>
+</div>
+<div class="chart-sidebar-box" id="csuiteBox">
+<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+<p>Loading executive roles...</p>
+</div>
+<div class="chart-sidebar-box" id="remixSnapshotBox">
+<h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+<p>Loading remix metrics...</p>
+<p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
+</div>
+</div> <!-- ✅ CLOSE sidebar -->
+<div class="main">
+<div class="metric-box full-width">
+<h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
+<p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
+<p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.</p>
+<div style="margin-top:16px;">
+<p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+<p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+</div>
+</div>
+<div class="metric-box">
+<h3>🧠 Chat Interface</h3>
+<textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+<button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button></div>
+<div class="metric-box">
+<h3>💼 Real-World Earnings</h3>
+<ul></ul>
+</div>
+    <div class="metric-box">
+  <h3>📦 Your AiGentsy Includes</h3>
+  <ul id="businessSummaryList">
+    <li>Loading your AiGentsy bundle...</li>
+  </ul>
+</div>
+<div class="metric-box">
+<h3>📦 SDK &amp; Licensing</h3>
+<!-- Injected by autoMatchEngine -->
+<ul id="autoMatchOfferings"></ul>
+<!-- Modal-triggering buttons -->
+<button class="btn-glow" onclick="openModal('sdk')">🚀 Unlock SDK</button>
+<button class="btn-glow" onclick="openModal('vault')">💼 Unlock Vault</button>
+<button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
+<button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
+</div>
+    <div class="metric-box">
+  <h3>📈 Activity Feed</h3>
+  <ul id="activityFeedList">
+    <li>Loading recent activity...</li>
+  </ul>
+</div>
+<div class="metric-box">
+<h3>📡 Activity Feed</h3>
+<ul></ul>
+<div style="margin-top: 10px;">
+<h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+<a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+<a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+</div>
+</div>
+<div class="metric-box">
+<h3>💰 Wallet &amp; Off-Ramp</h3>
+<ul> </ul>
+<a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+</div>
+<div class="metric-box">
+<h3>📊 Mint Snapshot</h3>
+<ul></ul>
+<a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
+<a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
+</div>
+<div class="metric-box">
+<h3>⚔️ Remix Arena Challenge</h3>
+<p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
+<a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
+</div>
+<div class="metric-box">
+<h3>📊 Growth &amp; Deployment</h3>
+</div>
+</div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
       const ctx = document.getElementById('walletChart');
       if (ctx) {
         new Chart(ctx, {
@@ -290,9 +207,9 @@
       }
     });
   </script>
-  <!-- PATCH: AiGentsy Simplified Runtime Injection -->
-  <script>
-   const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
+<!-- PATCH: AiGentsy Simplified Runtime Injection -->
+<script>
+const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
 const chatLog = document.createElement("div");
 chatLog.className = "chat-log";
 chatLog.style.maxHeight = "240px";
@@ -458,10 +375,10 @@ if (sendBtn) sendBtn.onclick = runAgent;
  
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "AiGentsy CTO";
-  if (endpoint.includes("growth")) return "AiGentsy CMO";
-  if (endpoint.includes("remix")) return "AiGentsy CLO";
-  return "Autonomous AiGentsy";
+  if (endpoint.includes("sdk")) return "CTO – Tech & AI";
+  if (endpoint.includes("growth")) return "CMO – Growth";
+  if (endpoint.includes("remix")) return "CLO – Legal & Licensing";
+  return "Your AiGentsy";
 }
 
 
@@ -490,9 +407,43 @@ const user = data.record || data.user || null;
 console.log("📦 User from AME runtime:", user);
 if (!user) return;
 
+      // ✅ Inject "Your AiGentsy Includes" business summary
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
+
+  const rendered = summaryItems.map(item => {
+    const hasAccess = item.accessKey ? user[item.accessKey] : false;
+    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
+    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
+  }).join("");
+
+  summaryBox.innerHTML = rendered;
+}
     console.log("🔍 Matched user record:", user);
     if (!user) return;
+const ctx = document.getElementById('walletChart');
+if (Chart && ctx && user) {
+  const aigx = user.yield?.aigxEarned || 0;
+  const staked = user.staked ? 1 : 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
 
+  const chartInstance = Chart.getChart(ctx);
+  if (chartInstance) {
+    chartInstance.data.datasets[0].data = [aigx, staked, referrals];
+    chartInstance.update();
+    console.log("✅ Wallet chart updated dynamically:", { aigx, staked, referrals });
+  } else {
+    console.warn("⚠️ Chart not found at runtime. Static fallback in place.");
+  }
+}
     const boxes = document.querySelectorAll(".metric-box");
 
     boxes.forEach(box => {
@@ -594,25 +545,28 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-    // === Dynamic C-Suite Mapping ===
+// === MetaMatch C-Suite Injector ===
 const csuiteBox = document.getElementById("csuiteBox");
 if (csuiteBox) {
   const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: "AiGent SDK" },
-    { role: "CMO", name: "AiGent Growth" },
-    { role: "CLO", name: "AiGent Remix" },
-    { role: "CFO", name: "AiGent0" }
+    { role: "CEO", label: "👤 You (CEO)" },
+    { role: "CLO", label: "📜 CLO – Legal Ops" },
+    { role: "CMO", label: "📣 CMO – Marketing & Growth" },
+    { role: "CTO", label: "💻 CTO – Tech & AI" },
+    { role: "CFO", label: "💰 CFO – Financial Ops" }
   ];
 
+  const rendered = cSuiteRoles.map(({ role, label }) =>
+    `<li><strong>${role}:</strong> ${label}</li>`
+  ).join("");
+
   csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-    }</ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    <h4 style="color:#00bfff;margin-bottom:6px;">🏢 Your C-Suite</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;">${rendered}</ul>
+    <p style="font-size:0.85rem; color:#00bfff;">This is your fully staffed AiGentsy business team.</p>
   `;
 }
+
 
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
@@ -662,7 +616,31 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
-   
+ // ✅ Activity Feed Renderer
+const activityBox = document.getElementById("activityFeedList");
+if (activityBox) {
+  try {
+    const activityRes = await fetch("https://aigentsy-ame-runtime.onrender.com/log-feed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const activityData = await activityRes.json();
+    const logs = activityData?.logs || [];
+
+    if (logs.length === 0) {
+      activityBox.innerHTML = "<li>No recent activity yet.</li>";
+    } else {
+      activityBox.innerHTML = logs.slice(0, 5).map(log => {
+        return `<li>• ${log.buyer || "Someone"} unlocked ${log.offeringId} from ${log.seller || "AiGentsy Protocol"}</li>`;
+      }).join("");
+    }
+  } catch (err) {
+    console.error("❌ Activity Feed error:", err);
+    activityBox.innerHTML = "<li>Error loading feed</li>";
+  }
+}  
     // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
@@ -701,8 +679,28 @@ async function unlockOffering(username, offeringId, stripeLink) {
       const result = await res.json();
 
       if (result.success) {
-        alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
+        // ✅ Toast UI
+        const toast = document.getElementById("toast");
+        toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 3000);
+
+        // ✅ Log to backend (JSONBin safe)
+        await fetch("https://aigentsy-ame-runtime.onrender.com/log-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,                      // buyer
+            offeringId,
+            action: "unlock",
+            source: "dashboard",
+            timestamp: new Date().toISOString(),
+            buyer: username,
+            seller: user?.source || "AiGentsy Protocol"
+          })
+        });
+
+        setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
@@ -714,20 +712,18 @@ async function unlockOffering(username, offeringId, stripeLink) {
     }
   }, 1500);
 }
-  </script>
-  <!-- ✅ Close script BEFORE modal -->
-  <!-- 🔒 Modal Container -->
-  <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
-   <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
-    <button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">
-     ❌
-    </button>
-    <div id="modalContent">
-    </div>
-   </div>
-  </div>
-  <script>
-   function openModal(type) {
+
+</script> <!-- ✅ Close script BEFORE modal -->
+
+<!-- 🔒 Modal Container -->
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+<div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+<button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+<div id="modalContent"></div>
+</div>
+</div>
+<script>
+  function openModal(type) {
     const username = localStorage.getItem("aigentsyUsername");
     if (!username) return alert("No user found.");
 
@@ -773,9 +769,12 @@ async function unlockOffering(username, offeringId, stripeLink) {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
-  </script>
-  <script>
-   // === AUTO-MATCH ENGINE — OFFERINGS LOGIC ===
+</script>
+
+<script>
+
+
+// === AUTO-MATCH ENGINE — OFFERINGS LOGIC ===
 async function autoMatchEngine(username) {
   try {
     const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
@@ -790,33 +789,56 @@ async function autoMatchEngine(username) {
 
     const list = document.getElementById("autoMatchOfferings");
     if (!list) return;
+    list.innerHTML = ""; // Clear old contents
 
-    const offerings = [];
-
-    if (
-      (!user.remixUnlocked && (user.traits?.includes?.("creator") || user.business_type === "media"))
-    ) {
-      offerings.push({
-        id: "Remix",
-        label: "Remix Unlock",
+    const offerings = [
+      {
+        id: "sdk",
+        label: "SDK Toolkit",
+        accessKey: "sdkAccess_eligible",
+        condition: !user.sdkAccess_eligible,
+        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+      },
+      {
+        id: "legal",
+        label: "Legal Kit",
+        accessKey: "legalUnlocked",
+        condition: !(user.traits || []).includes("legal"),
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "branding",
+        label: "Branding Pack",
+        accessKey: "brandingUnlocked",
+        condition: !(user.traits || []).includes("marketing"),
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      },
+      {
+        id: "remix",
+        label: "Remix License",
         accessKey: "remixUnlocked",
+        condition: !user.remixUnlocked,
         stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-      });
-    }
+      },
+      {
+        id: "clone",
+        label: "Clone License",
+        accessKey: "cloneLicenseUnlocked",
+        condition: !user.cloneLicenseUnlocked,
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      }
+    ];
 
-    if (offerings.length === 0) {
+    offerings.forEach(({ id, label, accessKey, condition, stripe }) => {
       const li = document.createElement("li");
-      li.textContent = "No unlocks available at this time. ✅";
-      list.appendChild(li);
-      return;
-    }
-
-    offerings.forEach(offering => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-          🔓 Unlock ${offering.label}
-        </button>`;
+      if (user[accessKey] === true || condition === false) {
+        li.innerHTML = `✅ ${label} Unlocked`;
+      } else {
+        li.innerHTML = `
+          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
+            🔓 Unlock ${label}
+          </button>`;
+      }
       list.appendChild(li);
     });
 
@@ -849,7 +871,42 @@ window.addEventListener("DOMContentLoaded", () => {
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
+async function runAgent() {
+  const textarea = document.querySelector("textarea"); // ✅ REQUIRED
+  const input = textarea.value.trim();
+  if (!input) return;
 
-  </script>
- </body>
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `🧠 You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  textarea.value = "";
+
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 AiGent0: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, memory })
+    });
+
+    const data = await res.json();
+    const reply = data.output || "No response.";
+    loader.textContent = `🤖 AiGent0: ${reply}`;
+    memory.push(reply);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+  } catch (err) {
+    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
+  }
+}
+</script>
+</body>
 </html>
