@@ -145,6 +145,10 @@
   <h3>📦 Your AiGentsy Includes</h3>
   <ul id="businessSummaryList"></ul>
 </div>
+    <div class="metric-box" id="inviteBox" style="display:none;">
+  <h3>🤝 Expand Your Team</h3>
+  <ul id="inviteList"></ul>
+</div>
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
 <ul></ul>
@@ -406,7 +410,28 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
+// ✅ MetaHive Expansion: Invite teammates if traits are missing
+const inviteBox = document.getElementById("inviteBox");
+const inviteList = document.getElementById("inviteList");
 
+if (inviteBox && inviteList && user) {
+  const invites = [];
+
+  if (!(user.traits || []).includes("marketing")) {
+    invites.push("📣 Add a Growth Partner (CMO)");
+  }
+  if (!(user.traits || []).includes("legal")) {
+    invites.push("📜 Add a Legal Partner (CLO)");
+  }
+  if (!(user.traits || []).includes("finance")) {
+    invites.push("💰 Add a Financial Partner (CFO)");
+  }
+
+  if (invites.length > 0) {
+    inviteBox.style.display = "block";
+    inviteList.innerHTML = invites.map(txt => `<li>${txt}</li>`).join("");
+  }
+}
   const rendered = summaryItems.map(item => {
     const hasAccess = item.accessKey ? user[item.accessKey] : false;
     const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
