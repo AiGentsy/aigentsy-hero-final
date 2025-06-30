@@ -147,10 +147,15 @@
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
 </div>
-   
+    <div class="metric-box">
+  <h3>📈 Activity Feed</h3>
+  <ul id="activityFeedList">
+    <li>Loading recent activity...</li>
+  </ul>
+</div>
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
-<ul id="activityFeedList"></ul> <!-- ✅ Add ID so JS can target it -->
+<ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
 <a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
@@ -349,6 +354,32 @@ let reply = formatResponseEnhanced(data.output || "No response.");
 const agentRole = getAgentRoleFromEndpoint(endpoint);
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
+    // Optional: Add visual buttons again
+    const buttons = document.createElement("div");
+    buttons.style.marginTop = "12px";
+    buttons.innerHTML = `
+      <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
+      <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
+      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+    loader.appendChild(buttons);
+
+    memory.push(`🤖 ${reply}`);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    textarea.focus();
+  } catch (err) {
+    loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
+  }
+}
+
+if (sendBtn) sendBtn.onclick = runAgent;
+ 
+// PATCH: Dynamic label substitution by runtime source
+function getAgentRoleFromEndpoint(endpoint) {
+  if (endpoint.includes("sdk")) return "CTO – Tech & AI";
+  if (endpoint.includes("growth")) return "CMO – Growth";
+  if (endpoint.includes("remix")) return "CLO – Legal & Licensing";
+  return "Your AiGentsy";
+}
 
 
 async function injectUserDashboard() {
@@ -585,7 +616,31 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
+ // ✅ Activity Feed Renderer
+const activityBox = document.getElementById("activityFeedList");
+if (activityBox) {
+  try {
+    const activityRes = await fetch("https://aigentsy-ame-runtime.onrender.com/log-feed", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
 
+    const activityData = await activityRes.json();
+    const logs = activityData?.logs || [];
+
+    if (logs.length === 0) {
+      activityBox.innerHTML = "<li>No recent activity yet.</li>";
+    } else {
+      activityBox.innerHTML = logs.slice(0, 5).map(log => {
+        return `<li>• ${log.buyer || "Someone"} unlocked ${log.offeringId} from ${log.seller || "AiGentsy Protocol"}</li>`;
+      }).join("");
+    }
+  } catch (err) {
+    console.error("❌ Activity Feed error:", err);
+    activityBox.innerHTML = "<li>Error loading feed</li>";
+  }
+}  
     // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
