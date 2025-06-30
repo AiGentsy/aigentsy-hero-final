@@ -270,23 +270,6 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
-async function runAgent() {
-  const input = textarea.value.trim();
-  if (!input) return;
-
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  memory.push(input);
-  textarea.value = "";
-
-  const loader = document.createElement("div");
-  loader.className = "chat-agent";
-  loader.textContent = "🤖 Your AiGentsy: Thinking...";
-  chatLog.appendChild(loader);
-  chatLog.scrollTop = chatLog.scrollHeight;
 
   // ✅ Continuity patch: recall last AiGent response if input is a short confirm
   let conditionedInput = input;
