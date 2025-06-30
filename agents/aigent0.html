@@ -141,6 +141,10 @@
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
 </div>
+    <div class="metric-box">
+  <h3>📦 Your AiGentsy Includes</h3>
+  <ul id="businessSummaryList"></ul>
+</div>
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
 <ul></ul>
@@ -391,6 +395,26 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
+// ✅ "Your AiGentsy Includes" Summary Injection
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
+
+  const rendered = summaryItems.map(item => {
+    const hasAccess = item.accessKey ? user[item.accessKey] : false;
+    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
+    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
+  }).join("");
+
+  summaryBox.innerHTML = rendered;
+}
 
 console.log("📦 User from AME runtime:", user);
 if (!user) return;
