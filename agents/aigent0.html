@@ -354,32 +354,6 @@ let reply = formatResponseEnhanced(data.output || "No response.");
 const agentRole = getAgentRoleFromEndpoint(endpoint);
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
-    // Optional: Add visual buttons again
-    const buttons = document.createElement("div");
-    buttons.style.marginTop = "12px";
-    buttons.innerHTML = `
-      <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
-      <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
-    loader.appendChild(buttons);
-
-    memory.push(`🤖 ${reply}`);
-    chatLog.scrollTop = chatLog.scrollHeight;
-    textarea.focus();
-  } catch (err) {
-    loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
-  }
-}
-
-if (sendBtn) sendBtn.onclick = runAgent;
- 
-// PATCH: Dynamic label substitution by runtime source
-function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "CTO – Tech & AI";
-  if (endpoint.includes("growth")) return "CMO – Growth";
-  if (endpoint.includes("remix")) return "CLO – Legal & Licensing";
-  return "Your AiGentsy";
-}
 
 
 async function injectUserDashboard() {
