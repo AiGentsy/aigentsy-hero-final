@@ -655,8 +655,28 @@ async function unlockOffering(username, offeringId, stripeLink) {
       const result = await res.json();
 
       if (result.success) {
-        alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
+        // ✅ Toast UI
+        const toast = document.getElementById("toast");
+        toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 3000);
+
+        // ✅ Log to backend (JSONBin safe)
+        await fetch("https://aigentsy-ame-runtime.onrender.com/log-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,                      // buyer
+            offeringId,
+            action: "unlock",
+            source: "dashboard",
+            timestamp: new Date().toISOString(),
+            buyer: username,
+            seller: "system" // Replace with dynamic seller logic later
+          })
+        });
+
+        setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
