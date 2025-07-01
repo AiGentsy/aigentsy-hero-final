@@ -612,23 +612,22 @@ if (remixBox) {
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
    
-    // === Activity Feed ===
-const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
-if (activityBox) {
-  const feedUl = activityBox.querySelector("ul");
-  if (feedUl && (!user.activity || user.activity.length === 0)) {
-  feedUl.innerHTML = "<li>No recent activity yet.</li>";
-  return;
-}
-    if (feedUl && user.activity && user.activity.length) {
-    feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
+  // === Activity Feed ===
+try {
+  const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
+  if (activityBox) {
+    const feedUl = activityBox.querySelector("ul");
+
+    if (feedUl && (!user.activity || user.activity.length === 0)) {
+      feedUl.innerHTML = "<li>No recent activity yet.</li>";
+    } else if (feedUl && user.activity && user.activity.length) {
+      feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
+    }
   }
+} catch (e) {
+  console.error("Activity Feed error:", e);
 }
- 
-  } catch (e) {
-    console.error("injectUserDashboard error:", e);
-  }
-}
+
   async function fetchAgentData(username) {
   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
     method: "POST",
