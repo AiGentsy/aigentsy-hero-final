@@ -616,7 +616,11 @@ if (remixBox) {
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
   const feedUl = activityBox.querySelector("ul");
-  if (feedUl && user.activity && user.activity.length) {
+  if (feedUl && (!user.activity || user.activity.length === 0)) {
+  feedUl.innerHTML = "<li>No recent activity yet.</li>";
+  return;
+}
+    if (feedUl && user.activity && user.activity.length) {
     feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
   }
 }
