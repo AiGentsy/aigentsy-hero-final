@@ -164,6 +164,12 @@
 <a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
 </div>
 <div class="metric-box">
+  <h3>🏆 Team Achievements</h3>
+  <ul id="achievementList">
+    <li>Loading your business wins...</li>
+  </ul>
+</div>
+    <div class="metric-box">
 <h3>📊 Mint Snapshot</h3>
 <ul></ul>
 <button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button>
@@ -562,7 +568,32 @@ if (csuiteBox) {
     <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
   `;
 }
+const achievementBox = document.getElementById("achievementList");
+if (achievementBox && user) {
+  const achievements = [];
 
+  if (user.remixUnlockedForks > 0) {
+    achievements.push("🔁 Remix Activated – Forks Created");
+  }
+  if ((user.cloneLineage || []).length > 0) {
+    achievements.push("🧬 Clones Propagated – Lineage Extended");
+  }
+  if (user.yield?.aigxEarned > 0) {
+    achievements.push(`💰 Earnings Generated – ${user.yield.aigxEarned} AIGx`);
+  }
+  if (user.traits?.includes("legal")) {
+    achievements.push("📜 Legal Kit Installed");
+  }
+  if (user.traits?.includes("marketing")) {
+    achievements.push("📣 Branding Pack Live");
+  }
+
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  } else {
+    achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
+  }
+}
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
