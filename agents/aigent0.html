@@ -154,8 +154,20 @@
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<a class="btn-glow" href="#" onclick="alert('🛠 Profile page is under development.')">🔗 Agent Page</a>
-<a class="btn-glow" href="#" onclick="navigator.clipboard.writeText(window.location.href); alert('🔗 Link copied to clipboard!')">📤 Share Link</a>
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
+<script>
+  const agentPageBtn = document.getElementById("agentPageBtn");
+  const shareLinkBtn = document.getElementById("shareLinkBtn");
+
+  if (agentPageBtn && username) {
+    agentPageBtn.href = `/agents/${username}.html`;
+  }
+
+  if (shareLinkBtn && username) {
+    shareLinkBtn.href = `/share.html?agent=${username}`;
+  }
+</script>
 </div>
 </div>
 <div class="metric-box">
