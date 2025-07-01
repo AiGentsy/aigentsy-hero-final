@@ -367,9 +367,9 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
     const buttons = document.createElement("div");
     buttons.style.marginTop = "12px";
    buttons.innerHTML = `
-  <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
-  <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
-  <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+  <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+  <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>`;
     loader.appendChild(buttons);
 
     memory.push(`🤖 ${reply}`);
