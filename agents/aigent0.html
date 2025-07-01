@@ -382,6 +382,19 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
 if (sendBtn) sendBtn.onclick = runAgent;
  
+function triggerSDK() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`SDK trigger initialized for ${user}. Full SDK deployment coming soon.`);
+}
+
+function openPackagingModal() {
+  alert("Packaging setup modal will appear here.");
+}
+
+function matchClients() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`Client matching logic launching for ${user}. This will auto-link your AiGents.`);
+}
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
@@ -389,7 +402,6 @@ function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("remix")) return "AiGentsy CLO";
   return "Autonomous AiGentsy";
 }
-
 
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
