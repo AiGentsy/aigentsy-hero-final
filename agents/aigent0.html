@@ -608,7 +608,25 @@ if (achievementBox && user) {
     achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
   }
 }
- 
+
+      const includesBox = document.getElementById("businessSummaryList");
+if (includesBox && user) {
+  const unlocked = [];
+
+  if (user.traits?.includes("sdk")) unlocked.push("🧬 Developer SDK");
+  if (user.traits?.includes("vault")) unlocked.push("💼 Vault Access");
+  if (user.traits?.includes("legal")) unlocked.push("📜 Legal Kit");
+  if (user.traits?.includes("marketing")) unlocked.push("📣 Branding Pack");
+  if (user.traits?.includes("clone")) unlocked.push("🧬 Cloning License");
+  if (user.traits?.includes("remix")) unlocked.push("🔁 Remix Unlock");
+
+  if (unlocked.length > 0) {
+    includesBox.innerHTML = unlocked.map(item => `<li>${item}</li>`).join('');
+  } else {
+    includesBox.innerHTML = "<li>🚧 Nothing unlocked yet. Start building your AiGentsy to populate this list.</li>";
+  }
+}
+
       const publicLinksBox = document.getElementById("publicLinksBox");
 if (publicLinksBox && user) {
   const uname = user.consent?.username || "agent";
