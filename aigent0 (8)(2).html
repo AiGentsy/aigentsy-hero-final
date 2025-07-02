@@ -103,8 +103,15 @@
 <canvas height="220" id="propagationChart" width="300"></canvas>
 </div>
 <div class="chart-sidebar-box" id="csuiteBox">
-<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-<p>Loading executive roles...</p>
+  <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+  <ul style="padding-left: 18px; font-size: 0.9rem;">
+    <li><strong>CEO:</strong> You</li>
+    <li><strong>CTO:</strong> AiGent SDK</li>
+    <li><strong>CMO:</strong> AiGent Growth</li>
+    <li><strong>CLO:</strong> AiGent Remix</li>
+    <li><strong>CFO:</strong> AiGent0</li>
+  </ul>
+  <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
 <div class="chart-sidebar-box" id="remixSnapshotBox">
 <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
@@ -117,7 +124,7 @@
 <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
 <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
 <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
-<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.</p>
+<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerhips that we sync for you autonomously.</p>
 <div style="margin-top:16px;">
 <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
 <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
@@ -156,6 +163,8 @@
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
 <a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
 <a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
+<div id="publicLinksBox" style="margin-top: 10px;"></div>
+    
 <script>
   const agentPageBtn = document.getElementById("agentPageBtn");
   const shareLinkBtn = document.getElementById("shareLinkBtn");
@@ -573,25 +582,6 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-    // === Dynamic C-Suite Mapping ===
-const csuiteBox = document.getElementById("csuiteBox");
-if (csuiteBox) {
-  const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: "AiGent SDK" },
-    { role: "CMO", name: "AiGent Growth" },
-    { role: "CLO", name: "AiGent Remix" },
-    { role: "CFO", name: "AiGent0" }
-  ];
-
-  csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-    }</ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
-}
 const achievementBox = document.getElementById("achievementList");
 if (achievementBox && user) {
   const achievements = [];
@@ -618,7 +608,36 @@ if (achievementBox && user) {
     achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
   }
 }
-    // === Propagation Chart (Dynamic Remix/Yield Data) ===
+
+      const includesBox = document.getElementById("businessSummaryList");
+if (includesBox && user) {
+  const unlocked = [];
+
+  if (user.traits?.includes("sdk")) unlocked.push("🧬 Developer SDK");
+  if (user.traits?.includes("vault")) unlocked.push("💼 Vault Access");
+  if (user.traits?.includes("legal")) unlocked.push("📜 Legal Kit");
+  if (user.traits?.includes("marketing")) unlocked.push("📣 Branding Pack");
+  if (user.traits?.includes("clone")) unlocked.push("🧬 Cloning License");
+  if (user.traits?.includes("remix")) unlocked.push("🔁 Remix Unlock");
+
+  if (unlocked.length > 0) {
+    includesBox.innerHTML = unlocked.map(item => `<li>${item}</li>`).join('');
+  } else {
+    includesBox.innerHTML = "<li>🚧 Nothing unlocked yet. Start building your AiGentsy to populate this list.</li>";
+  }
+}
+
+      const publicLinksBox = document.getElementById("publicLinksBox");
+if (publicLinksBox && user) {
+  const uname = user.consent?.username || "agent";
+  publicLinksBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+    <a class="btn-glow" href="/profile.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+    <a class="btn-glow" href="/share.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+  `;
+}
+   
+      // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
   const remixCount = user.remixUnlocked?.remixCount || 0;
@@ -666,7 +685,7 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
-   
+
  // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
@@ -938,6 +957,29 @@ window.addEventListener("DOMContentLoaded", () => {
   if (username) {
     injectUserDashboard();
     autoMatchEngine(username);
+  }
+});
+
+    window.addEventListener("DOMContentLoaded", () => {
+  const csuiteBox = document.getElementById("csuiteBox");
+  const username = localStorage.getItem("aigentsyUsername") || "You";
+
+  if (csuiteBox) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
+    ];
+
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">${
+        cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
+      }</ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
   }
 });
 
