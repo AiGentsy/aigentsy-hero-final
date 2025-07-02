@@ -131,10 +131,7 @@
 <h3>💼 Real-World Earnings</h3>
 <ul></ul>
 </div>
-
-    <div id="publicLinksBox" style="margin-top: 10px;"></div>
-
-    <div class="metric-box">
+<div class="metric-box">
 <h3>📦 SDK &amp; Licensing</h3>
 <!-- Injected by autoMatchEngine -->
 <ul id="autoMatchOfferings"></ul>
@@ -144,8 +141,7 @@
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
 </div>
-</div>
-    </div>class="metric-box">
+    <div class="metric-box">
   <h3>📦 Your AiGentsy Includes</h3>
   <ul id="businessSummaryList"></ul>
 </div>
@@ -156,6 +152,10 @@
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
 <ul></ul>
+<div style="margin-top: 10px;">
+<h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
 <script>
   const agentPageBtn = document.getElementById("agentPageBtn");
   const shareLinkBtn = document.getElementById("shareLinkBtn");
@@ -666,16 +666,7 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
-  const publicLinksBox = document.getElementById("publicLinksBox");
-if (publicLinksBox && user) {
-  const uname = user.consent?.username || "agent";
-  publicLinksBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-    <a class="btn-glow" href="/profile.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
-    <a class="btn-glow" href="/share.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
-  `;
-}
- 
+   
  // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
