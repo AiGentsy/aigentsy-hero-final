@@ -574,25 +574,6 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-    // === Dynamic C-Suite Mapping ===
-const csuiteBox = document.getElementById("csuiteBox");
-if (csuiteBox) {
-  const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: "AiGent SDK" },
-    { role: "CMO", name: "AiGent Growth" },
-    { role: "CLO", name: "AiGent Remix" },
-    { role: "CFO", name: "AiGent0" }
-  ];
-
-  csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-    }</ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
-}
 const achievementBox = document.getElementById("achievementList");
 if (achievementBox && user) {
   const achievements = [];
@@ -950,6 +931,29 @@ window.addEventListener("DOMContentLoaded", () => {
   if (username) {
     injectUserDashboard();
     autoMatchEngine(username);
+  }
+});
+
+    window.addEventListener("DOMContentLoaded", () => {
+  const csuiteBox = document.getElementById("csuiteBox");
+  const username = localStorage.getItem("aigentsyUsername") || "You";
+
+  if (csuiteBox) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
+    ];
+
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">${
+        cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
+      }</ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
   }
 });
 
