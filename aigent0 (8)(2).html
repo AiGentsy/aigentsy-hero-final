@@ -154,25 +154,38 @@
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
-<a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
+<script>
+  const agentPageBtn = document.getElementById("agentPageBtn");
+  const shareLinkBtn = document.getElementById("shareLinkBtn");
+
+  if (agentPageBtn && username) {
+    agentPageBtn.href = `/agents/${username}.html`;
+  }
+
+  if (shareLinkBtn && username) {
+    shareLinkBtn.href = `/share.html?agent=${username}`;
+  }
+</script>
 </div>
 </div>
 <div class="metric-box">
 <h3>💰 Wallet &amp; Off-Ramp</h3>
 <ul> </ul>
-<a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+<a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
 </div>
 <div class="metric-box">
+  <h3>🏆 Team Achievements</h3>
+  <ul id="achievementList">
+    <li>Loading your business wins...</li>
+  </ul>
+</div>
+    <div class="metric-box">
 <h3>📊 Mint Snapshot</h3>
 <ul></ul>
-<a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
-<a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
-</div>
-<div class="metric-box">
-<h3>⚔️ Remix Arena Challenge</h3>
-<p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
-<a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/28EfZgbfJ0NRfxPbL46AM0b', '_blank')">📄 License This Venture</a>
 </div>
 <div class="metric-box">
 <h3>📊 Growth &amp; Deployment</h3>
@@ -353,10 +366,10 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
     // Optional: Add visual buttons again
     const buttons = document.createElement("div");
     buttons.style.marginTop = "12px";
-    buttons.innerHTML = `
-      <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
-      <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+   buttons.innerHTML = `
+  <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+  <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>`;
     loader.appendChild(buttons);
 
     memory.push(`🤖 ${reply}`);
@@ -369,6 +382,19 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
 if (sendBtn) sendBtn.onclick = runAgent;
  
+function triggerSDK() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`SDK trigger initialized for ${user}. Full SDK deployment coming soon.`);
+}
+
+function openPackagingModal() {
+  alert("Packaging setup modal will appear here.");
+}
+
+function matchClients() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`Client matching logic launching for ${user}. This will auto-link your AiGents.`);
+}
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
@@ -376,7 +402,6 @@ function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("remix")) return "AiGentsy CLO";
   return "Autonomous AiGentsy";
 }
-
 
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
@@ -567,7 +592,32 @@ if (csuiteBox) {
     <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
   `;
 }
+const achievementBox = document.getElementById("achievementList");
+if (achievementBox && user) {
+  const achievements = [];
 
+  if (user.remixUnlockedForks > 0) {
+    achievements.push("🔁 Remix Activated – Forks Created");
+  }
+  if ((user.cloneLineage || []).length > 0) {
+    achievements.push("🧬 Clones Propagated – Lineage Extended");
+  }
+  if (user.yield?.aigxEarned > 0) {
+    achievements.push(`💰 Earnings Generated – ${user.yield.aigxEarned} AIGx`);
+  }
+  if (user.traits?.includes("legal")) {
+    achievements.push("📜 Legal Kit Installed");
+  }
+  if (user.traits?.includes("marketing")) {
+    achievements.push("📣 Branding Pack Live");
+  }
+
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  } else {
+    achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
+  }
+}
     // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
@@ -617,7 +667,7 @@ if (remixBox) {
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
    
-    // === Activity Feed ===
+ // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
   const feedUl = activityBox.querySelector("ul");
@@ -630,6 +680,7 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
+
   async function fetchAgentData(username) {
   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
     method: "POST",
