@@ -947,23 +947,23 @@ async function autoMatchEngine(username) {
     console.error("❌ autoMatchEngine() error:", err);
   }
 }
-// === STARTUP HOOK ===
+// === STARTUP HOOK (MERGED) ===
 window.addEventListener("DOMContentLoaded", () => {
+  // Set default username if not stored yet
   if (!localStorage.getItem("aigentsyUsername")) {
     localStorage.setItem("aigentsyUsername", "admin4");
   }
 
-  const username = localStorage.getItem("aigentsyUsername");
+  const username = localStorage.getItem("aigentsyUsername") || "You";
+
+  // Inject full dashboard
   if (username) {
     injectUserDashboard();
     autoMatchEngine(username);
   }
-});
 
-    window.addEventListener("DOMContentLoaded", () => {
+  // Inject C-Suite team
   const csuiteBox = document.getElementById("csuiteBox");
-  const username = localStorage.getItem("aigentsyUsername") || "You";
-
   if (csuiteBox) {
     const cSuiteRoles = [
       { role: "CEO", name: `${username} (You)` },
@@ -972,26 +972,25 @@ window.addEventListener("DOMContentLoaded", () => {
       { role: "CLO", name: "AiGent Remix" },
       { role: "CFO", name: "AiGent0" }
     ];
-
     csuiteBox.innerHTML = `
       <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-      <ul style="padding-left: 18px; font-size: 0.9rem;">${
-        cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-      }</ul>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+      </ul>
       <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
     `;
   }
-});
 
-window.addEventListener("DOMContentLoaded", () => {
+  // Preload chat message
   const chatLog = document.getElementById("chatLog");
-  if (!chatLog) return;
-  const preload = document.createElement("div");
-  preload.className = "chat-agent";
-  preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-  chatLog.appendChild(preload);
+  if (chatLog) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    chatLog.appendChild(preload);
+  }
 });
-
+    
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
