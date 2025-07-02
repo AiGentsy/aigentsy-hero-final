@@ -619,7 +619,18 @@ if (achievementBox && user) {
     achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
   }
 }
-    // === Propagation Chart (Dynamic Remix/Yield Data) ===
+ 
+      const publicLinksBox = document.getElementById("publicLinksBox");
+if (publicLinksBox && user) {
+  const uname = user.consent?.username || "agent";
+  publicLinksBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+    <a class="btn-glow" href="/profile.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+    <a class="btn-glow" href="/share.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+  `;
+}
+   
+      // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
   const remixCount = user.remixUnlocked?.remixCount || 0;
