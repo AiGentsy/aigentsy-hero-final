@@ -898,10 +898,9 @@ async function autoMatchEngine(username) {
 <script>
 
 
-// === AUTO-MATCH ENGINE — OFFERINGS LOGIC ===
 async function autoMatchEngine(username) {
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username })
