@@ -701,7 +701,7 @@ if (activityBox) {
 }
 
   async function fetchAgentData(username) {
-  const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+  const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
@@ -761,7 +761,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
 
 async function autoMatchEngine(username) {
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username })
