@@ -768,7 +768,7 @@ async function autoMatchEngine(username) {
     });
 
     const data = await res.json();
-    const user = data.user || data;
+  const user = data.record || data;
     if (!user) return;
 
     const list = document.getElementById("autoMatchOfferings");
