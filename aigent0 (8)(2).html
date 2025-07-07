@@ -202,31 +202,7 @@
 <h3>📊 Growth & Deployment</h3>
 <ul></ul>
 </div>
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const ctx = document.getElementById('walletChart');
-      if (ctx) {
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['AIGx Earned', 'Staked', 'Referrals'],
-            datasets: [{
-              label: 'Metrics',
-              backgroundColor: '#00bfff',
-              borderRadius: 6
-            }]
-          },
-          options: {
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-              x: { ticks: { color: '#aaa' }, grid: { display: false } }
-            }
-          }
-        });
-      }
-    });
-  </script>
+
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -839,6 +815,11 @@ async function autoMatchEngine(username) {
     console.error("❌ autoMatchEngine() error:", err);
   }
 }
+    // ✅ Make key functions accessible globally
+window.injectUserDashboard = injectUserDashboard;
+window.autoMatchEngine = autoMatchEngine;
+window.unlockOffering = unlockOffering;
+
 </script> <!-- ✅ Close script BEFORE modal -->
 
 <!-- 🔒 Modal Container -->
@@ -1000,5 +981,18 @@ async function runAgent() {
   z-index: 9999;
 "></div>
 
+    <script>
+  // ✅ Delayed fallback: runs *after* all scripts are defined
+  setTimeout(() => {
+    const username = localStorage.getItem("aigentsyUsername") || "admin4";
+    if (typeof injectUserDashboard === "function" && typeof autoMatchEngine === "function") {
+      console.log("🚀 Final fallback triggered after load");
+      injectUserDashboard();
+      autoMatchEngine(username);
+    } else {
+      console.warn("⚠️ Fallback skipped — functions not defined yet.");
+    }
+  }, 100);
+</script>
 </body>
 </html>
