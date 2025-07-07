@@ -8,7 +8,17 @@
 <link href="/vaults.css" rel="stylesheet"/>
 <link href="/theme.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
+<!-- ✅ Inject username if passed via ?user= query -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get("user");
+    if (user) {
+      localStorage.setItem("aigentsyUsername", user);
+      console.log("👤 Set user from query param:", user);
+    }
+  </script>
+    
+    <style>
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
