@@ -815,6 +815,11 @@ async function autoMatchEngine(username) {
     console.error("❌ autoMatchEngine() error:", err);
   }
 }
+    // ✅ Make key functions accessible globally
+window.injectUserDashboard = injectUserDashboard;
+window.autoMatchEngine = autoMatchEngine;
+window.unlockOffering = unlockOffering;
+
 </script> <!-- ✅ Close script BEFORE modal -->
 
 <!-- 🔒 Modal Container -->
