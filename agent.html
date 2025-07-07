@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AiGentsy Agent Redirect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="refresh" content="3;url=/agents/aigent0.html">
+  <style>
+    body {
+      background: #0e101a;
+      color: #00bfff;
+      font-family: sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>⏳ Launching Your AiGentsy...</h2>
+  <p>Redirecting to your personalized dashboard.</p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("user");
+
+    if (username) {
+      localStorage.setItem("aigentsyUsername", username);
+      console.log("✅ Username stored:", username);
+      window.location.href = "/agents/aigent0.html";
+    } else {
+      document.body.innerHTML = '<h2>⚠️ No user found in URL.</h2><p>Please register via the home page.</p>';
+    }
+  </script>
+</body>
+</html>
