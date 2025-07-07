@@ -982,14 +982,17 @@ async function runAgent() {
 "></div>
 
     <script>
-  // ✅ Fallback: Force Inject Dashboard if DOMContentLoaded missed it
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
-  if (username) {
-    console.log("🚀 Fallback Startup Hook Triggered");
-    injectUserDashboard();
-    autoMatchEngine(username);
-  }
+  // ✅ Delayed fallback: runs *after* all scripts are defined
+  setTimeout(() => {
+    const username = localStorage.getItem("aigentsyUsername") || "admin4";
+    if (typeof injectUserDashboard === "function" && typeof autoMatchEngine === "function") {
+      console.log("🚀 Final fallback triggered after load");
+      injectUserDashboard();
+      autoMatchEngine(username);
+    } else {
+      console.warn("⚠️ Fallback skipped — functions not defined yet.");
+    }
+  }, 100);
 </script>
-
 </body>
 </html>
