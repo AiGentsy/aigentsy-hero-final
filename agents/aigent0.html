@@ -411,7 +411,18 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-// ✅ "Your AiGentsy Includes" Summary Injection
+// ✅ Normalize undefined user fields to avoid runtime errors
+if (user) {
+  user.traits = user.traits || [];
+  user.yield = user.yield || {};
+  user.remix = user.remix || {};
+  user.cloneLineage = user.cloneLineage || [];
+  user.runtimeFlags = user.runtimeFlags || {};
+  user.meta_role = user.meta_role || "—";
+  user.customInput = user.customInput || "—";
+  user.remixUnlocked = user.remixUnlocked || {};
+}
+      // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
