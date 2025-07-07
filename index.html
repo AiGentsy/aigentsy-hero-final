@@ -244,8 +244,6 @@
   });
 
   // === JSONBin Configuration ===
-  const JSONBIN_URL = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5";
-const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
     
   async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
   const now = new Date().toISOString();
@@ -256,25 +254,6 @@ const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyy
     "marketing": "CMO"
   };
 
-  const entry = {
-    id: crypto.randomUUID(),
-    ventureID: `aigent0-${username.toLowerCase()}`,
-    username,
-    created: now,
-    mintTime: now,
-    customInput: customDescription || "",
-    meta_role: roleMap[selectedAgent] || "CEO",
-    runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-    referral: referralCode || "origin/hero",
-    lineage_depth: 0,
-    yield_memory: true,
-    compliance_flag: false,
-    partner_ready: true,
-    sdk_eligible: selectedAgent === "saas",
-    earningsEnabled: true,
-    listingStatus: "active",
-    traits: [selectedAgent, "founder", "autonomous", "aigentsy"]
-  };
 
   try {
     // STEP 1: Fetch existing user array
