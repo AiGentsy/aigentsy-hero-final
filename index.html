@@ -346,6 +346,117 @@ const JSONBIN_SECRET = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyy
 
   window.location.href = `/agent.html?user=${user}`;
 });
-  </script>
+    <script>
+  // ... your existing login/signup logic above ...
+
+  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+    const now = new Date().toISOString();
+    const roleMap = {
+      "legal": "CLO",
+      "podcast": "CMO",
+      "saas": "CTO",
+      "marketing": "CMO"
+    };
+
+    const entry = {
+      id: `User #${Date.now()}`,
+      consent: {
+        agreed: true,
+        username,
+        timestamp: now
+      },
+      trait: selectedAgent || "founder",
+      traits: [selectedAgent, "founder", "autonomous", "aigentsy"],
+      referral: referralCode || "origin/hero",
+      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+      mintTime: now,
+      role: roleMap[selectedAgent] || "CEO",
+      protocol: "MetaUpgrade25",
+      realm: {
+        name: "Realm 101 — Strategic Expansion",
+        joinedAt: now
+      },
+      metaVenture: {
+        ventureHive: "Autonomous Launch",
+        ventureRole: roleMap[selectedAgent] || "CEO",
+        ventureStatus: "Pending",
+        ventureID: `MV-${Date.now()}`
+      },
+      remix: {
+        remixCount: 0,
+        remixCredits: 1000,
+        lineageDepth: 0,
+        royaltyTerms: "Standard 30%"
+      },
+      mirror: {
+        mirroredInRealms: ["Realm 101 — Strategic Expansion"],
+        mirrorIntegrity: "Pending",
+        sentinelAlert: false
+      },
+      yield: {
+        autoStake: false,
+        aigxEarned: 0,
+        vaultYield: 0,
+        remixYield: 0
+      },
+      earningsEnabled: true,
+      listingStatus: "Active",
+      protocolStatus: "Bound",
+      tethered: true,
+      name: `AiGent ${roleMap[selectedAgent] || "Founder"}`,
+      sdkAccess_eligible: selectedAgent === "saas",
+      sdkAccess: false,
+      vaultAccess: false,
+      remixUnlocked: false,
+      cloneLicenseUnlocked: false,
+      licensingApproved: false,
+      stripeUnlocked: false,
+      productsPurchased: [],
+      teachStage: 1,
+      teachInComplete: false,
+      complianceReviewed: false,
+      complianceLog: [],
+      teachInLog: [],
+      runtimeFlags: {
+        flagged: false,
+        eligibleForAudit: true,
+        needsReview: false
+      }
+    };
+
+    try {
+      const getRes = await fetch(JSONBIN_URL, {
+        headers: {
+          "X-Master-Key": JSONBIN_SECRET
+        }
+      });
+
+      if (!getRes.ok) {
+        console.error("JSONBin GET failed:", await getRes.text());
+        return;
+      }
+
+      const currentData = await getRes.json();
+      const updatedArray = [...currentData.record, entry];
+
+      const putRes = await fetch(JSONBIN_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": JSONBIN_SECRET
+        },
+        body: JSON.stringify(updatedArray)
+      });
+
+      if (!putRes.ok) {
+        console.error("JSONBin PUT failed:", await putRes.text());
+      } else {
+        console.log("✅ New user saved to JSONBin:", username);
+      }
+    } catch (err) {
+      console.error("JSONBin error:", err);
+    }
+  }
+</script>
 </body>
 </html>
