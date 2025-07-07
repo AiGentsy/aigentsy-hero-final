@@ -353,6 +353,39 @@
       console.error("JSONBin error:", err);
     }
   }
+   
+    enterBtn.addEventListener('click', async () => {
+  const user = usernameInput.value.trim();
+  const pass = passwordInput.value;
+
+  const storedUser = localStorage.getItem(`user:${user}`);
+  const storedPass = localStorage.getItem(`pass:${user}`);
+
+  const isNewUser = !storedUser || storedPass !== pass;
+
+  if (isNewUser) {
+    authMode = "signup";
+    localStorage.setItem(`user:${user}`, user);
+    localStorage.setItem(`pass:${user}`, pass);
+
+    await registerUserToJSONBin(
+      user,
+      selectedAgent,
+      aigentsySearch.value,
+      localStorage.getItem("aigentsyReferral")
+    );
+  } else {
+    authMode = "login";
+  }
+
+  localStorage.setItem("aigentsyUsername", user);
+  localStorage.setItem("aigentsyUserConsent", "true");
+  localStorage.setItem("aigentsyUserAgent", selectedAgent);
+  localStorage.setItem("aigentsyAuthMode", authMode);
+
+  window.location.href = `/agent.html?user=${user}`;
+});
+
 </script>
 </body>
 </html>
