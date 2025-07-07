@@ -354,7 +354,7 @@
     }
   }
    
-    enterBtn.addEventListener('click', async () => {
+   enterBtn.addEventListener('click', async () => {
   const user = usernameInput.value.trim();
   const pass = passwordInput.value;
 
@@ -364,16 +364,25 @@
   const isNewUser = !storedUser || storedPass !== pass;
 
   if (isNewUser) {
-    authMode = "signup";
-    localStorage.setItem(`user:${user}`, user);
-    localStorage.setItem(`pass:${user}`, pass);
+    if (authMode === "signup") {
+      localStorage.setItem(`user:${user}`, user);
+      localStorage.setItem(`pass:${user}`, pass);
 
-    await registerUserToJSONBin(
-      user,
-      selectedAgent,
-      aigentsySearch.value,
-      localStorage.getItem("aigentsyReferral")
-    );
+      try {
+        await registerUserToJSONBin(
+          user,
+          selectedAgent,
+          aigentsySearch.value,
+          localStorage.getItem("aigentsyReferral")
+        );
+      } catch (err) {
+        alert("❌ Registration failed. Please try again.");
+        return; // Stop execution
+      }
+    } else {
+      alert("❌ Incorrect login. Switch to Sign Up if you're new.");
+      return; // Stop execution
+    }
   } else {
     authMode = "login";
   }
@@ -383,7 +392,8 @@
   localStorage.setItem("aigentsyUserAgent", selectedAgent);
   localStorage.setItem("aigentsyAuthMode", authMode);
 
-window.location.assign(`/agents/aigent0.html?user=${user}`);
+  // ✅ Safer redirect
+  window.location.assign(`/agents/aigent0.html?user=${user}`);
 });
 
 </script>
