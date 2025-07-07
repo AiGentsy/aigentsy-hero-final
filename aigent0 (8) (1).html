@@ -103,8 +103,15 @@
 <canvas height="220" id="propagationChart" width="300"></canvas>
 </div>
 <div class="chart-sidebar-box" id="csuiteBox">
-<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-<p>Loading executive roles...</p>
+  <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+  <ul style="padding-left: 18px; font-size: 0.9rem;">
+    <li><strong>CEO:</strong> You</li>
+    <li><strong>CTO:</strong> AiGent SDK</li>
+    <li><strong>CMO:</strong> AiGent Growth</li>
+    <li><strong>CLO:</strong> AiGent Remix</li>
+    <li><strong>CFO:</strong> AiGent0</li>
+  </ul>
+  <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
 <div class="chart-sidebar-box" id="remixSnapshotBox">
 <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
@@ -117,7 +124,7 @@
 <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
 <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
 <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
-<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partner sync.</p>
+<p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerhips that we sync for you autonomously.</p>
 <div style="margin-top:16px;">
 <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
 <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
@@ -141,60 +148,61 @@
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
 </div>
+    <div class="metric-box">
+  <h3>📦 Your AiGentsy Includes</h3>
+  <ul id="businessSummaryList"></ul>
+</div>
+    <div class="metric-box" id="inviteBox" style="display:none;">
+  <h3>🤝 Expand Your Team</h3>
+  <ul id="inviteList"></ul>
+</div>
 <div class="metric-box">
 <h3>📡 Activity Feed</h3>
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<a class="btn-glow" href="/profile.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
-<a class="btn-glow" href="/share.html?agent=AUTO-001" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
+<div id="publicLinksBox" style="margin-top: 10px;"></div>
+    
+<script>
+    const username = localStorage.getItem("aigentsyUsername");  // ✅ ADD THIS LINE
+
+  const agentPageBtn = document.getElementById("agentPageBtn");
+  const shareLinkBtn = document.getElementById("shareLinkBtn");
+
+  if (agentPageBtn && username) {
+    agentPageBtn.href = `/agents/${username}.html`;
+  }
+
+  if (shareLinkBtn && username) {
+    shareLinkBtn.href = `/share.html?agent=${username}`;
+  }
+</script>
 </div>
 </div>
 <div class="metric-box">
 <h3>💰 Wallet &amp; Off-Ramp</h3>
 <ul> </ul>
-<a class="btn-glow" href="/cashout.html">💸 Cash Out to Fiat</a>
+<a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
 </div>
 <div class="metric-box">
+  <h3>🏆 Team Achievements</h3>
+  <ul id="achievementList">
+    <li>Loading your business wins...</li>
+  </ul>
+</div>
+    <div class="metric-box">
 <h3>📊 Mint Snapshot</h3>
 <ul></ul>
-<a class="btn-glow" href="/remix.html?agent=aigent-venture">🔁 Remix Again</a>
-<a class="btn-glow" href="/license.html?agent=aigent-venture">💼 License This Venture</a>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/28EfZgbfJ0NRfxPbL46AM0b', '_blank')">📄 License This Venture</a>
 </div>
 <div class="metric-box">
-<h3>⚔️ Remix Arena Challenge</h3>
-<p>Want to see how your AiGentsy stacks up? Compete with others, remix strategies, and grow your business live.</p>
-<a class="btn-glow" href="/arena.html?agent=AUTO-001">Join the Arena</a>
+<h3>📊 Growth & Deployment</h3>
+<ul></ul>
 </div>
-<div class="metric-box">
-<h3>📊 Growth &amp; Deployment</h3>
-</div>
-</div>
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const ctx = document.getElementById('walletChart');
-      if (ctx) {
-        new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: ['AIGx Earned', 'Staked', 'Referrals'],
-            datasets: [{
-              label: 'Metrics',
-              backgroundColor: '#00bfff',
-              borderRadius: 6
-            }]
-          },
-          options: {
-            plugins: { legend: { display: false } },
-            scales: {
-              y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-              x: { ticks: { color: '#aaa' }, grid: { display: false } }
-            }
-          }
-        });
-      }
-    });
-  </script>
+
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -345,10 +353,10 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
     // Optional: Add visual buttons again
     const buttons = document.createElement("div");
     buttons.style.marginTop = "12px";
-    buttons.innerHTML = `
-      <button class="btn-glow" onclick="alert('SDK Trigger coming soon')">🧬 Trigger SDK</button>
-      <button class="btn-glow" onclick="alert('Packaging Setup coming soon')">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="alert('Client Matching coming soon')">🤝 Match Clients</button>`;
+   buttons.innerHTML = `
+  <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+  <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>`;
     loader.appendChild(buttons);
 
     memory.push(`🤖 ${reply}`);
@@ -361,6 +369,19 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
 if (sendBtn) sendBtn.onclick = runAgent;
  
+function triggerSDK() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`SDK trigger initialized for ${user}. Full SDK deployment coming soon.`);
+}
+
+function openPackagingModal() {
+  alert("Packaging setup modal will appear here.");
+}
+
+function matchClients() {
+  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
+  alert(`Client matching logic launching for ${user}. This will auto-link your AiGents.`);
+}
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
@@ -368,7 +389,6 @@ function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("remix")) return "AiGentsy CLO";
   return "Autonomous AiGentsy";
 }
-
 
 async function injectUserDashboard() {
   console.log("👀 injectUserDashboard() called");
@@ -383,7 +403,7 @@ console.log("📡 Fetching data from JSONBin...");
   }
 
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ username })
@@ -391,6 +411,47 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
+// ✅ "Your AiGentsy Includes" Summary Injection
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
+// ✅ MetaHive Expansion: Invite teammates if traits are missing
+const inviteBox = document.getElementById("inviteBox");
+const inviteList = document.getElementById("inviteList");
+
+if (inviteBox && inviteList && user) {
+  const invites = [];
+
+  if (!(user.traits || []).includes("marketing")) {
+    invites.push("📣 Add a Growth Partner (CMO)");
+  }
+  if (!(user.traits || []).includes("legal")) {
+    invites.push("📜 Add a Legal Partner (CLO)");
+  }
+  if (!(user.traits || []).includes("finance")) {
+    invites.push("💰 Add a Financial Partner (CFO)");
+  }
+
+  if (invites.length > 0) {
+    inviteBox.style.display = "block";
+    inviteList.innerHTML = invites.map(txt => `<li>${txt}</li>`).join("");
+  }
+}
+  const rendered = summaryItems.map(item => {
+    const hasAccess = item.accessKey ? user[item.accessKey] : false;
+    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
+    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
+  }).join("");
+
+  summaryBox.innerHTML = rendered;
+}
 
 console.log("📦 User from AME runtime:", user);
 if (!user) return;
@@ -499,27 +560,62 @@ if (overviewBox) {
     <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
 }
 
-    // === Dynamic C-Suite Mapping ===
-const csuiteBox = document.getElementById("csuiteBox");
-if (csuiteBox) {
-  const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: "AiGent SDK" },
-    { role: "CMO", name: "AiGent Growth" },
-    { role: "CLO", name: "AiGent Remix" },
-    { role: "CFO", name: "AiGent0" }
-  ];
+const achievementBox = document.getElementById("achievementList");
+if (achievementBox && user) {
+  const achievements = [];
 
-  csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">${
-      cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")
-    }</ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
+  if (user.remixUnlockedForks > 0) {
+    achievements.push("🔁 Remix Activated – Forks Created");
+  }
+  if ((user.cloneLineage || []).length > 0) {
+    achievements.push("🧬 Clones Propagated – Lineage Extended");
+  }
+  if (user.yield?.aigxEarned > 0) {
+    achievements.push(`💰 Earnings Generated – ${user.yield.aigxEarned} AIGx`);
+  }
+  if (user.traits?.includes("legal")) {
+    achievements.push("📜 Legal Kit Installed");
+  }
+  if (user.traits?.includes("marketing")) {
+    achievements.push("📣 Branding Pack Live");
+  }
+
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  } else {
+    achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
+  }
 }
 
-    // === Propagation Chart (Dynamic Remix/Yield Data) ===
+      const includesBox = document.getElementById("businessSummaryList");
+if (includesBox && user) {
+  const unlocked = [];
+
+  if (user.traits?.includes("sdk")) unlocked.push("🧬 Developer SDK");
+  if (user.traits?.includes("vault")) unlocked.push("💼 Vault Access");
+  if (user.traits?.includes("legal")) unlocked.push("📜 Legal Kit");
+  if (user.traits?.includes("marketing")) unlocked.push("📣 Branding Pack");
+  if (user.traits?.includes("clone")) unlocked.push("🧬 Cloning License");
+  if (user.traits?.includes("remix")) unlocked.push("🔁 Remix Unlock");
+
+  if (unlocked.length > 0) {
+    includesBox.innerHTML = unlocked.map(item => `<li>${item}</li>`).join('');
+  } else {
+    includesBox.innerHTML = "<li>🚧 Nothing unlocked yet. Start building your AiGentsy to populate this list.</li>";
+  }
+}
+
+      const publicLinksBox = document.getElementById("publicLinksBox");
+if (publicLinksBox && user) {
+  const uname = user.consent?.username || "agent";
+  publicLinksBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+    <a class="btn-glow" href="/profile.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+    <a class="btn-glow" href="/share.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+  `;
+}
+   
+      // === Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
   const remixCount = user.remixUnlocked?.remixCount || 0;
@@ -567,8 +663,8 @@ if (remixBox) {
     <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
     <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
 }
-   
-    // === Activity Feed ===
+
+ // === Activity Feed ===
 const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
 if (activityBox) {
   const feedUl = activityBox.querySelector("ul");
@@ -581,8 +677,9 @@ if (activityBox) {
     console.error("injectUserDashboard error:", e);
   }
 }
+
   async function fetchAgentData(username) {
-  const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
+  const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username })
@@ -606,8 +703,28 @@ async function unlockOffering(username, offeringId, stripeLink) {
       const result = await res.json();
 
       if (result.success) {
-        alert(`✅ ${offeringId} unlocked successfully for ${username}.`);
-        setTimeout(() => window.location.reload(), 1500); // ✅ THIS is enough
+        // ✅ Toast UI
+        const toast = document.getElementById("toast");
+        toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 3000);
+
+        // ✅ Log to backend (JSONBin safe)
+        await fetch("https://aigentsy-ame-runtime.onrender.com/log-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,                      // buyer
+            offeringId,
+            action: "unlock",
+            source: "dashboard",
+            timestamp: new Date().toISOString(),
+            buyer: username,
+            seller: "system" // Replace with dynamic seller logic later
+          })
+        });
+
+        setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
         console.error(result);
@@ -619,6 +736,89 @@ async function unlockOffering(username, offeringId, stripeLink) {
     }
   }, 1500);
 }
+
+async function autoMatchEngine(username) {
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+  const user = data.record || data;
+    if (!user) return;
+
+    const list = document.getElementById("autoMatchOfferings");
+    if (!list) return;
+    list.innerHTML = ""; // Clear old contents
+
+    const offerings = [
+      {
+        id: "sdk",
+        label: "SDK Toolkit",
+        accessKey: "sdkAccess_eligible",
+        condition: !user.sdkAccess_eligible,
+        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+      },
+      {
+        id: "vault",
+        label: "Vault Access",
+        accessKey: "vaultAccess",
+        condition: !user.vaultAccess,
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "remix",
+        label: "Remix License",
+        accessKey: "remixUnlocked",
+        condition: !user.remixUnlocked,
+        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+      },
+      {
+        id: "clone",
+        label: "Clone License",
+        accessKey: "cloneLicenseUnlocked",
+        condition: !user.cloneLicenseUnlocked,
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      },
+      {
+        id: "legal",
+        label: "Legal Kit",
+        accessKey: "traits",
+        condition: !(user.traits || []).includes("legal"),
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "branding",
+        label: "Branding Pack",
+        accessKey: "traits",
+        condition: !(user.traits || []).includes("marketing"),
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      }
+    ];
+
+    offerings.forEach(({ id, label, accessKey, condition, stripe }) => {
+      const li = document.createElement("li");
+      if (!condition) {
+        li.innerHTML = `✅ ${label} Unlocked`;
+      } else {
+        li.innerHTML = `
+          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
+            🔓 Unlock ${label}
+          </button>`;
+      }
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("❌ autoMatchEngine() error:", err);
+  }
+}
+    // ✅ Make key functions accessible globally
+window.injectUserDashboard = injectUserDashboard;
+window.autoMatchEngine = autoMatchEngine;
+window.unlockOffering = unlockOffering;
 
 </script> <!-- ✅ Close script BEFORE modal -->
 
@@ -680,78 +880,50 @@ async function unlockOffering(username, offeringId, stripeLink) {
 
 <script>
 
-
-// === AUTO-MATCH ENGINE — OFFERINGS LOGIC ===
-async function autoMatchEngine(username) {
-  try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-
-    const data = await res.json();
-    const user = data.user || data;
-    if (!user) return;
-
-    const list = document.getElementById("autoMatchOfferings");
-    if (!list) return;
-
-    const offerings = [];
-
-    if (
-      (!user.remixUnlocked && (user.traits?.includes?.("creator") || user.business_type === "media"))
-    ) {
-      offerings.push({
-        id: "Remix",
-        label: "Remix Unlock",
-        accessKey: "remixUnlocked",
-        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-      });
-    }
-
-    if (offerings.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "No unlocks available at this time. ✅";
-      list.appendChild(li);
-      return;
-    }
-
-    offerings.forEach(offering => {
-      const li = document.createElement("li");
-      li.innerHTML = `
-        <button class="btn-glow" onclick="unlockOffering('${username}', '${offering.id}', '${offering.stripe}')">
-          🔓 Unlock ${offering.label}
-        </button>`;
-      list.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error("❌ autoMatchEngine() error:", err);
-  }
-}
-// === STARTUP HOOK ===
+// === STARTUP HOOK (MERGED) ===
 window.addEventListener("DOMContentLoaded", () => {
+  // Set default username if not stored yet
   if (!localStorage.getItem("aigentsyUsername")) {
     localStorage.setItem("aigentsyUsername", "admin4");
   }
 
-  const username = localStorage.getItem("aigentsyUsername");
+  const username = localStorage.getItem("aigentsyUsername") || "You";
+
+  // Inject full dashboard
   if (username) {
     injectUserDashboard();
     autoMatchEngine(username);
   }
-});
 
-window.addEventListener("DOMContentLoaded", () => {
+  // Inject C-Suite team
+  const csuiteBox = document.getElementById("csuiteBox");
+  if (csuiteBox) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
+    ];
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+      </ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
+  }
+
+  // Preload chat message
   const chatLog = document.getElementById("chatLog");
-  if (!chatLog) return;
-  const preload = document.createElement("div");
-  preload.className = "chat-agent";
-  preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-  chatLog.appendChild(preload);
+  if (chatLog) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    chatLog.appendChild(preload);
+  }
 });
-
+    
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
@@ -791,6 +963,36 @@ async function runAgent() {
     loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
   }
 }
+</script>
+
+<!-- ✅ Toast Notification Element -->
+<div id="toast" class="toast" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00bfff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #000;
+  font-size: 0.95rem;
+  z-index: 9999;
+"></div>
+
+    <script>
+  // ✅ Delayed fallback: runs *after* all scripts are defined
+  setTimeout(() => {
+    const username = localStorage.getItem("aigentsyUsername") || "admin4";
+    if (typeof injectUserDashboard === "function" && typeof autoMatchEngine === "function") {
+      console.log("🚀 Final fallback triggered after load");
+      injectUserDashboard();
+      autoMatchEngine(username);
+    } else {
+      console.warn("⚠️ Fallback skipped — functions not defined yet.");
+    }
+  }, 100);
 </script>
 </body>
 </html>
