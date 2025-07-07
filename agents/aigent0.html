@@ -976,5 +976,15 @@ async function runAgent() {
   z-index: 9999;
 "></div>
 
+    <script>
+  // ✅ Fallback: Force Inject Dashboard if DOMContentLoaded missed it
+  const username = localStorage.getItem("aigentsyUsername") || "admin4";
+  if (username) {
+    console.log("🚀 Fallback Startup Hook Triggered");
+    injectUserDashboard();
+    autoMatchEngine(username);
+  }
+</script>
+
 </body>
 </html>
