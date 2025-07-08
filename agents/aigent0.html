@@ -509,22 +509,13 @@ if (!user) return;
       }
 
       if (title.includes("Mint Snapshot")) {
-  const userId = user.id || user.userData?.userId || "—";
-  const agentName = user.name || "AiGent";
-  const status = user.earningsEnabled ? "Monetizing" : "Idle";
-
-  ul.innerHTML = `
-    <li><strong>ID:</strong> ${userId}</li>
-    <li><strong>Minted As:</strong> ${agentName}</li>
-    <li><strong>Status:</strong> Bound + ${status}</li>`;
-}
-
-    console.log("📊 Injecting Wallet Chart Data:", {
-  aigx: user.yield?.aigxEarned,
-  staked: user.staked,
-  referrals: user.cloneLineage
-});
-
+        ul.innerHTML = 
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>;
+      }
+    });
+      
 const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   if (walletChart.chartInstance) {
