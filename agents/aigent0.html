@@ -966,12 +966,12 @@ chatLog.scrollTop = chatLog.scrollHeight;
 
     const data = await res.json();
     const reply = data.output || "No response.";
-    loader.textContent = `🤖 AiGent0: ${reply}`;
+    loader.textContent = `🤖 ${agentRole}: ${reply}`;
     memory.push(reply);
     chatLog.scrollTop = chatLog.scrollHeight;
 
   } catch (err) {
-    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
+    loader.textContent = `🤖 ${agentRole}: Runtime error — ${err.message}`;
   }
 }
 </script>
