@@ -105,7 +105,11 @@
 <div class="chart-sidebar-box" id="csuiteBox">
   <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
   <ul style="padding-left: 18px; font-size: 0.9rem;">
-    <ul id="csuiteList" style="padding-left: 18px; font-size: 0.9rem;"></ul>
+    <li><strong>CEO:</strong> You</li>
+    <li><strong>CTO:</strong> AiGent SDK</li>
+    <li><strong>CMO:</strong> AiGent Growth</li>
+    <li><strong>CLO:</strong> AiGent Remix</li>
+    <li><strong>CFO:</strong> AiGent0</li>
   </ul>
   <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
@@ -119,7 +123,7 @@
 <div class="metric-box full-width">
 <h2>Your AiGentsy — Autonomous AiGentsy Launchpad</h2>
 <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
-<p class="trait-display" style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">Loading traits...</span></p>
+<p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
 <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerhips that we sync for you autonomously.</p>
 <div style="margin-top:16px;">
 <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
@@ -128,7 +132,7 @@
 </div>
 <div class="metric-box">
 <h3>🧠 Chat Interface</h3>
-<textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... How can we work for you today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+<textarea id="agentInput" name="" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
 <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button></div>
 <div class="metric-box">
 <h3>💼 Real-World Earnings</h3>
@@ -153,10 +157,12 @@
   <ul id="inviteList"></ul>
 </div>
 <div class="metric-box">
-<h3>📢 Market Your AiGentsy</h3>
+<h3>📡 Activity Feed</h3>
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
 <div id="publicLinksBox" style="margin-top: 10px;"></div>
     
 <script>
@@ -185,6 +191,12 @@
   <ul id="achievementList">
     <li>Loading your business wins...</li>
   </ul>
+</div>
+    <div class="metric-box">
+<h3>📊 Mint Snapshot</h3>
+<ul></ul>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button>
+<button class="btn-glow" onclick="window.open('https://buy.stripe.com/28EfZgbfJ0NRfxPbL46AM0b', '_blank')">📄 License This Venture</a>
 </div>
 <div class="metric-box">
 <h3>📊 Growth & Deployment</h3>
@@ -399,26 +411,6 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-// ✅ Normalize undefined user fields to avoid runtime errors
-if (user) {
-  user.traits = user.traits || [];
-  user.yield = user.yield || {};
-  user.remix = user.remix || {};
-  user.cloneLineage = user.cloneLineage || [];
-  user.runtimeFlags = user.runtimeFlags || {};
-  user.meta_role = user.meta_role || "—";
-  user.customInput = user.customInput || "—";
-  user.remixUnlocked = user.remixUnlocked || {};
-}
-const traitBox = document.querySelector('.trait-display span');
-if (traitBox && user.traits) {
-  traitBox.textContent = user.traits.join(', ') || '—';
-}
-
-document.getElementById("mintId").textContent = user.id || "—";
-document.getElementById("mintType").textContent = user.agentType || "AiGent";
-document.getElementById("mintStatus").textContent = user.status || "Idle";
-
 // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
@@ -884,9 +876,6 @@ window.unlockOffering = unlockOffering;
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
-
-  renderCSuite(user);
-
 </script>
 
 <script>
@@ -907,30 +896,30 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Inject C-Suite team
-  function renderCSuite(user) {
   const csuiteBox = document.getElementById("csuiteBox");
-  const list = document.getElementById("csuiteList");
-  if (csuiteBox && list && user) {
+  if (csuiteBox) {
     const cSuiteRoles = [
-      { role: "CEO", name: `${user.username} (You)` },
-      { role: "CTO", name: user.team?.CTO || "—" },
-      { role: "CMO", name: user.team?.CMO || "—" },
-      { role: "CLO", name: user.team?.CLO || "—" },
-      { role: "CFO", name: user.team?.CFO || "—" }
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
     ];
-    list.innerHTML = cSuiteRoles.map(({ role, name }) =>
-      `<li><strong>${role}:</strong> ${name}</li>`
-    ).join('');
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+      </ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
   }
-}
 
   // Preload chat message
   const chatLog = document.getElementById("chatLog");
   if (chatLog) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    const preloadRole = getAgentRoleFromEndpoint("https://aigentsy-ame-runtime.onrender.com/agent");
-preload.innerHTML = `🤖 <strong>${preloadRole}:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
     chatLog.appendChild(preload);
   }
 });
@@ -952,11 +941,10 @@ async function runAgent() {
   textarea.value = "";
 
   const loader = document.createElement("div");
-loader.className = "chat-agent";
-const agentRole = getAgentRoleFromEndpoint("https://aigentsy-ame-runtime.onrender.com/agent");
-loader.textContent = `🤖 ${agentRole}: Thinking...`;
-chatLog.appendChild(loader);
-chatLog.scrollTop = chatLog.scrollHeight;
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 AiGent0: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
 
   try {
     const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
@@ -967,12 +955,12 @@ chatLog.scrollTop = chatLog.scrollHeight;
 
     const data = await res.json();
     const reply = data.output || "No response.";
-    loader.textContent = `🤖 ${agentRole}: ${reply}`;
+    loader.textContent = `🤖 AiGent0: ${reply}`;
     memory.push(reply);
     chatLog.scrollTop = chatLog.scrollHeight;
 
   } catch (err) {
-    loader.textContent = `🤖 ${agentRole}: Runtime error — ${err.message}`;
+    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
   }
 }
 </script>
