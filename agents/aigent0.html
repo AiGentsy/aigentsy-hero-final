@@ -157,12 +157,10 @@
   <ul id="inviteList"></ul>
 </div>
 <div class="metric-box">
-<h3>📡 Activity Feed</h3>
+<h3>📡 Market Your AiGentsy</h3>
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
-<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
 <div id="publicLinksBox" style="margin-top: 10px;"></div>
     
 <script>
@@ -496,12 +494,14 @@ if (!user) return;
       }
 
       if (title.includes("Mint Snapshot")) {
-        ul.innerHTML = `
-          <li><strong>ID:</strong> ${user.id}</li>
-          <li><strong>Minted As:</strong> AiGent Venture</li>
-          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
-      }
-    });
+  ul.innerHTML = `
+    <li><strong>ID:</strong> ${user.id}</li>
+    <li><strong>Minted As:</strong> AiGent Venture</li>
+    <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>
+    <li><button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button></li>
+    <li><button class="btn-glow" onclick="window.open('https://buy.stripe.com/28EfZgbfJ0NRfxPbL46AM0b', '_blank')">📄 License This Venture</button></li>
+  `;
+}
 
     console.log("📊 Injecting Wallet Chart Data:", {
   aigx: user.yield?.aigxEarned,
@@ -874,6 +874,9 @@ window.unlockOffering = unlockOffering;
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+
+    renderCSuite(user);
+
 </script>
 
 <script>
@@ -894,23 +897,26 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Inject C-Suite team
+  function renderCSuite(user) {
   const csuiteBox = document.getElementById("csuiteBox");
-  if (csuiteBox) {
-    const cSuiteRoles = [
-      { role: "CEO", name: `${username} (You)` },
-      { role: "CTO", name: "AiGent SDK" },
-      { role: "CMO", name: "AiGent Growth" },
-      { role: "CLO", name: "AiGent Remix" },
-      { role: "CFO", name: "AiGent0" }
-    ];
-    csuiteBox.innerHTML = `
-      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-      <ul style="padding-left: 18px; font-size: 0.9rem;">
-        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
-      </ul>
-      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-    `;
-  }
+  if (!csuiteBox || !user) return;
+
+  const cSuiteRoles = [
+    { role: "CEO", name: `${user.username || "You"} (You)` },
+    { role: "CTO", name: user.team?.CTO || "AiGent SDK" },
+    { role: "CMO", name: user.team?.CMO || "AiGent Growth" },
+    { role: "CLO", name: user.team?.CLO || "AiGent Remix" },
+    { role: "CFO", name: user.team?.CFO || "AiGent0" }
+  ];
+
+  csuiteBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;">
+      ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+    </ul>
+    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+  `;
+}
 
   // Preload chat message
   const chatLog = document.getElementById("chatLog");
