@@ -923,7 +923,8 @@ window.addEventListener("DOMContentLoaded", () => {
   if (chatLog) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    const preloadRole = getAgentRoleFromEndpoint("https://aigentsy-ame-runtime.onrender.com/agent");
+    preload.innerHTML = `🤖 <strong>${preloadRole}:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
     chatLog.appendChild(preload);
   }
 });
