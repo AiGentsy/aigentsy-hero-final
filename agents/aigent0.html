@@ -411,18 +411,7 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-// ✅ Normalize undefined user fields to avoid runtime errors
-if (user) {
-  user.traits = user.traits || [];
-  user.yield = user.yield || {};
-  user.remix = user.remix || {};
-  user.cloneLineage = user.cloneLineage || [];
-  user.runtimeFlags = user.runtimeFlags || {};
-  user.meta_role = user.meta_role || "—";
-  user.customInput = user.customInput || "—";
-  user.remixUnlocked = user.remixUnlocked || {};
-}
-      // ✅ "Your AiGentsy Includes" Summary Injection
+// ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -509,13 +498,19 @@ if (!user) return;
       }
 
       if (title.includes("Mint Snapshot")) {
-        ul.innerHTML = 
+        ul.innerHTML = `
           <li><strong>ID:</strong> ${user.id}</li>
           <li><strong>Minted As:</strong> AiGent Venture</li>
-          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>;
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
       }
     });
-      
+
+    console.log("📊 Injecting Wallet Chart Data:", {
+  aigx: user.yield?.aigxEarned,
+  staked: user.staked,
+  referrals: user.cloneLineage
+});
+
 const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
   if (walletChart.chartInstance) {
