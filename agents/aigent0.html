@@ -893,6 +893,9 @@ window.unlockOffering = unlockOffering;
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+
+  renderCSuite(user);
+
 </script>
 
 <script>
@@ -913,17 +916,17 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Inject C-Suite team
+  function renderCSuite(user) {
   const csuiteBox = document.getElementById("csuiteBox");
-if (csuiteBox && user) {
-  const cSuiteRoles = [
-    { role: "CEO", name: `${username} (You)` },
-    { role: "CTO", name: user.team?.CTO || "—" },
-    { role: "CMO", name: user.team?.CMO || "—" },
-    { role: "CLO", name: user.team?.CLO || "—" },
-    { role: "CFO", name: user.team?.CFO || "—" }
-  ];
   const list = document.getElementById("csuiteList");
-  if (list) {
+  if (csuiteBox && list && user) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${user.username} (You)` },
+      { role: "CTO", name: user.team?.CTO || "—" },
+      { role: "CMO", name: user.team?.CMO || "—" },
+      { role: "CLO", name: user.team?.CLO || "—" },
+      { role: "CFO", name: user.team?.CFO || "—" }
+    ];
     list.innerHTML = cSuiteRoles.map(({ role, name }) =>
       `<li><strong>${role}:</strong> ${name}</li>`
     ).join('');
