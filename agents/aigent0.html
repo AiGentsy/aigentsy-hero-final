@@ -616,6 +616,9 @@ if (Chart && propagationCanvas) {
     }
   });
 }
+// 🔐 Normalize fallback structure to avoid undefined values
+user.remixUnlocked = user.remixUnlocked || {};
+user.yield = user.yield || {};
 
     // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
