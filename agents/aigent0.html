@@ -3,7 +3,7 @@
 <html lang="en">
 <meta charset="utf-8"/>
 <title>Autonomous AiGentsy Launchpad</title>
-<script defer src="/access-check.js"></script>
+<script defer="" src="/access-check.js"></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="/vaults.css" rel="stylesheet"/>
 <link href="/theme.css" rel="stylesheet"/>
@@ -91,7 +91,6 @@
       white-space: pre-line;
     }
   </style>
-</head>
 <body>
 <div class="sidebar">
 <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
@@ -102,16 +101,10 @@
 <h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
 <canvas height="220" id="propagationChart" width="300"></canvas>
 </div>
-<div class="chart-sidebar-box" id="csuiteBox">
-  <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-  <ul style="padding-left: 18px; font-size: 0.9rem;">
-    <li><strong>CEO:</strong> You</li>
-    <li><strong>CTO:</strong> AiGent SDK</li>
-    <li><strong>CMO:</strong> AiGent Growth</li>
-    <li><strong>CLO:</strong> AiGent Remix</li>
-    <li><strong>CFO:</strong> AiGent0</li>
-  </ul>
-  <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+<div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
+<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+<ul id="csuiteList" style="padding-left: 18px; font-size: 0.9rem;"></ul>
+<p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
 <div class="chart-sidebar-box" id="remixSnapshotBox">
 <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
@@ -148,21 +141,22 @@
 <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
 <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
 </div>
-    <div class="metric-box">
-  <h3>📦 Your AiGentsy Includes</h3>
-  <ul id="businessSummaryList"></ul>
+<div class="metric-box">
+<h3>📦 Your AiGentsy Includes</h3>
+<ul id="businessSummaryList"></ul>
 </div>
-    <div class="metric-box" id="inviteBox" style="display:none;">
-  <h3>🤝 Expand Your Team</h3>
-  <ul id="inviteList"></ul>
+<div class="metric-box" id="inviteBox" style="display:none;">
+<h3>🤝 Expand Your Team</h3>
+<ul id="inviteList"></ul>
 </div>
 <div class="metric-box">
-<h3>📡 Market Your AiGentsy</h3>
+<h3>📡 Activity Feed</h3>
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
-<div id="publicLinksBox" style="margin-top: 10px;"></div>
-    
+<a class="btn-glow" id="agentPageBtn">🔗 Agent Page</a>
+<a class="btn-glow" id="shareLinkBtn">📤 Share Link</a>
+
 <script>
     const username = localStorage.getItem("aigentsyUsername");  // ✅ ADD THIS LINE
 
@@ -185,20 +179,19 @@
 <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
 </div>
 <div class="metric-box">
-  <h3>🏆 Team Achievements</h3>
-  <ul id="achievementList">
-    <li>Loading your business wins...</li>
-  </ul>
-</div>
-    <div class="metric-box">
-<h3>📊 Mint Snapshot</h3>
-<ul></ul>
+<h3>🏆 Team Achievements</h3>
+<ul id="achievementList">
+<li>Loading your business wins...</li>
+</ul>
 </div>
 <div class="metric-box">
-<h3>📊 Growth & Deployment</h3>
+<h3>📊 Mint Snapshot</h3>
+<ul id="mintSnapshotList"></ul>
+</div>
+<div class="metric-box">
+<h3>📊 Growth &amp; Deployment</h3>
 <ul></ul>
 </div>
-
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -494,14 +487,12 @@ if (!user) return;
       }
 
       if (title.includes("Mint Snapshot")) {
-  ul.innerHTML = `
-    <li><strong>ID:</strong> ${user.id}</li>
-    <li><strong>Minted As:</strong> AiGent Venture</li>
-    <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>
-    <li><button class="btn-glow" onclick="window.open('https://buy.stripe.com/8x24gydnRfILdpH02m6AM07', '_blank')">🔁 Remix Again</button></li>
-    <li><button class="btn-glow" onclick="window.open('https://buy.stripe.com/28EfZgbfJ0NRfxPbL46AM0b', '_blank')">📄 License This Venture</button></li>
-  `;
-}
+        ul.innerHTML = `
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
+      }
+    });
 
     console.log("📊 Injecting Wallet Chart Data:", {
   aigx: user.yield?.aigxEarned,
@@ -819,7 +810,6 @@ window.autoMatchEngine = autoMatchEngine;
 window.unlockOffering = unlockOffering;
 
 </script> <!-- ✅ Close script BEFORE modal -->
-
 <!-- 🔒 Modal Container -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
 <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
@@ -874,11 +864,7 @@ window.unlockOffering = unlockOffering;
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
-
-    renderCSuite(user);
-
 </script>
-
 <script>
 
 // === STARTUP HOOK (MERGED) ===
@@ -897,34 +883,30 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Inject C-Suite team
-  function renderCSuite(user) {
   const csuiteBox = document.getElementById("csuiteBox");
-  if (!csuiteBox || !user) return;
-
-  const cSuiteRoles = [
-    { role: "CEO", name: `${user.username || "You"} (You)` },
-    { role: "CTO", name: user.team?.CTO || "AiGent SDK" },
-    { role: "CMO", name: user.team?.CMO || "AiGent Growth" },
-    { role: "CLO", name: user.team?.CLO || "AiGent Remix" },
-    { role: "CFO", name: user.team?.CFO || "AiGent0" }
-  ];
-
-  csuiteBox.innerHTML = `
-    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-    <ul style="padding-left: 18px; font-size: 0.9rem;">
-      ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
-    </ul>
-    <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-  `;
-}
+  if (csuiteBox) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
+    ];
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+      </ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
+  }
 
   // Preload chat message
   const chatLog = document.getElementById("chatLog");
   if (chatLog) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    const preloadRole = getAgentRoleFromEndpoint("https://aigentsy-ame-runtime.onrender.com/agent");
-    preload.innerHTML = `🤖 <strong>${preloadRole}:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
     chatLog.appendChild(preload);
   }
 });
@@ -969,9 +951,8 @@ async function runAgent() {
   }
 }
 </script>
-
 <!-- ✅ Toast Notification Element -->
-<div id="toast" class="toast" style="
+<div class="toast" id="toast" style="
   display: none;
   position: fixed;
   bottom: 30px;
@@ -985,8 +966,7 @@ async function runAgent() {
   font-size: 0.95rem;
   z-index: 9999;
 "></div>
-
-    <script>
+<script>
   // ✅ Delayed fallback: runs *after* all scripts are defined
   setTimeout(() => {
     const username = localStorage.getItem("aigentsyUsername") || "admin4";
@@ -999,5 +979,55 @@ async function runAgent() {
     }
   }, 100);
 </script>
-</body>
+</div><script>
+window.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+
+  fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const user = data.record || data;
+
+    // ✅ C-Suite
+    const csuiteList = document.getElementById("csuiteList");
+    if (csuiteList && user?.team) {
+      const cSuiteRoles = [
+        { role: "CEO", name: `${user.username || username} (You)` },
+        { role: "CTO", name: user.team.CTO || "AiGent CTO" },
+        { role: "CMO", name: user.team.CMO || "AiGent CMO" },
+        { role: "CLO", name: user.team.CLO || "AiGent CLO" },
+        { role: "CFO", name: user.team.CFO || "AiGent CFO" }
+      ];
+      csuiteList.innerHTML = cSuiteRoles.map(({ role, name }) =>
+        `<li><strong>${role}:</strong> ${name}</li>`).join('');
+    }
+
+    // ✅ Mint Snapshot
+    const mintList = document.getElementById("mintSnapshotList");
+    if (mintList && user) {
+      mintList.innerHTML = `
+        <li><strong>ID:</strong> ${user.id || "—"}</li>
+        <li><strong>Minted As:</strong> ${user.agentType || "AiGent Venture"}</li>
+        <li><strong>Status:</strong> Bound + ${(user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle")}</li>
+      `;
+    }
+
+    // ✅ Public Links
+    const publicLinksBox = document.getElementById("publicLinksBox");
+    const uname = user.consent?.username || username;
+    if (publicLinksBox && uname) {
+      publicLinksBox.innerHTML = `
+        <a class="btn-glow" href="/profile.html?agent=${uname}">🔗 Agent Page</a>
+        <a class="btn-glow" href="/share.html?agent=${uname}">📤 Share Link</a>
+      `;
+    }
+  })
+  .catch(err => console.error("Upgrade inject error:", err));
+});
+</script></body>
 </html>
