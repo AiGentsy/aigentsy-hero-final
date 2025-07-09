@@ -882,24 +882,6 @@ window.addEventListener("DOMContentLoaded", () => {
     autoMatchEngine(username);
   }
 
-  // Inject C-Suite team
-  const csuiteBox = document.getElementById("csuiteBox");
-  if (csuiteBox) {
-    const cSuiteRoles = [
-      { role: "CEO", name: `${username} (You)` },
-      { role: "CTO", name: "AiGent Tech" },
-      { role: "CMO", name: "AiGent Marketing" },
-      { role: "CLO", name: "AiGent Legal" },
-      { role: "CFO", name: "AiGent Finance" }
-    ];
-    csuiteBox.innerHTML = `
-      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-      <ul style="padding-left: 18px; font-size: 0.9rem;">
-        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
-      </ul>
-      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-    `;
-  }
 
   // Preload chat message
   const chatLog = document.getElementById("chatLog");
@@ -1000,7 +982,7 @@ window.addEventListener("DOMContentLoaded", () => {
         { role: "CEO", name: `${user.username || username} (You)` },
         { role: "CTO", name: user.team.CTO || "AiGent Tech" },
         { role: "CMO", name: user.team.CMO || "AiGent Marketing" },
-        { role: "CLO", name: user.team.CLO || "AiGent Legal" },
+        { role: "CLO", name: user.team.CLO || "AiGent IP & Legal" },
         { role: "CFO", name: user.team.CFO || "AiGent Finance" }
       ];
       csuiteList.innerHTML = cSuiteRoles.map(({ role, name }) =>
