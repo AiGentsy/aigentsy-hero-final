@@ -150,7 +150,7 @@
 <ul id="inviteList"></ul>
 </div>
 <div class="metric-box">
-<h3>📡 Activity Feed</h3>
+<h3>📡 AiGentsy Links</h3>
 <ul></ul>
 <div style="margin-top: 10px;">
 <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
@@ -887,10 +887,10 @@ window.addEventListener("DOMContentLoaded", () => {
   if (csuiteBox) {
     const cSuiteRoles = [
       { role: "CEO", name: `${username} (You)` },
-      { role: "CTO", name: "AiGent SDK" },
-      { role: "CMO", name: "AiGent Growth" },
-      { role: "CLO", name: "AiGent Remix" },
-      { role: "CFO", name: "AiGent0" }
+      { role: "CTO", name: "AiGent Tech" },
+      { role: "CMO", name: "AiGent Marketing" },
+      { role: "CLO", name: "AiGent Legal" },
+      { role: "CFO", name: "AiGent Finance" }
     ];
     csuiteBox.innerHTML = `
       <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
@@ -998,10 +998,10 @@ window.addEventListener("DOMContentLoaded", () => {
     if (csuiteList && user?.team) {
       const cSuiteRoles = [
         { role: "CEO", name: `${user.username || username} (You)` },
-        { role: "CTO", name: user.team.CTO || "AiGent CTO" },
-        { role: "CMO", name: user.team.CMO || "AiGent CMO" },
-        { role: "CLO", name: user.team.CLO || "AiGent CLO" },
-        { role: "CFO", name: user.team.CFO || "AiGent CFO" }
+        { role: "CTO", name: user.team.CTO || "AiGent Tech" },
+        { role: "CMO", name: user.team.CMO || "AiGent Marketing" },
+        { role: "CLO", name: user.team.CLO || "AiGent Legal" },
+        { role: "CFO", name: user.team.CFO || "AiGent Finance" }
       ];
       csuiteList.innerHTML = cSuiteRoles.map(({ role, name }) =>
         `<li><strong>${role}:</strong> ${name}</li>`).join('');
