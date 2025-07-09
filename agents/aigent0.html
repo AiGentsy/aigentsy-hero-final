@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <meta charset="utf-8"/>
 <title>Autonomous AiGentsy Launchpad</title>
@@ -15,21 +16,19 @@
       color: #fff;
       display: flex;
     }
-   .sidebar {
-  width: 420px; /* ✅ slightly wider */
-  background: #0a0a0a;
-  padding: 30px 20px;
-}
+    .sidebar {
+      width: 320px;
+      background: #0a0a0a;
+      padding: 30px 20px;
+    }
     .sidebar img {
       width: 160px;
       display: block;
       margin-bottom: 40px;
     }
     .chart-section {
-  margin-top: 30px;
-  height: 360px; /* ← was 340px */
-  overflow: hidden;
-}
+      margin-top: 30px;
+    }
     .chart-sidebar-box {
       margin-top: 20px;
       background: #111;
@@ -91,18 +90,21 @@
       font-weight: 500;
       white-space: pre-line;
     }
-</style>
+  </style>
 <body>
 <div class="sidebar">
 <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-<div class="chart-section" style="height: 340px; overflow: hidden;">
-  <h4 style="color:#00bfff; margin-bottom:6px;">📈 AiGentsy Growth</h4>
-  <canvas id="walletChart" height="280" width="320"></canvas>
+<div class="chart-section">
+<canvas height="300" id="walletChart" width="300"></canvas>
+</div>
+<div class="chart-sidebar-box">
+<h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
+<canvas height="220" id="propagationChart" width="300"></canvas>
 </div>
 <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
 <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
 <ul style="padding-left: 18px; font-size: 0.9rem;">
-  <li><strong>CEO:</strong> (You)</li>
+  <li><strong>CEO:</strong> You</li>
   <li><strong>CTO:</strong> AiGent Tech</li>
   <li><strong>CMO:</strong> AiGent Marketing</li>
   <li><strong>CLO:</strong> AiGent IP & Legal</li>
@@ -115,13 +117,9 @@
 <p>Loading remix metrics...</p>
 <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
 </div>
-    <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Includes</h4>
-  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
-</div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
-  <div class="metric-box">
+  <div class="metric-box full-width">
     <h2>Your AiGentsy's Autonomous Launchpad</h2>
     <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
     <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
@@ -132,7 +130,7 @@
     </div>
   </div>
 
-  <div class="metric-box"> <!-- Chat Interface -->
+  <div class="metric-box">
     <h3>🧠 Chat Interface</h3>
     <textarea id="agentInput" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
     <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
@@ -144,7 +142,7 @@
     <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
   </div>
 
-  <div class="metric-box"> <!-- SDK & Licensing -->
+  <div class="metric-box">
     <h3>📦 SDK & Licensing</h3>
     <ul id="autoMatchOfferings"></ul>
     <button class="btn-glow" onclick="openModal('sdk')">🚀 Unlock SDK</button>
@@ -158,7 +156,7 @@
     <ul></ul>
   </div>
 
-  <div class="metric-box"> <!-- Team Achievements -->
+  <div class="metric-box">
     <h3>🏆 Team Achievements</h3>
     <ul id="achievementList">
       <li>Loading your business wins...</li>
@@ -168,6 +166,11 @@
   <div class="metric-box">
     <h3>📊 Growth & Deployment</h3>
     <ul></ul>
+  </div>
+
+  <div class="metric-box">
+    <h3>📦 Your AiGentsy Includes</h3>
+    <ul id="businessSummaryList"></ul>
   </div>
 </div>
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
@@ -472,58 +475,36 @@ if (!user) return;
       }
     });
 
-    const walletChart = document.getElementById('walletChart');
-if (Chart && walletChart) {
-  if (walletChart.chartInstance) walletChart.chartInstance.destroy();
+    console.log("📊 Injecting Wallet Chart Data:", {
+  aigx: user.yield?.aigxEarned,
+  staked: user.staked,
+  referrals: user.cloneLineage
+});
 
-  const remixCount = user.remixUnlocked?.remixCount || 0;
-  const remixCredits = user.remixUnlocked?.remixCredits || 0;
-  const vaultYield = user.yield?.vaultYield || 0;
-  const remixYield = user.yield?.remixYield || 0;
-  const aigxEarned = user.yield?.aigxEarned || 0;
-  const staked = user.staked || 0;
-  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
+const walletChart = document.getElementById('walletChart');
+if (Chart && walletChart) {
+  if (walletChart.chartInstance) {
+    walletChart.chartInstance.destroy();
+  }
 
   walletChart.chartInstance = new Chart(walletChart, {
     type: 'bar',
     data: {
-      labels: [
-        'Remix Count',
-        'Remix Credits',
-        'Vault Yield',
-        'Remix Yield',
-        'AIGx Earned',
-        'Staked',
-        'Referrals'
-      ],
+      labels: ['AIGx Earned', 'Staked', 'Referrals'],
       datasets: [{
         data: [
-          remixCount,
-          remixCredits,
-          vaultYield,
-          remixYield,
-          aigxEarned,
-          staked,
-          referrals
+          user.yield?.aigxEarned || 0,
+          user.staked ? 1 : 0,
+          Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
         ],
-        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
+        backgroundColor: '#00bfff',
         borderRadius: 6
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'bottom',
-          labels: {
-            color: '#aaa',
-            boxWidth: 12,
-            padding: 12
-          }
-        }
-      },
+      plugins: { legend: { display: false } },
       scales: {
         y: {
           beginAtZero: true,
