@@ -601,43 +601,6 @@ if (publicLinksBox && user) {
 user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
 user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
 
-// === ✅ Propagation Chart (Dynamic Remix/Yield Data) ===
-const propagationCanvas = document.getElementById("propagationChart");
-if (Chart && propagationCanvas) {
-  const remixCount = user.remixUnlocked.remixCount || 0;
-  const remixCredits = user.remixUnlocked.remixCredits || 0;
-  const vaultYield = user.yield.vaultYield || 0;
-  const remixYield = user.yield.remixYield || 0;
-
-  const existing = Chart.getChart(propagationCanvas);
-  if (existing) existing.destroy();
-
-  new Chart(propagationCanvas, {
-    type: 'bar',
-    data: {
-      labels: ['Remixes', 'Credits', 'Vault Yield', 'Remix Yield'],
-      datasets: [{
-        data: [remixCount, remixCredits, vaultYield, remixYield],
-        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5'],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#888' },
-          grid: { color: '#222' }
-        },
-        x: {
-          ticks: { color: '#aaa' },
-          grid: { display: false }
-        }
-      }
-    }
-  });
-}
 
     // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
