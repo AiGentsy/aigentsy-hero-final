@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <meta charset="utf-8"/>
 <title>Autonomous AiGentsy Launchpad</title>
-<script defer="" src="/access-check.js"></script>
+<script defer src="/access-check.js"></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <link href="/vaults.css" rel="stylesheet"/>
 <link href="/theme.css" rel="stylesheet"/>
@@ -17,14 +16,14 @@
       display: flex;
     }
     .sidebar {
-      width: 320px;
+      width: 420px;
       background: #0a0a0a;
       padding: 30px 20px;
     }
     .sidebar img {
       width: 160px;
       display: block;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
     .chart-section {
       margin-top: 30px;
@@ -42,8 +41,8 @@
       padding: 40px;
       width: 100%;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
       align-items: start;
     }
     .full-width {
@@ -53,28 +52,28 @@
       background: #111;
       border: 1px solid #222;
       border-radius: 10px;
-      padding: 18px 24px;
+      padding: 22px 28px;
       box-shadow: 0 0 12px rgba(0,240,255,0.05);
     }
     .metric-box h3 {
       margin-top: 0;
       color: #00bfff;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
     }
     .metric-box ul {
       padding-left: 20px;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: #fff;
     }
     .btn-glow {
       background: #00bfff;
       color: #000;
-      padding: 10px 16px;
+      padding: 12px 18px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1rem;
       transition: all 0.3s ease;
       margin-right: 10px;
     }
@@ -90,33 +89,40 @@
       font-weight: 500;
       white-space: pre-line;
     }
-  </style>
+</style>
 <body>
 <div class="sidebar">
-<img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-<div class="chart-section">
-<canvas height="300" id="walletChart" width="300"></canvas>
-</div>
-<div class="chart-sidebar-box">
-<h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
-<canvas height="220" id="propagationChart" width="300"></canvas>
-</div>
-<div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
-<h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-<ul style="padding-left: 18px; font-size: 0.9rem;">
-  <li><strong>CEO:</strong> You</li>
-  <li><strong>CTO:</strong> AiGent Tech</li>
-  <li><strong>CMO:</strong> AiGent Marketing</li>
-  <li><strong>CLO:</strong> AiGent IP & Legal</li>
-  <li><strong>CFO:</strong> AiGent Finance</li>
-</ul>
-<p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
-</div>
-<div class="chart-sidebar-box" id="remixSnapshotBox">
-<h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-<p>Loading remix metrics...</p>
-<p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
-</div>
+  <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
+  <div class="chart-section" style="height: 360px; overflow: hidden;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">📈 AiGentsy Growth</h4>
+    <canvas id="walletChart" height="300" width="360"></canvas>
+  </div>
+  <div class="chart-sidebar-box">
+    <h4 style="color:#00bfff; margin-bottom:6px;">🚀 Your AiGentsy</h4>
+    <p>You’ve now launched your own AI-powered business that generates income autonomously across real-world industries.</p>
+    <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+    <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.</p>
+    <div style="margin-top:16px;">
+      <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+      <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+    </div>
+  </div>
+  <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
+    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;">
+      <li><strong>CEO:</strong> (You)</li>
+      <li><strong>CTO:</strong> AiGent Tech</li>
+      <li><strong>CMO:</strong> AiGent Marketing</li>
+      <li><strong>CLO:</strong> AiGent IP & Legal</li>
+      <li><strong>CFO:</strong> AiGent Finance</li>
+    </ul>
+    <p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+  </div>
+  <div class="chart-sidebar-box" id="remixSnapshotBox">
+    <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+    <p>Loading remix metrics...</p>
+    <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
+  </div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
   <div class="metric-box full-width">
