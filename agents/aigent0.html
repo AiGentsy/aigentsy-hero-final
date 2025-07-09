@@ -103,7 +103,13 @@
 </div>
 <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
 <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-<ul id="csuiteList" style="padding-left: 18px; font-size: 0.9rem;"></ul>
+<ul style="padding-left: 18px; font-size: 0.9rem;">
+  <li><strong>CEO:</strong> You</li>
+  <li><strong>CTO:</strong> AiGent Tech</li>
+  <li><strong>CMO:</strong> AiGent Marketing</li>
+  <li><strong>CLO:</strong> AiGent IP & Legal</li>
+  <li><strong>CFO:</strong> AiGent Finance</li>
+</ul>
 <p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
 <div class="chart-sidebar-box" id="remixSnapshotBox">
@@ -971,19 +977,7 @@ window.addEventListener("DOMContentLoaded", () => {
   .then(data => {
     const user = data.record || data;
 
-    // ✅ C-Suite
-    const csuiteList = document.getElementById("csuiteList");
-    if (csuiteList && user?.team) {
-      const cSuiteRoles = [
-        { role: "CEO", name: `${user.username || username} (You)` },
-        { role: "CTO", name: user.team.CTO || "AiGent CTO" },
-        { role: "CMO", name: user.team.CMO || "AiGent CMO" },
-        { role: "CLO", name: user.team.CLO || "AiGent CLO" },
-        { role: "CFO", name: user.team.CFO || "AiGent CFO" }
-      ];
-      csuiteList.innerHTML = cSuiteRoles.map(({ role, name }) =>
-        `<li><strong>${role}:</strong> ${name}</li>`).join('');
-    }
+    
 
     // ✅ Mint Snapshot
     const mintList = document.getElementById("mintSnapshotList");
