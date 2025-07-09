@@ -585,9 +585,9 @@ if (publicLinksBox && user) {
   `;
 }
    
-     // 🔐 Normalize fallback structure to avoid undefined values
-user.remixUnlocked = user.remixUnlocked || {};
-user.yield = user.yield || {};
+     // 🔐 Normalize fallback structure to avoid undefined values (must come before chart)
+user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
+user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
 
 // === ✅ Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
