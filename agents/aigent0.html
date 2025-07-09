@@ -474,6 +474,11 @@ if (!user) return;
 if (Chart && walletChart) {
   if (walletChart.chartInstance) walletChart.chartInstance.destroy();
 
+    // 🛡️ Ensure all user subfields exist before chart draws
+user.remixUnlocked = user.remixUnlocked || {};
+user.yield = user.yield || {};
+user.cloneLineage = user.cloneLineage || [];
+
   const remixCount = user.remixUnlocked?.remixCount || 0;
   const remixCredits = user.remixUnlocked?.remixCredits || 0;
   const vaultYield = user.yield?.vaultYield || 0;
