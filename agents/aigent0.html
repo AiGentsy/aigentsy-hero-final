@@ -471,36 +471,58 @@ if (!user) return;
       }
     });
 
-    console.log("📊 Injecting Wallet Chart Data:", {
-  aigx: user.yield?.aigxEarned,
-  staked: user.staked,
-  referrals: user.cloneLineage
-});
-
-const walletChart = document.getElementById('walletChart');
+    const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
-  if (walletChart.chartInstance) {
-    walletChart.chartInstance.destroy();
-  }
+  if (walletChart.chartInstance) walletChart.chartInstance.destroy();
+
+  const remixCount = user.remixUnlocked?.remixCount || 0;
+  const remixCredits = user.remixUnlocked?.remixCredits || 0;
+  const vaultYield = user.yield?.vaultYield || 0;
+  const remixYield = user.yield?.remixYield || 0;
+  const aigxEarned = user.yield?.aigxEarned || 0;
+  const staked = user.staked || 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
 
   walletChart.chartInstance = new Chart(walletChart, {
     type: 'bar',
     data: {
-      labels: ['AIGx Earned', 'Staked', 'Referrals'],
+      labels: [
+        'Remix Count',
+        'Remix Credits',
+        'Vault Yield',
+        'Remix Yield',
+        'AIGx Earned',
+        'Staked',
+        'Referrals'
+      ],
       datasets: [{
         data: [
-          user.yield?.aigxEarned || 0,
-          user.staked ? 1 : 0,
-          Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
+          remixCount,
+          remixCredits,
+          vaultYield,
+          remixYield,
+          aigxEarned,
+          staked,
+          referrals
         ],
-        backgroundColor: '#00bfff',
+        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
         borderRadius: 6
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            color: '#aaa',
+            boxWidth: 12,
+            padding: 12
+          }
+        }
+      },
       scales: {
         y: {
           beginAtZero: true,
