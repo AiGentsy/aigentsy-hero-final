@@ -136,9 +136,10 @@
     <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
   </div>
 
-  <div class="metric-box">
-    <h3>💼 Real-World Earnings</h3>
+ <div class="metric-box">
+    <h3>💰 Wallet & Off-Ramp</h3>
     <ul></ul>
+    <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
   </div>
 
   <div class="metric-box">
@@ -151,14 +152,8 @@
   </div>
 
   <div class="metric-box">
-    <h3>📊 Growth & Deployment</h3>
+    <h3>💼 Real-World Earnings</h3>
     <ul></ul>
-  </div>
-
-  <div class="metric-box">
-    <h3>💰 Wallet & Off-Ramp</h3>
-    <ul></ul>
-    <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
   </div>
 
   <div class="metric-box">
@@ -166,6 +161,11 @@
     <ul id="achievementList">
       <li>Loading your business wins...</li>
     </ul>
+  </div>
+
+  <div class="metric-box">
+    <h3>📊 Growth & Deployment</h3>
+    <ul></ul>
   </div>
 
   <div class="metric-box">
@@ -585,13 +585,17 @@ if (publicLinksBox && user) {
   `;
 }
    
-      // === Propagation Chart (Dynamic Remix/Yield Data) ===
+     // 🔐 Normalize fallback structure to avoid undefined values
+user.remixUnlocked = user.remixUnlocked || {};
+user.yield = user.yield || {};
+
+// === ✅ Propagation Chart (Dynamic Remix/Yield Data) ===
 const propagationCanvas = document.getElementById("propagationChart");
 if (Chart && propagationCanvas) {
-  const remixCount = user.remixUnlocked?.remixCount || 0;
-  const remixCredits = user.remixUnlocked?.remixCredits || 0;
-  const vaultYield = user.yield?.vaultYield || 0;
-  const remixYield = user.yield?.remixYield || 0;
+  const remixCount = user.remixUnlocked.remixCount || 0;
+  const remixCredits = user.remixUnlocked.remixCredits || 0;
+  const vaultYield = user.yield.vaultYield || 0;
+  const remixYield = user.yield.remixYield || 0;
 
   const existing = Chart.getChart(propagationCanvas);
   if (existing) existing.destroy();
@@ -622,9 +626,6 @@ if (Chart && propagationCanvas) {
     }
   });
 }
-// 🔐 Normalize fallback structure to avoid undefined values
-user.remixUnlocked = user.remixUnlocked || {};
-user.yield = user.yield || {};
 
     // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
