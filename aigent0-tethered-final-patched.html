@@ -998,10 +998,10 @@ window.addEventListener("DOMContentLoaded", () => {
     if (csuiteList && user?.team) {
       const cSuiteRoles = [
         { role: "CEO", name: `${user.username || username} (You)` },
-        { role: "CTO", name: user.team.CTO || "AiGent SDK" },
-        { role: "CMO", name: user.team.CMO || "AiGent Growth" },
-        { role: "CLO", name: user.team.CLO || "AiGent Remix" },
-        { role: "CFO", name: user.team.CFO || "AiGent0" }
+        { role: "CTO", name: user.team.CTO || "AiGent CTO" },
+        { role: "CMO", name: user.team.CMO || "AiGent CMO" },
+        { role: "CLO", name: user.team.CLO || "AiGent CLO" },
+        { role: "CFO", name: user.team.CFO || "AiGent CFO" }
       ];
       csuiteList.innerHTML = cSuiteRoles.map(({ role, name }) =>
         `<li><strong>${role}:</strong> ${name}</li>`).join('');
