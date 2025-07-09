@@ -512,11 +512,15 @@ if (Chart && walletChart) {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-  legend: {
-    display: false
-  }
-}
-
+      legend: {
+      display: true,
+      position: 'bottom',
+      labels: {
+      color: '#aaa',
+      padding: 16
+     }
+   }
+ }
       scales: {
         y: {
           beginAtZero: true,
