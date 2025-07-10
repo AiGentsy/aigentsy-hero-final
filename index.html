@@ -395,6 +395,23 @@
   // ✅ Safer redirect
   window.location.assign(`/agents/aigent0.html?user=${user}`);
 });
+// 🧠 Launch Kit Modal Automatically on Hero Selection
+aigentCards.forEach(card => {
+  card.addEventListener('click', () => {
+    const type = card.getAttribute('data-agent');
+    if (["legal", "saas", "marketing"].includes(type)) {
+      openKitModal(type); // 🔓 show kit modal
+    }
+  });
+});
+
+// 🧠 Also open custom modal if user types a new idea
+aigentsySearch.addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
+  if (value.length > 8 && !["legal", "saas", "marketing", "podcast"].some(v => value.includes(v))) {
+    openKitModal("custom");
+  }
+});
 
 </script>
 </body>
