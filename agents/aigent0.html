@@ -345,8 +345,9 @@ function openPackagingModal() {
 
 function matchClients() {
   const user = localStorage.getItem("aigentsyUsername") || "unknown user";
-  alert(`Client matching logic launching for ${user}. This will auto-link your AiGents.`);
+  alert(`🤝 Client matching is coming soon for ${user}. Your AiGentsy will soon auto-connect to live demand.`);
 }
+
 // PATCH: Dynamic label substitution by runtime source
 function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO";
