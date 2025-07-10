@@ -1166,7 +1166,7 @@ window.addEventListener("DOMContentLoaded", () => {
       <p>This kit includes:</p>
       <ul>${kit.features.map(f => `<li>${f}</li>`).join('')}</ul>
       <p><strong>Status:</strong> ${kit.status}</p>
-      ${kit.stripeLink ? `<a href="${kit.stripeLink}" target="_blank" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
+      ${kit.stripeLink ? `<a href="#" onclick="confirmStripeUnlock('${kit.stripeLink}')" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
     `;
     document.getElementById("modalOverlay").style.display = "flex";
   }
@@ -1174,6 +1174,19 @@ window.addEventListener("DOMContentLoaded", () => {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+    function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+    function confirmStripeUnlock(link) {
+  window.open(link, '_blank');
+  showToast("🔓 Stripe unlock started. Return here after purchase to confirm.");
+}
 </script>
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
   <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
