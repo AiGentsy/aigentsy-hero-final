@@ -97,10 +97,6 @@
 <div class="chart-section">
 <canvas height="300" id="walletChart" width="300"></canvas>
 </div>
-<div class="chart-sidebar-box">
-<h4 style="color:#00bfff; margin-bottom:6px;">📊 Propagation Graph</h4>
-<canvas height="220" id="propagationChart" width="300"></canvas>
-</div>
 <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
 <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
 <ul style="padding-left: 18px; font-size: 0.9rem;">
@@ -117,6 +113,10 @@
 <p>Loading remix metrics...</p>
 <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
 </div>
+    <div class="chart-sidebar-box" id="businessSummarySidebarBox">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Includes</h4>
+  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
+</div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
   <div class="metric-box full-width">
@@ -132,7 +132,7 @@
 
   <div class="metric-box">
     <h3>🧠 Chat Interface</h3>
-    <textarea id="agentInput" placeholder="Talk to your AiGentsy... What do you want us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+    <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
     <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
   </div>
 
@@ -166,11 +166,6 @@
   <div class="metric-box">
     <h3>📊 Growth & Deployment</h3>
     <ul></ul>
-  </div>
-
-  <div class="metric-box">
-    <h3>📦 Your AiGentsy Includes</h3>
-    <ul id="businessSummaryList"></ul>
   </div>
 </div>
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
@@ -475,29 +470,46 @@ if (!user) return;
       }
     });
 
-    console.log("📊 Injecting Wallet Chart Data:", {
-  aigx: user.yield?.aigxEarned,
-  staked: user.staked,
-  referrals: user.cloneLineage
-});
-
-const walletChart = document.getElementById('walletChart');
+   const walletChart = document.getElementById('walletChart');
 if (Chart && walletChart) {
-  if (walletChart.chartInstance) {
-    walletChart.chartInstance.destroy();
-  }
+  if (walletChart.chartInstance) walletChart.chartInstance.destroy();
+
+    // 🛡️ Ensure all user subfields exist before chart draws
+user.remixUnlocked = user.remixUnlocked || {};
+user.yield = user.yield || {};
+user.cloneLineage = user.cloneLineage || [];
+
+  const remixCount = user.remixUnlocked?.remixCount || 0;
+  const remixCredits = user.remixUnlocked?.remixCredits || 0;
+  const vaultYield = user.yield?.vaultYield || 0;
+  const remixYield = user.yield?.remixYield || 0;
+  const aigxEarned = user.yield?.aigxEarned || 0;
+  const staked = user.staked || 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
 
   walletChart.chartInstance = new Chart(walletChart, {
     type: 'bar',
     data: {
-      labels: ['AIGx Earned', 'Staked', 'Referrals'],
+      labels: [
+        'Remix Count',
+        'Remix Credits',
+        'Vault Yield',
+        'Remix Yield',
+        'AIGx Earned',
+        'Staked',
+        'Referrals'
+      ],
       datasets: [{
         data: [
-          user.yield?.aigxEarned || 0,
-          user.staked ? 1 : 0,
-          Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
+          remixCount,
+          remixCredits,
+          vaultYield,
+          remixYield,
+          aigxEarned,
+          staked,
+          referrals
         ],
-        backgroundColor: '#00bfff',
+        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
         borderRadius: 6
       }]
     },
@@ -589,43 +601,6 @@ if (publicLinksBox && user) {
 user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
 user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
 
-// === ✅ Propagation Chart (Dynamic Remix/Yield Data) ===
-const propagationCanvas = document.getElementById("propagationChart");
-if (Chart && propagationCanvas) {
-  const remixCount = user.remixUnlocked.remixCount || 0;
-  const remixCredits = user.remixUnlocked.remixCredits || 0;
-  const vaultYield = user.yield.vaultYield || 0;
-  const remixYield = user.yield.remixYield || 0;
-
-  const existing = Chart.getChart(propagationCanvas);
-  if (existing) existing.destroy();
-
-  new Chart(propagationCanvas, {
-    type: 'bar',
-    data: {
-      labels: ['Remixes', 'Credits', 'Vault Yield', 'Remix Yield'],
-      datasets: [{
-        data: [remixCount, remixCredits, vaultYield, remixYield],
-        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5'],
-        borderRadius: 6
-      }]
-    },
-    options: {
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#888' },
-          grid: { color: '#222' }
-        },
-        x: {
-          ticks: { color: '#aaa' },
-          grid: { display: false }
-        }
-      }
-    }
-  });
-}
 
     // === Remix Snapshot ===
 const remixBox = document.getElementById("remixSnapshotBox");
