@@ -376,31 +376,17 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-// ✅ "Your AiGentsy Includes" Sidebar Injection
-const includesBox = document.getElementById('includesList');
-if (includesBox && user) {
-  includesBox.innerHTML = ''; // Clear existing
-
-  const unlocked = [];
-
-  if (user.sdkUnlocked || user.sdkAccess_eligible) unlocked.push('SDK Toolkit');
-  if (user.vaultUnlocked || user.vaultAccess) unlocked.push('Vault Access');
-  if (user.remixUnlocked?.remixLicense) unlocked.push('Remix License');
-  if (user.cloneUnlocked || user.cloneLicenseUnlocked) unlocked.push('Clone License');
-  if ((user.traits || []).includes('legal') || user.legalUnlocked) unlocked.push('Legal Kit');
-  if ((user.traits || []).includes('marketing') || user.brandingUnlocked) unlocked.push('Branding Pack');
-
-  if (unlocked.length) {
-    unlocked.forEach(item => {
-      const li = document.createElement('li');
-      li.innerHTML = `✅ ${item}`;
-      includesBox.appendChild(li);
-    });
-  } else {
-    includesBox.innerHTML = '<li>🧱 Nothing unlocked yet. Start building your AiGentsy to populate this list.</li>';
-  }
-}
-
+// ✅ "Your AiGentsy Includes" Summary Injection
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
 const inviteList = document.getElementById("inviteList");
