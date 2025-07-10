@@ -113,15 +113,20 @@
 <p>Loading remix metrics...</p>
 <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
 </div>
-    <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Includes</h4>
-  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
-</div>  <!-- 📄 Dynamic Business Kit Overview -->
-<div class="chart-sidebar-box" id="businessKitDocBox" style="margin-top:18px;">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📄 Business Kit Overview</h4>
-  <div id="dynamicKitDoc" style="font-size:0.9rem; line-height:1.4; color:#ccc;">
-    Loading your kit details...
+   <!-- 📦 Your AiGentsy Kit & Unlocks -->
+<div class="chart-sidebar-box" id="businessSummarySidebarBox">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+
+  <div style="margin-bottom:10px;">
+    <strong style="color:#fff;">Business Kit Overview:</strong>
+    <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
+      Loading your kit details...
+    </div>
   </div>
+
+  <strong style="color:#fff;">Modules Unlocked:</strong>
+  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
+</div>
 </div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
@@ -635,55 +640,44 @@ if (includesBox && user) {
   }
 }
 
-      // 🧠 Inject Business Kit Overview below the Includes box
+   // === Business Kit Overview (Dynamic Description) ===
 const kitDocBox = document.getElementById("dynamicKitDoc");
 if (kitDocBox && user) {
-  const selectedKit = user.traits?.includes("legal") ? "legal"
-                    : user.traits?.includes("saas") ? "saas"
-                    : user.traits?.includes("marketing") ? "marketing"
-                    : "custom";
+  let doc = "🧠 No kit detected.";
 
-  const kitDetails = {
-    legal: `
-      <strong>Legal Kit Includes:</strong>
-      <ul>
-        <li>✅ IP Assignment Agreement</li>
-        <li>✅ NCNDA Generator</li>
-        <li>✅ Licensing Templates</li>
-        <li>✅ Legal Agent Companion</li>
-      </ul>
-    `,
-    saas: `
-      <strong>SaaS Toolkit Includes:</strong>
-      <ul>
-        <li>✅ Auth + Subscription Templates</li>
-        <li>✅ Pricing Page Generator</li>
-        <li>✅ Stripe Integration</li>
-        <li>✅ SaaS Deployment Agent</li>
-      </ul>
-    `,
-    marketing: `
-      <strong>Marketing Stack Includes:</strong>
-      <ul>
-        <li>✅ Branding + Naming Generator</li>
-        <li>✅ Landing Page Templates</li>
-        <li>✅ Email & Social Launch Assets</li>
-        <li>✅ CMO Agent Companion</li>
-      </ul>
-    `,
-    custom: `
-      <strong>Custom Kit Includes:</strong>
-      <ul>
-        <li>✅ Matched C-Suite</li>
-        <li>✅ Auto-bundled services</li>
-        <li>✅ Unlock suggestions based on needs</li>
-        <li>✅ Real-time deployment logic</li>
-      </ul>
-    `
-  };
+  if (user.traits?.includes("legal")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>📜 IP Assignment & Licensing Templates</li>
+        <li>🤝 Legal Agent Companion Included</li>
+        <li>🛡️ Trust Layer Hooks</li>
+      </ul>`;
+  } else if (user.traits?.includes("saas")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>💻 Auth & Subscription System</li>
+        <li>💰 Stripe Monetization Ready</li>
+        <li>🔁 Auto-routing AiGents</li>
+      </ul>`;
+  } else if (user.traits?.includes("marketing")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>📣 Brand & Naming Generator</li>
+        <li>📧 Email & Launch Assets</li>
+        <li>🧠 CMO AiGent Included</li>
+      </ul>`;
+  } else if (user.traits?.includes("custom")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>🧠 Generated from your search</li>
+        <li>👥 Matched C-Suite Roles</li>
+        <li>🚀 Pre-filled Deploy Templates</li>
+      </ul>`;
+  }
 
-  kitDocBox.innerHTML = kitDetails[selectedKit];
+  kitDocBox.innerHTML = doc;
 }
+      
       const publicLinksBox = document.getElementById("publicLinksBox");
 if (publicLinksBox && user) {
   const uname = user.consent?.username || "agent";
