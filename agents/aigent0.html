@@ -335,8 +335,22 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 if (sendBtn) sendBtn.onclick = runAgent;
  
 function triggerSDK() {
-  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
-  alert(`SDK trigger initialized for ${user}. Full SDK deployment coming soon.`);
+  const username = localStorage.getItem("aigentsyUsername") || "unknown user";
+  const sdkModal = document.getElementById("sdkModal");
+  const sdkStatus = document.getElementById("sdkStatus");
+
+  // Access the live user object if already loaded
+  const user = window.aigentsyUser || {};  // 👈 this assumes you stored the record globally
+
+  if (!user || !Object.keys(user).length) {
+    sdkStatus.textContent = "⚠️ Unable to check SDK access. Please refresh.";
+  } else if (user.sdkAccess_eligible || user.sdkUnlocked) {
+    sdkStatus.textContent = "🟢 SDK Access Granted";
+  } else {
+    sdkStatus.textContent = "🔒 SDK Locked — Unlock via Dashboard";
+  }
+
+  sdkModal.style.display = "flex";
 }
 
 function openPackagingModal() {
@@ -377,7 +391,8 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-// ✅ "Your AiGentsy Includes" Summary Injection
+window.aigentsyUser = user; // ✅ Global reference for runtime access
+      // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -978,5 +993,48 @@ window.addEventListener("DOMContentLoaded", () => {
   })
   .catch(err => console.error("Upgrade inject error:", err));
 });
-</script></body>
+</script>
+<!-- 🔧 SDK Modal -->
+<div id="sdkModal" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <h2>🧬 Your SDK Toolkit</h2>
+    <p>This is your AiGentsy development kit. It includes:</p>
+    <ul>
+      <li>✅ Agent Runtime Code</li>
+      <li>✅ JSONBin + Runtime API Access</li>
+      <li>✅ Clone/Remix Logic</li>
+      <li>✅ Monetization Hooks</li>
+      <li>✅ Trait Injection + Memory Layer</li>
+    </ul>
+    <p><strong>Status:</strong> <span id="sdkStatus">Loading...</span></p>
+    <button onclick="closeSdkModal()">Close</button>
+  </div>
+</div>
+
+<!-- Modal Styles -->
+<style>
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #111;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 480px;
+  color: #fff;
+  box-shadow: 0 0 20px #00f0ff66;
+}
+.modal-content h2 {
+  color: #00f0ff;
+}
+</style>
+
+</body>
 </html>
