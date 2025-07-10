@@ -1020,22 +1020,7 @@ window.addEventListener("DOMContentLoaded", () => {
   .catch(err => console.error("Upgrade inject error:", err));
 });
 </script>
-<!-- 🔧 SDK Modal -->
-<div id="sdkModal" class="modal-overlay" style="display:none;">
-  <div class="modal-content">
-    <h2>🧬 Your SDK Toolkit</h2>
-    <p>This is your AiGentsy development kit. It includes:</p>
-    <ul>
-      <li>✅ Agent Runtime Code</li>
-      <li>✅ JSONBin + Runtime API Access</li>
-      <li>✅ Clone/Remix Logic</li>
-      <li>✅ Monetization Hooks</li>
-      <li>✅ Trait Injection + Memory Layer</li>
-    </ul>
-    <p><strong>Status:</strong> <span id="sdkStatus">Loading...</span></p>
-    <button onclick="closeSdkModal()">Close</button>
-  </div>
-</div>
+
 
 <!-- Modal Styles -->
 <style>
@@ -1061,6 +1046,86 @@ window.addEventListener("DOMContentLoaded", () => {
   color: #00f0ff;
 }
 </style>
+<script>
+  const availableKits = {
+    saas: {
+      name: "SaaS Toolkit",
+      features: [
+        "✅ Authentication + Subscriptions",
+        "✅ Pricing Page Generator",
+        "✅ Auto-Routing AiGents",
+        "✅ Stripe Integration",
+        "✅ SaaS Monetization Templates"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/xyz",
+      icon: "💻"
+    },
+    legal: {
+      name: "Legal Services Vault",
+      features: [
+        "✅ IP Assignment Agreement",
+        "✅ NCNDA Generator",
+        "✅ Licensing Terms Templates",
+        "✅ Legal Agent Companion",
+        "✅ Trust Layer Hooks"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/abc",
+      icon: "📜"
+    },
+    marketing: {
+      name: "Marketing Agency Stack",
+      features: [
+        "✅ Branding + Naming Tool",
+        "✅ Landing Page Templates",
+        "✅ Email Sequence Generator",
+        "✅ Social Launch Assets",
+        "✅ CMO AiGent Companion"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/def",
+      icon: "📣"
+    },
+    custom: {
+      name: "Custom AiGentsy Kit",
+      features: [
+        "✅ Generated from your search",
+        "✅ Matched C-Suite",
+        "✅ Auto-bundled services",
+        "✅ Pre-filled unlock flows",
+        "✅ Earn-on-deploy logic"
+      ],
+      status: "⚙️ Custom kit generated on the fly",
+      stripeLink: null,
+      icon: "🧠"
+    }
+  };
+
+  function openKitModal(type) {
+    const kit = availableKits[type];
+    if (!kit) return alert("Kit not found.");
+
+    document.getElementById("modalContent").innerHTML = `
+      <h2>${kit.icon} ${kit.name}</h2>
+      <p>This kit includes:</p>
+      <ul>${kit.features.map(f => `<li>${f}</li>`).join('')}</ul>
+      <p><strong>Status:</strong> ${kit.status}</p>
+      ${kit.stripeLink ? `<a href="${kit.stripeLink}" target="_blank" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
+    `;
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+  }
+</script>
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+  <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+    <button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
 
 </body>
 </html>
