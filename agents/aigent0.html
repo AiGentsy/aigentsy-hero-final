@@ -335,31 +335,57 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 if (sendBtn) sendBtn.onclick = runAgent;
  
 function triggerSDK() {
-  const username = localStorage.getItem("aigentsyUsername") || "unknown user";
-  const sdkModal = document.getElementById("sdkModal");
-  const sdkStatus = document.getElementById("sdkStatus");
+  const user = window.aigentsyUser || {};
+  const username = user?.consent?.username || "unknown user";
 
-  // Access the live user object if already loaded
-  const user = window.aigentsyUser || {};  // 👈 this assumes you stored the record globally
+  const content = `
+    <h2>🧬 Your SDK Toolkit</h2>
+    <p>This is your AiGentsy development kit. It includes:</p>
+    <ul>
+      <li>✅ Agent Runtime Code</li>
+      <li>✅ JSONBin + Runtime API Access</li>
+      <li>✅ Clone/Remix Logic</li>
+      <li>✅ Monetization Hooks</li>
+      <li>✅ Trait Injection + Memory Layer</li>
+    </ul>
+    <p><strong>Status:</strong> ${user.sdkAccess_eligible || user.sdkUnlocked ? "🟢 SDK Access Granted" : "🔒 SDK Locked — Unlock via Dashboard"}</p>
+  `;
 
-  if (!user || !Object.keys(user).length) {
-    sdkStatus.textContent = "⚠️ Unable to check SDK access. Please refresh.";
-  } else if (user.sdkAccess_eligible || user.sdkUnlocked) {
-    sdkStatus.textContent = "🟢 SDK Access Granted";
-  } else {
-    sdkStatus.textContent = "🔒 SDK Locked — Unlock via Dashboard";
-  }
-
-  sdkModal.style.display = "flex";
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function openPackagingModal() {
-  alert("Packaging setup modal will appear here.");
+  const content = `
+    <h2>📦 Set Up Packaging</h2>
+    <p>This module will let you bundle your AiGentsy into ready-to-sell packages.</p>
+    <ul>
+      <li>Set price, licensing terms, and category</li>
+      <li>Distribute on the AiGentsy marketplace</li>
+      <li>Auto-track buyers, remixes, and revenue</li>
+    </ul>
+    <p><strong>Status:</strong> Coming soon</p>
+  `;
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function matchClients() {
-  const user = localStorage.getItem("aigentsyUsername") || "unknown user";
-  alert(`🤝 Client matching is coming soon for ${user}. Your AiGentsy will soon auto-connect to live demand.`);
+  const user = window.aigentsyUser || {};
+  const username = user?.consent?.username || "unknown user";
+
+  const content = `
+    <h2>🤝 Client Matching</h2>
+    <p>Your AiGentsy will soon auto-match with:</p>
+    <ul>
+      <li>🔍 Active demand across realms</li>
+      <li>💼 Business buyers who need your offering</li>
+      <li>⚙️ Other agents seeking team roles</li>
+    </ul>
+    <p><strong>Status:</strong> Matching engine in preview mode for ${username}</p>
+  `;
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modalOverlay").style.display = "flex";
 }
 
 // PATCH: Dynamic label substitution by runtime source
