@@ -116,6 +116,12 @@
     <div class="chart-sidebar-box" id="businessSummarySidebarBox">
   <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Includes</h4>
   <ul id="businessSummaryList" style="padding-left:18px;"></ul>
+</div>  <!-- 📄 Dynamic Business Kit Overview -->
+<div class="chart-sidebar-box" id="businessKitDocBox" style="margin-top:18px;">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📄 Business Kit Overview</h4>
+  <div id="dynamicKitDoc" style="font-size:0.9rem; line-height:1.4; color:#ccc;">
+    Loading your kit details...
+  </div>
 </div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
@@ -629,6 +635,55 @@ if (includesBox && user) {
   }
 }
 
+      // 🧠 Inject Business Kit Overview below the Includes box
+const kitDocBox = document.getElementById("dynamicKitDoc");
+if (kitDocBox && user) {
+  const selectedKit = user.traits?.includes("legal") ? "legal"
+                    : user.traits?.includes("saas") ? "saas"
+                    : user.traits?.includes("marketing") ? "marketing"
+                    : "custom";
+
+  const kitDetails = {
+    legal: `
+      <strong>Legal Kit Includes:</strong>
+      <ul>
+        <li>✅ IP Assignment Agreement</li>
+        <li>✅ NCNDA Generator</li>
+        <li>✅ Licensing Templates</li>
+        <li>✅ Legal Agent Companion</li>
+      </ul>
+    `,
+    saas: `
+      <strong>SaaS Toolkit Includes:</strong>
+      <ul>
+        <li>✅ Auth + Subscription Templates</li>
+        <li>✅ Pricing Page Generator</li>
+        <li>✅ Stripe Integration</li>
+        <li>✅ SaaS Deployment Agent</li>
+      </ul>
+    `,
+    marketing: `
+      <strong>Marketing Stack Includes:</strong>
+      <ul>
+        <li>✅ Branding + Naming Generator</li>
+        <li>✅ Landing Page Templates</li>
+        <li>✅ Email & Social Launch Assets</li>
+        <li>✅ CMO Agent Companion</li>
+      </ul>
+    `,
+    custom: `
+      <strong>Custom Kit Includes:</strong>
+      <ul>
+        <li>✅ Matched C-Suite</li>
+        <li>✅ Auto-bundled services</li>
+        <li>✅ Unlock suggestions based on needs</li>
+        <li>✅ Real-time deployment logic</li>
+      </ul>
+    `
+  };
+
+  kitDocBox.innerHTML = kitDetails[selectedKit];
+}
       const publicLinksBox = document.getElementById("publicLinksBox");
 if (publicLinksBox && user) {
   const uname = user.consent?.username || "agent";
@@ -1111,7 +1166,7 @@ window.addEventListener("DOMContentLoaded", () => {
       <p>This kit includes:</p>
       <ul>${kit.features.map(f => `<li>${f}</li>`).join('')}</ul>
       <p><strong>Status:</strong> ${kit.status}</p>
-      ${kit.stripeLink ? `<a href="${kit.stripeLink}" target="_blank" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
+      ${kit.stripeLink ? `<a href="#" onclick="confirmStripeUnlock('${kit.stripeLink}')" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
     `;
     document.getElementById("modalOverlay").style.display = "flex";
   }
@@ -1119,6 +1174,19 @@ window.addEventListener("DOMContentLoaded", () => {
   function closeModal() {
     document.getElementById("modalOverlay").style.display = "none";
   }
+    function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+    function confirmStripeUnlock(link) {
+  window.open(link, '_blank');
+  showToast("🔓 Stripe unlock started. Return here after purchase to confirm.");
+}
 </script>
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
   <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
