@@ -1188,6 +1188,102 @@ window.addEventListener("DOMContentLoaded", () => {
     <div id="modalContent"></div>
   </div>
 </div>
+<!-- 🚀 Teach-In Modal Sequence (Auto-runs After Login) -->
+<div id="teachInOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000d1a; z-index:9999; color:#fff;">
+  <div id="teachInContent" style="max-width:600px; margin:80px auto; padding:2rem; background:#111; border-radius:16px; box-shadow:0 0 20px #00bfff;">
+    <h2 id="teachInTitle" style="color:#00bfff; margin-bottom:1rem;"></h2>
+    <div id="teachInBody" style="font-size:1rem; line-height:1.5; margin-bottom:1.5rem;"></div>
+    <button id="teachInNextBtn" class="btn-glow">Next →</button>
+  </div>
+</div>
 
+<script>
+  const teachInSlides = [
+    {
+      title: "🧠 You’re Starting a Real AI Business",
+      body: `AiGentsy gives you a fully equipped, AI-powered business from day one.<br><br>
+      ✅ You are the CEO<br>
+      ✅ You get an AI team to run it<br>
+      ✅ You can sell, earn, and grow — powered by AI`
+    },
+    {
+      title: "💸 How You Make Money (On & Off Platform)",
+      body: `Earn by offering AI tools, services, and templates on AiGentsy — and also resell or promote them on Fiverr, Upwork, Instagram, and beyond.<br><br>
+      ✅ Sell unlocks<br>
+      ✅ Monetize templates<br>
+      ✅ Invite and earn` 
+    },
+    {
+      title: "📦 What’s in Your Business Box",
+      body: `Every AiGentsy comes with toolkits you can unlock:<br><br>
+      ✅ <strong>SDK Toolkit</strong>: Agent engine, monetization logic, deploy hooks<br>
+      ✅ <strong>Legal Kit</strong>: NDAs, licenses, IP contracts<br>
+      ✅ <strong>Branding Pack</strong>: Names, logos, launch templates`
+    },
+    {
+      title: "👥 Your AI Team Grows It With You",
+      body: `You get a full AI C-Suite:<br><br>
+      ✅ CTO (builds tools)<br>
+      ✅ CMO (launches)<br>
+      ✅ CFO (tracks yield)<br>
+      ✅ CLO (handles legal)`
+    },
+    {
+      title: "♻️ Earn Every Time Someone Uses Your Work",
+      body: `Every remix, unlock, and client you generate earns you AIGx credits:<br><br>
+      ✅ You earn royalties<br>
+      ✅ You earn from remixes<br>
+      ✅ You earn from services`
+    },
+    {
+      title: "🪙 AIGx → Real Money (Fiat)",
+      body: `AIGx is the currency of your AiGentsy. You earn it from:<br><br>
+      ✅ Selling unlocks<br>
+      ✅ Referrals + usage<br>
+      ✅ Real-world services<br><br>
+      Convert to cash once you hit earnings milestones — via secure Stripe payout.`
+    },
+    {
+      title: "🚀 You're Ready to Launch",
+      body: `✅ Unlock your kits<br>
+      ✅ Match clients<br>
+      ✅ Watch your value grow<br><br>
+      Your AI business is ready. Let’s build.`
+    }
+  ];
+
+  let currentTeachIn = 0;
+
+  function showTeachIn() {
+    const overlay = document.getElementById("teachInOverlay");
+    const title = document.getElementById("teachInTitle");
+    const body = document.getElementById("teachInBody");
+    const btn = document.getElementById("teachInNextBtn");
+
+    overlay.style.display = "block";
+    title.innerHTML = teachInSlides[0].title;
+    body.innerHTML = teachInSlides[0].body;
+
+    btn.onclick = () => {
+      currentTeachIn++;
+      if (currentTeachIn < teachInSlides.length) {
+        title.innerHTML = teachInSlides[currentTeachIn].title;
+        body.innerHTML = teachInSlides[currentTeachIn].body;
+      } else {
+        localStorage.setItem("aigentsyTeachInComplete", "true");
+        overlay.style.display = "none";
+        injectUserDashboard(); // launch dashboard only after teach-in
+      }
+    };
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("aigentsyTeachInComplete")) {
+      showTeachIn();
+    } else {
+      injectUserDashboard();
+    }
+  });
+</script>
 </body>
 </html>
