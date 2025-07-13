@@ -645,6 +645,24 @@ if (includesBox && user) {
   }
 }
 
+      const snapshotBox = document.getElementById("snapshotBox");
+if (snapshotBox && user) {
+  snapshotBox.innerHTML = `
+    <h3>📸 AiGentsy Snapshot</h3>
+    <ul style="padding-left: 18px; font-size: 0.95rem; line-height: 1.5;">
+      <li><strong>Remix Count:</strong> ${user.remixUnlocked?.remixCount || 0}</li>
+      <li><strong>Clone Lineage:</strong> ${user.cloneLineage?.length || 0}</li>
+      <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
+      <li><strong>AIGx Earned:</strong> +${user.yield?.aigxEarned || 0}</li>
+      <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
+      <li><strong>Real-World Services Rendered:</strong> ${user.servicesRendered || 0}</li>
+    </ul>
+    <p style="font-size: 0.85rem; color: #aaa; margin-top: 12px;">
+      🔁 Snapshot updates automatically as your AiGentsy evolves.
+    </p>
+  `;
+}
+
    // === Business Kit Overview (Dynamic Description) ===
 const kitDocBox = document.getElementById("dynamicKitDoc");
 if (kitDocBox && user) {
