@@ -159,43 +159,51 @@
       </div>
     </div>
 
-    <div class="metric-box">
-      <h3>💰 Wallet & Off-Ramp</h3>
-      <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
-        <li>AIGx Earned: 0</li>
-        <li>Staked: 0</li>
-        <li>Referrals: 0 active</li>
-      </ul>
-      <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
-      <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
-        <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
-        <ul style="padding-left:18px; margin:0;">
-          <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
-          <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
-          <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
-          <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
-          <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
-          <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
-        </ul>
-      </div>
-      <div id="growthMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
-        <h4 style="color:#00bfff; margin-bottom:6px;">🌱 Growth & Deployment</h4>
-        <ul style="padding-left:18px; margin:0;">
-          <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
-          <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-          <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
-          <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
-          <li>📊 Live Status: <span id="growthStatus">—</span></li>
-        </ul>
-      </div>
-    </div>
+   <div class="metric-box">
+  <h3>💰 Wallet & Off-Ramp</h3>
+  <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
+    <li>AIGx Earned: 0</li>
+    <li>Staked: 0</li>
+    <li>Referrals: 0 active</li>
+  </ul>
+  <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
 
-    <div class="metric-box">
-      <h3>💼 Real-World Earnings</h3>
-      <ul></ul>
-    </div>
+  <!-- 📊 AiGentsy Snapshot -->
+  <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
+      <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
+      <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+      <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+      <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+      <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+    </ul>
   </div>
 
+  <!-- 🌱 Growth & Deployment -->
+  <div id="growthMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌱 Growth & Deployment</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
+      <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
+      <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
+      <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
+      <li>📊 Live Status: <span id="growthStatus">—</span></li>
+    </ul>
+  </div>
+
+  <!-- 💼 Real-World Earnings -->
+  <div id="earningsMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">💼 Real-World Earnings</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
+      <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
+      <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
+      <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
+    </ul>
+  </div>
+</div>
 
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
