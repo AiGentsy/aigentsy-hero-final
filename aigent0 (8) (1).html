@@ -113,15 +113,20 @@
 <p>Loading remix metrics...</p>
 <p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
 </div>
-    <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Includes</h4>
-  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
-</div>  <!-- 📄 Dynamic Business Kit Overview -->
-<div class="chart-sidebar-box" id="businessKitDocBox" style="margin-top:18px;">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📄 Business Kit Overview</h4>
-  <div id="dynamicKitDoc" style="font-size:0.9rem; line-height:1.4; color:#ccc;">
-    Loading your kit details...
+   <!-- 📦 Your AiGentsy Kit & Unlocks -->
+<div class="chart-sidebar-box" id="businessSummarySidebarBox">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+
+  <div style="margin-bottom:10px;">
+    <strong style="color:#fff;">Business Kit Overview:</strong>
+    <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
+      Loading your kit details...
+    </div>
   </div>
+
+  <strong style="color:#fff;">Modules Unlocked:</strong>
+  <ul id="businessSummaryList" style="padding-left:18px;"></ul>
+</div>
 </div>
 </div> <!-- ✅ CLOSE sidebar -->
 <div class="main">
@@ -635,55 +640,44 @@ if (includesBox && user) {
   }
 }
 
-      // 🧠 Inject Business Kit Overview below the Includes box
+   // === Business Kit Overview (Dynamic Description) ===
 const kitDocBox = document.getElementById("dynamicKitDoc");
 if (kitDocBox && user) {
-  const selectedKit = user.traits?.includes("legal") ? "legal"
-                    : user.traits?.includes("saas") ? "saas"
-                    : user.traits?.includes("marketing") ? "marketing"
-                    : "custom";
+  let doc = "🧠 No kit detected.";
 
-  const kitDetails = {
-    legal: `
-      <strong>Legal Kit Includes:</strong>
-      <ul>
-        <li>✅ IP Assignment Agreement</li>
-        <li>✅ NCNDA Generator</li>
-        <li>✅ Licensing Templates</li>
-        <li>✅ Legal Agent Companion</li>
-      </ul>
-    `,
-    saas: `
-      <strong>SaaS Toolkit Includes:</strong>
-      <ul>
-        <li>✅ Auth + Subscription Templates</li>
-        <li>✅ Pricing Page Generator</li>
-        <li>✅ Stripe Integration</li>
-        <li>✅ SaaS Deployment Agent</li>
-      </ul>
-    `,
-    marketing: `
-      <strong>Marketing Stack Includes:</strong>
-      <ul>
-        <li>✅ Branding + Naming Generator</li>
-        <li>✅ Landing Page Templates</li>
-        <li>✅ Email & Social Launch Assets</li>
-        <li>✅ CMO Agent Companion</li>
-      </ul>
-    `,
-    custom: `
-      <strong>Custom Kit Includes:</strong>
-      <ul>
-        <li>✅ Matched C-Suite</li>
-        <li>✅ Auto-bundled services</li>
-        <li>✅ Unlock suggestions based on needs</li>
-        <li>✅ Real-time deployment logic</li>
-      </ul>
-    `
-  };
+  if (user.traits?.includes("legal")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>📜 IP Assignment & Licensing Templates</li>
+        <li>🤝 Legal Agent Companion Included</li>
+        <li>🛡️ Trust Layer Hooks</li>
+      </ul>`;
+  } else if (user.traits?.includes("saas")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>💻 Auth & Subscription System</li>
+        <li>💰 Stripe Monetization Ready</li>
+        <li>🔁 Auto-routing AiGents</li>
+      </ul>`;
+  } else if (user.traits?.includes("marketing")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>📣 Brand & Naming Generator</li>
+        <li>📧 Email & Launch Assets</li>
+        <li>🧠 CMO AiGent Included</li>
+      </ul>`;
+  } else if (user.traits?.includes("custom")) {
+    doc = `
+      <ul style="padding-left:16px;">
+        <li>🧠 Generated from your search</li>
+        <li>👥 Matched C-Suite Roles</li>
+        <li>🚀 Pre-filled Deploy Templates</li>
+      </ul>`;
+  }
 
-  kitDocBox.innerHTML = kitDetails[selectedKit];
+  kitDocBox.innerHTML = doc;
 }
+      
       const publicLinksBox = document.getElementById("publicLinksBox");
 if (publicLinksBox && user) {
   const uname = user.consent?.username || "agent";
@@ -1194,6 +1188,149 @@ window.addEventListener("DOMContentLoaded", () => {
     <div id="modalContent"></div>
   </div>
 </div>
+<!-- 🚀 Teach-In Modal Sequence (Auto-runs After Login) -->
+<div id="teachInOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000d1a; z-index:9999; color:#fff;">
+  <div id="teachInContent" style="max-width:600px; margin:80px auto; padding:2rem; background:#111; border-radius:16px; box-shadow:0 0 20px #00bfff;">
+    <h2 id="teachInTitle" style="color:#00bfff; margin-bottom:1rem;"></h2>
+    <div id="teachInBody" style="font-size:1rem; line-height:1.5; margin-bottom:1.5rem;"></div>
+    <button id="teachInNextBtn" class="btn-glow">Next →</button>
+  </div>
+</div>
 
+<script>
+  const teachInSlides = [
+  {
+    title: "👋 You’re Not Just a User — You’re a Founder",
+    body: `Welcome to <strong>AiGentsy</strong> — the platform where you launch a fully functional, AI-powered business in minutes.<br><br>
+    When you signed up, we generated a business just for you — complete with an AI team, monetization tools, and a direct path to income.<br><br>
+    🧠 You’re not just using software.<br>💼 You’re running a business.`
+  },
+  {
+    title: "📦 Your Business Includes Real-World Tools",
+    body: `
+    <ul>
+      <li><strong>SDK Toolkit</strong> – Exportable tools to run your AI anywhere (like client sites or portals)</li>
+      <li><strong>Legal Kit</strong> – Contracts, licensing templates, and IP protections</li>
+      <li><strong>Branding Pack</strong> – Logos, landing pages, and social launch assets</li>
+      <li><strong>Remix Engine</strong> – Others can fork your work — and you earn every time they do</li>
+    </ul>
+    🛠 All tools can be used with clients, customers, or even your own storefronts — on or off platform.`
+  },
+ {
+  title: "💸 Real Use Cases (That Earn Real Money)",
+  body: `
+  <ul>
+    <li>🛍 Selling AI-generated product descriptions & templates on your TikTok Shop</li>
+    <li>💼 Resume Optimization Agent offered on Fiverr — built + deployed in minutes</li>
+    <li>🎙 Podcast Clipping Agent that auto-generates reels for influencers & YouTubers</li>
+    <li>📜 Legal Filing Bot that automates LLC formation with Stripe checkout</li>
+  </ul>
+  Every example above was built — and sold — using AiGentsy tools.<br><br>
+  🚫 No code. No gatekeepers. No tech team required.`
+},
+    {
+    title: "🔓 Unlocking = Ownership + Income",
+    body: `
+    Unlocking features does two things:<br><br>
+    <ul>
+      <li>🧩 Adds real tools to your business (SDK, legal templates, etc.)</li>
+      <li>💸 Gives you protocol ownership — you earn yield when others use or remix what you create</li>
+    </ul>
+    You’re not buying shares. You’re building value — and earning your stake by participating.<br><br>
+    The more AiGentsy grows, the more your share grows too.`
+  },
+  {
+    title: "💼 You Don’t Need Permission to Earn",
+    body: `
+    You can earn starting today:<br><br>
+    <ul>
+      <li>Build services using your AiGentsy kits</li>
+      <li>Sell your work on platforms like Fiverr, TikTok, Instagram, or your own site</li>
+      <li>Accept payments however you like</li>
+      <li>Earn AIGx automatically from remixing, referrals, and usage</li>
+    </ul>
+    AIGx can be converted to fiat once your earnings hit the required threshold.<br><br>
+    ✅ No platform tax. You keep what you earn.`
+  },
+  {
+  title: "🤝 Let the Platform Match You",
+  body: `
+  AiGentsy isn’t just tools — it’s a marketplace.<br><br>
+  Our system <strong>automatically connects you</strong> with:
+  <ul>
+    <li>💼 Clients who need your AiGent’s services</li>
+    <li>🧠 Other users who can complete your C-Suite</li>
+    <li>📦 Turnkey kits to fill gaps in your business</li>
+  </ul>
+  You can build — or buy — what you need in one click.<br><br>
+  It’s business formation on autopilot.`
+},
+      {
+    title: "🌐 What Is AIGx and How Do Payouts Work?",
+    body: `
+    <strong>AIGx</strong> is your on-platform reward token. You earn it by:
+    <ul>
+      <li>🔁 Remix activity</li>
+      <li>🎯 Referrals and agent growth</li>
+      <li>📦 Vault deployments and client work</li>
+    </ul>
+    Once your AIGx meets withdrawal milestones, you can cash out securely via Stripe.<br><br>
+    This ensures payouts stay safe, compliant, and tied to real usage.`
+  },
+  {
+    title: "🚀 AiGentsy Is the Only One of Its Kind",
+    body: `
+    <ul>
+      <li>🛒 Shopify gives you a store — not a team or equity</li>
+      <li>💼 Upwork sells your time — AiGentsy builds your business</li>
+      <li>🤖 ChatGPT gives answers — AiGentsy builds your income stream</li>
+    </ul>
+    We’re the only place where AI grows a fully automated business for you — and gives you a stake in the system’s growth.<br><br>
+    Participation = Ownership. And your success grows with the platform.`
+  },
+  {
+    title: "🎉 Let’s Launch Your AiGentsy",
+    body: `
+    ✅ Deploy your business<br>
+    ✅ Grow your C-Suite<br>
+    ✅ Earn from unlocks, referrals, and usage<br><br>
+    Your business is waiting inside.<br>
+    🚀 <strong>Let’s build.</strong>`
+  }
+];
+    
+  let currentTeachIn = 0;
+
+  function showTeachIn() {
+    const overlay = document.getElementById("teachInOverlay");
+    const title = document.getElementById("teachInTitle");
+    const body = document.getElementById("teachInBody");
+    const btn = document.getElementById("teachInNextBtn");
+
+    overlay.style.display = "block";
+    title.innerHTML = teachInSlides[0].title;
+    body.innerHTML = teachInSlides[0].body;
+
+    btn.onclick = () => {
+      currentTeachIn++;
+      if (currentTeachIn < teachInSlides.length) {
+        title.innerHTML = teachInSlides[currentTeachIn].title;
+        body.innerHTML = teachInSlides[currentTeachIn].body;
+      } else {
+        localStorage.setItem("aigentsyTeachInComplete", "true");
+        overlay.style.display = "none";
+        injectUserDashboard(); // launch dashboard only after teach-in
+      }
+    };
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("aigentsyTeachInComplete")) {
+      showTeachIn();
+    } else {
+      injectUserDashboard();
+    }
+  });
+</script>
 </body>
 </html>
