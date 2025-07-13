@@ -108,10 +108,15 @@
 </ul>
 <p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
 </div>
-<div class="chart-sidebar-box" id="remixSnapshotBox">
-<h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
-<p>Loading remix metrics...</p>
-<p style="font-size:0.9rem; color:#00bfff;">+ Add new team member to Your AiGentsy</p>
+<div class="chart-sidebar-box" id="growthBoxSidebar" style="margin-top:18px;">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📈 Growth & Deployment</h4>
+  <ul style="padding-left:18px; font-size:0.9rem;">
+    <li>🧑‍💼 Clients: 0</li>
+    <li>🌱 Referrals: 0</li>
+    <li>⚙️ Deployments: 0</li>
+    <li>🔄 Integrations: 0</li>
+    <li>📡 Live Status: —</li>
+  </ul>
 </div>
    <!-- 📦 Your AiGentsy Kit & Unlocks -->
 <div class="chart-sidebar-box" id="businessSummarySidebarBox">
@@ -147,11 +152,28 @@
     <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
   </div>
 
- <div class="metric-box">
-    <h3>💰 Wallet & Off-Ramp</h3>
-    <ul></ul>
-    <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
+<div class="metric-box">
+  <h3>💰 Wallet & Off-Ramp</h3>
+  <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
+    <li>AIGx Earned: 0</li>
+    <li>Staked: 0</li>
+    <li>Referrals: 0 active</li>
+  </ul>
+  <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
+
+  <!-- 📸 AiGentsy Snapshot -->
+  <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
+      <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
+      <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+      <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+      <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+      <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+    </ul>
   </div>
+</div>
 
   <div class="metric-box">
     <h3>📦 SDK & Licensing</h3>
