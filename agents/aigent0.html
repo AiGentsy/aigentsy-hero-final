@@ -1,105 +1,106 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <meta charset="utf-8"/>
 <title>Autonomous AiGentsy Launchpad</title>
-<script defer="" src="/access-check.js"></script>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<link href="/vaults.css" rel="stylesheet"/>
-<link href="/theme.css" rel="stylesheet"/>
+<script defer src="/access-check.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="/vaults.css"/>
+<link rel="stylesheet" href="/theme.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      margin: 0;
-      background: radial-gradient(circle at center, #0e101a, #000);
-      color: #fff;
-      display: flex;
-    }
-    .sidebar {
-      width: 320px;
-      background: #0a0a0a;
-      padding: 30px 20px;
-    }
-    .sidebar img {
-      width: 160px;
-      display: block;
-      margin-bottom: 40px;
-    }
-    .chart-section {
-      margin-top: 30px;
-    }
-    .chart-sidebar-box {
-      margin-top: 20px;
-      background: #111;
-      color: #ccc;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      border: 1px solid #333;
-    }
-    .main {
-      padding: 40px;
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-    .full-width {
-      grid-column: 1 / -1;
-    }
-    .metric-box {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 10px;
-      padding: 18px 24px;
-      box-shadow: 0 0 12px rgba(0,240,255,0.05);
-    }
-    .metric-box h3 {
-      margin-top: 0;
-      color: #00bfff;
-      font-size: 1.25rem;
-    }
-    .metric-box ul {
-      padding-left: 20px;
-      font-size: 0.95rem;
-      color: #fff;
-    }
-    .btn-glow {
-      background: #00bfff;
-      color: #000;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      margin-right: 10px;
-    }
-    .btn-glow:hover {
-      background: #009cd8;
-    }
-    .chat-user {
-      color: #00B3FF;
-      font-weight: 500;
-    }
-    .chat-agent {
-      color: #FFFFFF;
-      font-weight: 500;
-      white-space: pre-line;
-    }
-  </style>
+  .col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: radial-gradient(circle at center, #0e101a, #000);
+    color: #fff;
+    display: flex;
+  }
+  .sidebar {
+    width: 320px;
+    background: #0a0a0a;
+    padding: 30px 20px;
+  }
+  .sidebar img {
+    width: 160px;
+    display: block;
+    margin-bottom: 40px;
+  }
+  .chart-section {
+    margin-top: 30px;
+  }
+  .chart-sidebar-box {
+    margin-top: 20px;
+    background: #111;
+    color: #ccc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #333;
+  }
+  .main {
+    padding: 40px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  .metric-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 18px 24px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.05);
+  }
+  .metric-box h3 {
+    margin-top: 0;
+    color: #00bfff;
+    font-size: 1.25rem;
+  }
+  .metric-box ul {
+    padding-left: 20px;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+  .btn-glow {
+    background: #00bfff;
+    color: #000;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+  }
+  .btn-glow:hover {
+    background: #009cd8;
+  }
+  .chat-user {
+    color: #00B3FF;
+    font-weight: 500;
+  }
+  .chat-agent {
+    color: #FFFFFF;
+    font-weight: 500;
+    white-space: pre-line;
+  }
+</style>
 <body>
   <div class="sidebar">
     <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
-    
     <div class="chart-section">
-      <canvas height="300" id="walletChart" width="300"></canvas>
+      <canvas id="walletChart" width="300" height="300"></canvas>
     </div>
-
-    <!-- 🏢 C-Suite Team -->
     <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
       <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
       <ul style="padding-left: 18px; font-size: 0.9rem;">
@@ -111,96 +112,90 @@
       </ul>
       <p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
     </div>
-
-    <!-- 📦 Your AiGentsy Kit & Unlocks -->
     <div class="chart-sidebar-box" id="businessSummarySidebarBox">
       <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
-
       <div style="margin-bottom:10px;">
         <strong style="color:#fff;">Business Kit Overview:</strong>
         <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
           Loading your kit details...
         </div>
       </div>
-
       <strong style="color:#fff;">Modules Unlocked:</strong>
       <ul id="businessSummaryList" style="padding-left:18px;"></ul>
     </div>
-  </div> <!-- ✅ CLOSE sidebar -->
+  </div>
 
-<div class="main">
-  <div class="metric-box full-width">
-    <h2>Your AiGentsy's Autonomous Launchpad</h2>
-    <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
-    <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
-    <p style="color:#aaa; font-size:0.85rem;">💡 <strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.</p>
-    <div style="margin-top:16px;">
-      <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
-      <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+  <div class="main">
+    <div class="metric-box full-width">
+      <h2>Your AiGentsy's Autonomous Launchpad</h2>
+      <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
+      <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+      <p style="color:#aaa; font-size:0.85rem;"><strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.</p>
+      <div style="margin-top:16px;">
+        <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+        <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+      </div>
+    </div>
+
+    <div class="col-left">
+      <div class="metric-box">
+        <h3>AiGentsy Chat</h3>
+        <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+        <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
+      </div>
+      <div class="metric-box">
+        <h3>📦 SDK & Licensing</h3>
+        <ul id="autoMatchOfferings"></ul>
+        <button class="btn-glow" onclick="openModal('sdk')">🚀 Unlock SDK</button>
+        <button class="btn-glow" onclick="openModal('vault')">💼 Unlock Vault</button>
+        <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
+        <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
+      </div>
+      <div class="metric-box">
+        <h3>🏆 Team Achievements</h3>
+        <ul id="achievementList">
+          <li>Loading your business wins...</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="metric-box">
+      <h3>💰 Wallet & Off-Ramp</h3>
+      <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
+        <li>AIGx Earned: 0</li>
+        <li>Staked: 0</li>
+        <li>Referrals: 0 active</li>
+      </ul>
+      <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
+      <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+        <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+        <ul style="padding-left:18px; margin:0;">
+          <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
+          <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
+          <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+          <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+          <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+          <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+        </ul>
+      </div>
+      <div id="growthMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+        <h4 style="color:#00bfff; margin-bottom:6px;">🌱 Growth & Deployment</h4>
+        <ul style="padding-left:18px; margin:0;">
+          <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
+          <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
+          <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
+          <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
+          <li>📊 Live Status: <span id="growthStatus">—</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="metric-box">
+      <h3>💼 Real-World Earnings</h3>
+      <ul></ul>
     </div>
   </div>
 
-  <div class="metric-box">
-    <h3>AiGentsy Chat</h3>
-    <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-    <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
-  </div>
-
-<div class="metric-box">
-  <h3>💰 Wallet & Off-Ramp</h3>
-  <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
-    <li>AIGx Earned: 0</li>
-    <li>Staked: 0</li>
-    <li>Referrals: 0 active</li>
-  </ul>
-  <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
-
-  <!-- 📸 AiGentsy Snapshot -->
-  <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
-    <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
-    <ul style="padding-left:18px; margin:0;">
-      <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
-      <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
-      <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
-      <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
-      <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
-      <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
-    </ul>
-  </div>
-
-  <!-- 🌱 Growth & Deployment -->
-  <div id="growthMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
-    <h4 style="color:#00bfff; margin-bottom:6px;">🌱 Growth & Deployment</h4>
-    <ul style="padding-left:18px; margin:0;">
-      <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
-      <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-      <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
-      <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
-      <li>📊 Live Status: <span id="growthStatus">—</span></li>
-    </ul>
-  </div>
-</div>
-
-  <div class="metric-box">
-    <h3>📦 SDK & Licensing</h3>
-    <ul id="autoMatchOfferings"></ul>
-    <button class="btn-glow" onclick="openModal('sdk')">🚀 Unlock SDK</button>
-    <button class="btn-glow" onclick="openModal('vault')">💼 Unlock Vault</button>
-    <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
-    <button class="btn-glow" onclick="openModal('clone')">🧬 Unlock Clone</button>
-  </div>
-
-  <div class="metric-box">
-    <h3>💼 Real-World Earnings</h3>
-    <ul></ul>
-  </div>
-
-  <div class="metric-box">
-    <h3>🏆 Team Achievements</h3>
-    <ul id="achievementList">
-      <li>Loading your business wins...</li>
-    </ul>
-  </div>
 
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
