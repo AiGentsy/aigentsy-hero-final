@@ -153,7 +153,7 @@
 
       <div class="aigent-options">
         <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
-        <div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">TikTok, Instagram, growth kits for creators</span></div>
+        <div class="aigent-card" data-agent="podcast">Podcast AiGentsy<br><span style="font-size: 0.85rem;">Create, host, monetize episodes</span></div>
         <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
         <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
       </div>
@@ -220,8 +220,7 @@
       const lower = value.toLowerCase();
       let match = "";
       if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
-     else if (lower.includes("social") || lower.includes("influencer") || lower.includes("instagram") || lower.includes("tiktok"))
-  match = "Try the Social AiGentsy – built for creators, reels, and launch kits.";
+      else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
       else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
       else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
       else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
@@ -249,13 +248,11 @@
   async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
     const now = new Date().toISOString();
     const roleMap = {
-  "legal": "CLO",
-  "social": "CMO",
-  "saas": "CTO",
-  "marketing": "CMO",
-  "universal": "CEO"
-};
-
+      "legal": "CLO",
+      "podcast": "CMO",
+      "saas": "CTO",
+      "marketing": "CMO"
+    };
 
     const entry = {
       id: `User #${Date.now()}`,
@@ -322,22 +319,7 @@
         needsReview: false
       }
     };
-const prebuiltKits = ["legal", "saas", "marketing", "social"];
-const fallback = selectedAgent || "universal";
 
-entry.prebuiltKit = prebuiltKits.includes(fallback) ? fallback : "universal";
-entry.offeringType = "kit";
-entry.offeringKeywords =
-  fallback === "social"
-    ? ["tiktok", "instagram", "reels", "launch", "content"]
-    : fallback === "legal"
-    ? ["IP", "contracts", "LLC", "compliance"]
-    : fallback === "saas"
-    ? ["builder", "tools", "agent", "software"]
-    : fallback === "marketing"
-    ? ["SEO", "ads", "outreach", "growth"]
-    : ["ai", "business", "launch", "automate", "growth"];
-    
     try {
       const getRes = await fetch(JSONBIN_URL, {
         headers: {
@@ -417,9 +399,9 @@ entry.offeringKeywords =
 aigentCards.forEach(card => {
   card.addEventListener('click', () => {
     const type = card.getAttribute('data-agent');
-   if (["legal", "saas", "marketing", "social"].includes(type)) {
-  openKitModal(type); // 🔓 show kit modal
-}
+    if (["legal", "saas", "marketing"].includes(type)) {
+      openKitModal(type); // 🔓 show kit modal
+    }
   });
 });
 
