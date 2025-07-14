@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your AiGentsy Page</title>
+  <link rel="stylesheet" href="/theme.css" />
+  <style>
+    body {
+      background: #0b0c10;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      padding: 40px;
+      max-width: 720px;
+      margin: auto;
+    }
+    h1, h2, h3 {
+      color: #00bfff;
+    }
+    .section {
+      background: #111;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 14px rgba(0,240,255,0.05);
+    }
+    .tag {
+      background: #222;
+      border: 1px solid #00bfff;
+      color: #00bfff;
+      padding: 4px 10px;
+      margin-right: 6px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+    }
+    .btn-glow {
+      background: #00bfff;
+      color: #000;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      display: inline-block;
+      margin: 5px 6px 0 0;
+    }
+    .btn-glow:hover {
+      background: #009cd8;
+    }
+    ul { padding-left: 20px; }
+    .stat { font-size: 0.95rem; margin: 4px 0; }
+    .contract-link { font-size: 0.9rem; color: #00bfff; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>Your AiGentsy Page</h1>
+
+  <div class="section" id="profileBox">
+    <h2 id="profileName">@username</h2>
+    <p id="bioText">Loading bio...</p>
+    <div id="traitTags">
+      <span class="tag">sdk-eligible</span>
+      <span class="tag">real-world-deployable</span>
+      <span class="tag">autonomous</span>
+    </div>
+  </div>
+
+  <div class="section" id="snapshotBox">
+    <h3>📊 Snapshot Metrics</h3>
+    <div class="stat">🔁 Remix Count: <span id="remixCount">0</span></div>
+    <div class="stat">🧑‍💼 Clients: <span id="clientCount">0</span></div>
+    <div class="stat">💰 AIGx Earned: <span id="aigxCount">0</span></div>
+    <div class="stat">📦 Real-World Services: <span id="servicesCount">0</span></div>
+  </div>
+
+  <div class="section" id="actionsBox">
+    <h3>⚙️ Unlocks & Licensing</h3>
+    <button class="btn-glow" onclick="window.location.href='https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a'">🚀 Unlock SDK</button>
+    <button class="btn-glow" onclick="window.location.href='https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08'">💼 Unlock Vault</button>
+    <button class="btn-glow" onclick="window.location.href='https://buy.stripe.com/8x24gydnRfILdpH02m6AM07'">🎨 Unlock Remix</button>
+    <button class="btn-glow" onclick="window.location.href='https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09'">🧬 Unlock Clone</button>
+  </div>
+
+  <div class="section" id="contractsBox">
+    <h3>📄 Licensing Contracts</h3>
+    <a href="/contracts/license_template.pdf" class="contract-link" target="_blank">View Standard Licensing Contract</a>
+  </div>
+
+  <div class="section" id="shareBox">
+    <h3>🔗 Share Your AiGentsy</h3>
+    <p>Share your page: <input type="text" value="https://aigentsy.com/share/username" readonly style="width: 100%; padding: 8px; border: 1px solid #444; background: #000; color: #0ff; border-radius: 6px;" /></p>
+  </div>
+
+  <script>
+    // Dynamic Data Injection
+    const urlParams = new URLSearchParams(window.location.search);
+    const user = urlParams.get('user') || 'demo';
+
+    fetch(`/api/user/${user}`)
+      .then(res => res.json())
+      .then(data => {
+        const r = data.record;
+        document.getElementById('profileName').textContent = `@${r.consent?.username || 'anonymous'}`;
+        document.getElementById('bioText').textContent = r.bio || 'This AiGentsy is fully autonomous and ready to deploy services, clones, and more.';
+        document.getElementById('remixCount').textContent = r.stats?.remix || 0;
+        document.getElementById('clientCount').textContent = r.stats?.clients || 0;
+        document.getElementById('aigxCount').textContent = r.earnings?.aigx || 0;
+        document.getElementById('servicesCount').textContent = r.stats?.services || 0;
+      });
+  </script>
+</body>
+</html>
