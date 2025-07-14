@@ -249,13 +249,13 @@
   async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
     const now = new Date().toISOString();
     const roleMap = {
-      const roleMap = {
   "legal": "CLO",
   "social": "CMO",
   "saas": "CTO",
   "marketing": "CMO",
   "universal": "CEO"
 };
+
 
     const entry = {
       id: `User #${Date.now()}`,
