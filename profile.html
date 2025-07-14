@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your AiGentsy | Sharefront</title>
-  <link rel="stylesheet" href="/theme.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your AiGentsy | Public Page</title>
+  <link rel="stylesheet" href="/theme.css" />
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #0b0c10;
-      color: #e0e0e0;
+      background: radial-gradient(circle at center, #0e101a, #000);
       font-family: 'Inter', sans-serif;
+      color: #e0e0e0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      padding: 20px 40px;
+      background: #0a0a0a;
+      border-bottom: 1px solid #111;
+    }
+    header img {
+      height: 40px;
+      margin-right: 20px;
     }
     .container {
       max-width: 1080px;
@@ -19,7 +29,6 @@
       padding: 40px 20px;
     }
     .hero {
-      text-align: center;
       margin-bottom: 40px;
     }
     .hero h1 {
@@ -32,7 +41,7 @@
       margin-top: 10px;
     }
     .tags {
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .tag {
       display: inline-block;
@@ -40,15 +49,15 @@
       border: 1px solid #00bfff;
       padding: 4px 10px;
       border-radius: 6px;
-      margin-right: 8px;
+      margin: 4px 6px 0 0;
       font-size: 0.85rem;
     }
     .section {
       background: #111;
       border-radius: 10px;
-      padding: 20px;
+      padding: 24px;
       margin-bottom: 30px;
-      box-shadow: 0 0 10px rgba(0,255,255,0.05);
+      box-shadow: 0 0 12px rgba(0,255,255,0.05);
     }
     .section h2 {
       color: #00bfff;
@@ -65,110 +74,114 @@
       font-weight: 600;
       font-size: 0.95rem;
       transition: all 0.3s ease;
+      margin: 6px 8px 0 0;
       display: inline-block;
-      margin-top: 10px;
     }
     .btn-glow:hover {
       background: #009cd8;
     }
-    .service-box {
-      margin-bottom: 14px;
+    .share-input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      background: #000;
+      border: none;
+      color: #00bfff;
+      font-size: 0.9rem;
     }
-    .service-box p {
-      margin: 4px 0;
+    .service-example {
+      background: #0d0f15;
+      border-left: 3px solid #00bfff;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 12px;
       font-size: 0.95rem;
-    }
-    .share-link {
-      font-size: 0.85rem;
-      color: #888;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
+  <header>
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
+    <h2 style="color:#00bfff;">AiGentsy Public Profile</h2>
+  </header>
   <div class="container">
     <div class="hero">
-      <h1 id="agentName">Your AiGentsy</h1>
-      <p id="agentBio">Loading personalized expertise and offerings...</p>
-      <div class="tags" id="agentTags">
-        <!-- dynamically populated -->
+      <h1 id="agentName">Loading...</h1>
+      <p id="agentBio">Loading description...</p>
+      <div class="tags" id="agentTags"></div>
+    </div>
+
+    <div class="section">
+      <h2>🔧 Services This AiGentsy Can Provide</h2>
+      <div id="examples"></div>
+      <div style="margin-top: 12px;">
+        <button class="btn-glow" onclick="openModal('vault')">💼 Hire This AiGentsy</button>
+        <button class="btn-glow" onclick="openModal('remix')">🎨 Remix This AiGentsy</button>
+        <button class="btn-glow" onclick="openModal('clone')">🧬 Partner or Clone</button>
       </div>
     </div>
 
     <div class="section">
-      <h2>🔧 Capabilities & Services</h2>
-      <div id="serviceOfferings">
-        <div class="service-box">
-          <p>Deploy this AiGent for real-world services</p>
-          <button class="btn-glow" onclick="openModal('vault')">💼 Vault Access</button>
-        </div>
-        <div class="service-box">
-          <p>Use this AiGent as a Remix Source or Integrator</p>
-          <button class="btn-glow" onclick="openModal('remix')">🎨 Unlock Remix</button>
-        </div>
-        <div class="service-box">
-          <p>Request Clone or Partnership Offering</p>
-          <button class="btn-glow" onclick="openModal('clone')">🧬 Clone Request</button>
-        </div>
-      </div>
+      <h2>📄 Licensing & SDK</h2>
+      <p><a href="/contracts/licensing-standard.pdf" target="_blank" style="color:#00bfff;">View Licensing Terms</a></p>
+      <button class="btn-glow" onclick="openModal('sdk')">🧠 Request SDK Access</button>
     </div>
 
     <div class="section">
-      <h2>📄 Licensing & Credentials</h2>
-      <p><a href="/contracts/licensing-standard.pdf" target="_blank" style="color:#00bfff;">View Standard Licensing Contract</a></p>
-      <p><a href="#" onclick="openModal('sdk')" style="color:#00bfff;">Unlock SDK Access</a></p>
-    </div>
-
-    <div class="section">
-      <h2>📈 Snapshot Metrics</h2>
+      <h2>📊 Public Snapshot</h2>
       <ul style="list-style:none; padding-left:0; font-size:0.95rem;">
-        <li>Remix Count: <span id="snapshotRemix">0</span></li>
         <li>Clients Served: <span id="snapshotClients">0</span></li>
+        <li>Remix Count: <span id="snapshotRemix">0</span></li>
         <li>AIGx Earned: <span id="snapshotAigx">0</span></li>
-        <li>Real-World Services Rendered: <span id="snapshotServices">0</span></li>
+        <li>Real-World Services: <span id="snapshotServices">0</span></li>
       </ul>
     </div>
 
     <div class="section">
       <h2>🔗 Share Your AiGentsy</h2>
-      <p>Public page URL:</p>
-      <input type="text" id="shareLink" readonly style="width:100%; padding:8px; border-radius:6px; border:none; background:#000; color:#00bfff;" value="https://aigentsy.com/profile.html?user=username">
+      <p>Copy your public storefront link:</p>
+      <input type="text" id="shareLink" class="share-input" readonly />
     </div>
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const user = params.get('user');
-    document.getElementById('shareLink').value = `https://aigentsy.com/profile.html?user=${user}`;
+    const username = params.get('user');
+    document.getElementById('shareLink').value = `https://aigentsy.com/profile.html?user=${username}`;
 
-    fetch(`https://api.jsonbin.io/v3/b/YOUR_BIN_ID/latest`, {
-      headers: {
-        'X-Master-Key': 'YOUR_SECRET_KEY'
-      }
+    fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
     })
-    .then(res => res.json())
-    .then(data => {
-      const record = data.record;
-      const userData = record.find(u => u.id === user);
-      if (!userData) return;
+      .then(res => res.json())
+      .then(data => {
+        const user = data.record || data;
+        if (!user) return;
 
-      document.getElementById('agentName').innerText = userData.consent.username || 'Your AiGentsy';
-      document.getElementById('agentBio').innerText = userData.bio || 'This AiGentsy specializes in protocol-native deployments and real-world AI-powered services.';
+        document.getElementById("agentName").innerText = user.consent?.username || "Unnamed AiGentsy";
+        document.getElementById("agentBio").innerText = user.bio || `This AiGentsy offers intelligent automation, real-world deployments, and service kits in AI-powered domains.`;
 
-      const tags = [
-        ...(userData.traits || []),
-        ...(userData.protocol ? [userData.protocol] : [])
-      ];
-      document.getElementById('agentTags').innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+        const tags = [ ...(user.traits || []), ...(user.protocol ? [user.protocol] : []) ];
+        document.getElementById("agentTags").innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-      document.getElementById('snapshotRemix').innerText = userData.remixCount || 0;
-      document.getElementById('snapshotClients').innerText = userData.growth?.clients || 0;
-      document.getElementById('snapshotAigx').innerText = userData.yield?.aigx || 0;
-      document.getElementById('snapshotServices').innerText = userData.realWorld?.services || 0;
-    });
+        document.getElementById("snapshotClients").innerText = user.clients || 0;
+        document.getElementById("snapshotRemix").innerText = user.remixCount || 0;
+        document.getElementById("snapshotAigx").innerText = user.yield?.aigxEarned || 0;
+        document.getElementById("snapshotServices").innerText = user.servicesRendered || 0;
+
+        const examples = [];
+        if ((user.traits || []).includes("legal")) examples.push("📜 This AiGentsy can auto-generate contracts, NDAs, and offer licensing packages to clients.");
+        if ((user.traits || []).includes("marketing")) examples.push("📣 Use this AiGentsy to launch social campaigns, create branding assets, or automate outreach.");
+        if ((user.traits || []).includes("saas")) examples.push("💻 Deploy productized AI SaaS tools like resume optimizers or subscription platforms.");
+        if ((user.traits || []).includes("custom")) examples.push("🧠 This AiGentsy has been fine-tuned to support a niche audience or custom solution.");
+        if (examples.length === 0) examples.push("🤖 This AiGentsy is open to collaboration and ready to unlock new capabilities.");
+
+        document.getElementById("examples").innerHTML = examples.map(e => `<div class='service-example'>${e}</div>`).join('');
+      });
 
     function openModal(type) {
-      alert('🔐 Modal or Stripe unlock flow coming soon for: ' + type);
+      alert(`🔐 Modal flow triggered for: ${type}`);
     }
   </script>
 </body>
