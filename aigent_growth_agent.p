@@ -27,6 +27,18 @@ def get_jsonbin_record(username: str) -> dict:
         print("⚠️ JSONBin fetch failed:", str(e))
         return {}
 
+ # 🔹 NEW ──────────────────────────────────────────────────────────────────────
+def get_all_jsonbin_records() -> list[dict]:
+    """Return every user record in JSONBin (used for offer↔need matching)."""
+    try:
+        url = os.getenv("JSONBIN_URL")
+        headers = {"X-Master-Key": os.getenv("JSONBIN_SECRET")}
+        res = requests.get(url, headers=headers, timeout=10)
+        return res.json().get("record", [])
+    except Exception as e:
+        print("⚠️ JSONBin (all‑records) fetch failed:", str(e))
+        return []
+# ────────────────────────────────────────────────────────────────────────────
 # ----------------- Static Config -----------------
 
 agent_traits = {
@@ -83,7 +95,6 @@ class AgentState(BaseModel):
     memory: list[str] = []
 
 # ----------------- Core Logic -----------------
-
 async def invoke(state: AgentState) -> dict:
     user_input = state.input or ""
     if not user_input:
@@ -98,7 +109,6 @@ async def invoke(state: AgentState) -> dict:
         traits = record.get("traits", list(agent_traits.keys()))
         kits = list(record.get("kits", {"universal": {"unlocked": True}}).keys())
         region = record.get("region", "Global")
-                # ---- NEW: compute service needs ---------------------------------
         service_needs = suggest_service_needs(traits, kits)
 
         match_preferences = {"client": 3, "investor": 2, "reseller": 1, "partner": 4}
@@ -110,17 +120,16 @@ async def invoke(state: AgentState) -> dict:
                 "traits": traits,
             }
 
-        if any(
-            phrase in user_input.lower()
-            for phrase in ["match clients", "find clients", "connect me", "partner", "collaborate", "find customers"]
-        ):
+        # 🔁 MetaMatch trigger phrases
+        if any(phrase in user_input.lower() for phrase in [
+            "match clients", "find clients", "connect me", "partner", "collaborate", "find customers"
+        ]):
             from aigent_growth_metamatch import run_metamatch_campaign
-
             if os.getenv("METAMATCH_LIVE", "false").lower() == "true":
                 print("🧠 MetaMatch triggered…")
-                matches = run_metamatch_campaign(
-                    {"username": username, "traits": traits, "prebuiltKit": kits}
-                )
+                matches = run_metamatch_campaign({
+                    "username": username, "traits": traits, "prebuiltKit": kits
+                })
                 stamp_metagraph_entry(username, traits)
                 for m in matches or []:
                     log_revsplit(username, m.get("username", "unknown"))
@@ -130,15 +139,19 @@ async def invoke(state: AgentState) -> dict:
             if os.getenv("ENABLE_OUTBOUND", "false").lower() == "true":
                 trigger_outbound_proposal()
 
+        # ✅ NEW: Optimized-for summary response
         state.memory.append(user_input)
         if "what am i optimized for" in user_input.lower():
             trait_str = ", ".join(traits)
             kit_str = ", ".join(kits)
+            svc_bullets = "\n• " + "\n• ".join(service_needs)
+
             resp = (
-                f"Traits ➜ {', '.join(traits)}  |  Kits ➜ {', '.join(kits)}  "
-                f"| Region ➜ {region}\n"
-                f"🔍 Next suggested moves: {', '.join(service_needs)}"
+                f"You're currently optimized for traits like {trait_str}, "
+                f"equipped with the {kit_str} kit(s), and operating in the {region} region.\n\n"
+                f"📊 **Next best moves for you:**{svc_bullets}"
             )
+
             return {
                 "output": resp,
                 "memory": state.memory,
@@ -148,7 +161,7 @@ async def invoke(state: AgentState) -> dict:
                 "suggested_services": service_needs,
             }
 
-        # ---- Trait‑aware fallback ----
+        # 💬 Trait-aware fallback w/ dual-offer match
         persona_intro = (
             f"You are responding on behalf of the AiGentsy business '{username}'. "
             f"Their traits are: {', '.join(traits)}. Their region is {region}. "
@@ -175,6 +188,19 @@ async def invoke(state: AgentState) -> dict:
         if username == "growth_default" or username.lower() == "universal":
             persona_intro += " The user may have typed a custom business name in the search bar. If traits are limited, default to broad business-building advice."
 
+        # 🔄 Dual-offer matching
+        my_offers = record.get("offers", [])
+        my_needs = record.get("needs", [])
+        matched_partners = dual_side_offer_match(username, my_offers, my_needs)
+        if matched_partners:
+            match_lines = [
+                f"🔗 **{p['username']}**  →  offers match: {p['matched_their_offers']} | needs match: {p['matched_their_needs']}"
+                for p in matched_partners[:5]
+            ]
+            match_msg = "🤝 **Potential dual‑side partners found:**\n" + "\n".join(match_lines)
+            persona_intro += "\n\n" + match_msg
+
+        # 🧠 Final LLM response
         llm_resp = await llm.ainvoke([
             SystemMessage(content=AIGENT_SYS_MSG.content + "\n\n" + persona_intro),
             HumanMessage(content=user_input)
@@ -261,6 +287,33 @@ def trigger_outbound_proposal():
     except Exception as e:
         print("⚠️ Outbound proposal error:", str(e))
 
+# 🔹 NEW ──────────────────────────────────────────────────────────────────────
+def dual_side_offer_match(username: str,
+                          my_offers: list[str],
+                          my_needs: list[str]) -> list[dict]:
+    """
+    Return a list of partner records where:
+       • partner.offers ∩ my_needs  OR  partner.needs ∩ my_offers
+    """
+    partners: list[dict] = []
+    if not (my_offers or my_needs):
+        return partners
+
+    for user in get_all_jsonbin_records():
+        if user.get("username") == username:      # skip self
+            continue
+        offers = user.get("offers", [])
+        needs  = user.get("needs",  [])
+        if set(offers) & set(my_needs) or set(needs) & set(my_offers):
+            partners.append(
+                {
+                    "username": user.get("username"),
+                    "matched_their_offers": list(set(offers) & set(my_needs)),
+                    "matched_their_needs":  list(set(needs)  & set(my_offers)),
+                }
+            )
+    return partners
+# ────────────────────────────────────────────────────────────────────────────
 # ----------------- Graph & Endpoint -----------------
 
 @lru_cache
@@ -273,31 +326,82 @@ def get_agent_graph():
 
 app = FastAPI()
 
+def metabridge_dual_match_realworld_fulfillment(input_text: str) -> list[dict]:
+    """
+    Matches external job/offer text to AiGentsy agents with relevant traits/kits.
+    Can be used inside MetaBridge or outbound campaign intake.
+
+    Returns list of potential matches with user, traits, score, and match_reason.
+    """
+    try:
+        url = os.getenv("JSONBIN_URL")
+        headers = {"X-Master-Key": os.getenv("JSONBIN_SECRET")}
+        res = requests.get(url, headers=headers, timeout=10)
+        all_users = res.json().get("record", [])
+
+        matches = []
+
+        keywords = input_text.lower().split()
+        for user in all_users:
+            score = 0
+            reasons = []
+
+            user_traits = [t.lower() for t in user.get("traits", [])]
+            user_kits = list(user.get("kits", {}).keys())
+
+            # Score trait/kit hits
+            for kw in keywords:
+                if kw in user_traits:
+                    score += 2
+                    reasons.append(f"Trait match: {kw}")
+                if kw in user_kits:
+                    score += 1
+                    reasons.append(f"Kit match: {kw}")
+                if kw in user.get("ventureID", "").lower():
+                    score += 1
+                    reasons.append("Business name match")
+
+            if score > 0:
+                matches.append({
+                    "username": user.get("username"),
+                    "venture": user.get("ventureID"),
+                    "traits": user_traits,
+                    "kits": user_kits,
+                    "score": score,
+                    "match_reason": ", ".join(reasons),
+                    "contact_url": user.get("runtimeURL", "#")
+                })
+
+        return sorted(matches, key=lambda m: m["score"], reverse=True)
+
+    except Exception as e:
+        print("⚠️ MetaBridge Dual Match error:", str(e))
+        return []
+        
 @app.post("/metabridge")
 async def metabridge(request: Request):
+    """
+    MetaBridge: Dual-side external fulfillment matcher.
+
+    Accepts:
+        - query: a text-based offer/need to match against AiGentsy users
+        - username: optional, for tracking or internal fallback
+
+    Returns:
+        - Top matching AiGentsy agents with score and match reasons
+    """
     payload = await request.json()
+    search_query = payload.get("query")  # external offer or need
     username = payload.get("username", "growth_default")
-    traits = payload.get("traits")
-    kit = payload.get("kit")
 
-    if not traits or not kit:
-        record = get_jsonbin_record(username)
-        traits = record.get("traits", ["starter"])
-        kit = list(record.get("kits", {"universal": {"unlocked": True}}).keys())
+    if not search_query:
+        return {"status": "error", "message": "No query provided."}
 
-    try:
-        from aigent_growth_metamatch import run_metamatch_campaign
-        matches = run_metamatch_campaign({
-            "username": username,
-            "traits": traits,
-            "prebuiltKit": kit
-        })
-        return {
-            "matches": matches,
-            "status": "ok",
-            "traits_used": traits,
-            "kits_used": kit,
-            "username": username
-        }
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    matches = metabridge_dual_match_realworld_fulfillment(search_query)
+
+    return {
+        "status": "ok",
+        "query": search_query,
+        "match_count": len(matches),
+        "matches": matches,
+    }
