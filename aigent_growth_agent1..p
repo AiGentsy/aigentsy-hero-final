@@ -328,10 +328,8 @@ app = FastAPI()
 
 def metabridge_dual_match_realworld_fulfillment(input_text: str) -> list[dict]:
     """
-    Matches external job/offer text to AiGentsy agents with relevant traits/kits.
-    Can be used inside MetaBridge or outbound campaign intake.
-
-    Returns list of potential matches with user, traits, score, and match_reason.
+    Matches external job/offer text to AiGentsy users with relevant offerings, traits, or kits.
+    Prioritizes `user_offerings` if available.
     """
     try:
         url = os.getenv("JSONBIN_URL")
@@ -340,24 +338,29 @@ def metabridge_dual_match_realworld_fulfillment(input_text: str) -> list[dict]:
         all_users = res.json().get("record", [])
 
         matches = []
-
         keywords = input_text.lower().split()
+
         for user in all_users:
             score = 0
             reasons = []
 
-            user_traits = [t.lower() for t in user.get("traits", [])]
-            user_kits = list(user.get("kits", {}).keys())
+            # Primary: user_offerings
+            offerings = [o.lower() for o in user.get("user_offerings", [])]
+            traits = [t.lower() for t in user.get("traits", [])]
+            kits = list(user.get("kits", {}).keys())
+            venture = user.get("ventureID", "").lower()
 
-            # Score trait/kit hits
             for kw in keywords:
-                if kw in user_traits:
+                if kw in offerings:
+                    score += 4
+                    reasons.append(f"Offering match: {kw}")
+                if kw in traits:
                     score += 2
                     reasons.append(f"Trait match: {kw}")
-                if kw in user_kits:
+                if kw in kits:
                     score += 1
                     reasons.append(f"Kit match: {kw}")
-                if kw in user.get("ventureID", "").lower():
+                if kw in venture:
                     score += 1
                     reasons.append("Business name match")
 
@@ -365,8 +368,9 @@ def metabridge_dual_match_realworld_fulfillment(input_text: str) -> list[dict]:
                 matches.append({
                     "username": user.get("username"),
                     "venture": user.get("ventureID"),
-                    "traits": user_traits,
-                    "kits": user_kits,
+                    "traits": traits,
+                    "kits": kits,
+                    "offerings": offerings,
                     "score": score,
                     "match_reason": ", ".join(reasons),
                     "contact_url": user.get("runtimeURL", "#")
@@ -377,7 +381,6 @@ def metabridge_dual_match_realworld_fulfillment(input_text: str) -> list[dict]:
     except Exception as e:
         print("⚠️ MetaBridge Dual Match error:", str(e))
         return []
-
 # ----------------- Proposal Generator & Delivery -----------------
 
 def proposal_generator(query: str, matches: list[dict]) -> list[dict]:
@@ -421,6 +424,47 @@ def proposal_delivery(sender: str, proposals: list[dict]):
         print(f"📬 {len(proposals)} proposal(s) logged.")
     except Exception as e:
         print("⚠️ Proposal log failed:", str(e))
+
+# ----------------- External Signal Trigger -----------------
+
+external_signal_registry: list[dict] = []
+
+@app.post("/external_signal")
+async def external_signal(request: Request):
+    """
+    Activates off-platform signal tracking. This tells the agent:
+    "I'm marketing my offering right now on X platform — prepare proposals."
+
+    Payload:
+        - username (str)
+        - platform (str): e.g., "linkedin", "tiktok", "fiverr"
+        - tags (list[str]): optional topics or keywords (e.g., ["ai", "seo"])
+    """
+    try:
+        payload = await request.json()
+        username = payload.get("username", "growth_default")
+        platform = payload.get("platform", "unknown")
+        tags = payload.get("tags", [])
+
+        log_entry = {
+            "username": username,
+            "platform": platform,
+            "tags": tags,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+        external_signal_registry.append(log_entry)
+
+        print(f"🚀 External signal received: {log_entry}")
+
+        return {
+            "status": "ok",
+            "message": f"Signal received for {username} on {platform}. Proposal prep will begin.",
+            "signal": log_entry
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 @app.post("/metabridge")
 async def metabridge(request: Request):
