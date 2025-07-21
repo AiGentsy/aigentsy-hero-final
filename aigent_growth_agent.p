@@ -7,7 +7,9 @@ from functools import lru_cache
 from langchain_openai import ChatOpenAI
 from fastapi import FastAPI, Request
 from datetime import datetime
+from proposal_delivery import deliver_proposal
 import requests
+
 
 load_dotenv()
 
@@ -314,6 +316,53 @@ def dual_side_offer_match(username: str,
             )
     return partners
 # ────────────────────────────────────────────────────────────────────────────
+def auto_proposal_on_mint(new_record: dict):
+    """
+    When a new user is created (minted), this function:
+    - Scans for other users with offering/need matches
+    - Generates a proposal using existing logic
+    - Dispatches it via webhook/email/etc
+    """
+    try:
+        username = new_record.get("username")
+        if not username:
+            return
+
+        offer = ", ".join(new_record.get("user_offerings", [])) or new_record.get("meta_role", "")
+        if not offer:
+            return
+
+        from proposal_generator import proposal_generator, proposal_dispatch, deliver_proposal
+        from aigent_growth_metamatch import metabridge_dual_match_realworld_fulfillment
+
+        matches = metabridge_dual_match_realworld_fulfillment(offer)
+        if not matches:
+            return
+
+        proposal = proposal_generator(username, offer, matches)
+        proposal_dispatch(username, proposal, match_target=matches[0].get("username"))
+
+        deliver_proposal(
+            query=offer,
+            matches=matches,
+            originator=username
+        )
+        print("✅ Auto-proposal dispatched on mint.")
+
+    except Exception as e:
+        print("⚠️ Auto-proposal mint error:", str(e))
+
+def generate_offplatform_invite(username: str, proposal_text: str) -> str:
+    """
+    Appends a CTA + referral-based invite link to the generated proposal
+    """
+    try:
+        invite_link = f"https://aigentsy.com/start?invite={username}"
+        return proposal_text + "\n\n💡 Not on AiGentsy yet? Join here: " + invite_link
+    except Exception as e:
+        print("⚠️ Invite link generation error:", str(e))
+        return proposal_text
+
 # ----------------- Graph & Endpoint -----------------
 
 @lru_cache
@@ -405,6 +454,35 @@ def proposal_generator(query: str, matches: list[dict]) -> list[dict]:
         proposals.append({"to": recipient, "body": body})
 
     return proposals
+
+def proposal_dispatch(username: str, proposal: str, match_target: str = None):
+    """
+    Stores or delivers a proposal for logging or external delivery.
+    """
+    try:
+        bin_url = os.getenv("PROPOSAL_LOG_URL")
+        headers = {
+            "X-Master-Key": os.getenv("JSONBIN_SECRET"),
+            "Content-Type": "application/json"
+        }
+
+        record = {
+            "username": username,
+            "target": match_target,
+            "proposal": proposal,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+        # Append to latest record
+        r = requests.get(bin_url, headers=headers, timeout=10)
+        current = r.json().get("record", [{}])[-1]
+        current.setdefault("proposals", []).append(record)
+        requests.put(bin_url, json=r.json()["record"], headers=headers, timeout=10)
+
+        print("📬 Proposal logged successfully.")
+
+    except Exception as e:
+        print("⚠️ Proposal dispatch error:", str(e))
 
 def proposal_delivery(sender: str, proposals: list[dict]):
     """
@@ -504,6 +582,16 @@ async def scan_external_content(request: Request):
         # 🎯 Match using AiGentsy logic
         matches = metabridge_dual_match_realworld_fulfillment(inferred_offer)
         proposal = proposal_generator(username, inferred_offer, matches)
+        proposal_dispatch(username, proposal, match_target=matches[0].get("username") if matches else None)
+              # 🔁 Deliver proposals externally (webhook/email/DM)
+        try:
+            deliver_proposal(
+                query=inferred_offer,
+                matches=matches,
+                originator=username
+            )
+        except Exception as e:
+            print("⚠️ Proposal delivery failed:", str(e))
 
         return {
             "status": "ok",
@@ -539,6 +627,7 @@ async def metabridge(request: Request):
 
     matches = metabridge_dual_match_realworld_fulfillment(search_query)
     proposals = proposal_generator(search_query, matches)
+    proposal_dispatch(username, proposal, match_target=matches[0].get("username") if matches else None)
     proposal_delivery(username, proposals)
 
     return {
