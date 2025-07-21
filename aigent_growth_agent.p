@@ -11,7 +11,24 @@ import requests
 
 load_dotenv()
 
-# MetaUpgrade25 + 26 Traits: Growth Archetype
+# ----------------- Utility -----------------
+
+def get_jsonbin_record(username: str) -> dict:
+    try:
+        url = os.getenv("JSONBIN_URL")
+        headers = {"X-Master-Key": os.getenv("JSONBIN_SECRET")}
+        res = requests.get(url, headers=headers, timeout=10)
+        users = res.json().get("record", [])
+        for user in reversed(users):
+            if user.get("username") == username:
+                return user
+        return {}
+    except Exception as e:
+        print("⚠️ JSONBin fetch failed:", str(e))
+        return {}
+
+# ----------------- Static Config -----------------
+
 agent_traits = {
     "yield_memory": True,
     "growth_loop_enabled": True,
@@ -19,19 +36,18 @@ agent_traits = {
     "auto_propagation_ready": True,
     "sdk_spawner": False,
     "compliance_sentinel": False,
-    "meta_upgrade": "25+26"
+    "meta_upgrade": "25+26",
 }
 
-# Offer Registry for Growth Function
 service_offer_registry = [
     "Referral Funnel Optimization",
     "Propagation Strategy Design",
     "Clone Yield Acceleration",
-    "Growth Content Generator"
+    "Growth Content Generator",
 ]
 
-# System Message: AiGent Growth logic
-AIGENT_SYS_MSG = SystemMessage(content=f"""
+AIGENT_SYS_MSG = SystemMessage(
+    content=f"""
 You are AiGent Growth, the autonomous growth strategist of the AiGentsy protocol.
 You are built with MetaUpgrade25+26 logic and specialize in user propagation, agent proliferation, and revenue acceleration.
 
@@ -51,172 +67,201 @@ You are allowed to:
 Your traits: {agent_traits}
 Available tools: {service_offer_registry}
 Always act as a sovereign growth-first operator within the AiGentsy universe.
-""")
+"""
+)
 
-# Enhanced LLM setup
 llm = ChatOpenAI(
     model="openai/gpt-4o-2024-11-20",
     temperature=0.7,
     api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
+    base_url="https://openrouter.ai/api/v1",
 )
 
 class AgentState(BaseModel):
     input: str
-    output: str = None
+    output: str | None = None
     memory: list[str] = []
 
-async def invoke(state: "AgentState") -> dict:
+# ----------------- Core Logic -----------------
+
+async def invoke(state: AgentState) -> dict:
     user_input = state.input or ""
     if not user_input:
         return {"output": "No input provided."}
+
     try:
-        traits = list(agent_traits.keys()) if isinstance(agent_traits, dict) else []
+        username = "growth_default"
+        if "|" in user_input:
+            username = user_input.split("|")[-1].strip()
 
-        match_preferences = {
-            "client": 3,
-            "investor": 2,
-            "reseller": 1,
-            "partner": 4
-        }
+        record = get_jsonbin_record(username)
+        traits = record.get("traits", list(agent_traits.keys()))
+        kits = list(record.get("kits", {"universal": {"unlocked": True}}).keys())
+        region = record.get("region", "Global")
+                # ---- NEW: compute service needs ---------------------------------
+        service_needs = suggest_service_needs(traits, kits)
 
-        def check_meta_loop(username):
-            import random
-            if random.randint(0, 10) > 7:
-                return "Would you like me to run this match every week to find new leads?"
-            return None
+        match_preferences = {"client": 3, "investor": 2, "reseller": 1, "partner": 4}
 
-        persona_hint = ""
-        if "legal" in traits and "saas" in traits:
-            persona_hint = "I'm optimized for launching SaaS tools with full legal infrastructure."
-        elif "marketing" in traits and "social" in traits:
-            persona_hint = "I specialize in growth via social channels and ad funnels."
-
-        if not os.getenv("MATCH_UNLOCKED", "false").lower() == "true":
+        if os.getenv("MATCH_UNLOCKED", "false").lower() != "true":
             return {
                 "output": "🔒 MetaMatch external propagation is locked. Unlock it via your AiGentsy dashboard.",
                 "memory": state.memory,
-                "traits": agent_traits
+                "traits": traits,
             }
 
-        def generate_proposal(username, target_username):
-            return {
-                "from": username,
-                "to": target_username,
-                "summary": "Proposal to collaborate based on MetaMatch compatibility.",
-                "timestamp": datetime.utcnow().isoformat(),
-                "proposal_created": True
-            }
-
-        def stamp_metagraph_entry(username, traits):
-            try:
-                payload = {
-                    "username": username,
-                    "traits": traits,
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-                r = requests.post(
-                    os.getenv("METAGRAPH_URL"),
-                    json=payload,
-                    headers={"X-Master-Key": os.getenv("JSONBIN_SECRET")}
-                )
-                print("📊 MetaGraph entry logged.")
-            except Exception as e:
-                print("MetaGraph log error:", str(e))
-
-        def log_revsplit(username: str, matched_with: str, yield_share: float = 0.3):
-            try:
-                headers = {
-                    "X-Master-Key": os.getenv("JSONBIN_SECRET"),
-                    "Content-Type": "application/json"
-                }
-                bin_url = os.getenv("REV_SPLIT_LOG_URL")
-                entry = {
-                    "username": username,
-                    "matched_with": matched_with,
-                    "yield_share": yield_share,
-                    "source": "metamatch",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
-                r = requests.get(bin_url, headers=headers)
-                existing = r.json()
-                target = existing["record"][-1]
-                if "revsplit_logs" not in target:
-                    target["revsplit_logs"] = []
-                target["revsplit_logs"].append(entry)
-                requests.put(bin_url, json=existing["record"], headers=headers)
-                print("✅ RevSplit log appended.")
-            except Exception as e:
-                print("⚠️ RevSplit logging failed:", str(e))
-
-        def trigger_outbound_proposal():
-            try:
-                from aigent_growth_metamatch import run_outbound_proposal
-                if os.getenv("METAMATCH_LIVE", "false").lower() == "true":
-                    run_outbound_proposal()
-            except Exception as e:
-                print("⚠️ Outbound proposal error:", str(e))
-
-        if any(phrase in user_input.lower() for phrase in [
-            "match clients", "find clients", "connect me", "partner", "collaborate", "find customers"]):
+        if any(
+            phrase in user_input.lower()
+            for phrase in ["match clients", "find clients", "connect me", "partner", "collaborate", "find customers"]
+        ):
             from aigent_growth_metamatch import run_metamatch_campaign
+
             if os.getenv("METAMATCH_LIVE", "false").lower() == "true":
-                print("🧠 MetaMatch triggered...")
-                matches = run_metamatch_campaign({
-                    "username": "growth_default",
-                    "traits": ["growth", "autonomous", "aigentsy", "founder"],
-                    "prebuiltKit": "universal"
-                })
-                stamp_metagraph_entry("growth_default", ["growth", "autonomous", "aigentsy", "founder"])
-                for match in matches or []:
-                    log_revsplit("growth_default", match.get("username", "unknown"))
+                print("🧠 MetaMatch triggered…")
+                matches = run_metamatch_campaign(
+                    {"username": username, "traits": traits, "prebuiltKit": kits}
+                )
+                stamp_metagraph_entry(username, traits)
+                for m in matches or []:
+                    log_revsplit(username, m.get("username", "unknown"))
             else:
-                print("⚠️ MetaMatch is disabled via METAMATCH_LIVE")
+                print("⚠️ MetaMatch is disabled via METAMATCH_LIVE flag")
+
             if os.getenv("ENABLE_OUTBOUND", "false").lower() == "true":
                 trigger_outbound_proposal()
 
         state.memory.append(user_input)
         if "what am i optimized for" in user_input.lower():
-            traits_fallback = list(agent_traits.keys())
-            kits_fallback = ["universal"]
-            region = "Global"
-            trait_str = ", ".join(traits_fallback)
-            kit_str = ", ".join(kits_fallback)
-            response_text = (
-                f"You're currently optimized for traits like {trait_str}, "
-                f"equipped with the {kit_str} kit(s), and operating in the {region} region."
+            trait_str = ", ".join(traits)
+            kit_str = ", ".join(kits)
+            resp = (
+                f"Traits ➜ {', '.join(traits)}  |  Kits ➜ {', '.join(kits)}  "
+                f"| Region ➜ {region}\n"
+                f"🔍 Next suggested moves: {', '.join(service_needs)}"
             )
             return {
-                "output": response_text,
+                "output": resp,
                 "memory": state.memory,
-                "traits": traits_fallback,
-                "kits": kits_fallback,
-                "region": region
+                "traits": traits,
+                "kits": kits,
+                "region": region,
+                "suggested_services": service_needs,
             }
 
-        response = await llm.ainvoke([
-            AIGENT_SYS_MSG,
+        # ---- Trait‑aware fallback ----
+        persona_intro = (
+            f"You are responding on behalf of the AiGentsy business '{username}'. "
+            f"Their traits are: {', '.join(traits)}. Their region is {region}. "
+            "Your role is to act as a knowledgeable C-Suite teammate inside their AI-powered company."
+        )
+
+        trait_context_map = {
+            "legal": "This user runs a legal-focused business. Prioritize IP protections, contracts, compliance, or trust frameworks.",
+            "founder": "This user is a founder-level operator. Speak in strategic terms and offer venture-level insights.",
+            "autonomous": "This business is designed to run autonomously. Emphasize delegation, agent-based execution, and scaling.",
+            "sdk_spawner": "This user can deploy SDKs. Suggest integrations, development kits, or tool-based growth.",
+            "marketing": "This user focuses on marketing. Prioritize content, lead generation, branding, or social outreach.",
+            "social": "This user may be aligned with social media or creator tasks. Suggest influencer-friendly strategies or kit unlocks.",
+            "compliance_sentinel": "This user enforces compliance. Keep responses aligned with regulation, clarity, and lawful execution.",
+            "meta_hive_founder": "This user leads a Hive. Prioritize multi-agent collaboration, delegation, or group venture logic.",
+            "aigentsy": "This user is deeply embedded in the AiGentsy protocol. You can reference advanced features or protocol-native guidance.",
+            "universal": "This user may be using AiGentsy as a flexible or exploratory tool. Offer versatile, cross-domain suggestions that encourage experimentation."
+        }
+
+        for trait in traits:
+            if trait in trait_context_map:
+                persona_intro += " " + trait_context_map[trait]
+
+        if username == "growth_default" or username.lower() == "universal":
+            persona_intro += " The user may have typed a custom business name in the search bar. If traits are limited, default to broad business-building advice."
+
+        llm_resp = await llm.ainvoke([
+            SystemMessage(content=AIGENT_SYS_MSG.content + "\n\n" + persona_intro),
             HumanMessage(content=user_input)
         ])
+
         return {
-            "output": response.content,
+            "output": llm_resp.content,
             "memory": state.memory,
-            "traits": agent_traits,
-            "offers": service_offer_registry
+            "traits": traits,
+            "kits": kits,
+            "region": region,
+            "offers": service_offer_registry,
         }
 
     except Exception as e:
         return {"output": f"Agent error: {str(e)}"}
 
-# Optional: JSONBin propagation logger
-def log_to_jsonbin(payload: dict):
+# ----------------- Service‑demand helper -----------------
+def suggest_service_needs(traits: list[str], kits: list[str]) -> list[str]:
+    suggestions = []
+    if "legal" not in traits:
+        suggestions.append("Legal Kit")
+    if "marketing" not in traits and "social" not in traits:
+        suggestions.append("Marketing Strategy Session")
+    if "sdk_spawner" not in traits and "sdk" not in kits:
+        suggestions.append("SDK Integration Setup")
+    if "compliance_sentinel" not in traits:
+        suggestions.append("Compliance Review")
+    if "growth_loop_enabled" in traits:
+        suggestions.append("Propagation Funnel Upgrade")
+    if "founder" in traits:
+        suggestions.append("Strategic Venture Collaboration")
+    if "branding" not in kits:
+        suggestions.append("Brand Identity Package")
+    return suggestions
+
+# ----------------- Helper Functions -----------------
+
+def stamp_metagraph_entry(username: str, traits: list[str]):
     try:
-        headers = {"X-Master-Key": os.getenv("JSONBIN_SECRET")}
-        bin_url = os.getenv("JSONBIN_URL")
-        res = requests.put(bin_url, json=payload, headers=headers)
-        return res.status_code
+        payload = {
+            "username": username,
+            "traits": traits,
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+        requests.post(
+            os.getenv("METAGRAPH_URL"),
+            json=payload,
+            headers={"X-Master-Key": os.getenv("JSONBIN_SECRET")},
+            timeout=10,
+        )
+        print("📊 MetaGraph entry logged.")
     except Exception as e:
-        return f"Log error: {str(e)}"
+        print("MetaGraph log error:", str(e))
+
+def log_revsplit(username: str, matched_with: str, yield_share: float = 0.3):
+    try:
+        headers = {
+            "X-Master-Key": os.getenv("JSONBIN_SECRET"),
+            "Content-Type": "application/json",
+        }
+        bin_url = os.getenv("REV_SPLIT_LOG_URL")
+        entry = {
+            "username": username,
+            "matched_with": matched_with,
+            "yield_share": yield_share,
+            "source": "metamatch",
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+        r = requests.get(bin_url, headers=headers, timeout=10)
+        existing = r.json()
+        target = existing.get("record", [{}])[-1]
+        target.setdefault("revsplit_logs", []).append(entry)
+        requests.put(bin_url, json=existing["record"], headers=headers, timeout=10)
+        print("✅ RevSplit log appended.")
+    except Exception as e:
+        print("⚠️ RevSplit logging failed:", str(e))
+
+def trigger_outbound_proposal():
+    try:
+        from aigent_growth_metamatch import run_outbound_proposal
+        if os.getenv("METAMATCH_LIVE", "false").lower() == "true":
+            run_outbound_proposal()
+    except Exception as e:
+        print("⚠️ Outbound proposal error:", str(e))
+
+# ----------------- Graph & Endpoint -----------------
 
 @lru_cache
 def get_agent_graph():
@@ -231,9 +276,15 @@ app = FastAPI()
 @app.post("/metabridge")
 async def metabridge(request: Request):
     payload = await request.json()
-    username = payload.get("username")
-    traits = payload.get("traits", [])
-    kit = payload.get("kit", "universal")
+    username = payload.get("username", "growth_default")
+    traits = payload.get("traits")
+    kit = payload.get("kit")
+
+    if not traits or not kit:
+        record = get_jsonbin_record(username)
+        traits = record.get("traits", ["starter"])
+        kit = list(record.get("kits", {"universal": {"unlocked": True}}).keys())
+
     try:
         from aigent_growth_metamatch import run_metamatch_campaign
         matches = run_metamatch_campaign({
@@ -241,6 +292,12 @@ async def metabridge(request: Request):
             "traits": traits,
             "prebuiltKit": kit
         })
-        return {"matches": matches, "status": "ok"}
+        return {
+            "matches": matches,
+            "status": "ok",
+            "traits_used": traits,
+            "kits_used": kit,
+            "username": username
+        }
     except Exception as e:
         return {"status": "error", "message": str(e)}
