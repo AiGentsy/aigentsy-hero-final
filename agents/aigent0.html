@@ -157,6 +157,15 @@
           <li>Loading your business wins...</li>
         </ul>
       </div>
+    <div class="metric-box">
+   <h3>🌐 Expand Your Business Circle</h3>
+   <p style="font-size: 0.85rem; color:#999;">
+     Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
+   </p>
+     <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
+       <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
+      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+     </div>
     </div>
 
    <div class="metric-box">
@@ -494,7 +503,10 @@ if (inviteBox && inviteList && user) {
   if (!(user.traits || []).includes("finance")) {
     invites.push("💰 Add a Financial Partner (CFO)");
   }
-
+// 🧑‍🤝‍🧑 External invite expansion
+  invites.push("🤝 Expand your business circle — invite collaborators or clients");
+  invites.push("🔗 Share your agent page to attract partnerships");
+  
   if (invites.length > 0) {
     inviteBox.style.display = "block";
     inviteList.innerHTML = invites.map(txt => `<li>${txt}</li>`).join("");
