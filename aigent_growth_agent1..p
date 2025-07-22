@@ -7,7 +7,9 @@ from functools import lru_cache
 from langchain_openai import ChatOpenAI
 from fastapi import FastAPI, Request
 from datetime import datetime
+from proposal_delivery import deliver_proposal
 import requests
+
 
 load_dotenv()
 
@@ -314,6 +316,53 @@ def dual_side_offer_match(username: str,
             )
     return partners
 # ────────────────────────────────────────────────────────────────────────────
+def auto_proposal_on_mint(new_record: dict):
+    """
+    When a new user is created (minted), this function:
+    - Scans for other users with offering/need matches
+    - Generates a proposal using existing logic
+    - Dispatches it via webhook/email/etc
+    """
+    try:
+        username = new_record.get("username")
+        if not username:
+            return
+
+        offer = ", ".join(new_record.get("user_offerings", [])) or new_record.get("meta_role", "")
+        if not offer:
+            return
+
+        from proposal_generator import proposal_generator, proposal_dispatch, deliver_proposal
+        from aigent_growth_metamatch import metabridge_dual_match_realworld_fulfillment
+
+        matches = metabridge_dual_match_realworld_fulfillment(offer)
+        if not matches:
+            return
+
+        proposal = proposal_generator(username, offer, matches)
+        proposal_dispatch(username, proposal, match_target=matches[0].get("username"))
+
+        deliver_proposal(
+            query=offer,
+            matches=matches,
+            originator=username
+        )
+        print("✅ Auto-proposal dispatched on mint.")
+
+    except Exception as e:
+        print("⚠️ Auto-proposal mint error:", str(e))
+
+def generate_offplatform_invite(username: str, proposal_text: str) -> str:
+    """
+    Appends a CTA + referral-based invite link to the generated proposal
+    """
+    try:
+        invite_link = f"https://aigentsy.com/start?invite={username}"
+        return proposal_text + "\n\n💡 Not on AiGentsy yet? Join here: " + invite_link
+    except Exception as e:
+        print("⚠️ Invite link generation error:", str(e))
+        return proposal_text
+
 # ----------------- Graph & Endpoint -----------------
 
 @lru_cache
@@ -454,6 +503,44 @@ def proposal_delivery(sender: str, proposals: list[dict]):
     except Exception as e:
         print("⚠️ Proposal log failed:", str(e))
 
+# ----------------- Trait Inference from External Content -----------------
+@app.post("/infer_traits_from_text")
+async def infer_traits_from_text(request: Request):
+    """
+    Given raw text (e.g., social media bio or post), infer the user's likely traits.
+    Returns a list of inferred AiGentsy traits.
+    """
+    try:
+        payload = await request.json()
+        raw_text = payload.get("text", "").strip()
+
+        if not raw_text:
+            return {"status": "error", "message": "No text provided."}
+
+        trait_prompt = f"""
+You're an AiGentsy trait analyst.
+
+Given the following user-submitted text, infer what traits might apply from this list:
+
+legal, marketing, finance, sdk_spawner, compliance_sentinel, founder, social, autonomous, meta_hive_founder
+
+Text:
+\"\"\"{raw_text}\"\"\"
+
+Return a list of the most likely traits from the list above, separated by commas. Keep it short.
+"""
+
+        trait_resp = await llm.ainvoke([HumanMessage(content=trait_prompt)])
+        inferred = [t.strip() for t in trait_resp.content.split(",") if t.strip()]
+
+        return {
+            "status": "ok",
+            "inferred_traits": inferred
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 # ----------------- External Signal Trigger -----------------
 
 external_signal_registry: list[dict] = []
@@ -534,7 +621,16 @@ async def scan_external_content(request: Request):
         matches = metabridge_dual_match_realworld_fulfillment(inferred_offer)
         proposal = proposal_generator(username, inferred_offer, matches)
         proposal_dispatch(username, proposal, match_target=matches[0].get("username") if matches else None)
-      
+              # 🔁 Deliver proposals externally (webhook/email/DM)
+        try:
+            deliver_proposal(
+                query=inferred_offer,
+                matches=matches,
+                originator=username
+            )
+        except Exception as e:
+            print("⚠️ Proposal delivery failed:", str(e))
+
         return {
             "status": "ok",
             "url": target_url,
