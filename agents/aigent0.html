@@ -881,6 +881,13 @@ async function autoMatchEngine(username) {
         stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
       },
       {
+        id: "aigx",
+        label: "AIGx Earnings Unlock",
+        accessKey: "yield",
+        condition: !(user.yield?.aigxEarnedEnabled),
+        stripe: "https://buy.stripe.com/abc123456789xyz" // replace with actual Stripe link
+      },
+      {
         id: "legal",
         label: "Legal Kit",
         accessKey: "traits",
