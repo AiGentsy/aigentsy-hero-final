@@ -396,6 +396,21 @@ reply = reply.replace(/\bfeatures\b/g, "tools");
 // Keep it direct
 reply = reply.replace(/\bI would propose\b/g, "Here's what I’d do");
 reply = reply.replace(/\bI would recommend\b/g, "I’d suggest");
+// Remove formal references like "your CMO"
+reply = reply.replace(/\byour (CFO|CMO|CTO|CLO)\b/gi, "I");
+reply = reply.replace(/\bAs your (CFO|CMO|CTO|CLO)\b/gi, "Here's what I’d do");
+// Additional tone softening
+reply = reply.replace(/\bstructured pitch gameplan\b/gi, "simple plan");
+reply = reply.replace(/\btool or platform\b/gi, "tool");
+reply = reply.replace(/\btechdriven plan\b/gi, "fast strategy");
+reply = reply.replace(/\bscalable growth objective\b/gi, "goal");
+reply = reply.replace(/\bconversion rates\b/gi, "signups");
+reply = reply.replace(/\breferral participation\b/gi, "referrals");
+reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
+reply = reply.replace(/\bdata integration\b/gi, "data sync");
+reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
+// Clean up extra whitespace or double spacing
+reply = reply.replace(/\s{2,}/g, " ");
 
 const agentRole = getAgentRoleFromEndpoint(endpoint);  // ✅ ADD THIS LINE
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
