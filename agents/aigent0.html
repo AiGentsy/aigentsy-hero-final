@@ -366,6 +366,22 @@ try {
 }
 
 let reply = formatResponseEnhanced(data.output || "No response.");
+// Correct internal references
+reply = reply.replace(/\b(CFO|CMO|CTO|CLO)\b/g, function(match) {
+  const map = {
+    CFO: "AiGent Finance",
+    CMO: "AiGent Marketing",
+    CTO: "AiGent Tech",
+    CLO: "AiGent IP & Legal"
+  };
+  return map[match] || match;
+});
+
+// Remove "your [role]" phrasing
+reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
+
+// Tone-down formal intros
+reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
 // Reword third-person agent self-references into first-person
 reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
 reply = reply.replace(/\bAiGent (Marketing|Tech|Remix|Finance)\b/g, "I");
@@ -421,11 +437,11 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
 // 👇 DO NOT DELETE THIS FUNCTION!
 function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "AiGentsy CTO";
-  if (endpoint.includes("growth")) return "AiGentsy CMO";
-  if (endpoint.includes("remix")) return "AiGentsy CLO";
-  if (endpoint.includes("onrender.com/agent")) return "AiGentsy CFO";
-  return "AiGentsy Team";
+  if (endpoint.includes("sdk")) return "AiGent Tech";
+  if (endpoint.includes("growth")) return "AiGent Marketing";
+  if (endpoint.includes("remix")) return "AiGent IP & Legal";
+  if (endpoint.includes("onrender.com/agent") || endpoint.includes("venture")) return "AiGent Finance";
+  return "Your AiGent Team";
 }
     
     // Optional: Add visual buttons again
