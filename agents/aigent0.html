@@ -366,29 +366,24 @@ try {
 }
 
 let reply = formatResponseEnhanced(data.output || "No response.");
-// Correct internal references
-reply = reply.replace(/\b(CFO|CMO|CTO|CLO)\b/g, function(match) {
-  const map = {
-    CFO: "AiGent Finance",
-    CMO: "AiGent Marketing",
-    CTO: "AiGent Tech",
-    CLO: "AiGent IP & Legal"
-  };
-  return map[match] || match;
-});
 
-// Remove "your [role]" phrasing
+// Convert third-person and formal agent references to conversational tone
 reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
-
-// Tone-down formal intros
 reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
-// Reword third-person agent self-references into first-person
-reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
+reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO)\b/g, "I");
 reply = reply.replace(/\bAiGent (Marketing|Tech|Remix|Finance)\b/g, "I");
 reply = reply.replace(/\bThis agent\b/g, "I");
 reply = reply.replace(/\bThis AiGent\b/g, "I");
+reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
+
+// Grammar corrections
+reply = reply.replace(/\bI is\b/g, "I’m");
+
+// Clarify roles and tone
 reply = reply.replace(/\bMy role is to\b/g, "I");
 reply = reply.replace(/\bMy focus is on\b/g, "I focus on");
+
+// Simplify terminology
 reply = reply.replace(/\bProtocol\b/g, "platform");
 reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
 reply = reply.replace(/\bRemix\b/g, "fork");
@@ -398,24 +393,14 @@ reply = reply.replace(/\bMetaHive\b/g, "your agent team");
 reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
-// Refine tone: eliminate third-person formalities
-reply = reply.replace(/\bYour (CFO|CMO|CTO|CLO) would\b/g, "Here's what I’d do as your $1");
-reply = reply.replace(/\bYour (CFO|CMO|CTO|CLO)\b/g, "I");
-reply = reply.replace(/\bthis CMO\b/gi, "I");
-// Remove wordy corporate phrases
+
+// Replace corporate phrases with conversational tone
 reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
 reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
 reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
 reply = reply.replace(/\bframework\b/g, "gameplan");
 reply = reply.replace(/\bstrategy\b/g, "plan");
 reply = reply.replace(/\bfeatures\b/g, "tools");
-// Keep it direct
-reply = reply.replace(/\bI would propose\b/g, "Here's what I’d do");
-reply = reply.replace(/\bI would recommend\b/g, "I’d suggest");
-// Remove formal references like "your CMO"
-reply = reply.replace(/\byour (CFO|CMO|CTO|CLO)\b/gi, "I");
-reply = reply.replace(/\bAs your (CFO|CMO|CTO|CLO)\b/gi, "Here's what I’d do");
-// Additional tone softening
 reply = reply.replace(/\bstructured pitch gameplan\b/gi, "simple plan");
 reply = reply.replace(/\btool or platform\b/gi, "tool");
 reply = reply.replace(/\btechdriven plan\b/gi, "fast strategy");
@@ -425,23 +410,30 @@ reply = reply.replace(/\breferral participation\b/gi, "referrals");
 reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
-// Clean up extra whitespace or double spacing
+
+// Vary tone for better UX
+reply = reply.replace(/\bHere's what I’d do\b/g, () => {
+  const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
+  return variants[Math.floor(Math.random() * variants.length)];
+});
+
+// Line breaks and cleanup
 reply = reply.replace(/\s{2,}/g, " ");
-// Add paragraph spacing for better readability
-reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n"); // Split after periods that start a new sentence
-reply = reply.replace(/(\n{3,})/g, "\n\n"); // Normalize too many line breaks
+reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
+reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-const agentRole = getAgentRoleFromEndpoint(endpoint);  // ✅ ADD THIS LINE
+// Agent role header
+const agentRole = getAgentRoleFromEndpoint(endpoint);
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
-// 👇 DO NOT DELETE THIS FUNCTION!
+// Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "AiGent Tech";
-  if (endpoint.includes("growth")) return "AiGent Marketing";
-  if (endpoint.includes("remix")) return "AiGent IP & Legal";
-  if (endpoint.includes("onrender.com/agent") || endpoint.includes("venture")) return "AiGent Finance";
-  return "Your AiGent Team";
+  if (endpoint.includes("sdk")) return "CTO";
+  if (endpoint.includes("growth")) return "CMO";
+  if (endpoint.includes("remix")) return "CLO";
+  if (endpoint.includes("venture") || endpoint.includes("aigent0") || endpoint.includes("finance")) return "CFO";
+  return "AiGentsy Team";
 }
     
     // Optional: Add visual buttons again
