@@ -1099,42 +1099,6 @@ window.addEventListener("DOMContentLoaded", () => {
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
-async function runAgent() {
-  const textarea = document.querySelector("textarea"); // ✅ REQUIRED
-  const input = textarea.value.trim();
-  if (!input) return;
-
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  memory.push(input);
-  textarea.value = "";
-
-  const loader = document.createElement("div");
-  loader.className = "chat-agent";
-  loader.textContent = "🤖 AiGent0: Thinking...";
-  chatLog.appendChild(loader);
-  chatLog.scrollTop = chatLog.scrollHeight;
-
-  try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input, memory })
-    });
-
-    const data = await res.json();
-    const reply = data.output || "No response.";
-    loader.textContent = `🤖 AiGent0: ${reply}`;
-    memory.push(reply);
-    chatLog.scrollTop = chatLog.scrollHeight;
-
-  } catch (err) {
-    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
-  }
-}
 </script>
 <!-- ✅ Toast Notification Element -->
 <div class="toast" id="toast" style="
