@@ -382,6 +382,20 @@ reply = reply.replace(/\bMetaHive\b/g, "your agent team");
 reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
+// Refine tone: eliminate third-person formalities
+reply = reply.replace(/\bYour (CFO|CMO|CTO|CLO) would\b/g, "Here's what I’d do as your $1");
+reply = reply.replace(/\bYour (CFO|CMO|CTO|CLO)\b/g, "I");
+reply = reply.replace(/\bthis CMO\b/gi, "I");
+// Remove wordy corporate phrases
+reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
+reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
+reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
+reply = reply.replace(/\bframework\b/g, "gameplan");
+reply = reply.replace(/\bstrategy\b/g, "plan");
+reply = reply.replace(/\bfeatures\b/g, "tools");
+// Keep it direct
+reply = reply.replace(/\bI would propose\b/g, "Here's what I’d do");
+reply = reply.replace(/\bI would recommend\b/g, "I’d suggest");
 
 const agentRole = getAgentRoleFromEndpoint(endpoint);  // ✅ ADD THIS LINE
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
