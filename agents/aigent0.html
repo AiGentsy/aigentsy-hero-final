@@ -429,10 +429,10 @@ loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
-  if (endpoint.includes("sdk")) return "CTO";
-  if (endpoint.includes("growth")) return "CMO";
-  if (endpoint.includes("remix")) return "CLO";
-  if (endpoint.includes("venture") || endpoint.includes("aigent0") || endpoint.includes("finance")) return "CFO";
+  if (endpoint.includes("aigent-sdk")) return "CTO";                // AiGent SDK
+  if (endpoint.includes("aigent-growth")) return "CMO";             // AiGent Growth
+  if (endpoint.includes("aigent-remix")) return "CLO";              // AiGent IP & Legal
+  if (endpoint.includes("aigent0") || endpoint.includes("venture")) return "CFO"; // AiGent Finance
   return "AiGentsy Team";
 }
     
