@@ -411,6 +411,10 @@ reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 // Clean up extra whitespace or double spacing
 reply = reply.replace(/\s{2,}/g, " ");
+// Add paragraph spacing for better readability
+reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n"); // Split after periods that start a new sentence
+reply = reply.replace(/(\n{3,})/g, "\n\n"); // Normalize too many line breaks
+reply = reply.trim();
 
 const agentRole = getAgentRoleFromEndpoint(endpoint);  // ✅ ADD THIS LINE
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
