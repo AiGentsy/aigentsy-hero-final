@@ -366,7 +366,24 @@ try {
 }
 
 let reply = formatResponseEnhanced(data.output || "No response.");
-const agentRole = getAgentRoleFromEndpoint(endpoint);
+reply = reply.replace(/\bProtocol\b/g, "platform");
+reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
+reply = reply.replace(/\bRemix\b/g, "fork");
+reply = reply.replace(/\bSDK\b/g, "toolkit");
+reply = reply.replace(/\bYield Memory\b/g, "your learning system");
+reply = reply.replace(/\bMetaHive\b/g, "your agent team");
+reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
+reply = reply.replace(/\bautonomously\b/g, "automatically");
+reply = reply.replace(/\bsovereign\b/g, "independent");
+
+  function getAgentRoleFromEndpoint(endpoint) {
+  if (endpoint.includes("sdk")) return "AiGentsy CTO (Tech)";
+  if (endpoint.includes("growth")) return "AiGentsy CMO (Growth)";
+  if (endpoint.includes("remix")) return "AiGentsy CLO (Creative)";
+  if (endpoint.includes("onrender.com/agent")) return "AiGentsy CFO (Venture)";
+  return "AiGentsy Team";
+}
+
 loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
     // Optional: Add visual buttons again
