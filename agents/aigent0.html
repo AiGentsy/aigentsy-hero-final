@@ -376,15 +376,17 @@ reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
 
-  function getAgentRoleFromEndpoint(endpoint) {
+const agentRole = getAgentRoleFromEndpoint(endpoint);  // ✅ ADD THIS LINE
+loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+
+// 👇 DO NOT DELETE THIS FUNCTION!
+function getAgentRoleFromEndpoint(endpoint) {
   if (endpoint.includes("sdk")) return "AiGentsy CTO (Tech)";
   if (endpoint.includes("growth")) return "AiGentsy CMO (Growth)";
   if (endpoint.includes("remix")) return "AiGentsy CLO (Creative)";
   if (endpoint.includes("onrender.com/agent")) return "AiGentsy CFO (Venture)";
   return "AiGentsy Team";
 }
-
-loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
     // Optional: Add visual buttons again
     const buttons = document.createElement("div");
