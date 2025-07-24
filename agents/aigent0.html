@@ -425,7 +425,12 @@ reply = reply.trim();
 
 // Agent role header
 const agentRole = getAgentRoleFromEndpoint(endpoint);
-loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+// Optional: Add soft role-based intro if not already present
+if (["CFO", "CMO", "CTO", "CLO"].includes(agentRole) && !reply.toLowerCase().includes("as your")) {
+  reply = `As your ${agentRole}, ${reply.charAt(0).toLowerCase() + reply.slice(1)}`;
+}
+
+loader.textContent = `🤖 Your AiGentsy:\n${agentRole === "AiGentsy Team" ? "" : `(${agentRole}) `}${reply}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
