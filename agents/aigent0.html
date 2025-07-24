@@ -294,16 +294,14 @@ async function runAgent(userInput) {
 
   // === Smart Routing Logic ===
   let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // Default: CFO (AiGent0)
-  const lower = conditionedInput.toLowerCase();
 
-  if (lower.includes("legal") || lower.includes("contract") || lower.includes("license") || lower.includes("ip") || lower.includes("compliance") || lower.includes("insulate")) {
-    endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO
-  } else if (lower.includes("growth") || lower.includes("marketing") || lower.includes("campaign") || lower.includes("audience") || lower.includes("promotion") || lower.includes("referral") || lower.includes("scale")) {
-    endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
-  } else if (lower.includes("tech") || lower.includes("build") || lower.includes("clone") || lower.includes("sdk") || lower.includes("toolkit") || lower.includes("feature") || lower.includes("developer")) {
-    endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
-  } else if (lower.includes("finance") || lower.includes("revenue") || lower.includes("yield") || lower.includes("profit") || lower.includes("payment") || lower.includes("cashout") || lower.includes("budget") || lower.includes("token") || lower.includes("earn")) {
-    endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO
+  const lower = conditionedInput.toLowerCase();
+  if (lower.includes("legal") || lower.includes("contract") || lower.includes("license") || lower.includes("ip") || lower.includes("compliance")) {
+    endpoint = "https://aigent-remix-runtime.onrender.com/agent";
+  } else if (lower.includes("growth") || lower.includes("marketing") || lower.includes("campaign") || lower.includes("referral")) {
+    endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+  } else if (lower.includes("tech") || lower.includes("clone") || lower.includes("sdk") || lower.includes("toolkit") || lower.includes("build")) {
+    endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
   }
 
   // === Visual Loader & Fetch ===
@@ -320,16 +318,9 @@ async function runAgent(userInput) {
       body: JSON.stringify({ input: conditionedInput })
     });
 
-    let data;
-    try {
-      data = await res.json();
-    } catch (err) {
-      console.error("JSON parsing error:", err);
-      loader.textContent = `⚠️ Invalid response format from runtime.`;
-      return;
-    }
-
+    const data = await res.json();
     let reply = formatResponseEnhanced(data.output || "No response.");
+
     const agentRole = getAgentRoleFromEndpoint(endpoint);
     loader.textContent = `🤖 ${agentRole}:\n${reply}`;
 
