@@ -285,84 +285,68 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
-async function runAgent() {
-  const input = textarea.value.trim();
-  if (!input) return;
+async function runAgent(userInput) {
+  if (!userInput.trim()) return;
 
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  memory.push(input);
-  textarea.value = "";
+  const conditionedInput = userInput.trim();
+  chat.innerHTML += `<div class="msg user">${conditionedInput}</div>`;
+  input.value = "";
 
-  const loader = document.createElement("div");
-  loader.className = "chat-agent";
-  loader.textContent = "🤖 Your AiGentsy: Thinking...";
-  chatLog.appendChild(loader);
-  chatLog.scrollTop = chatLog.scrollHeight;
+  // === Smart Routing Logic ===
+  let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // Default: CFO (AiGent0)
+  const lower = conditionedInput.toLowerCase();
 
-  // ✅ Continuity patch: recall last AiGent response if input is a short confirm
-  let conditionedInput = input;
-  const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let’s do it"];
-  const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
-  if (shortConfirm.includes(input.toLowerCase()) && lastAgentTurn) {
-    conditionedInput = `${lastAgentTurn.replace("🤖 Legal AiGentsy:", "").trim()}\n\nPlease continue based on this.`;
+  if (lower.includes("legal") || lower.includes("contract") || lower.includes("license") || lower.includes("ip") || lower.includes("compliance") || lower.includes("insulate")) {
+    endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO
+  } else if (lower.includes("growth") || lower.includes("marketing") || lower.includes("campaign") || lower.includes("audience") || lower.includes("promotion") || lower.includes("referral") || lower.includes("scale")) {
+    endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
+  } else if (lower.includes("tech") || lower.includes("build") || lower.includes("clone") || lower.includes("sdk") || lower.includes("toolkit") || lower.includes("feature") || lower.includes("developer")) {
+    endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
+  } else if (lower.includes("finance") || lower.includes("revenue") || lower.includes("yield") || lower.includes("profit") || lower.includes("payment") || lower.includes("cashout") || lower.includes("budget") || lower.includes("token") || lower.includes("earn")) {
+    endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO
   }
 
+  // === Visual Loader & Fetch ===
+  const loader = document.createElement("div");
+  loader.className = "msg bot";
+  loader.textContent = "🤖 Thinking...";
+  chat.appendChild(loader);
+  chat.scrollTop = chat.scrollHeight;
+
   try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input: conditionedInput })
+    });
 
-// 🔁 Post to selected agent runtime
-    // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
-let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = AiGent0 (CEO)
+    let data;
+    try {
+      data = await res.json();
+    } catch (err) {
+      console.error("JSON parsing error:", err);
+      loader.textContent = `⚠️ Invalid response format from runtime.`;
+      return;
+    }
 
-const lower = conditionedInput.toLowerCase();
-if (
-  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech")
-) {
-  endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
-} else if (
-  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") ||
-  lower.includes("outreach") || lower.includes("campaigns")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
-} else if (
-  lower.includes("remix") || lower.includes("clone") || lower.includes("license") ||
-  lower.includes("ip") || lower.includes("branding")
-) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / IP
-} else if (
-  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") ||
-  lower.includes("budget")
-) {
-  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO (fallback to CEO/AiGent0)
-} else if (
-  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
+    let reply = formatResponseEnhanced(data.output || "No response.");
+    const agentRole = getAgentRoleFromEndpoint(endpoint);
+    loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+
+  } catch (err) {
+    loader.textContent = `⚠️ Error: ${err.message}`;
+  }
+
+  chat.scrollTop = chat.scrollHeight;
 }
-  else if (
-  lower.includes("legal") || lower.includes("contract") || lower.includes("ip") || lower.includes("compliance")
-) {
-  endpoint = "https://aigent-remix-runtime.onrender/agent.com"; // CLO also handles Legal
-} else if (
-  lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
-) {
-  endpoint = "https://aigentsy-ame-runtime.onrender/agent.com"; // CEO handles Partner logic
-}
-  const res = await fetch(endpoint, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ input: conditionedInput, memory })
-});
 
-let data;
-try {
-  data = await res.json();
-} catch (e) {
-  console.error("❌ JSON parse error from runtime:", e);
-  throw new Error("Server returned non-JSON. Check endpoint or network.");
+// === Agent Role Name Display ===
+function getAgentRoleFromEndpoint(endpoint) {
+  if (endpoint.includes("sdk")) return "CTO";
+  if (endpoint.includes("growth")) return "CMO";
+  if (endpoint.includes("remix")) return "CLO";
+  if (endpoint.includes("ame-runtime") || endpoint.includes("aigent0") || endpoint.includes("finance")) return "CFO";
+  return "AiGentsy Team";
 }
 
 let reply = formatResponseEnhanced(data.output || "No response.");
