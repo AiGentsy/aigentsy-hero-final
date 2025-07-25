@@ -411,6 +411,14 @@ reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 
+    // Fix common grammatical issues and typos
+reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
+reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
+reply = reply.replace(/\bcan also also\b/gi, "can also");
+reply = reply.replace(/\b insight into into\b/gi, "insight into");
+reply = reply.replace(/\bthe the\b/gi, "the");
+reply = reply.replace(/\s+([.,!?])/g, "$1"); // remove extra space before punctuation
+
 // Vary tone for better UX
 reply = reply.replace(/\bHere's what I’d do\b/g, () => {
   const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
@@ -423,14 +431,27 @@ reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
 reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-// Agent role header
-const agentRole = getAgentRoleFromEndpoint(endpoint);
-// Optional: Add soft role-based intro if not already present
-if (["CFO", "CMO", "CTO", "CLO"].includes(agentRole) && !reply.toLowerCase().includes("as your")) {
-  reply = `As your ${agentRole}, ${reply.charAt(0).toLowerCase() + reply.slice(1)}`;
+// 🔍 Detect agent role from user input instead of endpoint
+function getAgentRoleFromInput(input) {
+  const lower = input.toLowerCase();
+
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|cmo)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|clo)\b/.test(lower)) return "CLO";
+  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|cfo)\b/.test(lower)) return "CFO";
+
+  return null; // No match → fallback to general "Your AiGentsy"
 }
 
-loader.textContent = `🤖 Your AiGentsy:\n${agentRole === "AiGentsy Team" ? "" : `(${agentRole}) `}${reply}`;
+const agentRole = getAgentRoleFromInput(userInput || "");
+
+// Optional role-based intro prefix
+if (agentRole && !reply.toLowerCase().includes("as your")) {
+  reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
+}
+
+// Display final loader message
+loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
