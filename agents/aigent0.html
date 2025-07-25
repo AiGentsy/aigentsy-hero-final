@@ -365,16 +365,6 @@ try {
 
 let reply = formatResponseEnhanced(data.output || "No response.");
 
-    // ✅ AiGentsy Value Expansion Patch — Inserted After Response Format
-if (agentRole === "AiGentsy Team" && !reply.toLowerCase().includes("metabridge")) {
-  reply += "\n\n🌐 Your AiGentsy is more than just a chatbot — it's a fully equipped, revenue-generating AI business platform. Here's what it can do for you:\n\n" +
-    "• 🤝 Auto-Match Engine: Instantly connects your skills, offers, or needs to others on the platform for revenue, collabs, or clients.\n" +
-    "• 🔁 MetaBridge: Actively scouts OFF-platform opportunities (like clients, referrals, and deals) and routes them to your AiGent.\n" +
-    "• 🧬 SDK + Licensing: Allows others to clone your work or tools and pay you for it.\n" +
-    "• 🎨 Remix Engine: Lets others remix what you've built — and you get yield.\n" +
-    "• 💸 Real-World Earnings: Everything is wired for revenue — every referral, clone, package, or service routes back to your AiGentsy wallet.\n\n" +
-    "Ask anything — your AiGentsy will route it to the right expert (CMO, CTO, CLO, or CFO) when needed, or guide you directly.";
-}
 // Convert third-person and formal agent references to conversational tone
 reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
 reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
