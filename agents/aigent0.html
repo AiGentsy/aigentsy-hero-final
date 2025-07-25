@@ -365,7 +365,18 @@ try {
 
 let reply = formatResponseEnhanced(data.output || "No response.");
 
-// Convert third-person and formal agent references to conversational tone
+// ✅ AiGentsy Value Expansion Patch — Inserted After Response Format
+if (!reply.toLowerCase().includes("metabridge")) {
+  reply += "\n\n🌐 Your AiGentsy isn’t just one assistant — it’s your entire AI-powered business team. Here’s what it includes:\n\n" +
+    "• 🤝 Auto-Match: Finds you clients, partners, or offers based on your needs.\n" +
+    "• 🔁 MetaBridge: Markets you *off-platform*, bringing inbound leads, partners, and real-world deals.\n" +
+    "• 🧬 Toolkits + SDKs: Clone or license what you build — and earn from it.\n" +
+    "• 🎨 Forking: Others can remix your work — and you get credit + yield.\n" +
+    "• 💼 Legal, Marketing, Tech, and Finance experts: Routed automatically based on your question.\n\n" +
+    "You can earn from referrals, services, remixes, SDKs, and licensing. Everything routes back to you.";
+}
+
+// Convert formal agent references
 reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
 reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
 reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO)\b/g, "I");
@@ -374,14 +385,11 @@ reply = reply.replace(/\bThis agent\b/g, "I");
 reply = reply.replace(/\bThis AiGent\b/g, "I");
 reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
 
-// Grammar corrections
+// Grammar + Simplification
 reply = reply.replace(/\bI is\b/g, "I’m");
-
-// Clarify roles and tone
 reply = reply.replace(/\bMy role is to\b/g, "I");
 reply = reply.replace(/\bMy focus is on\b/g, "I focus on");
 
-// Simplify terminology
 reply = reply.replace(/\bProtocol\b/g, "platform");
 reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
 reply = reply.replace(/\bRemix\b/g, "fork");
@@ -392,7 +400,7 @@ reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
 
-// Replace corporate phrases with conversational tone
+// Replace corporate phrases
 reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
 reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
 reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
@@ -409,47 +417,48 @@ reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 
-    // Fix common grammatical issues and typos
+// Typos
 reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
 reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
 reply = reply.replace(/\bcan also also\b/gi, "can also");
 reply = reply.replace(/\b insight into into\b/gi, "insight into");
 reply = reply.replace(/\bthe the\b/gi, "the");
-reply = reply.replace(/\s+([.,!?])/g, "$1"); // remove extra space before punctuation
+reply = reply.replace(/\s+([.,!?])/g, "$1");
 
-// Vary tone for better UX
+// Tone variants
 reply = reply.replace(/\bHere's what I’d do\b/g, () => {
   const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
   return variants[Math.floor(Math.random() * variants.length)];
 });
 
-// Line breaks and cleanup
+// Cleanup
 reply = reply.replace(/\s{2,}/g, " ");
 reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
 reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-// 🔍 Detect agent role from user input instead of endpoint
+// Role detection (from user input, not endpoint)
 function getAgentRoleFromInput(input) {
   const lower = input.toLowerCase();
 
-  if (/\b(marketing|promote|audience|growth|sell|reach|customers|cmo)\b/.test(lower)) return "CMO";
-  if (/\b(legal|license|licensing|compliance|ip|rights|remix|clo)\b/.test(lower)) return "CLO";
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads|attract)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
   if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
-  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|cfo)\b/.test(lower)) return "CFO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|payment|withdraw|cfo)\b/.test(lower)) return "CFO";
 
-  return null; // No match → fallback to general "Your AiGentsy"
+  return null;
 }
 
-const userInput = conditionedInput;
-const agentRole = getAgentRoleFromInput(userInput || "");
+// Fix: prevent runtime crash
+const userInput = textarea?.value || "";
+const agentRole = getAgentRoleFromInput(userInput);
 
-// Optional role-based intro prefix
+// Add intro label
 if (agentRole && !reply.toLowerCase().includes("as your")) {
   reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
 }
 
-// Display final loader message
+// Final output
 loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
 
 // Role resolver
