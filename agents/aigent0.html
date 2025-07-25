@@ -443,6 +443,7 @@ function getAgentRoleFromInput(input) {
   return null; // No match → fallback to general "Your AiGentsy"
 }
 
+const userInput = inputField.value.trim();
 const agentRole = getAgentRoleFromInput(userInput || "");
 
 // Optional role-based intro prefix
