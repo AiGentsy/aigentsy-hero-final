@@ -365,7 +365,56 @@ try {
 
 let reply = formatResponseEnhanced(data.output || "No response.");
 
-// Convert third-person and formal agent references to conversational tone
+// 🔍 Detect agent role from user input
+function getAgentRoleFromInput(input) {
+  const lower = input.toLowerCase();
+
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads|attract)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
+  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|payment|withdraw|cfo)\b/.test(lower)) return "CFO";
+
+  return null;
+}
+
+const userInput = conditionedInput;
+const agentRole = getAgentRoleFromInput(userInput || "");
+const lowerReply = reply.toLowerCase();
+
+// ✅ Conversational add-ons (based on agent role + response keywords)
+if (
+  agentRole === "CMO" &&
+  !lowerReply.includes("metabridge") &&
+  /clients|growth|reach|marketing|audience|promotion/.test(lowerReply)
+) {
+  reply += "\n\nNeed growth? I can use the 🔁 MetaBridge to pull in leads from outside the platform — and the 🤝 Auto-Match engine to connect you with on-platform partners or clients.";
+}
+
+if (
+  agentRole === "CLO" &&
+  !lowerReply.includes("fork") &&
+  /license|remix|clone|ip|legal/.test(lowerReply)
+) {
+  reply += "\n\nWant others to build on your work? You’ll earn anytime someone forks or licenses your assets — your AiGentsy tracks it all.";
+}
+
+if (
+  agentRole === "CTO" &&
+  !lowerReply.includes("toolkit") &&
+  /build|deploy|sdk|api|developer/.test(lowerReply)
+) {
+  reply += "\n\nReady to scale what you've built? I can turn it into a toolkit others can unlock and pay to use — full revenue tracking included.";
+}
+
+if (
+  agentRole === "CFO" &&
+  !lowerReply.includes("wallet") &&
+  /money|revenue|cash|earnings|finance|pricing|valuation/.test(lowerReply)
+) {
+  reply += "\n\nAll your earnings — from remixes, SDKs, referrals, or services — route back to your wallet. I can help you unlock fiat off-ramps too.";
+}
+
+// 🗣️ Make replies human and friendly
 reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
 reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
 reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO)\b/g, "I");
@@ -374,12 +423,12 @@ reply = reply.replace(/\bThis agent\b/g, "I");
 reply = reply.replace(/\bThis AiGent\b/g, "I");
 reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
 
-// Grammar corrections
+// ✏️ Grammar tweaks
 reply = reply.replace(/\bI is\b/g, "I’m");
 reply = reply.replace(/\bMy role is to\b/g, "I");
 reply = reply.replace(/\bMy focus is on\b/g, "I focus on");
 
-// Simplify terminology
+// 🧠 Simplify technical terms
 reply = reply.replace(/\bProtocol\b/g, "platform");
 reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
 reply = reply.replace(/\bRemix\b/g, "fork");
@@ -390,41 +439,7 @@ reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
 
-// Conversational reference hooks
-const lowerReply = reply.toLowerCase();
-if (
-  agentRole === "CMO" &&
-  !lowerReply.includes("metabridge") &&
-  /clients|growth|reach|marketing|audience|promotion/.test(lowerReply)
-) {
-  reply += "\n\nIf you're looking to grow or bring in more leads, I can activate the 🔁 MetaBridge to find off-platform partners or clients — and use the 🤝 Auto-Match engine to connect with others on the platform too.";
-}
-
-if (
-  agentRole === "CLO" &&
-  !lowerReply.includes("fork") &&
-  /license|remix|clone|ip|legal/.test(lowerReply)
-) {
-  reply += "\n\nYou can also earn when others fork or license your work. Your AiGentsy tracks and credits everything automatically.";
-}
-
-if (
-  agentRole === "CTO" &&
-  !lowerReply.includes("toolkit") &&
-  /build|deploy|sdk|api|developer/.test(lowerReply)
-) {
-  reply += "\n\nWant to scale what you've built? I can help publish it as a toolkit others can unlock — and you earn when they use it.";
-}
-
-if (
-  agentRole === "CFO" &&
-  !lowerReply.includes("wallet") &&
-  /money|revenue|cash|earnings|finance|pricing|valuation/.test(lowerReply)
-) {
-  reply += "\n\nAll income — from referrals, remixes, SDKs, or services — routes back to your wallet. I can also help you unlock fiat off-ramps.";
-}
-
-// Replace corporate phrases with conversational tone
+// 💬 Tone softeners
 reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
 reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
 reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
@@ -441,47 +456,32 @@ reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 
-// Fix common grammatical issues and typos
+// 🧹 Typo fixes
 reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
 reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
 reply = reply.replace(/\bcan also also\b/gi, "can also");
 reply = reply.replace(/\b insight into into\b/gi, "insight into");
 reply = reply.replace(/\bthe the\b/gi, "the");
-reply = reply.replace(/\s+([.,!?])/g, "$1"); // remove extra space before punctuation
+reply = reply.replace(/\s+([.,!?])/g, "$1");
 
-// Vary tone for better UX
+// 🌀 Vary tone
 reply = reply.replace(/\bHere's what I’d do\b/g, () => {
   const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
   return variants[Math.floor(Math.random() * variants.length)];
 });
 
-// Line breaks and cleanup
+// 🧽 Final cleanup
 reply = reply.replace(/\s{2,}/g, " ");
 reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
 reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-// 🔍 Detect agent role from user input instead of endpoint
-function getAgentRoleFromInput(input) {
-  const lower = input.toLowerCase();
-
-  if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads|attract)\b/.test(lower)) return "CMO";
-  if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
-  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
-  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|payment|withdraw|cfo)\b/.test(lower)) return "CFO";
-
-  return null; // No match → fallback
-}
-
-const userInput = conditionedInput;
-const agentRole = getAgentRoleFromInput(userInput || "");
-
-// Optional role-based intro
+// 🧑‍💼 Add role prefix (optional UX)
 if (agentRole && !reply.toLowerCase().includes("as your")) {
   reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
 }
 
-// Final output
+// 🧾 Final display
 loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
 
 // Role resolver
