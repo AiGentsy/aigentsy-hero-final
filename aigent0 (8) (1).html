@@ -315,42 +315,40 @@ async function runAgent() {
 
 // 🔁 Post to selected agent runtime
     // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
-let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = AiGent0 (CEO)
+let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = Your AiGentsy
 
 const lower = conditionedInput.toLowerCase();
 if (
-  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech")
+  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech") ||
+  lower.includes("tools") || lower.includes("integration") || lower.includes("product") || lower.includes("feature")
 ) {
   endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
 } else if (
-  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") ||
-  lower.includes("outreach") || lower.includes("campaigns")
+  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") || lower.includes("market") ||
+  lower.includes("outreach") || lower.includes("campaign") || lower.includes("promotion") || lower.includes("audience")
 ) {
   endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
 } else if (
-  lower.includes("remix") || lower.includes("clone") || lower.includes("license") ||
-  lower.includes("ip") || lower.includes("branding")
+  lower.includes("remix") || lower.includes("clone") || lower.includes("license") || lower.includes("legal") ||
+  lower.includes("ip") || lower.includes("compliance") || lower.includes("contract") || lower.includes("branding")
 ) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / IP
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / Legal
 } else if (
-  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") ||
-  lower.includes("budget")
+  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") || lower.includes("budget") ||
+  lower.includes("yield") || lower.includes("payment") || lower.includes("profit") || lower.includes("revenue") ||
+  lower.includes("token") || lower.includes("earn")
 ) {
-  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO (fallback to CEO/AiGent0)
-} else if (
-  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
-}
-  else if (
-  lower.includes("legal") || lower.includes("contract") || lower.includes("ip") || lower.includes("compliance")
-) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO also handles Legal
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO / Venture Agent
 } else if (
   lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
 ) {
   endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
+} else if (
+  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant logic = CMO fallback
 }
+
   const res = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -411,6 +409,14 @@ reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 
+    // Fix common grammatical issues and typos
+reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
+reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
+reply = reply.replace(/\bcan also also\b/gi, "can also");
+reply = reply.replace(/\b insight into into\b/gi, "insight into");
+reply = reply.replace(/\bthe the\b/gi, "the");
+reply = reply.replace(/\s+([.,!?])/g, "$1"); // remove extra space before punctuation
+
 // Vary tone for better UX
 reply = reply.replace(/\bHere's what I’d do\b/g, () => {
   const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
@@ -423,9 +429,28 @@ reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
 reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-// Agent role header
-const agentRole = getAgentRoleFromEndpoint(endpoint);
-loader.textContent = `🤖 ${agentRole}:\n${reply}`;
+// 🔍 Detect agent role from user input instead of endpoint
+function getAgentRoleFromInput(input) {
+  const lower = input.toLowerCase();
+
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|cmo)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|clo)\b/.test(lower)) return "CLO";
+  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|cfo)\b/.test(lower)) return "CFO";
+
+  return null; // No match → fallback to general "Your AiGentsy"
+}
+
+const userInput = conditionedInput;
+const agentRole = getAgentRoleFromInput(userInput || "");
+
+// Optional role-based intro prefix
+if (agentRole && !reply.toLowerCase().includes("as your")) {
+  reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
+}
+
+// Display final loader message
+loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
@@ -1099,42 +1124,6 @@ window.addEventListener("DOMContentLoaded", () => {
 let memory = [];
 const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
 
-async function runAgent() {
-  const textarea = document.querySelector("textarea"); // ✅ REQUIRED
-  const input = textarea.value.trim();
-  if (!input) return;
-
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `🧠 You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  memory.push(input);
-  textarea.value = "";
-
-  const loader = document.createElement("div");
-  loader.className = "chat-agent";
-  loader.textContent = "🤖 AiGent0: Thinking...";
-  chatLog.appendChild(loader);
-  chatLog.scrollTop = chatLog.scrollHeight;
-
-  try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/agent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input, memory })
-    });
-
-    const data = await res.json();
-    const reply = data.output || "No response.";
-    loader.textContent = `🤖 AiGent0: ${reply}`;
-    memory.push(reply);
-    chatLog.scrollTop = chatLog.scrollHeight;
-
-  } catch (err) {
-    loader.textContent = "🤖 AiGent0: Runtime error — " + err.message;
-  }
-}
 </script>
 <!-- ✅ Toast Notification Element -->
 <div class="toast" id="toast" style="
