@@ -319,38 +319,36 @@ let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = A
 
 const lower = conditionedInput.toLowerCase();
 if (
-  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech")
+  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech") ||
+  lower.includes("tools") || lower.includes("integration") || lower.includes("product") || lower.includes("feature")
 ) {
   endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
 } else if (
-  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") ||
-  lower.includes("outreach") || lower.includes("campaigns")
+  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") || lower.includes("market") ||
+  lower.includes("outreach") || lower.includes("campaign") || lower.includes("promotion") || lower.includes("audience")
 ) {
   endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
 } else if (
-  lower.includes("remix") || lower.includes("clone") || lower.includes("license") ||
-  lower.includes("ip") || lower.includes("branding")
+  lower.includes("remix") || lower.includes("clone") || lower.includes("license") || lower.includes("legal") ||
+  lower.includes("ip") || lower.includes("compliance") || lower.includes("contract") || lower.includes("branding")
 ) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / IP
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / Legal
 } else if (
-  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") ||
-  lower.includes("budget")
+  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") || lower.includes("budget") ||
+  lower.includes("yield") || lower.includes("payment") || lower.includes("profit") || lower.includes("revenue") ||
+  lower.includes("token") || lower.includes("earn")
 ) {
-  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO (fallback to CEO/AiGent0)
-} else if (
-  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant = CMO fallback
-}
-  else if (
-  lower.includes("legal") || lower.includes("contract") || lower.includes("ip") || lower.includes("compliance")
-) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO also handles Legal
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO / Venture Agent
 } else if (
   lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
 ) {
   endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
+} else if (
+  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant logic = CMO fallback
 }
+
   const res = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
