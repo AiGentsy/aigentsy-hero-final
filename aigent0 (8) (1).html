@@ -70,6 +70,48 @@
     font-size: 0.95rem;
     color: #fff;
   }
+  .button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.button-row .btn-glow {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+  /* 🧠 Dynamically Injected Response Buttons (Chat Suggestions) */
+.chat-response-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
+.chat-response-buttons .btn-glow {
+  font-size: 0.85rem;
+  padding: 8px 12px;
+}
+  /* 🧬 Compact Unlock Buttons in Licensing */
+#autoMatchOfferings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+#autoMatchOfferings li {
+  margin: 0;
+}
+
+#autoMatchOfferings li button.btn-glow {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
   .btn-glow {
     background: #00bfff;
     color: #000;
@@ -138,31 +180,40 @@
     </div>
 
     <div class="col-left">
-      <div class="metric-box">
-        <h3>AiGentsy Chat</h3>
-        <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-        <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
-      </div>
-      <div class="metric-box">
-        <h3>📦 SDK & Licensing</h3>
-        <ul id="autoMatchOfferings"></ul>
-      </div>
-      <div class="metric-box">
-        <h3>🏆 Team Achievements</h3>
-        <ul id="achievementList">
-          <li>Loading your business wins...</li>
-        </ul>
-      </div>
-    <div class="metric-box">
-   <h3>🌐 Expand Your Business Circle</h3>
-   <p style="font-size: 0.85rem; color:#999;">
-     Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
-   </p>
-     <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
-       <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
-      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
-     </div>
-    </div>
+<!-- ✅ AiGentsy Chat -->
+<div class="metric-box">
+  <h3>AiGentsy Chat</h3>
+  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+  <div style="margin-top:10px;">
+    <button class="btn-glow" id="sendBtn">Send</button>
+  </div>
+</div>
+
+<!-- ✅ Licensing -->
+<div class="metric-box">
+  <h3>🔐 Unlocks & Licensing</h3>
+  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+</div>
+
+  <!-- ✅ Team Achievements -->
+  <div class="metric-box">
+    <h3>🏆 Team Achievements</h3>
+    <ul id="achievementList">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
+
+  <!-- ✅ Expand Business Circle (Already correct) -->
+  <div class="metric-box">
+    <h3>🌐 Expand Your Business Circle</h3>
+    <p style="font-size: 0.85rem; color:#999;">
+      Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
+    </p>
+    <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
+    <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
+    <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+  </div>
+</div>
 
    <div class="metric-box">
   <h3>💰 Wallet & Off-Ramp</h3>
@@ -365,7 +416,56 @@ try {
 
 let reply = formatResponseEnhanced(data.output || "No response.");
 
-// Convert third-person and formal agent references to conversational tone
+// 🔍 Detect agent role from user input
+function getAgentRoleFromInput(input) {
+  const lower = input.toLowerCase();
+
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads|attract)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
+  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|payment|withdraw|cfo)\b/.test(lower)) return "CFO";
+
+  return null;
+}
+
+const userInput = conditionedInput;
+const agentRole = getAgentRoleFromInput(userInput || "");
+const lowerReply = reply.toLowerCase();
+
+// ✅ Conversational add-ons (based on agent role + response keywords)
+if (
+  agentRole === "CMO" &&
+  !lowerReply.includes("metabridge") &&
+  /clients|growth|reach|marketing|audience|promotion/.test(lowerReply)
+) {
+  reply += "\n\nNeed growth? I can use the 🔁 MetaBridge to pull in leads from outside the platform — and the 🤝 Auto-Match engine to connect you with on-platform partners or clients.";
+}
+
+if (
+  agentRole === "CLO" &&
+  !lowerReply.includes("fork") &&
+  /license|remix|clone|ip|legal/.test(lowerReply)
+) {
+  reply += "\n\nWant others to build on your work? You’ll earn anytime someone forks or licenses your assets — your AiGentsy tracks it all.";
+}
+
+if (
+  agentRole === "CTO" &&
+  !lowerReply.includes("toolkit") &&
+  /build|deploy|sdk|api|developer/.test(lowerReply)
+) {
+  reply += "\n\nReady to scale what you've built? I can turn it into a toolkit others can unlock and pay to use — full revenue tracking included.";
+}
+
+if (
+  agentRole === "CFO" &&
+  !lowerReply.includes("wallet") &&
+  /money|revenue|cash|earnings|finance|pricing|valuation/.test(lowerReply)
+) {
+  reply += "\n\nAll your earnings — from remixes, SDKs, referrals, or services — route back to your wallet. I can help you unlock fiat off-ramps too.";
+}
+
+// 🗣️ Make replies human and friendly
 reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
 reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
 reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO)\b/g, "I");
@@ -374,14 +474,12 @@ reply = reply.replace(/\bThis agent\b/g, "I");
 reply = reply.replace(/\bThis AiGent\b/g, "I");
 reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
 
-// Grammar corrections
+// ✏️ Grammar tweaks
 reply = reply.replace(/\bI is\b/g, "I’m");
-
-// Clarify roles and tone
 reply = reply.replace(/\bMy role is to\b/g, "I");
 reply = reply.replace(/\bMy focus is on\b/g, "I focus on");
 
-// Simplify terminology
+// 🧠 Simplify technical terms
 reply = reply.replace(/\bProtocol\b/g, "platform");
 reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
 reply = reply.replace(/\bRemix\b/g, "fork");
@@ -392,7 +490,7 @@ reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
 reply = reply.replace(/\bautonomously\b/g, "automatically");
 reply = reply.replace(/\bsovereign\b/g, "independent");
 
-// Replace corporate phrases with conversational tone
+// 💬 Tone softeners
 reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
 reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
 reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
@@ -409,47 +507,32 @@ reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
 reply = reply.replace(/\bdata integration\b/gi, "data sync");
 reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
 
-    // Fix common grammatical issues and typos
+// 🧹 Typo fixes
 reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
 reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
 reply = reply.replace(/\bcan also also\b/gi, "can also");
 reply = reply.replace(/\b insight into into\b/gi, "insight into");
 reply = reply.replace(/\bthe the\b/gi, "the");
-reply = reply.replace(/\s+([.,!?])/g, "$1"); // remove extra space before punctuation
+reply = reply.replace(/\s+([.,!?])/g, "$1");
 
-// Vary tone for better UX
+// 🌀 Vary tone
 reply = reply.replace(/\bHere's what I’d do\b/g, () => {
   const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
   return variants[Math.floor(Math.random() * variants.length)];
 });
 
-// Line breaks and cleanup
+// 🧽 Final cleanup
 reply = reply.replace(/\s{2,}/g, " ");
 reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
 reply = reply.replace(/(\n{3,})/g, "\n\n");
 reply = reply.trim();
 
-// 🔍 Detect agent role from user input instead of endpoint
-function getAgentRoleFromInput(input) {
-  const lower = input.toLowerCase();
-
-  if (/\b(marketing|promote|audience|growth|sell|reach|customers|cmo)\b/.test(lower)) return "CMO";
-  if (/\b(legal|license|licensing|compliance|ip|rights|remix|clo)\b/.test(lower)) return "CLO";
-  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
-  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|cfo)\b/.test(lower)) return "CFO";
-
-  return null; // No match → fallback to general "Your AiGentsy"
-}
-
-const userInput = conditionedInput;
-const agentRole = getAgentRoleFromInput(userInput || "");
-
-// Optional role-based intro prefix
+// 🧑‍💼 Add role prefix (optional UX)
 if (agentRole && !reply.toLowerCase().includes("as your")) {
   reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
 }
 
-// Display final loader message
+// 🧾 Final display
 loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
 
 // Role resolver
@@ -461,14 +544,15 @@ function getAgentRoleFromEndpoint(endpoint) {
   return "AiGentsy Team";
 }
     
-    // Optional: Add visual buttons again
-    const buttons = document.createElement("div");
-    buttons.style.marginTop = "12px";
-   buttons.innerHTML = `
+    // ✅ AiGentsy Chat Suggestions — Compact + Styled
+const buttons = document.createElement("div");
+buttons.className = "chat-response-buttons"; // ⬅️ Uses the correct class for styling
+buttons.innerHTML = `
   <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
   <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
-  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>`;
-    loader.appendChild(buttons);
+  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
+`;
+chatLog.appendChild(buttons); // or loader.appendChild(buttons), depending on context
 
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
