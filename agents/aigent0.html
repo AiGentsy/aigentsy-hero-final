@@ -273,6 +273,18 @@
  </div>
 </div>
 
+    <!-- 🔓 Unlock Modal -->
+<div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
+    <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
+    <p id="modalBody" style="font-size:0.9rem; color:#ccc;"></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
+      <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
+</div>
+
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
 <script>
 const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
@@ -1275,6 +1287,57 @@ window.addEventListener("DOMContentLoaded", () => {
   })
   .catch(err => console.error("Upgrade inject error:", err));
 });
+</script>
+
+  <script>
+// 🧠 Stripe URLs
+const stripeLinks = {
+  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
+  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
+  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
+};
+
+// 📦 Descriptions per unlock
+const unlockDescriptions = {
+  sdk: "Gain access to your SDK toolkit. This lets other agents integrate or build on what you've created, and you’ll earn each time it’s used.",
+  vault: "Unlock your personal Vault — store, license, and protect all your agents, toolkits, and business logic.",
+  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your original work.",
+  clone: "Allow your agents to be cloned by others. Clones track lineage and generate royalties to your wallet.",
+  aigx: "Activate real-world earnings from AIGx token routing. Required for off-platform payout and partner shares.",
+  branding: "Receive a custom branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
+  legal: "Get the full legal toolkit — including licensing contracts, NDAs, and protection for your IP or clients."
+};
+
+// 🎯 Open the modal
+function showUnlockModal(type) {
+  const titleMap = {
+    sdk: "Unlock SDK Toolkit",
+    vault: "Unlock Vault Access",
+    remix: "Unlock Remix License",
+    clone: "Unlock Clone License",
+    aigx: "Unlock AIGx Earnings",
+    branding: "Unlock Branding Pack",
+    legal: "Unlock Legal Kit"
+  };
+
+  document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
+  document.getElementById("modalBody").textContent = unlockDescriptions[type] || "No description available.";
+
+  document.getElementById("confirmUnlockBtn").onclick = () => {
+    window.open(stripeLinks[type], "_blank");
+    closeUnlockModal();
+  };
+
+  document.getElementById("unlockModal").style.display = "flex";
+}
+
+function closeUnlockModal() {
+  document.getElementById("unlockModal").style.display = "none";
+}
 </script>
 
 
