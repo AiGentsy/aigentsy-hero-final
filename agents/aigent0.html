@@ -168,21 +168,29 @@
     </div>
 
     <div class="col-left">
- <!-- ✅ AiGentsy Chat -->
+<!-- ✅ AiGentsy Chat -->
 <div class="metric-box">
   <h3>AiGentsy Chat</h3>
-  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
-  <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+
+  <!-- Action Buttons Row -->
+  <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+    <button class="btn-glow" style="font-size: 0.85rem; padding: 8px 12px;" onclick="triggerSDK()">🧬 Trigger SDK</button>
+    <button class="btn-glow" style="font-size: 0.85rem; padding: 8px 12px;" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+    <button class="btn-glow" style="font-size: 0.85rem; padding: 8px 12px;" onclick="matchClients()">🤝 Match Clients</button>
+  </div>
+
+  <!-- Chat Input -->
+  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+
+  <!-- Send Button Only -->
+  <div style="margin-top:10px;">
     <button class="btn-glow" id="sendBtn">Send</button>
-    <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
-    <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
-    <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
   </div>
 </div>
 
 <!-- ✅ Licensing -->
 <div class="metric-box">
-  <h3>🔐 Licensing</h3>
+  <h3>🔐 Unlocks & Licensing</h3>
   <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
 </div>
 
