@@ -671,6 +671,33 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
+  // ✅ Licensing Modal Button Generator (Dynamic Unlocks)
+const licensingBox = document.getElementById("autoMatchOfferings");
+if (licensingBox && user) {
+  const unlocks = [
+    { label: "SDK Toolkit", key: "sdkAccess_eligible", action: "unlockSDK" },
+    { label: "Vault Access", key: "vaultAccess", action: "unlockVault" },
+    { label: "Remix License", key: "remixUnlocked", action: "unlockRemix" },
+    { label: "Clone License", key: "cloneLicenseUnlocked", action: "unlockClone" },
+    { label: "AIGx Earnings", key: "aigxEligible", action: "unlockAIGx" },
+    { label: "Branding Pack", trait: "marketing", action: "unlockBranding" },
+    { label: "Legal Kit", trait: "legal", action: "unlockLegal" }
+  ];
+
+  for (const item of unlocks) {
+    const eligible =
+      item.key ? user[item.key] : user.traits?.includes(item.trait);
+    if (!eligible) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.className = "btn-glow";
+      btn.textContent = `🔓 Unlock ${item.label}`;
+      btn.onclick = () => showUnlockModal(item.action.replace("unlock", "").toLowerCase());
+      li.appendChild(btn);
+      licensingBox.appendChild(li);
+    }
+  }
+}
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
 const inviteList = document.getElementById("inviteList");
