@@ -150,28 +150,31 @@
     </div>
 
     <div class="col-left">
-  <!-- ✅ AiGentsy Chat -->
-  <div class="metric-box">
-    <h3>AiGentsy Chat</h3>
-    <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-    <div class="button-row">
-      <button class="btn-glow" id="sendBtn">Send</button>
-      <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
-      <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
-    </div>
+ <!-- ✅ AiGentsy Chat -->
+<div class="metric-box">
+  <h3>AiGentsy Chat</h3>
+  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+  <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+    <button class="btn-glow" id="sendBtn">Send</button>
+    <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+    <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+    <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
   </div>
+</div>
 
-  <!-- ✅ SDK & Licensing -->
-  <div class="metric-box">
-    <h3>📦 SDK & Licensing</h3>
-    <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
-    <div class="button-row">
-      <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
-      <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
-      <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
-    </div>
+  <!-- ✅ Licensing -->
+<div class="metric-box">
+  <h3>🔐 Licensing</h3>
+  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+  <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px;">
+    <button class="btn-glow" onclick="unlockVault()">🔓 Unlock Vault Access</button>
+    <button class="btn-glow" onclick="unlockRemix()">🔓 Unlock Remix License</button>
+    <button class="btn-glow" onclick="unlockClone()">🔓 Unlock Clone License</button>
+    <button class="btn-glow" onclick="unlockAIGx()">🔓 Unlock AIGx Earnings</button>
+    <button class="btn-glow" onclick="unlockBranding()">🔓 Unlock Branding Pack</button>
+    <button class="btn-glow" onclick="unlockLegal()">🔓 Unlock Legal Kit</button>
   </div>
+</div>
 
   <!-- ✅ Team Achievements -->
   <div class="metric-box">
