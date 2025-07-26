@@ -82,6 +82,24 @@
   border-radius: 5px;
   white-space: nowrap;
 }
+  /* 🧬 Compact Unlock Buttons in Licensing */
+#autoMatchOfferings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+#autoMatchOfferings li {
+  margin: 0;
+}
+
+#autoMatchOfferings li button.btn-glow {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
   .btn-glow {
     background: #00bfff;
     color: #000;
@@ -162,18 +180,10 @@
   </div>
 </div>
 
-  <!-- ✅ Licensing -->
+<!-- ✅ Licensing -->
 <div class="metric-box">
   <h3>🔐 Licensing</h3>
   <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
-  <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px;">
-    <button class="btn-glow" onclick="unlockVault()">🔓 Unlock Vault Access</button>
-    <button class="btn-glow" onclick="unlockRemix()">🔓 Unlock Remix License</button>
-    <button class="btn-glow" onclick="unlockClone()">🔓 Unlock Clone License</button>
-    <button class="btn-glow" onclick="unlockAIGx()">🔓 Unlock AIGx Earnings</button>
-    <button class="btn-glow" onclick="unlockBranding()">🔓 Unlock Branding Pack</button>
-    <button class="btn-glow" onclick="unlockLegal()">🔓 Unlock Legal Kit</button>
-  </div>
 </div>
 
   <!-- ✅ Team Achievements -->
