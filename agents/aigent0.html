@@ -660,17 +660,7 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
-      // ✅ "Your AiGentsy Includes" Summary Injection
-const summaryBox = document.getElementById("businessSummaryList");
-if (summaryBox && user) {
-  const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
-    { label: "Vault Access", accessKey: "vaultAccess" },
-    { label: "Remix License", accessKey: "remixUnlocked" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
-    { label: "Legal Kit", trait: "legal" },
-    { label: "Branding Pack", trait: "marketing" }
-  ];
+  
  // ✅ Modal-Based Unlock Buttons (Dynamic Licensing)
 const licensingBox = document.getElementById("autoMatchOfferings");
 if (licensingBox && user) {
