@@ -672,6 +672,20 @@ if (summaryBox && user) {
     { label: "Branding Pack", trait: "marketing", modalKey: "branding" },
     { label: "Legal Kit", trait: "legal", modalKey: "legal" }
   ];
+for (const item of unlocks) {
+    const eligible =
+      item.key ? user[item.key] : user.traits?.includes(item.trait);
+    if (!eligible) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.className = "btn-glow";
+      btn.textContent = `🔓 Unlock ${item.label}`;
+      btn.onclick = () => showUnlockModal(item.modalKey); // ✅ Modal logic
+      li.appendChild(btn);
+      licensingBox.appendChild(li);
+    }
+  }
+}
 
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
