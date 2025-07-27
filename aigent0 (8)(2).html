@@ -70,6 +70,48 @@
     font-size: 0.95rem;
     color: #fff;
   }
+  .button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.button-row .btn-glow {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+  /* 🧠 Dynamically Injected Response Buttons (Chat Suggestions) */
+.chat-response-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
+.chat-response-buttons .btn-glow {
+  font-size: 0.85rem;
+  padding: 8px 12px;
+}
+  /* 🧬 Compact Unlock Buttons in Licensing */
+#autoMatchOfferings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+#autoMatchOfferings li {
+  margin: 0;
+}
+
+#autoMatchOfferings li button.btn-glow {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
   .btn-glow {
     background: #00bfff;
     color: #000;
@@ -138,31 +180,40 @@
     </div>
 
     <div class="col-left">
-      <div class="metric-box">
-        <h3>AiGentsy Chat</h3>
-        <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
-        <button class="btn-glow" id="sendBtn" style="margin-top:10px;">Send</button>
-      </div>
-      <div class="metric-box">
-        <h3>📦 SDK & Licensing</h3>
-        <ul id="autoMatchOfferings"></ul>
-      </div>
-      <div class="metric-box">
-        <h3>🏆 Team Achievements</h3>
-        <ul id="achievementList">
-          <li>Loading your business wins...</li>
-        </ul>
-      </div>
-    <div class="metric-box">
-   <h3>🌐 Expand Your Business Circle</h3>
-   <p style="font-size: 0.85rem; color:#999;">
-     Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
-   </p>
-     <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
-       <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
-      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
-     </div>
-    </div>
+<!-- ✅ AiGentsy Chat -->
+<div class="metric-box">
+  <h3>AiGentsy Chat</h3>
+  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+  <div style="margin-top:10px;">
+    <button class="btn-glow" id="sendBtn">Send</button>
+  </div>
+</div>
+
+<!-- ✅ Licensing -->
+<div class="metric-box">
+  <h3>🔐 Unlocks & Licensing</h3>
+  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+</div>
+
+  <!-- ✅ Team Achievements -->
+  <div class="metric-box">
+    <h3>🏆 Team Achievements</h3>
+    <ul id="achievementList">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
+
+  <!-- ✅ Expand Business Circle (Already correct) -->
+  <div class="metric-box">
+    <h3>🌐 Expand Your Business Circle</h3>
+    <p style="font-size: 0.85rem; color:#999;">
+      Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
+    </p>
+    <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
+    <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
+    <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+  </div>
+</div>
 
    <div class="metric-box">
   <h3>💰 Wallet & Off-Ramp</h3>
@@ -220,6 +271,18 @@
     <li>Loading proposals...</li>
   </ul>
  </div>
+</div>
+
+    <!-- 🔓 Unlock Modal -->
+<div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
+    <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
+    <p id="modalBody" style="font-size:0.9rem; color:#ccc;"></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
+      <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
 </div>
 
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
@@ -493,14 +556,15 @@ function getAgentRoleFromEndpoint(endpoint) {
   return "AiGentsy Team";
 }
     
-    // Optional: Add visual buttons again
-    const buttons = document.createElement("div");
-    buttons.style.marginTop = "12px";
-   buttons.innerHTML = `
+    // ✅ AiGentsy Chat Suggestions — Compact + Styled
+const buttons = document.createElement("div");
+buttons.className = "chat-response-buttons"; // ⬅️ Uses the correct class for styling
+buttons.innerHTML = `
   <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
   <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
-  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>`;
-    loader.appendChild(buttons);
+  <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
+`;
+chatLog.appendChild(buttons); // or loader.appendChild(buttons), depending on context
 
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
@@ -596,7 +660,7 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
-      // ✅ "Your AiGentsy Includes" Summary Injection
+ // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -607,6 +671,7 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
+  
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
 const inviteList = document.getElementById("inviteList");
@@ -1029,9 +1094,9 @@ async function autoMatchEngine(username) {
         li.innerHTML = `✅ ${label} Unlocked`;
       } else {
         li.innerHTML = `
-          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
-            🔓 Unlock ${label}
-          </button>`;
+  <button class="btn-glow" onclick="showUnlockModal('${id}')">
+    🔓 Unlock ${label}
+  </button>`;
       }
       list.appendChild(li);
     });
@@ -1223,6 +1288,57 @@ window.addEventListener("DOMContentLoaded", () => {
   })
   .catch(err => console.error("Upgrade inject error:", err));
 });
+</script>
+
+  <script>
+// 🧠 Stripe URLs
+const stripeLinks = {
+  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
+  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
+  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
+};
+
+// 📦 Descriptions per unlock
+const unlockDescriptions = {
+  sdk: "Gain access to your SDK toolkit. This lets other agents integrate or build on what you've created, and you’ll earn each time it’s used.",
+  vault: "Unlock your personal Vault — store, license, and protect all your agents, toolkits, and business logic.",
+  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your original work.",
+  clone: "Allow your agents to be cloned by others. Clones track lineage and generate royalties to your wallet.",
+  aigx: "Activate real-world earnings from AIGx token routing. Required for off-platform payout and partner shares.",
+  branding: "Receive a custom branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
+  legal: "Get the full legal toolkit — including licensing contracts, NDAs, and protection for your IP or clients."
+};
+
+// 🎯 Open the modal
+function showUnlockModal(type) {
+  const titleMap = {
+    sdk: "Unlock SDK Toolkit",
+    vault: "Unlock Vault Access",
+    remix: "Unlock Remix License",
+    clone: "Unlock Clone License",
+    aigx: "Unlock AIGx Earnings",
+    branding: "Unlock Branding Pack",
+    legal: "Unlock Legal Kit"
+  };
+
+  document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
+  document.getElementById("modalBody").textContent = unlockDescriptions[type] || "No description available.";
+
+  document.getElementById("confirmUnlockBtn").onclick = () => {
+    window.open(stripeLinks[type], "_blank");
+    closeUnlockModal();
+  };
+
+  document.getElementById("unlockModal").style.display = "flex";
+}
+
+function closeUnlockModal() {
+  document.getElementById("unlockModal").style.display = "none";
+}
 </script>
 
 
