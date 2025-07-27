@@ -664,14 +664,14 @@ window.aigentsyUser = user; // ✅ Global reference for runtime access
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
-    { label: "Vault Access", accessKey: "vaultAccess" },
-    { label: "Remix License", accessKey: "remixUnlocked" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
-    { label: "Legal Kit", trait: "legal" },
-    { label: "Branding Pack", trait: "marketing" }
-  ]; 
-
+    { label: "SDK Toolkit", key: "sdkAccess_eligible", modalKey: "sdk" },
+    { label: "Vault Access", key: "vaultAccess", modalKey: "vault" },
+    { label: "Remix License", key: "remixUnlocked", modalKey: "remix" },
+    { label: "Clone License", key: "cloneLicenseUnlocked", modalKey: "clone" },
+    { label: "AIGx Earnings", key: "aigxEligible", modalKey: "aigx" },
+    { label: "Branding Pack", trait: "marketing", modalKey: "branding" },
+    { label: "Legal Kit", trait: "legal", modalKey: "legal" }
+  ];
 
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
