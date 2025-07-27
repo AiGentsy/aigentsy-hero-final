@@ -1094,9 +1094,9 @@ async function autoMatchEngine(username) {
         li.innerHTML = `✅ ${label} Unlocked`;
       } else {
         li.innerHTML = `
-          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
-            🔓 Unlock ${label}
-          </button>`;
+  <button class="btn-glow" onclick="showUnlockModal('${id}')">
+    🔓 Unlock ${label}
+  </button>`;
       }
       list.appendChild(li);
     });
