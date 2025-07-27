@@ -671,7 +671,34 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
- 
+ // ✅ Modal-Based Unlock Buttons (Dynamic Licensing)
+const licensingBox = document.getElementById("autoMatchOfferings");
+if (licensingBox && user) {
+  const unlocks = [
+    { label: "SDK Toolkit", key: "sdkAccess_eligible", action: "sdk" },
+    { label: "Vault Access", key: "vaultAccess", action: "vault" },
+    { label: "Remix License", key: "remixUnlocked", action: "remix" },
+    { label: "Clone License", key: "cloneLicenseUnlocked", action: "clone" },
+    { label: "AIGx Earnings", key: "aigxEligible", action: "aigx" },
+    { label: "Branding Pack", trait: "marketing", action: "branding" },
+    { label: "Legal Kit", trait: "legal", action: "legal" }
+  ];
+
+  for (const item of unlocks) {
+    const eligible =
+      item.key ? user[item.key] : user.traits?.includes(item.trait);
+    if (!eligible) {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.className = "btn-glow";
+      btn.textContent = `🔓 Unlock ${item.label}`;
+      btn.onclick = () => showUnlockModal(item.action); // ✅ Show modal with correct info
+      li.appendChild(btn);
+      licensingBox.appendChild(li);
+    }
+  }
+}
+
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
 const inviteList = document.getElementById("inviteList");
