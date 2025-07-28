@@ -1353,6 +1353,60 @@ function closeUnlockModal() {
 }
 </script>
 
+<script>
+let attachedFiles = [];
+
+function handleFiles(files) {
+  for (let file of files) {
+    attachedFiles.push(file);
+  }
+  renderFilePreview();
+}
+
+function renderFilePreview() {
+  const preview = document.getElementById("filePreview");
+  if (!preview) return;
+  if (attachedFiles.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+  preview.innerHTML = "📎 Attached: " + attachedFiles.map(f => f.name).join(", ");
+}
+
+// Optional: handle drag events for drop zone
+const dropZone = document.getElementById("fileDropZone");
+if (dropZone) {
+  dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#00bfff";
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.borderColor = "#444";
+  });
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#444";
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const text = document.getElementById("agentInput").value.trim();
+  if (!text && attachedFiles.length === 0) return;
+
+  // ⬇️ Send message + file data to agent logic (customize as needed)
+  console.log("Message:", text);
+  console.log("Files:", attachedFiles);
+
+  // TODO: Send to agent runtime logic if desired
+  // Reset
+  document.getElementById("agentInput").value = "";
+  attachedFiles = [];
+  renderFilePreview();
+}
+</script>
+
 
 <!-- Modal Styles -->
 <style>
