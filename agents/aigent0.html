@@ -1481,6 +1481,24 @@ function showUnlockModal(type) {
   document.getElementById("unlockModal").style.display = "flex";
 }
 
+  function openPackagingModal() {
+  const modal = document.getElementById("packagingModal");
+  const notesBox = document.getElementById("packagingNotes");
+  if (notesBox) notesBox.value = localStorage.getItem("packagingNotes") || "";
+  modal.style.display = "flex";
+}
+
+function closePackagingModal() {
+  document.getElementById("packagingModal").style.display = "none";
+}
+
+function submitPackaging() {
+  const notes = document.getElementById("packagingNotes").value.trim();
+  localStorage.setItem("packagingNotes", notes);
+  alert("✅ Packaging flow saved locally.");
+  closePackagingModal();
+}
+
   function showModuleModal(module) {
   const content = {
     sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
@@ -1833,6 +1851,26 @@ function handleSubmit(event) {
     <div id="modalContent"></div>
     <div style="text-align: right; margin-top: 12px;">
       <button class="btn-glow" onclick="document.getElementById('moduleModal').style.display='none'">Close</button>
+    </div>
+  </div>
+</div>
+<!-- ✅ Packaging Modal -->
+<div id="packagingModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:480px; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff;">
+    <h3>📦 Set Up Your Packaging Flow</h3>
+    <p>This creates the delivery logic for your offering — client-ready kits, guides, or downloads.</p>
+    <ul style="font-size:0.9rem; line-height:1.6;">
+      <li>🧬 Link to your SDK or Clone</li>
+      <li>📄 Attach delivery PDFs or .zip assets</li>
+      <li>🔗 Create external delivery links</li>
+      <li>🎯 Target your ideal client or use case</li>
+    </ul>
+    <div style="margin-top:12px;">
+      <textarea id="packagingNotes" placeholder="Describe what the client will receive..." style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+    </div>
+    <div style="margin-top:12px; text-align:right;">
+      <button class="btn-glow" onclick="submitPackaging()">Save</button>
+      <button class="btn-glow" onclick="closePackagingModal()">Close</button>
     </div>
   </div>
 </div>
