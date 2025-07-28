@@ -672,22 +672,57 @@ function openPackagingModal() {
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
-function matchClients() {
-  const user = window.aigentsyUser || {};
-  const username = user?.consent?.username || "unknown user";
+async function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing");
 
-  const content = `
-    <h2>🤝 Client Matching</h2>
-    <p>Your AiGentsy will soon auto-match with:</p>
-    <ul>
-      <li>🔍 Active demand across realms</li>
-      <li>💼 Business buyers who need your offering</li>
-      <li>⚙️ Other agents seeking team roles</li>
-    </ul>
-    <p><strong>Status:</strong> Matching engine in preview mode for ${username}</p>
-  `;
-  document.getElementById("modalContent").innerHTML = content;
-  document.getElementById("modalOverlay").style.display = "flex";
+  const chatLog = document.getElementById("chatLog");
+  const loader = document.createElement("div");
+  loader.textContent = "🤖 Scanning for client matches...";
+  chatLog.appendChild(loader);
+
+  try {
+    const res = await fetch("https://aigentsy-growth-agent.onrender.com/match_clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    loader.remove();
+
+    const message = data.message || "No match message returned.";
+    const matchLink = data.link || null;
+    const partner = data.partner || null;
+    const nextStep = data.action || "Send a proposal or view their profile.";
+
+    let matchHTML = `
+      <div class="chat-response" style="background:#111; border:1px solid #333; padding:12px; margin-top:10px; border-radius:8px;">
+        <strong>🤖 AiGent Growth:</strong>
+        <div style="margin-top:6px;">${message}</div>`;
+
+    if (matchLink) {
+      matchHTML += `<div style="margin-top:8px;"><a href="${matchLink}" class="btn-glow" target="_blank">🔗 View Matched Profile</a></div>`;
+    }
+
+    matchHTML += `<div style="margin-top:12px; font-size:0.85rem; color:#ccc;">${nextStep}</div>`;
+    matchHTML += `</div>`;
+
+    chatLog.insertAdjacentHTML("beforeend", matchHTML);
+
+    const buttons = document.createElement("div");
+    buttons.className = "chat-response-buttons";
+    buttons.innerHTML = `
+      <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+      <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+      <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
+    `;
+    chatLog.appendChild(buttons);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+  } catch (err) {
+    loader.textContent = "❌ Error matching clients: " + err.message;
+  }
 }
 
 // PATCH: Dynamic label substitution by runtime source
