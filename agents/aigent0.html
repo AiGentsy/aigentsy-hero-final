@@ -607,6 +607,56 @@ function triggerSDK() {
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
+// ✅ Client Matching Trigger
+function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername") || "growth_default";
+  const loader = document.getElementById("agentLoader") || document.querySelector(".chat-loader");
+  const chatLog = document.getElementById("chatLog");
+
+  loader.textContent = "🤖 Matching clients...";
+
+  fetch("https://aigentsy-growth-agent.onrender.com/metabridge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: "client match",
+      username: username
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    loader.textContent = "";
+    const matches = data.matches || [];
+    const proposals = data.proposals || [];
+
+    if (!matches.length) {
+      chatLog.innerHTML += `<div class="chat-entry agent">🤖 No client matches found right now. Try expanding your offerings or traits.</div>`;
+    } else {
+      chatLog.innerHTML += `
+        <div class="chat-entry agent">
+          <strong>🤝 Client Matches Found:</strong><br>
+          ${matches.map(m => `🔗 <a href="${m.contact_url}" target="_blank">${m.username}</a> — ${m.match_reason}`).join("<br>")}
+        </div>
+      `;
+    }
+
+    if (proposals.length) {
+      chatLog.innerHTML += `
+        <div class="chat-entry agent">
+          <strong>📬 Proposals Generated:</strong><br>
+          ${proposals.map(p => `<pre>${p.body}</pre>`).join("<hr>")}
+        </div>
+      `;
+    }
+
+    chatLog.scrollTop = chatLog.scrollHeight;
+  })
+  .catch(err => {
+    loader.textContent = "";
+    chatLog.innerHTML += `<div class="chat-entry agent">⚠️ Error: ${err.message}</div>`;
+  });
+}
+
 function openPackagingModal() {
   const content = `
     <h2>📦 Set Up Packaging</h2>
