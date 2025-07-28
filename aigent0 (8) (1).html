@@ -180,10 +180,21 @@
     </div>
 
     <div class="col-left">
-<!-- ✅ AiGentsy Chat -->
+<!-- ✅ AiGentsy Chat (w/ Drag & Drop) -->
+<!-- ✅ AiGentsy Chat w/ Drag & Drop (Minimal, Functional) -->
 <div class="metric-box">
   <h3>AiGentsy Chat</h3>
   <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+
+  <div id="fileDropZone"
+       style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;cursor:pointer"
+       onclick="document.getElementById('fileInput').click()">
+    📁 Drag & Drop or Click to Attach Files
+    <input id="fileInput" type="file" multiple style="display:none" onchange="handleFiles(this.files)">
+  </div>
+
+  <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
+
   <div style="margin-top:10px;">
     <button class="btn-glow" id="sendBtn">Send</button>
   </div>
@@ -271,6 +282,18 @@
     <li>Loading proposals...</li>
   </ul>
  </div>
+</div>
+
+    <!-- 🔓 Unlock Modal -->
+<div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
+    <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
+    <p id="modalBody" style="font-size:0.9rem; color:#ccc;"></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
+      <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
 </div>
 
 <!-- PATCH: AiGentsy Simplified Runtime Injection -->
@@ -648,7 +671,7 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
-      // ✅ "Your AiGentsy Includes" Summary Injection
+ // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -659,6 +682,7 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
+  
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
 const inviteList = document.getElementById("inviteList");
@@ -1081,9 +1105,9 @@ async function autoMatchEngine(username) {
         li.innerHTML = `✅ ${label} Unlocked`;
       } else {
         li.innerHTML = `
-          <button class="btn-glow" onclick="unlockOffering('${username}', '${id}', '${stripe}')">
-            🔓 Unlock ${label}
-          </button>`;
+  <button class="btn-glow" onclick="showUnlockModal('${id}')">
+    🔓 Unlock ${label}
+  </button>`;
       }
       list.appendChild(li);
     });
@@ -1275,6 +1299,158 @@ window.addEventListener("DOMContentLoaded", () => {
   })
   .catch(err => console.error("Upgrade inject error:", err));
 });
+</script>
+
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Global drop buffer
+  window.aigentsyDroppedFiles = [];
+
+  // ✅ Update file preview + sync to packaging
+  function handleFileDrop(e) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (!files.length) return;
+
+    window.aigentsyDroppedFiles.push(...files);
+
+    const preview = document.getElementById("filePreviewBox") || document.createElement("div");
+    preview.id = "filePreviewBox";
+    preview.style.marginTop = "10px";
+    preview.innerHTML = "<strong>📁 Files added:</strong><ul style='margin: 6px 0; padding-left: 20px; font-size: 0.85rem; color: #ccc;'></ul>";
+    const ul = preview.querySelector("ul");
+
+    files.forEach(file => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
+      ul.appendChild(li);
+    });
+
+    const container = document.querySelector(".metric-box textarea#agentInput").parentNode;
+    container.appendChild(preview);
+  }
+
+  // ✅ Submit handler
+  window.handleSubmit = function(event) {
+    event.preventDefault();
+    const text = document.getElementById("agentInput").value.trim();
+    if (!text && window.aigentsyDroppedFiles.length === 0) return;
+
+    console.log("Message:", text);
+    console.log("Files:", window.aigentsyDroppedFiles);
+
+    document.getElementById("agentInput").value = "";
+    window.aigentsyDroppedFiles = [];
+    const previewBox = document.getElementById("filePreviewBox");
+    if (previewBox) previewBox.remove();
+  };
+});
+</script>
+
+  
+  <script>
+// 🧠 Stripe URLs
+const stripeLinks = {
+  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
+  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
+  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
+};
+
+// 📦 Descriptions per unlock
+const unlockDescriptions = {
+  sdk: "Gain access to your SDK toolkit. This lets other agents integrate or build on what you've created, and you’ll earn each time it’s used.",
+  vault: "Unlock your personal Vault — store, license, and protect all your agents, toolkits, and business logic.",
+  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your original work.",
+  clone: "Allow your agents to be cloned by others. Clones track lineage and generate royalties to your wallet.",
+  aigx: "Activate real-world earnings from AIGx token routing. Required for off-platform payout and partner shares.",
+  branding: "Receive a custom branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
+  legal: "Get the full legal toolkit — including licensing contracts, NDAs, and protection for your IP or clients."
+};
+
+// 🎯 Open the modal
+function showUnlockModal(type) {
+  const titleMap = {
+    sdk: "Unlock SDK Toolkit",
+    vault: "Unlock Vault Access",
+    remix: "Unlock Remix License",
+    clone: "Unlock Clone License",
+    aigx: "Unlock AIGx Earnings",
+    branding: "Unlock Branding Pack",
+    legal: "Unlock Legal Kit"
+  };
+
+  document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
+  document.getElementById("modalBody").textContent = unlockDescriptions[type] || "No description available.";
+
+  document.getElementById("confirmUnlockBtn").onclick = () => {
+    window.open(stripeLinks[type], "_blank");
+    closeUnlockModal();
+  };
+
+  document.getElementById("unlockModal").style.display = "flex";
+}
+
+function closeUnlockModal() {
+  document.getElementById("unlockModal").style.display = "none";
+}
+</script>
+
+<script>
+let attachedFiles = [];
+
+function handleFiles(files) {
+  for (let file of files) {
+    attachedFiles.push(file);
+  }
+  renderFilePreview();
+}
+
+function renderFilePreview() {
+  const preview = document.getElementById("filePreview");
+  if (!preview) return;
+  if (attachedFiles.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+  preview.innerHTML = "📎 Attached: " + attachedFiles.map(f => f.name).join(", ");
+}
+
+// Optional: handle drag events for drop zone
+const dropZone = document.getElementById("fileDropZone");
+if (dropZone) {
+  dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#00bfff";
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.borderColor = "#444";
+  });
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#444";
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const text = document.getElementById("agentInput").value.trim();
+  if (!text && attachedFiles.length === 0) return;
+
+  // ⬇️ Send message + file data to agent logic (customize as needed)
+  console.log("Message:", text);
+  console.log("Files:", attachedFiles);
+
+  // TODO: Send to agent runtime logic if desired
+  // Reset
+  document.getElementById("agentInput").value = "";
+  attachedFiles = [];
+  renderFilePreview();
+}
 </script>
 
 
