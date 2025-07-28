@@ -180,13 +180,25 @@
     </div>
 
     <div class="col-left">
-<!-- ✅ AiGentsy Chat -->
+<!-- ✅ AiGentsy Chat (w/ Drag & Drop) -->
 <div class="metric-box">
   <h3>AiGentsy Chat</h3>
-  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
-  <div style="margin-top:10px;">
-    <button class="btn-glow" id="sendBtn">Send</button>
-  </div>
+  <form id="chatForm" style="display: flex; flex-direction: column;" onsubmit="handleSubmit(event)">
+    <textarea id="agentInput" placeholder="Talk to your AiGentsy..." style="width:100%;padding:10px;margin-top:10px;background:#000;color:#fff;border:1px solid #444;border-radius:6px;"></textarea>
+
+    <div id="fileDropZone"
+         style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;"
+         onclick="document.getElementById('fileInput').click()">
+      📁 Drag & Drop or Click to Attach Files
+      <input id="fileInput" type="file" multiple style="display: none;" onchange="handleFiles(this.files)">
+    </div>
+
+    <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
+
+    <div class="button-row" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
+      <button class="btn-glow" type="submit" id="sendBtn">Send</button>
+    </div>
+  </form>
 </div>
 
 <!-- ✅ Licensing -->
