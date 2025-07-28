@@ -1301,6 +1301,53 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Global drop buffer
+  window.aigentsyDroppedFiles = [];
+
+  // ✅ Update file preview + sync to packaging
+  function handleFileDrop(e) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (!files.length) return;
+
+    window.aigentsyDroppedFiles.push(...files);
+
+    const preview = document.getElementById("filePreviewBox") || document.createElement("div");
+    preview.id = "filePreviewBox";
+    preview.style.marginTop = "10px";
+    preview.innerHTML = "<strong>📁 Files added:</strong><ul style='margin: 6px 0; padding-left: 20px; font-size: 0.85rem; color: #ccc;'></ul>";
+    const ul = preview.querySelector("ul");
+
+    files.forEach(file => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
+      ul.appendChild(li);
+    });
+
+    const container = document.querySelector(".metric-box textarea#agentInput").parentNode;
+    container.appendChild(preview);
+  }
+
+  // ✅ Submit handler
+  window.handleSubmit = function(event) {
+    event.preventDefault();
+    const text = document.getElementById("agentInput").value.trim();
+    if (!text && window.aigentsyDroppedFiles.length === 0) return;
+
+    console.log("Message:", text);
+    console.log("Files:", window.aigentsyDroppedFiles);
+
+    document.getElementById("agentInput").value = "";
+    window.aigentsyDroppedFiles = [];
+    const previewBox = document.getElementById("filePreviewBox");
+    if (previewBox) previewBox.remove();
+  };
+});
+</script>
+
+  
   <script>
 // 🧠 Stripe URLs
 const stripeLinks = {
