@@ -180,10 +180,21 @@
     </div>
 
     <div class="col-left">
-<!-- ✅ AiGentsy Chat -->
+<!-- ✅ AiGentsy Chat (w/ Drag & Drop) -->
+<!-- ✅ AiGentsy Chat w/ Drag & Drop (Minimal, Functional) -->
 <div class="metric-box">
   <h3>AiGentsy Chat</h3>
   <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+
+  <div id="fileDropZone"
+       style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;cursor:pointer"
+       onclick="document.getElementById('fileInput').click()">
+    📁 Drag & Drop or Click to Attach Files
+    <input id="fileInput" type="file" multiple style="display:none" onchange="handleFiles(this.files)">
+  </div>
+
+  <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
+
   <div style="margin-top:10px;">
     <button class="btn-glow" id="sendBtn">Send</button>
   </div>
@@ -875,39 +886,81 @@ if (includesBox && user) {
   }
 }
 
-   // === Business Kit Overview (Dynamic Description) ===
+// === Business Kit Overview (Dynamic Description) ===
 const kitDocBox = document.getElementById("dynamicKitDoc");
 if (kitDocBox && user) {
-  let doc = "🧠 No kit detected.";
+  let doc = "";
 
+  // Legal Kit
   if (user.traits?.includes("legal")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>📜 IP Assignment & Licensing Templates</li>
-        <li>🤝 Legal Agent Companion Included</li>
-        <li>🛡️ Trust Layer Hooks</li>
-      </ul>`;
-  } else if (user.traits?.includes("saas")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>💻 Auth & Subscription System</li>
-        <li>💰 Stripe Monetization Ready</li>
-        <li>🔁 Auto-routing AiGents</li>
-      </ul>`;
-  } else if (user.traits?.includes("marketing")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>📣 Brand & Naming Generator</li>
-        <li>📧 Email & Launch Assets</li>
-        <li>🧠 CMO AiGent Included</li>
-      </ul>`;
-  } else if (user.traits?.includes("custom")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>🧠 Generated from your search</li>
-        <li>👥 Matched C-Suite Roles</li>
-        <li>🚀 Pre-filled Deploy Templates</li>
-      </ul>`;
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📜 Legal Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📜 IP Assignment & Licensing Templates</li>
+          <li>🤝 Legal Agent Companion Included</li>
+          <li>🛡️ Trust Layer Hooks</li>
+        </ul>
+      </div>`;
+  }
+
+  // SaaS Kit
+  if (user.traits?.includes("saas")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>💻 SaaS Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>💻 Auth & Subscription System</li>
+          <li>💰 Stripe Monetization Ready</li>
+          <li>🔁 Auto-routing AiGents</li>
+        </ul>
+      </div>`;
+  }
+
+  // Branding Pack
+  if (user.traits?.includes("marketing")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🎨 Branding Pack:</strong>
+        <ul style="padding-left:16px;">
+          <li>✅ Logo Templates (editable .svg)</li>
+          <li>✅ Brand Guidelines (colors, fonts, tone)</li>
+          <li>✅ Social Media Kit (headers, bios)</li>
+          <li>✅ Slide Deck Starter</li>
+          <li>✅ Landing Page Template (HTML)</li>
+        </ul>
+      </div>`;
+  }
+
+  // Packaging Kit
+  if (user.traits?.includes("packaging")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📦 Packaging Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📝 Offer Description + Value Hook</li>
+          <li>📤 Stripe Link Routing</li>
+          <li>🤝 License Terms & Delivery Metadata</li>
+        </ul>
+      </div>`;
+  }
+
+  // Custom Builder Kit
+  if (user.traits?.includes("custom")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🧠 Custom Startup Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>🧠 Generated from your search</li>
+          <li>👥 Matched C-Suite Roles</li>
+          <li>🚀 Pre-filled Deploy Templates</li>
+        </ul>
+      </div>`;
+  }
+
+  // Fallback
+  if (!doc) {
+    doc = "🧠 No kit detected.";
   }
 
   kitDocBox.innerHTML = doc;
@@ -1290,6 +1343,53 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Global drop buffer
+  window.aigentsyDroppedFiles = [];
+
+  // ✅ Update file preview + sync to packaging
+  function handleFileDrop(e) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (!files.length) return;
+
+    window.aigentsyDroppedFiles.push(...files);
+
+    const preview = document.getElementById("filePreviewBox") || document.createElement("div");
+    preview.id = "filePreviewBox";
+    preview.style.marginTop = "10px";
+    preview.innerHTML = "<strong>📁 Files added:</strong><ul style='margin: 6px 0; padding-left: 20px; font-size: 0.85rem; color: #ccc;'></ul>";
+    const ul = preview.querySelector("ul");
+
+    files.forEach(file => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
+      ul.appendChild(li);
+    });
+
+    const container = document.querySelector(".metric-box textarea#agentInput").parentNode;
+    container.appendChild(preview);
+  }
+
+  // ✅ Submit handler
+  window.handleSubmit = function(event) {
+    event.preventDefault();
+    const text = document.getElementById("agentInput").value.trim();
+    if (!text && window.aigentsyDroppedFiles.length === 0) return;
+
+    console.log("Message:", text);
+    console.log("Files:", window.aigentsyDroppedFiles);
+
+    document.getElementById("agentInput").value = "";
+    window.aigentsyDroppedFiles = [];
+    const previewBox = document.getElementById("filePreviewBox");
+    if (previewBox) previewBox.remove();
+  };
+});
+</script>
+
+  
   <script>
 // 🧠 Stripe URLs
 const stripeLinks = {
@@ -1338,6 +1438,60 @@ function showUnlockModal(type) {
 
 function closeUnlockModal() {
   document.getElementById("unlockModal").style.display = "none";
+}
+</script>
+
+<script>
+let attachedFiles = [];
+
+function handleFiles(files) {
+  for (let file of files) {
+    attachedFiles.push(file);
+  }
+  renderFilePreview();
+}
+
+function renderFilePreview() {
+  const preview = document.getElementById("filePreview");
+  if (!preview) return;
+  if (attachedFiles.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+  preview.innerHTML = "📎 Attached: " + attachedFiles.map(f => f.name).join(", ");
+}
+
+// Optional: handle drag events for drop zone
+const dropZone = document.getElementById("fileDropZone");
+if (dropZone) {
+  dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#00bfff";
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.borderColor = "#444";
+  });
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#444";
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const text = document.getElementById("agentInput").value.trim();
+  if (!text && attachedFiles.length === 0) return;
+
+  // ⬇️ Send message + file data to agent logic (customize as needed)
+  console.log("Message:", text);
+  console.log("Files:", attachedFiles);
+
+  // TODO: Send to agent runtime logic if desired
+  // Reset
+  document.getElementById("agentInput").value = "";
+  attachedFiles = [];
+  renderFilePreview();
 }
 </script>
 
