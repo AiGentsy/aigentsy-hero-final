@@ -805,7 +805,7 @@ if (!user) return;
           <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
           <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0 || 0}</li>
           <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
-          <li><strong>Deployments:</strong> ${user.deployments || 0}</li>
+          <li><strong>Offerings Sent:</strong> ${user.offerings?.length || 0}</li>
           <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
           <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
       }
