@@ -886,39 +886,81 @@ if (includesBox && user) {
   }
 }
 
-   // === Business Kit Overview (Dynamic Description) ===
+// === Business Kit Overview (Dynamic Description) ===
 const kitDocBox = document.getElementById("dynamicKitDoc");
 if (kitDocBox && user) {
-  let doc = "🧠 No kit detected.";
+  let doc = "";
 
+  // Legal Kit
   if (user.traits?.includes("legal")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>📜 IP Assignment & Licensing Templates</li>
-        <li>🤝 Legal Agent Companion Included</li>
-        <li>🛡️ Trust Layer Hooks</li>
-      </ul>`;
-  } else if (user.traits?.includes("saas")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>💻 Auth & Subscription System</li>
-        <li>💰 Stripe Monetization Ready</li>
-        <li>🔁 Auto-routing AiGents</li>
-      </ul>`;
-  } else if (user.traits?.includes("marketing")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>📣 Brand & Naming Generator</li>
-        <li>📧 Email & Launch Assets</li>
-        <li>🧠 CMO AiGent Included</li>
-      </ul>`;
-  } else if (user.traits?.includes("custom")) {
-    doc = `
-      <ul style="padding-left:16px;">
-        <li>🧠 Generated from your search</li>
-        <li>👥 Matched C-Suite Roles</li>
-        <li>🚀 Pre-filled Deploy Templates</li>
-      </ul>`;
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📜 Legal Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📜 IP Assignment & Licensing Templates</li>
+          <li>🤝 Legal Agent Companion Included</li>
+          <li>🛡️ Trust Layer Hooks</li>
+        </ul>
+      </div>`;
+  }
+
+  // SaaS Kit
+  if (user.traits?.includes("saas")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>💻 SaaS Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>💻 Auth & Subscription System</li>
+          <li>💰 Stripe Monetization Ready</li>
+          <li>🔁 Auto-routing AiGents</li>
+        </ul>
+      </div>`;
+  }
+
+  // Branding Pack
+  if (user.traits?.includes("marketing")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🎨 Branding Pack:</strong>
+        <ul style="padding-left:16px;">
+          <li>✅ Logo Templates (editable .svg)</li>
+          <li>✅ Brand Guidelines (colors, fonts, tone)</li>
+          <li>✅ Social Media Kit (headers, bios)</li>
+          <li>✅ Slide Deck Starter</li>
+          <li>✅ Landing Page Template (HTML)</li>
+        </ul>
+      </div>`;
+  }
+
+  // Packaging Kit
+  if (user.traits?.includes("packaging")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📦 Packaging Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📝 Offer Description + Value Hook</li>
+          <li>📤 Stripe Link Routing</li>
+          <li>🤝 License Terms & Delivery Metadata</li>
+        </ul>
+      </div>`;
+  }
+
+  // Custom Builder Kit
+  if (user.traits?.includes("custom")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🧠 Custom Startup Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>🧠 Generated from your search</li>
+          <li>👥 Matched C-Suite Roles</li>
+          <li>🚀 Pre-filled Deploy Templates</li>
+        </ul>
+      </div>`;
+  }
+
+  // Fallback
+  if (!doc) {
+    doc = "🧠 No kit detected.";
   }
 
   kitDocBox.innerHTML = doc;
