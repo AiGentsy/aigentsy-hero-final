@@ -1012,17 +1012,16 @@ if (kitDocBox && user) {
 
   // Legal Kit
   if (user.traits?.includes("legal")) {
-  doc += `
-    <div style="margin-bottom: 12px;">
-      <strong>📜 Legal Kit:</strong>
-      <ul style="padding-left:16px;">
-        <li>📜 IP Assignment & Licensing Templates</li>
-        <li>🤝 Legal Agent Companion Included</li>
-        <li>🛡️ Trust Layer Hooks</li>
-        <li><a href="#" onclick="showModuleModal('legal')" class="btn-glow" style="margin-top:6px;">📂 View Legal Kit</a></li>
-      </ul>
-    </div>`;
-}
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📜 Legal Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📜 IP Assignment & Licensing Templates</li>
+          <li>🤝 Legal Agent Companion Included</li>
+          <li>🛡️ Trust Layer Hooks</li>
+        </ul>
+      </div>`;
+  }
 
   // SaaS Kit
   if (user.traits?.includes("saas")) {
