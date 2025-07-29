@@ -1573,30 +1573,43 @@ function submitPackaging() {
   closePackagingModal();
 }
 
-  function showModuleModal(module) {
+ // ✅ Safe module modal trigger
+function showModuleModal(module) {
+  console.log("Module modal triggered:", module); // Debug log
   const content = {
     sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
     vault: `<h3>💼 Vault Access</h3><p><a href="/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>`,
     legal: `<h3>📜 Legal Kit</h3>
-  <ul>
-    <li><a href="/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
-    <li><a href="/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
-    <li><a href="/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
-    <li><a href="/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
-  </ul>`,
+      <ul>
+        <li><a href="/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
+        <li><a href="/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
+        <li><a href="/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
+        <li><a href="/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
+      </ul>`,
     branding: `<h3>🎨 Branding Pack</h3>
-  <ul>
-    <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
-    <li><a href="/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
-    <li><a href="/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
-  </ul>`,
+      <ul>
+        <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
+        <li><a href="/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
+        <li><a href="/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
+      </ul>`,
     clone: `<h3>🧬 Cloning License</h3><p><a href="/kits/clone-license.pdf" target="_blank">License Terms</a></p>`,
     remix: `<h3>🔁 Remix Unlock</h3><p><a href="/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>`
   };
 
   const modal = document.getElementById("moduleModal");
   const box = document.getElementById("modalContent");
-  box.innerHTML = content[module] || "<p>No files yet for this module.</p>";
+
+  if (!modal || !box) {
+    console.warn("Modal elements missing.");
+    return;
+  }
+
+  if (!content[module]) {
+    box.innerHTML = `<p>❌ Unknown module: ${module}</p>`;
+  } else {
+    box.innerHTML = content[module];
+  }
+
   modal.style.display = "flex";
 }
 
