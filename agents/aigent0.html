@@ -258,6 +258,15 @@
       <li>📊 Live Status: <span id="growthStatus">—</span></li>
     </ul>
   </div>
+    
+     <!-- 📥 Proposal Inbox -->
+<div id="proposalInboxBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📥 Proposals Inbox</h4>
+  <div id="proposalInbox">
+    <p>Loading...</p>
+  </div>
+</div>
+<script>loadProposalInbox();</script>
 
   <!-- 💼 Real-World Earnings -->
   <div id="earningsMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
@@ -1968,6 +1977,56 @@ async function submitPackage() {
       injectUserDashboard();
     }
   });
+  
+  let currentProposalPartner = null;
+
+function openProposalModal(partner) {
+  currentProposalPartner = partner;
+  document.getElementById("proposalModal").style.display = "flex";
+}
+
+function closeProposalModal() {
+  document.getElementById("proposalModal").style.display = "none";
+}
+
+async function submitProposal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const title = document.getElementById("proposalTitle").value.trim();
+  const details = document.getElementById("proposalBody").value.trim();
+  const link = document.getElementById("proposalLink").value.trim();
+
+  if (!title || !details || !currentProposalPartner) {
+    return alert("Please fill in all fields and confirm recipient.");
+  }
+
+  const payload = {
+    sender: username,
+    recipient: currentProposalPartner,
+    title,
+    details,
+    link,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/submit_proposal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("✅ Proposal sent!");
+      closeProposalModal();
+    } else {
+      alert("❌ Failed to send proposal.");
+    }
+  } catch (err) {
+    console.error("Proposal send error:", err);
+    alert("⚠️ Proposal failed to send.");
+  }
+}
+
 </script>
   <div id="moduleModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;">
   <div style="background: #111; border: 1px solid #444; padding: 20px; max-width: 480px; color: #eee; border-radius: 10px; box-shadow: 0 0 12px #0ff;">
