@@ -998,18 +998,26 @@ if (achievementBox && user) {
   }
 }
 
-    const includesBox = document.getElementById("businessSummaryList");
-if (includesBox && user) {
-  const unlocked = [];
+    const traits = user?.traits || [];
 
-  if (user.traits?.includes("sdk")) unlocked.push(`<li id="kit-sdk">🧬 Developer SDK</li>`);
-  if (user.traits?.includes("vault")) unlocked.push(`<li id="kit-vault">💼 Vault Access</li>`);
-  if (user.traits?.includes("legal")) unlocked.push(`<li id="kit-legal">📜 Legal Kit</li>`);
-  if (user.traits?.includes("marketing")) unlocked.push(`<li id="kit-branding">📣 Branding Pack</li>`);
-  if (user.traits?.includes("clone")) unlocked.push(`<li id="kit-clone">🧬 Cloning License</li>`);
-  if (user.traits?.includes("remix")) unlocked.push(`<li id="kit-remix">🔁 Remix Unlock</li>`);
+const modalMap = {
+  "kit-sdk": "sdk",
+  "kit-vault": "vault",
+  "kit-legal": "legal",
+  "kit-branding": "branding",
+  "kit-clone": "clone",
+  "kit-remix": "remix"
+};
 
-  includesBox.innerHTML = unlocked.join('') || "<li>—</li>";
+for (const id in modalMap) {
+  const el = document.getElementById(id);
+  if (traits.includes(modalMap[id])) {
+    el.style.display = "list-item"; // Show kit
+    el.addEventListener("click", () => {
+      showModuleModal(modalMap[id]);
+    });
+  }
+}
 
   // Attach event listeners after injection
   const modalMap = {
