@@ -1619,13 +1619,15 @@ function showModuleModal(module) {
     return;
   }
 
-  box.innerHTML = content[module] || `<p>❌ Unknown module: ${module}</p>`;
+  if (!content[module]) {
+    box.innerHTML = `<p>❌ Unknown module: ${module}</p>`;
+  } else {
+    box.innerHTML = content[module];
+  }
+
   modal.style.display = "flex";
 }
 
-function closeUnlockModal() {
-  document.getElementById("unlockModal").style.display = "none";
-}
 </script>
 
 <script>
