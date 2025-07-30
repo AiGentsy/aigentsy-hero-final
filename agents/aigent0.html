@@ -1575,6 +1575,8 @@ function submitPackaging() {
 
  // ✅ Safe module modal trigger
 function showModuleModal(module) {
+  console.log("🟡 Modal requested for module:", module);
+
   const content = {
     sdk: `
       <h3>🧬 Developer SDK</h3>
@@ -1615,18 +1617,21 @@ function showModuleModal(module) {
   const box = document.getElementById("modalContent");
 
   if (!modal || !box) {
-    console.warn("Modal elements missing.");
+    console.warn("⚠️ Modal elements missing.");
     return;
   }
 
   if (!content[module]) {
+    console.warn("❌ No content found for module:", module);
     box.innerHTML = `<p>❌ Unknown module: ${module}</p>`;
   } else {
+    console.log("✅ Content found. Injecting HTML...");
     box.innerHTML = content[module];
   }
 
   modal.style.display = "flex";
 }
+
 
 </script>
 
