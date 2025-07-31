@@ -794,8 +794,10 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
-injectTraitKitLinks(user); 
-// ✅ "Your AiGentsy Includes" Summary Injection
+
+injectTraitKitLinks(user); // ✅ Injects full modal-hooked links
+
+// ✅ "Your AiGentsy Includes" Summary Injection (with modal support)
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -806,6 +808,28 @@ if (summaryBox && user) {
     { label: "Legal Kit", trait: "legal" },
     { label: "Branding Pack", trait: "marketing" }
   ];
+
+  summaryItems.forEach(item => {
+    let unlocked = false;
+    if (item.accessKey && user[item.accessKey]) unlocked = true;
+    if (item.trait && user.traits?.includes(item.trait)) unlocked = true;
+
+    if (unlocked) {
+      const moduleKey = (item.label || "").toLowerCase().includes("sdk") ? 'sdk' :
+                        (item.label || "").toLowerCase().includes("vault") ? 'vault' :
+                        (item.label || "").toLowerCase().includes("remix") ? 'remix' :
+                        (item.label || "").toLowerCase().includes("clone") ? 'clone' :
+                        (item.label || "").toLowerCase().includes("legal") ? 'legal' :
+                        (item.label || "").toLowerCase().includes("brand") ? 'branding' : null;
+
+      const li = document.createElement("li");
+      li.innerHTML = moduleKey
+        ? `<a href="#" onclick="showModuleModal('${moduleKey}')">${item.label}</a>`
+        : item.label;
+      summaryBox.appendChild(li);
+    }
+  });
+}
   
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
