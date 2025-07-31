@@ -793,39 +793,35 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-window.aigentsyUser = user; // ✅ Global reference for runtime access
+window.aigentsyUser = user;
 
-injectTraitKitLinks(user); // ✅ Injects full modal-hooked links
+injectTraitKitLinks(user); // ⚙️ Modal trigger link injection
 
-// ✅ "Your AiGentsy Includes" Summary Injection (with modal support)
+// ✅ Inject 'Your AiGentsy Kit & Unlocks' sidebar
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
-    { label: "Vault Access", accessKey: "vaultAccess" },
-    { label: "Remix License", accessKey: "remixUnlocked" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
-    { label: "Legal Kit", trait: "legal" },
-    { label: "Branding Pack", trait: "marketing" }
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible", key: "sdk" },
+    { label: "Vault Access", accessKey: "vaultAccess", key: "vault" },
+    { label: "Remix License", accessKey: "remixUnlocked", key: "remix" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked", key: "clone" },
+    { label: "Legal Kit", trait: "legal", key: "legal" },
+    { label: "Branding Pack", trait: "marketing", key: "branding" }
   ];
 
+  summaryBox.innerHTML = ""; // Clear existing content
   summaryItems.forEach(item => {
     let unlocked = false;
     if (item.accessKey && user[item.accessKey]) unlocked = true;
     if (item.trait && user.traits?.includes(item.trait)) unlocked = true;
 
     if (unlocked) {
-      const moduleKey = (item.label || "").toLowerCase().includes("sdk") ? 'sdk' :
-                        (item.label || "").toLowerCase().includes("vault") ? 'vault' :
-                        (item.label || "").toLowerCase().includes("remix") ? 'remix' :
-                        (item.label || "").toLowerCase().includes("clone") ? 'clone' :
-                        (item.label || "").toLowerCase().includes("legal") ? 'legal' :
-                        (item.label || "").toLowerCase().includes("brand") ? 'branding' : null;
-
       const li = document.createElement("li");
-      li.innerHTML = moduleKey
-        ? `<a href="#" onclick="showModuleModal('${moduleKey}')">${item.label}</a>`
-        : item.label;
+      if (item.key) {
+        li.innerHTML = `<a href="#" onclick="showModuleModal('${item.key}')">${item.label}</a>`;
+      } else {
+        li.textContent = item.label;
+      }
       summaryBox.appendChild(li);
     }
   });
