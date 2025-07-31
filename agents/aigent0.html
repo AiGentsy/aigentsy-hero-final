@@ -793,39 +793,18 @@ console.log("📡 Fetching data from JSONBin...");
 
 const data = await res.json();
 const user = data.record || data.user || null;
-window.aigentsyUser = user;
-
-injectTraitKitLinks(user); // ⚙️ Modal trigger link injection
-
-// ✅ Inject 'Your AiGentsy Kit & Unlocks' sidebar
+window.aigentsyUser = user; // ✅ Global reference for runtime access
+ // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible", key: "sdk" },
-    { label: "Vault Access", accessKey: "vaultAccess", key: "vault" },
-    { label: "Remix License", accessKey: "remixUnlocked", key: "remix" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked", key: "clone" },
-    { label: "Legal Kit", trait: "legal", key: "legal" },
-    { label: "Branding Pack", trait: "marketing", key: "branding" }
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
   ];
-
-  summaryBox.innerHTML = ""; // Clear existing content
-  summaryItems.forEach(item => {
-    let unlocked = false;
-    if (item.accessKey && user[item.accessKey]) unlocked = true;
-    if (item.trait && user.traits?.includes(item.trait)) unlocked = true;
-
-    if (unlocked) {
-      const li = document.createElement("li");
-      if (item.key) {
-        li.innerHTML = `<a href="#" onclick="showModuleModal('${item.key}')">${item.label}</a>`;
-      } else {
-        li.textContent = item.label;
-      }
-      summaryBox.appendChild(li);
-    }
-  });
-}
   
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
@@ -2137,59 +2116,6 @@ function closeProposalInboxModal() {
     </div>
   </div>
 </div>
-
-<script>
-function showModuleModal(module) {
-  const content = {
-    sdk: `<h3>🧬 Developer SDK</h3><p><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/aigentsy_legal_kit_bundle.zip" target="_blank">Download SDK Toolkit</a></p>`,
-    vault: `<h3>💼 Vault Access</h3><p><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>`,
-    legal: `
-      <h3>📜 Legal Kit</h3>
-      <ul style="padding-left:16px;">
-        <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
-        <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
-        <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
-        <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
-      </ul>`,
-    branding: `<h3>🎨 Branding Pack</h3><ul>
-      <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
-      <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
-      <li><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
-    </ul>`,
-    clone: `<h3>🧬 Cloning License</h3><p><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/clone-license.pdf" target="_blank">License Terms</a></p>`,
-    remix: `<h3>🔁 Remix Unlock</h3><p><a href="https://aigentsy.github.io/aigentsy-hero-final/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>`
-  };
-
-  const modal = document.getElementById("moduleModal");
-  const box = document.getElementById("modalContent");
-
-  if (!modal || !box) {
-    console.warn("❌ Modal elements missing.");
-    return;
-  }
-
-  box.innerHTML = content[module] || `<p>❌ Unknown module: ${module}</p>`;
-  modal.style.display = "flex";
-}
-
-// Inject trait-based modal triggers AFTER DOM + showModuleModal is ready
-function injectTraitKitLinks(user) {
-  const includesBox = document.getElementById("businessSummaryList");
-  if (!includesBox || !user) return;
-
-  const unlocked = [];
-
-  if (user.traits?.includes("sdk")) unlocked.push(`<li><a href="#" onclick="showModuleModal('sdk')">🧬 Developer SDK</a></li>`);
-  if (user.traits?.includes("vault")) unlocked.push(`<li><a href="#" onclick="showModuleModal('vault')">💼 Vault Access</a></li>`);
-  if (user.traits?.includes("legal")) unlocked.push(`<li><a href="#" onclick="showModuleModal('legal')">📜 Legal Kit</a></li>`);
-  if (user.traits?.includes("marketing")) unlocked.push(`<li><a href="#" onclick="showModuleModal('branding')">📣 Branding Pack</a></li>`);
-  if (user.traits?.includes("clone")) unlocked.push(`<li><a href="#" onclick="showModuleModal('clone')">🧬 Cloning License</a></li>`);
-  if (user.traits?.includes("remix")) unlocked.push(`<li><a href="#" onclick="showModuleModal('remix')">🔁 Remix Unlock</a></li>`);
-
-  includesBox.innerHTML = unlocked.join('') || "<li>—</li>";
-}
-</script>
-
 
 </body>
 </html>
