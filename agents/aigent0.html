@@ -2117,9 +2117,10 @@ function closeProposalInboxModal() {
   </div>
 </div>
 
-    <script>
+<script>
 function showModuleModal(module) {
-  console.log("Modal requested for module:", module); // Debug
+  const modal = document.getElementById("moduleModal");
+  const box = document.getElementById("modalContent");
 
   const content = {
     sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
@@ -2127,30 +2128,33 @@ function showModuleModal(module) {
     legal: `
       <h3>📜 Legal Kit</h3>
       <ul style="padding-left:16px;">
-        <li><a href="/aigentsy-hero-final/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
-        <li><a href="/aigentsy-hero-final/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
-        <li><a href="/aigentsy-hero-final/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
-        <li><a href="/aigentsy-hero-final/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
+        <li><a href="/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
+        <li><a href="/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
+        <li><a href="/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
+        <li><a href="/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
       </ul>
     `,
-    branding: `<h3>🎨 Branding Pack</h3><ul>
-      <li><a href="/aigentsy-hero-final/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
-      <li><a href="/aigentsy-hero-final/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
-      <li><a href="/aigentsy-hero-final/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
-    </ul>`,
+    branding: `<h3>🎨 Branding Pack</h3>
+      <ul>
+        <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
+        <li><a href="/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
+        <li><a href="/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
+      </ul>`,
     clone: `<h3>🧬 Cloning License</h3><p><a href="/kits/clone-license.pdf" target="_blank">License Terms</a></p>`,
     remix: `<h3>🔁 Remix Unlock</h3><p><a href="/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>`
   };
 
-  const modal = document.getElementById("moduleModal");
-  const box = document.getElementById("modalContent");
-
   if (!modal || !box) {
-    console.warn("❌ Modal elements missing.");
+    console.warn("❌ Modal structure missing.");
     return;
   }
 
-  box.innerHTML = content[module] || `<p>❌ Unknown module: ${module}</p>`;
+  if (!content[module]) {
+    box.innerHTML = `<p>❌ Unknown module: ${module}</p>`;
+  } else {
+    box.innerHTML = content[module];
+  }
+
   modal.style.display = "flex";
 }
 </script>
