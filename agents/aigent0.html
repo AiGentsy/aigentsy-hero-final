@@ -163,14 +163,7 @@
         </div>
       </div>
       <strong style="color:#fff;">Modules Unlocked:</strong>
-      <ul id="businessSummaryList" style="padding-left:18px;">
-  <li id="kit-sdk" style="display:none">🧬 Developer SDK</li>
-  <li id="kit-vault" style="display:none">💼 Vault Access</li>
-  <li id="kit-legal" style="display:none">📜 Legal Kit</li>
-  <li id="kit-branding" style="display:none">📣 Branding Pack</li>
-  <li id="kit-clone" style="display:none">🧬 Cloning License</li>
-  <li id="kit-remix" style="display:none">🔁 Remix Unlock</li>
-</ul>
+      <ul id="businessSummaryList" style="padding-left:18px;"></ul>
     </div>
   </div>
 
@@ -260,7 +253,7 @@
     <ul style="padding-left:18px; margin:0;">
       <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
       <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-      <li>🚀 Offerings Sent: <span id="growthOfferingsSent">0</span></li>
+      <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
       <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
       <li>📊 Live Status: <span id="growthStatus">—</span></li>
     </ul>
@@ -998,42 +991,18 @@ if (achievementBox && user) {
   }
 }
 
-    const traits = user?.traits || [];
+    const includesBox = document.getElementById("businessSummaryList");
+if (includesBox && user) {
+  const unlocked = [];
 
-const modalMap = {
-  "kit-sdk": "sdk",
-  "kit-vault": "vault",
-  "kit-legal": "legal",
-  "kit-branding": "branding",
-  "kit-clone": "clone",
-  "kit-remix": "remix"
-};
+  if (user.traits?.includes("sdk")) unlocked.push(`<li><a href="#" onclick="showModuleModal('sdk')">🧬 Developer SDK</a></li>`);
+  if (user.traits?.includes("vault")) unlocked.push(`<li><a href="#" onclick="showModuleModal('vault')">💼 Vault Access</a></li>`);
+  if (user.traits?.includes("legal")) unlocked.push(`<li><a href="#" onclick="showModuleModal('legal')">📜 Legal Kit</a></li>`);
+  if (user.traits?.includes("marketing")) unlocked.push(`<li><a href="#" onclick="showModuleModal('branding')">📣 Branding Pack</a></li>`);
+  if (user.traits?.includes("clone")) unlocked.push(`<li><a href="#" onclick="showModuleModal('clone')">🧬 Cloning License</a></li>`);
+  if (user.traits?.includes("remix")) unlocked.push(`<li><a href="#" onclick="showModuleModal('remix')">🔁 Remix Unlock</a></li>`);
 
-for (const id in modalMap) {
-  const el = document.getElementById(id);
-  if (traits.includes(modalMap[id])) {
-    el.style.display = "list-item"; // Show kit
-    el.addEventListener("click", () => {
-      showModuleModal(modalMap[id]);
-    });
-  }
-}
-
-  // Attach event listeners after injection
-  const modalMap = {
-    "kit-sdk": "sdk",
-    "kit-vault": "vault",
-    "kit-legal": "legal",
-    "kit-branding": "branding",
-    "kit-clone": "clone",
-    "kit-remix": "remix"
-  };
-
-  for (const id in modalMap) {
-    document.getElementById(id)?.addEventListener("click", () => {
-      showModuleModal(modalMap[id]);
-    });
-  }
+  includesBox.innerHTML = unlocked.join('') || "<li>—</li>";
 }
 
 // === Business Kit Overview (Dynamic Description) ===
@@ -1604,66 +1573,35 @@ function submitPackaging() {
   closePackagingModal();
 }
 
- // ✅ Safe module modal trigger
-function showModuleModal(module) {
-  console.log("🟡 Modal requested for module:", module);
-
+  function showModuleModal(module) {
   const content = {
-    sdk: `
-      <h3>🧬 Developer SDK</h3>
-      <p><a href="/aigentsy-hero-final/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>
-    `,
-    vault: `
-      <h3>💼 Vault Access</h3>
-      <p><a href="/aigentsy-hero-final/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>
-    `,
-    legal: `
-      <h3>📜 Legal Kit</h3>
-      <ul style="padding-left:16px;">
-        <li><a href="/aigentsy-hero-final/kits/ip_assignment_template.pdf" target="_blank">IP Assignment Template</a></li>
-        <li><a href="/aigentsy-hero-final/kits/mutual_ncnda_agreement.pdf" target="_blank">Mutual NCNDA Agreement</a></li>
-        <li><a href="/aigentsy-hero-final/kits/platform_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
-        <li><a href="/aigentsy-hero-final/kits/licensing_terms.pdf" target="_blank">Licensing Terms</a></li>
-      </ul>
-    `,
-    branding: `
-      <h3>🎨 Branding Pack</h3>
+    sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
+    vault: `<h3>💼 Vault Access</h3><p><a href="/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>`,
+    legal: `<h3>📜 Legal Kit</h3>
       <ul>
-        <li><a href="/aigentsy-hero-final/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
-        <li><a href="/aigentsy-hero-final/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
-        <li><a href="/aigentsy-hero-final/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
-      </ul>
-    `,
-    clone: `
-      <h3>🧬 Cloning License</h3>
-      <p><a href="/aigentsy-hero-final/kits/clone-license.pdf" target="_blank">License Terms</a></p>
-    `,
-    remix: `
-      <h3>🔁 Remix Unlock</h3>
-      <p><a href="/aigentsy-hero-final/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>
-    `
+        <li><a href="/kits/legal.pdf" target="_blank">IP Assignment Templates</a></li>
+        <li><a href="/kits/ncnda.pdf" target="_blank">Standard NCNDA</a></li>
+        <li><a href="/kits/legal-agent.html" target="_blank">Legal Agent Companion</a></li>
+      </ul>`,
+    branding: `<h3>🎨 Branding Pack</h3>
+      <ul>
+        <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
+        <li><a href="/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
+        <li><a href="/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
+      </ul>`,
+    clone: `<h3>🧬 Cloning License</h3><p><a href="/kits/clone-license.pdf" target="_blank">License Terms</a></p>`,
+    remix: `<h3>🔁 Remix Unlock</h3><p><a href="/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>`
   };
 
   const modal = document.getElementById("moduleModal");
   const box = document.getElementById("modalContent");
-
-  if (!modal || !box) {
-    console.warn("⚠️ Modal elements missing.");
-    return;
-  }
-
-  if (!content[module]) {
-    console.warn("❌ No content found for module:", module);
-    box.innerHTML = `<p>❌ Unknown module: ${module}</p>`;
-  } else {
-    console.log("✅ Content found. Injecting HTML...");
-    box.innerHTML = content[module];
-  }
-
+  box.innerHTML = content[module] || "<p>No files yet for this module.</p>";
   modal.style.display = "flex";
 }
 
-
+function closeUnlockModal() {
+  document.getElementById("unlockModal").style.display = "none";
+}
 </script>
 
 <script>
