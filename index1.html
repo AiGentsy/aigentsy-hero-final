@@ -153,9 +153,9 @@
 
       <div class="aigent-options">
         <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
-        <div class="aigent-card" data-agent="podcast">Podcast AiGentsy<br><span style="font-size: 0.85rem;">Create, host, monetize episodes</span></div>
-        <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
-        <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
+<div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
+<div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+<div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
       </div>
 
       <div id="aigentsySearchWrapper" style="margin-top: 30px;">
@@ -248,78 +248,86 @@
   async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
     const now = new Date().toISOString();
     const roleMap = {
-      "legal": "CLO",
-      "podcast": "CMO",
-      "saas": "CTO",
-      "marketing": "CMO"
+  "legal": "CLO",
+  "social": "CSO",
+  "saas": "CTO",
+  "marketing": "CMO",
+  "universal": "COO"
     };
 
-    const entry = {
-      id: `User #${Date.now()}`,
-      consent: {
-        agreed: true,
-        username,
-        timestamp: now
-      },
-      trait: selectedAgent || "founder",
-      traits: [selectedAgent, "founder", "autonomous", "aigentsy"],
-      referral: referralCode || "origin/hero",
-      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-      mintTime: now,
-      role: roleMap[selectedAgent] || "CEO",
-      protocol: "MetaUpgrade25",
-      realm: {
-        name: "Realm 101 — Strategic Expansion",
-        joinedAt: now
-      },
-      metaVenture: {
-        ventureHive: "Autonomous Launch",
-        ventureRole: roleMap[selectedAgent] || "CEO",
-        ventureStatus: "Pending",
-        ventureID: `MV-${Date.now()}`
-      },
-      remix: {
-        remixCount: 0,
-        remixCredits: 1000,
-        lineageDepth: 0,
-        royaltyTerms: "Standard 30%"
-      },
-      mirror: {
-        mirroredInRealms: ["Realm 101 — Strategic Expansion"],
-        mirrorIntegrity: "Pending",
-        sentinelAlert: false
-      },
-      yield: {
-        autoStake: false,
-        aigxEarned: 0,
-        vaultYield: 0,
-        remixYield: 0
-      },
-      earningsEnabled: true,
-      listingStatus: "Active",
-      protocolStatus: "Bound",
-      tethered: true,
-      name: `AiGent ${roleMap[selectedAgent] || "Founder"}`,
-      sdkAccess_eligible: selectedAgent === "saas",
-      sdkAccess: false,
-      vaultAccess: false,
-      remixUnlocked: false,
-      cloneLicenseUnlocked: false,
-      licensingApproved: false,
-      stripeUnlocked: false,
-      productsPurchased: [],
-      teachStage: 1,
-      teachInComplete: false,
-      complianceReviewed: false,
-      complianceLog: [],
-      teachInLog: [],
-      runtimeFlags: {
-        flagged: false,
-        eligibleForAudit: true,
-        needsReview: false
-      }
-    };
-
+   const entry = {
+  id: `User #${Date.now()}`,
+  consent: {
+    agreed: true,
+    username,
+    timestamp: now
+  },
+  trait: selectedAgent || "founder",
+  traits: [selectedAgent, "founder", "autonomous", "aigentsy"],
+  prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
+  offeringType: "kit",
+  offeringKeywords: selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
+    : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
+    : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
+    : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
+    : ["custom", "idea", "autonomous", "builder"],
+  referral: referralCode || "origin/hero",
+  runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+  mintTime: now,
+  role: roleMap[selectedAgent] || "CEO",
+  protocol: "MetaUpgrade25",
+  realm: {
+    name: "Realm 101 — Strategic Expansion",
+    joinedAt: now
+  },
+  metaVenture: {
+    ventureHive: "Autonomous Launch",
+    ventureRole: roleMap[selectedAgent] || "CEO",
+    ventureStatus: "Pending",
+    ventureID: `MV-${Date.now()}`
+  },
+  remix: {
+    remixCount: 0,
+    remixCredits: 1000,
+    lineageDepth: 0,
+    royaltyTerms: "Standard 30%"
+  },
+  mirror: {
+    mirroredInRealms: ["Realm 101 — Strategic Expansion"],
+    mirrorIntegrity: "Pending",
+    sentinelAlert: false
+  },
+  yield: {
+    autoStake: false,
+    aigxEarned: 0,
+    vaultYield: 0,
+    remixYield: 0
+  },
+  earningsEnabled: true,
+  listingStatus: "Active",
+  protocolStatus: "Bound",
+  tethered: true,
+  name: `AiGent ${roleMap[selectedAgent] || "Founder"}`,
+  sdkAccess_eligible: selectedAgent === "saas",
+  sdkAccess: false,
+  vaultAccess: false,
+  remixUnlocked: false,
+  cloneLicenseUnlocked: false,
+  licensingApproved: false,
+  stripeUnlocked: false,
+  productsPurchased: [],
+  teachStage: 1,
+  teachInComplete: false,
+  complianceReviewed: false,
+  complianceLog: [],
+  teachInLog: [],
+  runtimeFlags: {
+    flagged: false,
+    eligibleForAudit: true,
+    needsReview: false
+  }
+};
+    
     try {
       const getRes = await fetch(JSONBIN_URL, {
         headers: {
@@ -399,16 +407,16 @@
 aigentCards.forEach(card => {
   card.addEventListener('click', () => {
     const type = card.getAttribute('data-agent');
-    if (["legal", "saas", "marketing"].includes(type)) {
-      openKitModal(type); // 🔓 show kit modal
-    }
+    if (["legal", "saas", "marketing", "social"].includes(type)) {
+  openKitModal(type);
+}
   });
 });
 
 // 🧠 Also open custom modal if user types a new idea
 aigentsySearch.addEventListener("input", (e) => {
   const value = e.target.value.toLowerCase();
-  if (value.length > 8 && !["legal", "saas", "marketing", "podcast"].some(v => value.includes(v))) {
+  if (value.length > 8 && !["legal", "saas", "marketing", "social"].some(v => value.includes(v))) {
     openKitModal("custom");
   }
 });
