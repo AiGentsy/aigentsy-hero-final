@@ -797,6 +797,27 @@ async function injectUserDashboard() {
     const user = data.record || data.user || null;
     window.aigentsyUser = user; // ✅ Global reference for runtime access
 
+    // 🔁 Sync all runtimeFlags and unlocks to traits for UI consistency
+if (user) {
+  user.traits = user.traits || [];
+
+  const traitMap = [
+    { flagPath: "runtimeFlags.sdkAccess_eligible", trait: "sdk" },
+    { flagPath: "runtimeFlags.vaultAccess", trait: "vault" },
+    { flagPath: "runtimeFlags.remixUnlocked", trait: "remix" },
+    { flagPath: "cloneLicenseUnlocked", trait: "clone" },
+    { flagPath: "legalKitUnlocked", trait: "legal" },
+    { flagPath: "runtimeFlags.brandingKitUnlocked", trait: "marketing" }  // if you use this flag
+  ];
+
+  traitMap.forEach(({ flagPath, trait }) => {
+    const value = flagPath.split('.').reduce((obj, key) => obj?.[key], user);
+    if (value && !user.traits.includes(trait)) {
+      user.traits.push(trait);
+    }
+  });
+}
+
     console.log("🧠 Full user record:", user);
     console.log("💰 wallet.aigx:", user?.wallet?.aigx);
     console.log("💼 wallet.staked:", user?.wallet?.staked);
