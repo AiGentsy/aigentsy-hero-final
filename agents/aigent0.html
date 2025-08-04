@@ -794,32 +794,17 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
-// 🔓 Ensure traits reflect runtimeFlags so modal links populate
-if (user?.runtimeFlags?.vaultAccess) {
-  user.traits = user.traits || [];
-  if (!user.traits.includes("vault")) user.traits.push("vault");
-}
  // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
-    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible", module: "sdk" },
-    { label: "Vault Access", accessKey: "vaultAccess", module: "vault" },
-    { label: "Remix License", accessKey: "remixUnlocked", module: "remix" },
-    { label: "Clone License", accessKey: "cloneLicenseUnlocked", module: "clone" },
-    { label: "Legal Kit", trait: "legal", module: "legal" },
-    { label: "Branding Pack", trait: "marketing", module: "branding" }
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
   ];
-
-  const itemsToShow = summaryItems.filter(item =>
-    (item.accessKey && user.runtimeFlags?.[item.accessKey]) ||
-    (item.trait && user.traits?.includes(item.trait))
-  );
-
-  summaryBox.innerHTML = itemsToShow.map(item =>
-    `<li><a href="#" onclick="showModuleModal('${item.module}')">${item.label}</a></li>`
-  ).join('') || "<li>—</li>";
-}
   
 // ✅ MetaHive Expansion: Invite teammates if traits are missing
 const inviteBox = document.getElementById("inviteBox");
