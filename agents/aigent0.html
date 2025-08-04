@@ -777,7 +777,7 @@ async function injectUserDashboard() {
 
   const username = localStorage.getItem("aigentsyUsername");
   console.log("📌 Username from localStorage:", username);
-console.log("📡 Fetching data from JSONBin...");
+  console.log("📡 Fetching data from JSONBin...");
 
   if (!username) {
     console.warn("⚠️ No username found. Skipping user injection.");
@@ -785,21 +785,25 @@ console.log("📡 Fetching data from JSONBin...");
   }
 
   try {
-   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ username })
-});
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
 
-const data = await res.json();
-const user = data.record || data.user || null;
-window.aigentsyUser = user; // ✅ Global reference for runtime access
+    const data = await res.json();
+    console.log("🧠 Returned from backend:", data); // 🔍 Patch goes here
 
-console.log("🧠 Full user record:", user);
-console.log("💰 wallet.aigx:", user?.wallet?.aigx);
-console.log("💼 wallet.staked:", user?.wallet?.staked);
-console.log("🚀 runtimeFlags:", user?.runtimeFlags);
-console.log("🏷 traits:", user?.traits);
+    const user = data.record || data.user || null;
+    window.aigentsyUser = user; // ✅ Global reference for runtime access
+
+    console.log("🧠 Full user record:", user);
+    console.log("💰 wallet.aigx:", user?.wallet?.aigx);
+    console.log("💼 wallet.staked:", user?.wallet?.staked);
+    console.log("🚀 runtimeFlags:", user?.runtimeFlags);
+    console.log("🏷 traits:", user?.traits);
+
+    // ... (rest of your summaryBox, trait logic, etc.)
 
 // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
