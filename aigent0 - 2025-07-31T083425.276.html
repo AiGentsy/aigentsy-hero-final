@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8"/>
+<title>Autonomous AiGentsy Launchpad</title>
+<script defer src="/access-check.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="/vaults.css"/>
+<link rel="stylesheet" href="/theme.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: radial-gradient(circle at center, #0e101a, #000);
+    color: #fff;
+    display: flex;
+  }
+  .sidebar {
+    width: 320px;
+    background: #0a0a0a;
+    padding: 30px 20px;
+  }
+  .sidebar img {
+    width: 160px;
+    display: block;
+    margin-bottom: 40px;
+  }
+  .chart-section {
+    margin-top: 30px;
+  }
+  .chart-sidebar-box {
+    margin-top: 20px;
+    background: #111;
+    color: #ccc;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #333;
+  }
+  .main {
+    padding: 40px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  .full-width {
+    grid-column: 1 / -1;
+  }
+  .metric-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 18px 24px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.05);
+  }
+  .metric-box h3 {
+    margin-top: 0;
+    color: #00bfff;
+    font-size: 1.25rem;
+  }
+  .metric-box ul {
+    padding-left: 20px;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+  .button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.button-row .btn-glow {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+  /* 🧠 Dynamically Injected Response Buttons (Chat Suggestions) */
+.chat-response-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
+.chat-response-buttons .btn-glow {
+  font-size: 0.85rem;
+  padding: 8px 12px;
+}
+  /* 🧬 Compact Unlock Buttons in Licensing */
+#autoMatchOfferings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+#autoMatchOfferings li {
+  margin: 0;
+}
+
+#autoMatchOfferings li button.btn-glow {
+  font-size: 0.8rem;
+  padding: 8px 12px;
+}
+  .btn-glow {
+    background: #00bfff;
+    color: #000;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+  }
+  .btn-glow:hover {
+    background: #009cd8;
+  }
+  .chat-user {
+    color: #00B3FF;
+    font-weight: 500;
+  }
+  .chat-agent {
+    color: #FFFFFF;
+    font-weight: 500;
+    white-space: pre-line;
+  }
+</style>
+<body>
+  <div class="sidebar">
+    <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
+    <div class="chart-section">
+      <canvas id="walletChart" width="300" height="300"></canvas>
+    </div>
+    <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        <li><strong>CEO:</strong> You</li>
+        <li><strong>CTO:</strong> AiGent Tech</li>
+        <li><strong>CMO:</strong> AiGent Marketing</li>
+        <li><strong>CLO:</strong> AiGent IP & Legal</li>
+        <li><strong>CFO:</strong> AiGent Finance</li>
+      </ul>
+      <p id="csuiteNote" style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    </div>
+    <div class="chart-sidebar-box" id="businessSummarySidebarBox">
+      <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+      <div style="margin-bottom:10px;">
+        <strong style="color:#fff;">Business Kit Overview:</strong>
+        <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
+          Loading your kit details...
+        </div>
+      </div>
+      <strong style="color:#fff;">Modules Unlocked:</strong>
+      <ul id="businessSummaryList" style="padding-left:18px;"></ul>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="metric-box full-width">
+      <h2>Your AiGentsy's Autonomous Launchpad</h2>
+      <p>You've now launched your own AI-powered business that can generate income autonomously across real-world industries.</p>
+      <p style="color:#ccc; font-size:0.9rem;">Traits: <span style="color:#00bfff;">real-world-deployable, solo-hive-founder, sdk-eligible</span></p>
+      <p style="color:#aaa; font-size:0.85rem;"><strong>Tip:</strong> Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.</p>
+      <div style="margin-top:16px;">
+        <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+        <p style="font-size:0.9rem; color:#ccc;">Your AiGentsy automatically builds new agents when needed — your business grows itself.</p>
+      </div>
+    </div>
+
+    <div class="col-left">
+<!-- ✅ AiGentsy Chat w/ Drag & Drop (Minimal, Functional) -->
+<div class="metric-box">
+  <h3>AiGentsy Chat</h3>
+  <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+
+  <div id="fileDropZone"
+       style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;cursor:pointer"
+       onclick="document.getElementById('fileInput').click()">
+    📁 Drag & Drop or Click to Attach Files
+    <input id="fileInput" type="file" multiple style="display:none" onchange="handleFiles(this.files)">
+  </div>
+
+  <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
+
+  <div style="margin-top:10px;">
+    <button class="btn-glow" id="sendBtn">Send</button>
+  </div>
+</div>
+
+<!-- ✅ Licensing -->
+<div class="metric-box">
+  <h3>🔐 Unlocks & Licensing</h3>
+  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+</div>
+
+  <!-- ✅ Team Achievements -->
+  <div class="metric-box">
+    <h3>🏆 Team Achievements</h3>
+    <ul id="achievementList">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
+
+  <!-- ✅ Expand Business Circle (Already correct) -->
+  <div class="metric-box">
+    <h3>🌐 Expand Your Business Circle</h3>
+    <p style="font-size: 0.85rem; color:#999;">
+      Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
+    </p>
+    <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
+    <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
+    <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+  </div>
+</div>
+
+   <div class="metric-box">
+  <h3>💰 Wallet & Off-Ramp</h3>
+  <ul style="padding-left:18px; font-size:0.9rem; color:#ccc;">
+    <li>AIGx Earned: 0</li>
+    <li>Staked: 0</li>
+    <li>Referrals: 0 active</li>
+  </ul>
+  <a class="btn-glow" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a>
+
+  <!-- 📊 AiGentsy Snapshot -->
+  <div id="snapshotMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
+      <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
+      <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+      <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+      <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+      <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+    </ul>
+  </div>
+
+  <!-- 🌱 Growth & Deployment -->
+  <div id="growthMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌱 Growth & Deployment</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
+      <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
+      <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
+      <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
+      <li>📊 Live Status: <span id="growthStatus">—</span></li>
+    </ul>
+  </div>
+
+  <!-- 💼 Real-World Earnings -->
+  <div id="earningsMiniBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc;">
+    <h4 style="color:#00bfff; margin-bottom:6px;">💼 Real-World Earnings</h4>
+    <ul style="padding-left:18px; margin:0;">
+      <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
+      <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
+      <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
+      <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
+    </ul>
+  </div>
+
+
+<!-- 📩 Proposal Viewer (Click to View Inbox) -->
+<div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
+  <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
+</div>
+
+
+    <!-- 🔓 Unlock Modal -->
+<div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
+    <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
+    <p id="modalBody" style="font-size:0.9rem; color:#ccc;"></p>
+    <div style="margin-top:20px; text-align:right;">
+      <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
+      <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATCH: AiGentsy Simplified Runtime Injection -->
+<script>
+const chatContainer = document.querySelector(".metric-box h3")?.parentNode;
+const chatLog = document.createElement("div");
+chatLog.className = "chat-log";
+chatLog.style.maxHeight = "240px";
+chatLog.style.overflowY = "auto";
+chatLog.style.marginTop = "10px";
+if (chatContainer && chatContainer.querySelector("textarea")) {
+  chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
+}
+
+const textarea = document.querySelector("textarea");
+const sendBtn = document.querySelector("button.btn-glow");
+const memory = [];
+
+function explainTerms(text) {
+  const terms = {
+    'SDK': 'SDK (a developer toolkit you can plug into other apps)',
+    'SDK-as-a-Service': 'SDK-as-a-Service (a toolkit you can license to developers or businesses)',
+    'Remix Agent Licensing': 'Remix Licensing (lets others use or rebrand parts of your AiGentsy)',
+    'Yield Memory': 'Yield Memory (your AiGentsy remembers what worked best and builds on it)',
+    'MetaHive': 'MetaHive (a group of smart agents working together)',
+    'C-Suite': 'C-Suite (the key roles inside your business, like CEO or Legal Officer)',
+    'Your AiGentsy': 'Your AiGentsy (your full AI-powered business that you can grow and earn from)'
+  };
+
+  for (const [term, casual] of Object.entries(terms)) {
+    const plainRegex = new RegExp(`\\b${term}\\b`, 'g');
+    const alreadyExplainedRegex = new RegExp(`${term} \\(.*?\\)`, 'g');
+
+    // Only replace plain terms that haven't already been explained
+    text = text.replace(plainRegex, match => {
+      return alreadyExplainedRegex.test(text) ? match : casual;
+    });
+  }
+
+  return text;
+}
+
+function formatResponseEnhanced(text) {
+  let cleaned = text
+    .replace(/[*_~`>#-]/g, '') // remove basic markdown
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // strip markdown links
+    .replace(/\n+/g, ' ') // flatten newlines
+    .replace(/\s+/g, ' ') // normalize spacing
+    .replace(/\[\s?\]/g, '•') // convert checklist boxes to bullets
+    .replace(/\[\s?[xX]\s?\]/g, '✓'); // convert checked boxes to checkmarks
+
+  const highlights = [
+    'Revenue Sharing', 'Whitelabel Licensing', 'SDK-as-a-Service',
+    'Your AiGentsy', 'Remix Agent Licensing', 'Real-World Monetization',
+    'Yield Memory', 'C-Suite', 'Partner Match'
+  ];
+  highlights.forEach(term => {
+    const regex = new RegExp(`\\b(${term})\\b`, 'gi');
+    cleaned = cleaned.replace(regex, '$1'); // remove bolding (no markdown)
+  });
+
+  const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
+  return explainTerms(wrapped.trim());
+}
+  
+async function runAgent() {
+  const input = textarea.value.trim();
+  if (!input) return;
+
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `🧠 You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  textarea.value = "";
+
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "🤖 Your AiGentsy: Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
+
+  // ✅ Continuity patch: recall last AiGent response if input is a short confirm
+  let conditionedInput = input;
+  const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let’s do it"];
+  const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
+  if (shortConfirm.includes(input.toLowerCase()) && lastAgentTurn) {
+    conditionedInput = `${lastAgentTurn.replace("🤖 Legal AiGentsy:", "").trim()}\n\nPlease continue based on this.`;
+  }
+
+  try {
+
+// 🔁 Post to selected agent runtime
+    // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
+let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = Your AiGentsy
+
+const lower = conditionedInput.toLowerCase();
+if (
+  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech") ||
+  lower.includes("tools") || lower.includes("integration") || lower.includes("product") || lower.includes("feature")
+) {
+  endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
+} else if (
+  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") || lower.includes("market") ||
+  lower.includes("outreach") || lower.includes("campaign") || lower.includes("promotion") || lower.includes("audience")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
+} else if (
+  lower.includes("remix") || lower.includes("clone") || lower.includes("license") || lower.includes("legal") ||
+  lower.includes("ip") || lower.includes("compliance") || lower.includes("contract") || lower.includes("branding")
+) {
+  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / Legal
+} else if (
+  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") || lower.includes("budget") ||
+  lower.includes("yield") || lower.includes("payment") || lower.includes("profit") || lower.includes("revenue") ||
+  lower.includes("token") || lower.includes("earn")
+) {
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO / Venture Agent
+} else if (
+  lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
+) {
+  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
+} else if (
+  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
+) {
+  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant logic = CMO fallback
+}
+
+  const res = await fetch(endpoint, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ input: conditionedInput, memory })
+});
+
+let data;
+try {
+  data = await res.json();
+} catch (e) {
+  console.error("❌ JSON parse error from runtime:", e);
+  throw new Error("Server returned non-JSON. Check endpoint or network.");
+}
+
+let reply = formatResponseEnhanced(data.output || "No response.");
+
+// 🔍 Detect agent role from user input
+function getAgentRoleFromInput(input) {
+  const lower = input.toLowerCase();
+
+  if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads|attract)\b/.test(lower)) return "CMO";
+  if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
+  if (/\b(sdk|technology|build|api|tools|cto|deploy|platform|integration|tech|clone)\b/.test(lower)) return "CTO";
+  if (/\b(finance|money|cash|offramp|earnings|valuation|cost|pricing|revenue|payment|withdraw|cfo)\b/.test(lower)) return "CFO";
+
+  return null;
+}
+
+const userInput = conditionedInput;
+const agentRole = getAgentRoleFromInput(userInput || "");
+const lowerReply = reply.toLowerCase();
+
+// ✅ Conversational add-ons (based on agent role + response keywords)
+if (
+  agentRole === "CMO" &&
+  !lowerReply.includes("metabridge") &&
+  /clients|growth|reach|marketing|audience|promotion/.test(lowerReply)
+) {
+  reply += "\n\nNeed growth? I can use the 🔁 MetaBridge to pull in leads from outside the platform — and the 🤝 Auto-Match engine to connect you with on-platform partners or clients.";
+}
+
+if (
+  agentRole === "CLO" &&
+  !lowerReply.includes("fork") &&
+  /license|remix|clone|ip|legal/.test(lowerReply)
+) {
+  reply += "\n\nWant others to build on your work? You’ll earn anytime someone forks or licenses your assets — your AiGentsy tracks it all.";
+}
+
+if (
+  agentRole === "CTO" &&
+  !lowerReply.includes("toolkit") &&
+  /build|deploy|sdk|api|developer/.test(lowerReply)
+) {
+  reply += "\n\nReady to scale what you've built? I can turn it into a toolkit others can unlock and pay to use — full revenue tracking included.";
+}
+
+if (
+  agentRole === "CFO" &&
+  !lowerReply.includes("wallet") &&
+  /money|revenue|cash|earnings|finance|pricing|valuation/.test(lowerReply)
+) {
+  reply += "\n\nAll your earnings — from remixes, SDKs, referrals, or services — route back to your wallet. I can help you unlock fiat off-ramps too.";
+}
+
+// 🗣️ Make replies human and friendly
+reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal))\b/gi, "I");
+reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here’s what I’d do");
+reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO)\b/g, "I");
+reply = reply.replace(/\bAiGent (Marketing|Tech|Remix|Finance)\b/g, "I");
+reply = reply.replace(/\bThis agent\b/g, "I");
+reply = reply.replace(/\bThis AiGent\b/g, "I");
+reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I’m part of your AiGentsy business");
+
+// ✏️ Grammar tweaks
+reply = reply.replace(/\bI is\b/g, "I’m");
+reply = reply.replace(/\bMy role is to\b/g, "I");
+reply = reply.replace(/\bMy focus is on\b/g, "I focus on");
+
+// 🧠 Simplify technical terms
+reply = reply.replace(/\bProtocol\b/g, "platform");
+reply = reply.replace(/\bYour AiGentsy\b/g, "your business");
+reply = reply.replace(/\bRemix\b/g, "fork");
+reply = reply.replace(/\bSDK\b/g, "toolkit");
+reply = reply.replace(/\bYield Memory\b/g, "your learning system");
+reply = reply.replace(/\bMetaHive\b/g, "your agent team");
+reply = reply.replace(/\bMetaMatch\b/g, "auto-match engine");
+reply = reply.replace(/\bautonomously\b/g, "automatically");
+reply = reply.replace(/\bsovereign\b/g, "independent");
+
+// 💬 Tone softeners
+reply = reply.replace(/\bmaximizing visibility, adoption, and monetization\b/g, "getting more people to see it, try it, and pay for it");
+reply = reply.replace(/\badvanced integration\b/g, "plug-and-play connection");
+reply = reply.replace(/\bclone yields\b/g, "copies you earn from");
+reply = reply.replace(/\bframework\b/g, "gameplan");
+reply = reply.replace(/\bstrategy\b/g, "plan");
+reply = reply.replace(/\bfeatures\b/g, "tools");
+reply = reply.replace(/\bstructured pitch gameplan\b/gi, "simple plan");
+reply = reply.replace(/\btool or platform\b/gi, "tool");
+reply = reply.replace(/\btechdriven plan\b/gi, "fast strategy");
+reply = reply.replace(/\bscalable growth objective\b/gi, "goal");
+reply = reply.replace(/\bconversion rates\b/gi, "signups");
+reply = reply.replace(/\breferral participation\b/gi, "referrals");
+reply = reply.replace(/\bvalue proposition\b/gi, "main selling point");
+reply = reply.replace(/\bdata integration\b/gi, "data sync");
+reply = reply.replace(/\bunified customer view\b/gi, "clear customer picture");
+
+// 🧹 Typo fixes
+reply = reply.replace(/\bI’d do hm\b/gi, "I’d do");
+reply = reply.replace(/\bhere’s how i’d\b/gi, "Here’s how I’d");
+reply = reply.replace(/\bcan also also\b/gi, "can also");
+reply = reply.replace(/\b insight into into\b/gi, "insight into");
+reply = reply.replace(/\bthe the\b/gi, "the");
+reply = reply.replace(/\s+([.,!?])/g, "$1");
+
+// 🌀 Vary tone
+reply = reply.replace(/\bHere's what I’d do\b/g, () => {
+  const variants = ["Here’s what I’d do", "Here’s my take", "Here’s how I’d handle it"];
+  return variants[Math.floor(Math.random() * variants.length)];
+});
+
+// 🧽 Final cleanup
+reply = reply.replace(/\s{2,}/g, " ");
+reply = reply.replace(/\. (?=[A-Z])/g, ".\n\n");
+reply = reply.replace(/(\n{3,})/g, "\n\n");
+reply = reply.trim();
+
+// 🧑‍💼 Add role prefix (optional UX)
+if (agentRole && !reply.toLowerCase().includes("as your")) {
+  reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
+}
+
+// 🧾 Final display
+loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
+
+// Role resolver
+function getAgentRoleFromEndpoint(endpoint) {
+  if (endpoint.includes("aigent-sdk")) return "CTO";                // AiGent SDK
+  if (endpoint.includes("aigent-growth")) return "CMO";             // AiGent Growth
+  if (endpoint.includes("aigent-remix")) return "CLO";              // AiGent IP & Legal
+  if (endpoint.includes("aigent0") || endpoint.includes("venture")) return "CFO"; // AiGent Finance
+  return "AiGentsy Team";
+}
+    
+    // ✅ AiGentsy Chat Suggestions — Compact + Styled
+const buttons = document.createElement("div");
+buttons.className = "chat-response-buttons"; // ⬅️ Uses the correct class for styling
+buttons.innerHTML = `
+  <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+  <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+  <button class="btn-glow" onclick="triggerClientMatch()">🤝 Match Clients</button>
+`;
+chatLog.appendChild(buttons); // or loader.appendChild(buttons), depending on context
+
+    memory.push(`🤖 ${reply}`);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    textarea.focus();
+  } catch (err) {
+    loader.textContent = "🤖 Your AiGentsy: Runtime error — " + err.message;
+  }
+}
+
+if (sendBtn) sendBtn.onclick = runAgent;
+ 
+function triggerSDK() {
+  const user = window.aigentsyUser || {};
+  const username = user?.consent?.username || "unknown user";
+
+  const content = `
+    <h2>🧬 Your SDK Toolkit</h2>
+    <p>This is your AiGentsy development kit. It includes:</p>
+    <ul>
+      <li>✅ Agent Runtime Code</li>
+      <li>✅ JSONBin + Runtime API Access</li>
+      <li>✅ Clone/Remix Logic</li>
+      <li>✅ Monetization Hooks</li>
+      <li>✅ Trait Injection + Memory Layer</li>
+    </ul>
+    <p><strong>Status:</strong> ${user.sdkAccess_eligible || user.sdkUnlocked ? "🟢 SDK Access Granted" : "🔒 SDK Locked — Unlock via Dashboard"}</p>
+  `;
+
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modalOverlay").style.display = "flex";
+}
+
+// ✅ Client Matching Trigger
+function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername") || "growth_default";
+  const loader = document.getElementById("agentLoader") || document.querySelector(".chat-loader");
+  const chatLog = document.getElementById("chatLog");
+
+  loader.textContent = "🤖 Matching clients...";
+
+  fetch("https://aigentsy-growth-agent.onrender.com/metabridge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: "client match",
+      username: username
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    loader.textContent = "";
+    const matches = data.matches || [];
+    const proposals = data.proposals || [];
+
+    if (!matches.length) {
+      chatLog.innerHTML += `<div class="chat-entry agent">🤖 No client matches found right now. Try expanding your offerings or traits.</div>`;
+    } else {
+      chatLog.innerHTML += `
+        <div class="chat-entry agent">
+          <strong>🤝 Client Matches Found:</strong><br>
+          ${matches.map(m => `🔗 <a href="${m.contact_url}" target="_blank">${m.username}</a> — ${m.match_reason}`).join("<br>")}
+        </div>
+      `;
+    }
+
+    if (proposals.length) {
+      chatLog.innerHTML += `
+        <div class="chat-entry agent">
+          <strong>📬 Proposals Generated:</strong><br>
+          ${proposals.map(p => `<pre>${p.body}</pre>`).join("<hr>")}
+        </div>
+      `;
+    }
+
+    chatLog.scrollTop = chatLog.scrollHeight;
+  })
+  .catch(err => {
+    loader.textContent = "";
+    chatLog.innerHTML += `<div class="chat-entry agent">⚠️ Error: ${err.message}</div>`;
+  });
+}
+
+function openPackagingModal() {
+  const content = `
+    <h2>📦 Set Up Packaging</h2>
+    <p>This module will let you bundle your AiGentsy into ready-to-sell packages.</p>
+    <ul>
+      <li>Set price, licensing terms, and category</li>
+      <li>Distribute on the AiGentsy marketplace</li>
+      <li>Auto-track buyers, remixes, and revenue</li>
+    </ul>
+    <p><strong>Status:</strong> Coming soon</p>
+  `;
+  document.getElementById("modalContent").innerHTML = content;
+  document.getElementById("modalOverlay").style.display = "flex";
+}
+
+async function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing");
+
+  const chatLog = document.getElementById("chatLog");
+  const loader = document.createElement("div");
+  loader.textContent = "🤖 Scanning for client matches...";
+  chatLog.appendChild(loader);
+
+  try {
+    const res = await fetch("https://aigentsy-growth-agent.onrender.com/match_clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    loader.remove();
+
+    const message = data.message || "No match message returned.";
+    const matchLink = data.link || null;
+    const partner = data.partner || null;
+    const nextStep = data.action || "Send a proposal or view their profile.";
+
+    let matchHTML = `
+      <div class="chat-response" style="background:#111; border:1px solid #333; padding:12px; margin-top:10px; border-radius:8px;">
+        <strong>🤖 AiGent Growth:</strong>
+        <div style="margin-top:6px;">${message}</div>`;
+
+    if (matchLink && partner) {
+  matchHTML += `
+    <div style="margin-top:8px;">
+      <a href="${matchLink}" class="btn-glow" target="_blank">🔗 View Matched Profile</a>
+      <button class="btn-glow" onclick="openProposalModal('${partner}')">📤 Propose Deal</button>
+    </div>`;
+}
+
+matchHTML += `<div style="margin-top:12px; font-size:0.85rem; color:#ccc;">${nextStep}</div>`;
+matchHTML += `</div>`;
+
+chatLog.insertAdjacentHTML("beforeend", matchHTML);
+
+    const buttons = document.createElement("div");
+    buttons.className = "chat-response-buttons";
+    buttons.innerHTML = `
+      <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+      <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+      <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
+    `;
+    chatLog.appendChild(buttons);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+  } catch (err) {
+    loader.textContent = "❌ Error matching clients: " + err.message;
+  }
+}
+
+  function openProposalModal(partnerUsername) {
+  window.currentProposalTarget = partnerUsername;
+  document.getElementById("proposalModal").style.display = "flex";
+}
+
+async function submitProposal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const target = window.currentProposalTarget;
+  const title = document.getElementById("proposalTitle").value.trim();
+  const body = document.getElementById("proposalBody").value.trim();
+  const link = document.getElementById("proposalLink").value.trim();
+
+  if (!title || !body) return alert("Proposal title and body are required.");
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/propose_deal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: username,
+        to: target,
+        title,
+        body,
+        link,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (res.ok) {
+      alert("✅ Proposal sent!");
+      document.getElementById("proposalModal").style.display = "none";
+    } else {
+      alert("❌ Failed to send proposal.");
+    }
+  } catch (err) {
+    console.error("❌ Proposal error:", err);
+    alert("⚠️ Error sending proposal.");
+  }
+}
+
+// PATCH: Dynamic label substitution by runtime source
+function getAgentRoleFromEndpoint(endpoint) {
+  if (endpoint.includes("sdk")) return "AiGentsy CTO";
+  if (endpoint.includes("growth")) return "AiGentsy CMO";
+  if (endpoint.includes("remix")) return "AiGentsy CLO";
+  return "Autonomous AiGentsy";
+}
+
+async function injectUserDashboard() {
+  console.log("👀 injectUserDashboard() called");
+
+  const username = localStorage.getItem("aigentsyUsername");
+  console.log("📌 Username from localStorage:", username);
+console.log("📡 Fetching data from JSONBin...");
+
+  if (!username) {
+    console.warn("⚠️ No username found. Skipping user injection.");
+    return;
+  }
+
+  try {
+   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username })
+});
+
+const data = await res.json();
+const user = data.record || data.user || null;
+window.aigentsyUser = user; // ✅ Global reference for runtime access
+ // ✅ "Your AiGentsy Includes" Summary Injection
+const summaryBox = document.getElementById("businessSummaryList");
+if (summaryBox && user) {
+  const summaryItems = [
+    { label: "SDK Toolkit", accessKey: "sdkAccess_eligible" },
+    { label: "Vault Access", accessKey: "vaultAccess" },
+    { label: "Remix License", accessKey: "remixUnlocked" },
+    { label: "Clone License", accessKey: "cloneLicenseUnlocked" },
+    { label: "Legal Kit", trait: "legal" },
+    { label: "Branding Pack", trait: "marketing" }
+  ];
+  
+// ✅ MetaHive Expansion: Invite teammates if traits are missing
+const inviteBox = document.getElementById("inviteBox");
+const inviteList = document.getElementById("inviteList");
+
+if (inviteBox && inviteList && user) {
+  const invites = [];
+
+  if (!(user.traits || []).includes("marketing")) {
+    invites.push("📣 Add a Growth Partner (CMO)");
+  }
+  if (!(user.traits || []).includes("legal")) {
+    invites.push("📜 Add a Legal Partner (CLO)");
+  }
+  if (!(user.traits || []).includes("finance")) {
+    invites.push("💰 Add a Financial Partner (CFO)");
+  }
+// 🧑‍🤝‍🧑 External invite expansion
+  invites.push("🤝 Expand your business circle — invite collaborators or clients");
+  invites.push("🔗 Share your agent page to attract partnerships");
+  
+  if (invites.length > 0) {
+    inviteBox.style.display = "block";
+    inviteList.innerHTML = invites.map(txt => `<li>${txt}</li>`).join("");
+  }
+}
+  const rendered = summaryItems.map(item => {
+    const hasAccess = item.accessKey ? user[item.accessKey] : false;
+    const hasTrait = item.trait ? (user.traits || []).includes(item.trait) : false;
+    return `<li>${(hasAccess || hasTrait ? "✅" : "🔒")} ${item.label}</li>`;
+  }).join("");
+
+  summaryBox.innerHTML = rendered;
+}
+
+console.log("📦 User from AME runtime:", user);
+if (!user) return;
+
+    console.log("🔍 Matched user record:", user);
+    if (!user) return;
+
+    const boxes = document.querySelectorAll(".metric-box");
+
+    boxes.forEach(box => {
+      const title = box.querySelector("h3")?.textContent || "";
+      const ul = box.querySelector("ul");
+      if (!ul) return;
+
+      if (title.includes("Real-World Earnings")) {
+        ul.innerHTML = `
+          <li><strong>Services Rendered:</strong> ${user.servicesRendered || 0}</li>
+          <li><strong>Clients:</strong> ${user.clients || 0}</li>
+          <li><strong>Fiat Eligible:</strong> ${user.fiatEligible ? "✅ Yes" : "—"}</li>
+          <li><strong>AIGx Earned (Real-World):</strong> +${user.yield?.aigxEarned || 0}</li>`;
+      }
+
+      if (title.includes("SDK & Licensing")) {
+        ul.innerHTML = `
+          <li><strong>SDK Eligible:</strong> ${user.sdkAccess_eligible ? "✅ Yes" : "—"}</li>
+          <li><strong>License Unlocked:</strong> ${user.licensingApproved ? "🟢 Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Wallet")) {
+        ul.innerHTML = `
+          <li><strong>AIGx Earned:</strong> ${user.yield?.aigxEarned || 0}</li>
+          <li><strong>Staked:</strong> ${user.staked || 0}</li>
+          <li><strong>Referrals:</strong> ${user.cloneLineage?.length || 0 || 0} active</li>`;
+      }
+
+      if (title.includes("Growth & Deployment")) {
+        ul.innerHTML = `
+          <li><strong>New Clients:</strong> ${user.newClients || 0}</li>
+          <li><strong>New Referrals:</strong> ${user.cloneLineage?.length || 0 || 0}</li>
+          <li><strong>AIGx This Month:</strong> +${user.monthlyYield || 0}</li>
+          <li><strong>Offerings Sent:</strong> ${user.offerings?.length || 0}</li>
+          <li><strong>Integrations:</strong> ${user.integrations || 0}</li>
+          <li><strong>Live Status:</strong> ${user.liveStatus ? "✅ Active" : "—"}</li>`;
+      }
+
+      if (title.includes("Mint Snapshot")) {
+        ul.innerHTML = `
+          <li><strong>ID:</strong> ${user.id}</li>
+          <li><strong>Minted As:</strong> AiGent Venture</li>
+          <li><strong>Status:</strong> Bound + ${user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle"}</li>`;
+      }
+    });
+
+   const walletChart = document.getElementById('walletChart');
+if (Chart && walletChart) {
+  if (walletChart.chartInstance) walletChart.chartInstance.destroy();
+
+    // 🛡️ Ensure all user subfields exist before chart draws
+user.remixUnlocked = user.remixUnlocked || {};
+user.yield = user.yield || {};
+user.cloneLineage = user.cloneLineage || [];
+
+  const remixCount = user.remixUnlocked?.remixCount || 0;
+  const remixCredits = user.remixUnlocked?.remixCredits || 0;
+  const vaultYield = user.yield?.vaultYield || 0;
+  const remixYield = user.yield?.remixYield || 0;
+  const aigxEarned = user.yield?.aigxEarned || 0;
+  const staked = user.staked || 0;
+  const referrals = Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0;
+
+  walletChart.chartInstance = new Chart(walletChart, {
+    type: 'bar',
+    data: {
+      labels: [
+        'Remix Count',
+        'Remix Credits',
+        'Vault Yield',
+        'Remix Yield',
+        'AIGx Earned',
+        'Staked',
+        'Referrals'
+      ],
+      datasets: [{
+        data: [
+          remixCount,
+          remixCredits,
+          vaultYield,
+          remixYield,
+          aigxEarned,
+          staked,
+          referrals
+        ],
+        backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#888' },
+          grid: { color: '#222' }
+        },
+        x: {
+          ticks: { color: '#aaa' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+    
+// === Overview Sidebar ===
+const overviewBox = document.querySelector("#overviewBox ul");
+if (overviewBox) {
+  overviewBox.innerHTML = `
+    <li><strong>Role:</strong> ${user.meta_role || "—"}</li>
+    <li><strong>Type:</strong> ${user.customInput || "B2B SaaS"}</li>
+    <li><strong>Memory:</strong> ${user.yield_memory ? "Yes — remembers what works" : "—"}</li>
+    <li><strong>Dev-Ready:</strong> ${user.sdkAccess_eligible ? "Yes — downloadable kit" : "No"}</li>`;
+}
+
+const achievementBox = document.getElementById("achievementList");
+if (achievementBox && user) {
+  const achievements = [];
+
+  if (user.remixUnlockedForks > 0) {
+    achievements.push("🔁 Remix Activated – Forks Created");
+  }
+  if ((user.cloneLineage || []).length > 0) {
+    achievements.push("🧬 Clones Propagated – Lineage Extended");
+  }
+  if (user.yield?.aigxEarned > 0) {
+    achievements.push(`💰 Earnings Generated – ${user.yield.aigxEarned} AIGx`);
+  }
+  if (user.traits?.includes("legal")) {
+    achievements.push("📜 Legal Kit Installed");
+  }
+  if (user.traits?.includes("marketing")) {
+    achievements.push("📣 Branding Pack Live");
+  }
+
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  } else {
+    achievementBox.innerHTML = "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
+  }
+}
+
+    const includesBox = document.getElementById("businessSummaryList");
+if (includesBox && user) {
+  const unlocked = [];
+
+  if (user.traits?.includes("sdk")) unlocked.push(`<li><a href="#" onclick="showModuleModal('sdk')">🧬 Developer SDK</a></li>`);
+  if (user.traits?.includes("vault")) unlocked.push(`<li><a href="#" onclick="showModuleModal('vault')">💼 Vault Access</a></li>`);
+  if (user.traits?.includes("legal")) unlocked.push(`<li><a href="#" onclick="showModuleModal('legal')">📜 Legal Kit</a></li>`);
+  if (user.traits?.includes("marketing")) unlocked.push(`<li><a href="#" onclick="showModuleModal('branding')">📣 Branding Pack</a></li>`);
+  if (user.traits?.includes("clone")) unlocked.push(`<li><a href="#" onclick="showModuleModal('clone')">🧬 Cloning License</a></li>`);
+  if (user.traits?.includes("remix")) unlocked.push(`<li><a href="#" onclick="showModuleModal('remix')">🔁 Remix Unlock</a></li>`);
+
+  includesBox.innerHTML = unlocked.join('') || "<li>—</li>";
+}
+
+// === Business Kit Overview (Dynamic Description) ===
+const kitDocBox = document.getElementById("dynamicKitDoc");
+if (kitDocBox && user) {
+  let doc = "";
+
+  // Legal Kit
+  if (user.traits?.includes("legal")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📜 Legal Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📜 IP Assignment & Licensing Templates</li>
+          <li>🤝 Legal Agent Companion Included</li>
+          <li>🛡️ Trust Layer Hooks</li>
+        </ul>
+      </div>`;
+  }
+
+  // SaaS Kit
+  if (user.traits?.includes("saas")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>💻 SaaS Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>💻 Auth & Subscription System</li>
+          <li>💰 Stripe Monetization Ready</li>
+          <li>🔁 Auto-routing AiGents</li>
+        </ul>
+      </div>`;
+  }
+
+  // Branding Pack
+  if (user.traits?.includes("marketing")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🎨 Branding Pack:</strong>
+        <ul style="padding-left:16px;">
+          <li>✅ Logo Templates (editable .svg)</li>
+          <li>✅ Brand Guidelines (colors, fonts, tone)</li>
+          <li>✅ Social Media Kit (headers, bios)</li>
+          <li>✅ Slide Deck Starter</li>
+          <li>✅ Landing Page Template (HTML)</li>
+        </ul>
+      </div>`;
+  }
+
+  // Packaging Kit
+  if (user.traits?.includes("packaging")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>📦 Packaging Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>📝 Offer Description + Value Hook</li>
+          <li>📤 Stripe Link Routing</li>
+          <li>🤝 License Terms & Delivery Metadata</li>
+        </ul>
+      </div>`;
+  }
+
+  // Custom Builder Kit
+  if (user.traits?.includes("custom")) {
+    doc += `
+      <div style="margin-bottom: 12px;">
+        <strong>🧠 Custom Startup Kit:</strong>
+        <ul style="padding-left:16px;">
+          <li>🧠 Generated from your search</li>
+          <li>👥 Matched C-Suite Roles</li>
+          <li>🚀 Pre-filled Deploy Templates</li>
+        </ul>
+      </div>`;
+  }
+
+  // Fallback
+  if (!doc) {
+    doc = "🧠 No kit detected.";
+  }
+
+  kitDocBox.innerHTML = doc;
+}
+      
+      const publicLinksBox = document.getElementById("publicLinksBox");
+if (publicLinksBox && user) {
+  const uname = user.consent?.username || "agent";
+  publicLinksBox.innerHTML = `
+    <h4 style="color:#00bfff; margin-bottom:6px;">🌐 Public Links</h4>
+    <a class="btn-glow" href="/profile.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-bottom: 6px; display:inline-block;">🔗 Agent Page</a>
+    <a class="btn-glow" href="/share.html?agent=${uname}" style="font-size: 0.75rem; padding: 6px 10px; margin-left: 6px; display:inline-block;">📤 Share Link</a>
+  `;
+}
+   
+     // 🔐 Normalize fallback structure to avoid undefined values (must come before chart)
+user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
+user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
+
+
+    // === Remix Snapshot ===
+const remixBox = document.getElementById("remixSnapshotBox");
+if (remixBox) {
+  const forks = user.remixUnlockedForks || 0;
+  const spread = user.cloneLineageSpread || "—";
+  const strategy = user.remixUnlockedStrategy || "—";
+  remixBox.innerHTML = `
+    <h4 style="color:#00bfff;margin-bottom:6px;">🔁 Remix Snapshot</h4>
+    <p>Forks: ${forks}<br/>Lineage Spread: ${spread}<br/>Strategy: ${strategy}</p>`;
+}
+
+ // === Activity Feed ===
+const activityBox = Array.from(boxes).find(b => b.querySelector("h3")?.textContent.includes("Activity Feed"));
+if (activityBox) {
+  const feedUl = activityBox.querySelector("ul");
+  if (feedUl && user.activity && user.activity.length) {
+    feedUl.innerHTML = user.activity.map(entry => `<li>${entry}</li>`).join('');
+  }
+}
+
+    // === Proposal Viewer ===
+const proposalBox = document.getElementById("proposalViewerList");
+if (proposalBox && user && Array.isArray(user.proposals) && user.proposals.length > 0) {
+  proposalBox.innerHTML = user.proposals.map(p => `<li>🧾 ${p}</li>`).join('');
+} else if (proposalBox) {
+  proposalBox.innerHTML = "<li>🚧 No proposals yet. Try unlocking a business kit or syncing your offerings.</li>";
+}
+
+  } catch (e) {
+    console.error("injectUserDashboard error:", e);
+  }
+}
+
+  async function fetchAgentData(username) {
+  const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  });
+  return await res.json();
+}
+  
+async function unlockOffering(username, offeringId, stripeLink) {
+  window.open(stripeLink, "_blank");
+
+  setTimeout(async () => {
+    if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
+
+    try {
+      const res = await fetch("https://aigentsy-ame-runtime.onrender.com/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, offeringId })
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        // ✅ Toast UI
+        const toast = document.getElementById("toast");
+        toast.textContent = `✅ ${offeringId} unlocked for ${username}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 3000);
+
+        // ✅ Log to backend (JSONBin safe)
+        await fetch("https://aigentsy-ame-runtime.onrender.com/log-purchase", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username,                      // buyer
+            offeringId,
+            action: "unlock",
+            source: "dashboard",
+            timestamp: new Date().toISOString(),
+            buyer: username,
+            seller: "system" // Replace with dynamic seller logic later
+          })
+        });
+
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        alert(`❌ Failed to unlock ${offeringId}.`);
+        console.error(result);
+      }
+
+    } catch (err) {
+      console.error("❌ unlockOffering() error:", err);
+      alert("Error unlocking offering.");
+    }
+  }, 1500);
+}
+
+async function autoMatchEngine(username) {
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+  const user = data.record || data;
+    if (!user) return;
+
+    const list = document.getElementById("autoMatchOfferings");
+    if (!list) return;
+    list.innerHTML = ""; // Clear old contents
+
+    const offerings = [
+      {
+        id: "sdk",
+        label: "SDK Toolkit",
+        accessKey: "sdkAccess_eligible",
+        condition: !user.sdkAccess_eligible,
+        stripe: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a"
+      },
+      {
+        id: "vault",
+        label: "Vault Access",
+        accessKey: "vaultAccess",
+        condition: !user.vaultAccess,
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "remix",
+        label: "Remix License",
+        accessKey: "remixUnlocked",
+        condition: !user.remixUnlocked,
+        stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
+      },
+      {
+        id: "clone",
+        label: "Clone License",
+        accessKey: "cloneLicenseUnlocked",
+        condition: !user.cloneLicenseUnlocked,
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      },
+      {
+        id: "aigx",
+        label: "AIGx Earnings",
+        accessKey: "yield",
+        condition: !(user.yield?.aigxEarnedEnabled),
+        stripe: "https://buy.stripe.com/abc123456789xyz" // replace with actual Stripe link
+      },
+      {
+        id: "legal",
+        label: "Legal Kit",
+        accessKey: "traits",
+        condition: !(user.traits || []).includes("legal"),
+        stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
+      },
+      {
+        id: "branding",
+        label: "Branding Pack",
+        accessKey: "traits",
+        condition: !(user.traits || []).includes("marketing"),
+        stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
+      }
+    ];
+
+    offerings.forEach(({ id, label, accessKey, condition, stripe }) => {
+      const li = document.createElement("li");
+      if (!condition) {
+        li.innerHTML = `✅ ${label} Unlocked`;
+      } else {
+        li.innerHTML = `
+  <button class="btn-glow" onclick="showUnlockModal('${id}')">
+    🔓 Unlock ${label}
+  </button>`;
+      }
+      list.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("❌ autoMatchEngine() error:", err);
+  }
+}
+    // ✅ Make key functions accessible globally
+window.injectUserDashboard = injectUserDashboard;
+window.autoMatchEngine = autoMatchEngine;
+window.unlockOffering = unlockOffering;
+
+</script> <!-- ✅ Close script BEFORE modal -->
+<!-- 🔒 Modal Container -->
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+<div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+<button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+<div id="modalContent"></div>
+</div>
+</div>
+<script>
+  function openModal(type) {
+    const username = localStorage.getItem("aigentsyUsername");
+    if (!username) return alert("No user found.");
+
+    const offerings = {
+      sdk: {
+        title: "SDK Access Unlock",
+        price: "$40",
+        link: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+        id: "SDK"
+      },
+      vault: {
+        title: "Vault License Unlock",
+        price: "$25",
+        link: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+        id: "Vault"
+      },
+      remix: {
+        title: "Remix Feature Unlock",
+        price: "$15",
+        link: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+        id: "Remix"
+      },
+      clone: {
+        title: "Clone License Unlock",
+        price: "$30",
+        link: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+        id: "Clone"
+      },
+      aigx: {
+        title: "AIGx Earnings Unlock",
+        price: "$19",
+        link: "https://buy.stripe.com/abc123456789xyz",  // Replace with real link
+        id: "AIGx"
+      }
+    };
+
+    const o = offerings[type];
+    if (!o) return;
+
+    document.getElementById("modalContent").innerHTML = `
+      <h2 style="margin-bottom:1rem;">${o.title}</h2>
+      <p>This unlock costs <strong>${o.price}</strong>. Clicking unlock will open Stripe in a new tab. After purchase, you’ll be asked to confirm here.</p>
+      <button onclick="unlockOffering('${username}', '${o.id}', '${o.link}')" class="btn-glow">🔓 Unlock via Stripe</button>
+    `;
+
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+  }
+</script>
+<script>
+
+// === STARTUP HOOK (MERGED) ===
+window.addEventListener("DOMContentLoaded", () => {
+  // Set default username if not stored yet
+  if (!localStorage.getItem("aigentsyUsername")) {
+    localStorage.setItem("aigentsyUsername", "admin4");
+  }
+
+  const username = localStorage.getItem("aigentsyUsername") || "You";
+
+  // Inject full dashboard
+  if (username) {
+    injectUserDashboard();
+    autoMatchEngine(username);
+  }
+
+  // Inject C-Suite team
+  const csuiteBox = document.getElementById("csuiteBox");
+  if (csuiteBox) {
+    const cSuiteRoles = [
+      { role: "CEO", name: `${username} (You)` },
+      { role: "CTO", name: "AiGent SDK" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CLO", name: "AiGent Remix" },
+      { role: "CFO", name: "AiGent0" }
+    ];
+    csuiteBox.innerHTML = `
+      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+      <ul style="padding-left: 18px; font-size: 0.9rem;">
+        ${cSuiteRoles.map(({ role, name }) => `<li><strong>${role}:</strong> ${name}</li>`).join("")}
+      </ul>
+      <p style="font-size: 0.85rem; color: #888;">Each AiGent executes key executive functions across your venture.</p>
+    `;
+  }
+
+  // Preload chat message
+  const chatLog = document.getElementById("chatLog");
+  if (chatLog) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
+    chatLog.appendChild(preload);
+  }
+});
+    
+let memory = [];
+const triggerKeywords = ["launch", "mint", "remix", "earn", "scale", "partner"];
+
+</script>
+<!-- ✅ Toast Notification Element -->
+<div class="toast" id="toast" style="
+  display: none;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #00bfff;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #000;
+  font-size: 0.95rem;
+  z-index: 9999;
+"></div>
+<script>
+  // ✅ Delayed fallback: runs *after* all scripts are defined
+  setTimeout(() => {
+    const username = localStorage.getItem("aigentsyUsername") || "admin4";
+    if (typeof injectUserDashboard === "function" && typeof autoMatchEngine === "function") {
+      console.log("🚀 Final fallback triggered after load");
+      injectUserDashboard();
+      autoMatchEngine(username);
+    } else {
+      console.warn("⚠️ Fallback skipped — functions not defined yet.");
+    }
+  }, 100);
+</script>
+</div><script>
+window.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+
+  fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const user = data.record || data;
+
+    
+
+    // ✅ Mint Snapshot
+    const mintList = document.getElementById("mintSnapshotList");
+    if (mintList && user) {
+      mintList.innerHTML = `
+        <li><strong>ID:</strong> ${user.id || "—"}</li>
+        <li><strong>Minted As:</strong> ${user.agentType || "AiGent Venture"}</li>
+        <li><strong>Status:</strong> Bound + ${(user.yield?.aigxEarnedEnabled ? "Monetizing" : "Idle")}</li>
+      `;
+    }
+
+    // ✅ Public Links
+    const publicLinksBox = document.getElementById("publicLinksBox");
+    const uname = user.consent?.username || username;
+    if (publicLinksBox && uname) {
+      publicLinksBox.innerHTML = `
+        <a class="btn-glow" href="/profile.html?agent=${uname}">🔗 Agent Page</a>
+        <a class="btn-glow" href="/share.html?agent=${uname}">📤 Share Link</a>
+      `;
+    }
+  })
+  .catch(err => console.error("Upgrade inject error:", err));
+});
+</script>
+
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Global drop buffer
+  window.aigentsyDroppedFiles = [];
+
+  // ✅ Update file preview + sync to packaging
+  function handleFileDrop(e) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (!files.length) return;
+
+    window.aigentsyDroppedFiles.push(...files);
+
+    const preview = document.getElementById("filePreviewBox") || document.createElement("div");
+    preview.id = "filePreviewBox";
+    preview.style.marginTop = "10px";
+    preview.innerHTML = "<strong>📁 Files added:</strong><ul style='margin: 6px 0; padding-left: 20px; font-size: 0.85rem; color: #ccc;'></ul>";
+    const ul = preview.querySelector("ul");
+
+    files.forEach(file => {
+      const li = document.createElement("li");
+      li.textContent = file.name;
+      ul.appendChild(li);
+    });
+
+    const container = document.querySelector(".metric-box textarea#agentInput").parentNode;
+    container.appendChild(preview);
+  }
+
+  // ✅ Submit handler
+  window.handleSubmit = function(event) {
+    event.preventDefault();
+    const text = document.getElementById("agentInput").value.trim();
+    if (!text && window.aigentsyDroppedFiles.length === 0) return;
+
+    console.log("Message:", text);
+    console.log("Files:", window.aigentsyDroppedFiles);
+
+    document.getElementById("agentInput").value = "";
+    window.aigentsyDroppedFiles = [];
+    const previewBox = document.getElementById("filePreviewBox");
+    if (previewBox) previewBox.remove();
+  };
+});
+</script>
+
+  
+  <script>
+// 🧠 Stripe URLs
+const stripeLinks = {
+  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
+  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
+  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
+};
+
+// 📦 Descriptions per unlock
+const unlockDescriptions = {
+  sdk: "Gain access to your SDK toolkit. This lets other agents integrate or build on what you've created, and you’ll earn each time it’s used.",
+  vault: "Unlock your personal Vault — store, license, and protect all your agents, toolkits, and business logic.",
+  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your original work.",
+  clone: "Allow your agents to be cloned by others. Clones track lineage and generate royalties to your wallet.",
+  aigx: "Activate real-world earnings from AIGx token routing. Required for off-platform payout and partner shares.",
+  branding: "Receive a custom branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
+  legal: "Get the full legal toolkit — including licensing contracts, NDAs, and protection for your IP or clients."
+};
+
+// 🎯 Open the modal
+function showUnlockModal(type) {
+  const titleMap = {
+    sdk: "Unlock SDK Toolkit",
+    vault: "Unlock Vault Access",
+    remix: "Unlock Remix License",
+    clone: "Unlock Clone License",
+    aigx: "Unlock AIGx Earnings",
+    branding: "Unlock Branding Pack",
+    legal: "Unlock Legal Kit"
+  };
+
+  document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
+  document.getElementById("modalBody").textContent = unlockDescriptions[type] || "No description available.";
+
+  document.getElementById("confirmUnlockBtn").onclick = () => {
+    window.open(stripeLinks[type], "_blank");
+    closeUnlockModal();
+  };
+
+  document.getElementById("unlockModal").style.display = "flex";
+}
+
+  function openPackagingModal() {
+  const modal = document.getElementById("packagingModal");
+  const notesBox = document.getElementById("packagingNotes");
+  if (notesBox) notesBox.value = localStorage.getItem("packagingNotes") || "";
+  modal.style.display = "flex";
+}
+
+function closePackagingModal() {
+  document.getElementById("packagingModal").style.display = "none";
+}
+
+function submitPackaging() {
+  const notes = document.getElementById("packagingNotes").value.trim();
+  localStorage.setItem("packagingNotes", notes);
+  alert("✅ Packaging flow saved locally.");
+  closePackagingModal();
+}
+
+  function showModuleModal(module) {
+  const content = {
+    sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
+    vault: `<h3>💼 Vault Access</h3><p><a href="/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>`,
+    legal: `<h3>📜 Legal Kit</h3>
+      <ul>
+        <li><a href="/kits/legal.pdf" target="_blank">IP Assignment Templates</a></li>
+        <li><a href="/kits/ncnda.pdf" target="_blank">Standard NCNDA</a></li>
+        <li><a href="/kits/legal-agent.html" target="_blank">Legal Agent Companion</a></li>
+      </ul>`,
+    branding: `<h3>🎨 Branding Pack</h3>
+      <ul>
+        <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
+        <li><a href="/kits/naming-guide.pdf" target="_blank">Naming Guide</a></li>
+        <li><a href="/kits/logo-generator.html" target="_blank">Logo Generator Tool</a></li>
+      </ul>`,
+    clone: `<h3>🧬 Cloning License</h3><p><a href="/kits/clone-license.pdf" target="_blank">License Terms</a></p>`,
+    remix: `<h3>🔁 Remix Unlock</h3><p><a href="/kits/remix-license.pdf" target="_blank">Remix Terms & Attribution</a></p>`
+  };
+
+  const modal = document.getElementById("moduleModal");
+  const box = document.getElementById("modalContent");
+  box.innerHTML = content[module] || "<p>No files yet for this module.</p>";
+  modal.style.display = "flex";
+}
+
+function closeUnlockModal() {
+  document.getElementById("unlockModal").style.display = "none";
+}
+</script>
+
+<script>
+let attachedFiles = [];
+
+function handleFiles(files) {
+  for (let file of files) {
+    attachedFiles.push(file);
+  }
+  renderFilePreview();
+}
+
+function renderFilePreview() {
+  const preview = document.getElementById("filePreview");
+  if (!preview) return;
+  if (attachedFiles.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+  preview.innerHTML = "📎 Attached: " + attachedFiles.map(f => f.name).join(", ");
+}
+
+// Optional: handle drag events for drop zone
+const dropZone = document.getElementById("fileDropZone");
+if (dropZone) {
+  dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#00bfff";
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.borderColor = "#444";
+  });
+  dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.style.borderColor = "#444";
+    handleFiles(e.dataTransfer.files);
+  });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  const text = document.getElementById("agentInput").value.trim();
+  if (!text && attachedFiles.length === 0) return;
+
+  // ⬇️ Send message + file data to agent logic (customize as needed)
+  console.log("Message:", text);
+  console.log("Files:", attachedFiles);
+
+  // TODO: Send to agent runtime logic if desired
+  // Reset
+  document.getElementById("agentInput").value = "";
+  attachedFiles = [];
+  renderFilePreview();
+}
+</script>
+
+
+<!-- Modal Styles -->
+<style>
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #111;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 480px;
+  color: #fff;
+  box-shadow: 0 0 20px #00f0ff66;
+}
+.modal-content h2 {
+  color: #00f0ff;
+}
+</style>
+<script>
+  const availableKits = {
+    saas: {
+      name: "SaaS Toolkit",
+      features: [
+        "✅ Authentication + Subscriptions",
+        "✅ Pricing Page Generator",
+        "✅ Auto-Routing AiGents",
+        "✅ Stripe Integration",
+        "✅ SaaS Monetization Templates"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/xyz",
+      icon: "💻"
+    },
+    legal: {
+      name: "Legal Services Vault",
+      features: [
+        "✅ IP Assignment Agreement",
+        "✅ NCNDA Generator",
+        "✅ Licensing Terms Templates",
+        "✅ Legal Agent Companion",
+        "✅ Trust Layer Hooks"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/abc",
+      icon: "📜"
+    },
+    marketing: {
+      name: "Marketing Agency Stack",
+      features: [
+        "✅ Branding + Naming Tool",
+        "✅ Landing Page Templates",
+        "✅ Email Sequence Generator",
+        "✅ Social Launch Assets",
+        "✅ CMO AiGent Companion"
+      ],
+      status: "🔒 Locked – Unlock via Dashboard",
+      stripeLink: "https://buy.stripe.com/def",
+      icon: "📣"
+    },
+    custom: {
+      name: "Custom AiGentsy Kit",
+      features: [
+        "✅ Generated from your search",
+        "✅ Matched C-Suite",
+        "✅ Auto-bundled services",
+        "✅ Pre-filled unlock flows",
+        "✅ Earn-on-deploy logic"
+      ],
+      status: "⚙️ Custom kit generated on the fly",
+      stripeLink: null,
+      icon: "🧠"
+    }
+  };
+  function openPackagingModal() {
+  document.getElementById("packagingModal").style.display = "flex";
+}
+
+function closePackagingModal() {
+  document.getElementById("packagingModal").style.display = "none";
+}
+
+async function submitPackage() {
+  const username = localStorage.getItem("aigentsyUsername") || "unknown";
+  const title = document.getElementById("pkgTitle").value.trim();
+  const details = document.getElementById("pkgDetails").value.trim();
+  const link = document.getElementById("pkgLink").value.trim();
+
+  if (!title || !details) {
+    alert("Please include both a title and details.");
+    return;
+  }
+
+  const offer = {
+    title,
+    details,
+    link,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/log_package", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, offer })
+    });
+
+    if (res.ok) {
+      alert("✅ Offer saved!");
+      closePackagingModal();
+    } else {
+      alert("❌ Failed to save package.");
+    }
+  } catch (err) {
+    console.error("❌ Package submit error:", err);
+    alert("⚠️ Error sending offer.");
+  }
+}
+
+  function openKitModal(type) {
+    const kit = availableKits[type];
+    if (!kit) return alert("Kit not found.");
+
+    document.getElementById("modalContent").innerHTML = `
+      <h2>${kit.icon} ${kit.name}</h2>
+      <p>This kit includes:</p>
+      <ul>${kit.features.map(f => `<li>${f}</li>`).join('')}</ul>
+      <p><strong>Status:</strong> ${kit.status}</p>
+      ${kit.stripeLink ? `<a href="#" onclick="confirmStripeUnlock('${kit.stripeLink}')" class="btn-glow">🔓 Unlock via Stripe</a>` : ""}
+    `;
+    document.getElementById("modalOverlay").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modalOverlay").style.display = "none";
+  }
+    function showToast(message) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.style.display = "block";
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+}
+    function confirmStripeUnlock(link) {
+  window.open(link, '_blank');
+  showToast("🔓 Stripe unlock started. Return here after purchase to confirm.");
+}
+</script>
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7); z-index:9999; align-items:center; justify-content:center;">
+  <div id="modalBox" style="background:#111; padding:2rem; border-radius:12px; max-width:500px; width:90%; color:#fff; position:relative; box-shadow:0 0 20px #0ff;">
+    <button onclick="closeModal()" style="position:absolute; top:10px; right:12px; font-size:1.2rem; background:none; color:#fff; border:none;">❌</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<!-- 🚀 Teach-In Modal Sequence (Auto-runs After Login) -->
+<div id="teachInOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000d1a; z-index:9999; color:#fff;">
+  <div id="teachInContent" style="max-width:600px; margin:80px auto; padding:2rem; background:#111; border-radius:16px; box-shadow:0 0 20px #00bfff;">
+    <h2 id="teachInTitle" style="color:#00bfff; margin-bottom:1rem;"></h2>
+    <div id="teachInBody" style="font-size:1rem; line-height:1.5; margin-bottom:1.5rem;"></div>
+    <button id="teachInNextBtn" class="btn-glow">Next →</button>
+  </div>
+</div>
+
+<script>
+  const teachInSlides = [
+  {
+    title: "👋 You’re Not Just a User — You’re a Founder",
+    body: `Welcome to <strong>AiGentsy</strong> — the platform where you launch a fully functional, AI-powered business in minutes.<br><br>
+    When you signed up, we generated a business just for you — complete with an AI team, monetization tools, and a direct path to income.<br><br>
+    🧠 You’re not just using software.<br>💼 You’re running a business.`
+  },
+  {
+    title: "📦 Your Business Includes Real-World Tools",
+    body: `
+    <ul>
+      <li><strong>SDK Toolkit</strong> – Exportable tools to run your AI anywhere (like client sites or portals)</li>
+      <li><strong>Legal Kit</strong> – Contracts, licensing templates, and IP protections</li>
+      <li><strong>Branding Pack</strong> – Logos, landing pages, and social launch assets</li>
+      <li><strong>Remix Engine</strong> – Others can fork your work — and you earn every time they do</li>
+    </ul>
+    🛠 All tools can be used with clients, customers, or even your own storefronts — on or off platform.`
+  },
+ {
+  title: "💸 Real Use Cases (That Earn Real Money)",
+  body: `
+  <ul>
+    <li>🛍 Selling AI-generated product descriptions & templates on your TikTok Shop</li>
+    <li>💼 Resume Optimization Agent offered on Fiverr — built + deployed in minutes</li>
+    <li>🎙 Podcast Clipping Agent that auto-generates reels for influencers & YouTubers</li>
+    <li>📜 Legal Filing Bot that automates LLC formation with Stripe checkout</li>
+  </ul>
+  Every example above was built — and sold — using AiGentsy tools.<br><br>
+  🚫 No code. No gatekeepers. No tech team required.`
+},
+    {
+    title: "🔓 Unlocking = Ownership + Income",
+    body: `
+    Unlocking features does two things:<br><br>
+    <ul>
+      <li>🧩 Adds real tools to your business (SDK, legal templates, etc.)</li>
+      <li>💸 Gives you protocol ownership — you earn yield when others use or remix what you create</li>
+    </ul>
+    You’re not buying shares. You’re building value — and earning your stake by participating.<br><br>
+    The more AiGentsy grows, the more your share grows too.`
+  },
+  {
+    title: "💼 You Don’t Need Permission to Earn",
+    body: `
+    You can earn starting today:<br><br>
+    <ul>
+      <li>Build services using your AiGentsy kits</li>
+      <li>Sell your work on platforms like Fiverr, TikTok, Instagram, or your own site</li>
+      <li>Accept payments however you like</li>
+      <li>Earn AIGx automatically from remixing, referrals, and usage</li>
+    </ul>
+    AIGx can be converted to fiat once your earnings hit the required threshold.<br><br>
+    ✅ No platform tax. You keep what you earn.`
+  },
+  {
+  title: "🤝 Let the Platform Match You",
+  body: `
+  AiGentsy isn’t just tools — it’s a marketplace.<br><br>
+  Our system <strong>automatically connects you</strong> with:
+  <ul>
+    <li>💼 Clients who need your AiGent’s services</li>
+    <li>🧠 Other users who can complete your C-Suite</li>
+    <li>📦 Turnkey kits to fill gaps in your business</li>
+  </ul>
+  You can build — or buy — what you need in one click.<br><br>
+  It’s business formation on autopilot.`
+},
+      {
+    title: "🌐 What Is AIGx and How Do Payouts Work?",
+    body: `
+    <strong>AIGx</strong> is your on-platform reward token. You earn it by:
+    <ul>
+      <li>🔁 Remix activity</li>
+      <li>🎯 Referrals and agent growth</li>
+      <li>📦 Vault deployments and client work</li>
+    </ul>
+    Once your AIGx meets withdrawal milestones, you can cash out securely via Stripe.<br><br>
+    This ensures payouts stay safe, compliant, and tied to real usage.`
+  },
+  {
+    title: "🚀 AiGentsy Is the Only One of Its Kind",
+    body: `
+    <ul>
+      <li>🛒 Shopify gives you a store — not a team or equity</li>
+      <li>💼 Upwork sells your time — AiGentsy builds your business</li>
+      <li>🤖 ChatGPT gives answers — AiGentsy builds your income stream</li>
+    </ul>
+    We’re the only place where AI grows a fully automated business for you — and gives you a stake in the system’s growth.<br><br>
+    Participation = Ownership. And your success grows with the platform.`
+  },
+  {
+    title: "🎉 Let’s Launch Your AiGentsy",
+    body: `
+    ✅ Deploy your business<br>
+    ✅ Grow your C-Suite<br>
+    ✅ Earn from unlocks, referrals, and usage<br><br>
+    Your business is waiting inside.<br>
+    🚀 <strong>Let’s build.</strong>`
+  }
+];
+    
+  let currentTeachIn = 0;
+
+  function showTeachIn() {
+    const overlay = document.getElementById("teachInOverlay");
+    const title = document.getElementById("teachInTitle");
+    const body = document.getElementById("teachInBody");
+    const btn = document.getElementById("teachInNextBtn");
+
+    overlay.style.display = "block";
+    title.innerHTML = teachInSlides[0].title;
+    body.innerHTML = teachInSlides[0].body;
+
+    btn.onclick = () => {
+      currentTeachIn++;
+      if (currentTeachIn < teachInSlides.length) {
+        title.innerHTML = teachInSlides[currentTeachIn].title;
+        body.innerHTML = teachInSlides[currentTeachIn].body;
+      } else {
+        localStorage.setItem("aigentsyTeachInComplete", "true");
+        overlay.style.display = "none";
+        injectUserDashboard(); // launch dashboard only after teach-in
+      }
+    };
+  }
+
+  window.addEventListener("DOMContentLoaded", () => {
+    if (!localStorage.getItem("aigentsyTeachInComplete")) {
+      showTeachIn();
+    } else {
+      injectUserDashboard();
+    }
+  });
+  
+  let currentProposalPartner = null;
+
+function openProposalModal(partner) {
+  currentProposalPartner = partner;
+  document.getElementById("proposalModal").style.display = "flex";
+}
+
+function closeProposalModal() {
+  document.getElementById("proposalModal").style.display = "none";
+}
+
+async function submitProposal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const title = document.getElementById("proposalTitle").value.trim();
+  const details = document.getElementById("proposalBody").value.trim();
+  const link = document.getElementById("proposalLink").value.trim();
+
+  if (!title || !details || !currentProposalPartner) {
+    return alert("Please fill in all fields and confirm recipient.");
+  }
+
+  const payload = {
+    sender: username,
+    recipient: currentProposalPartner,
+    title,
+    details,
+    link,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/submit_proposal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      alert("✅ Proposal sent!");
+      closeProposalModal();
+    } else {
+      alert("❌ Failed to send proposal.");
+    }
+  } catch (err) {
+    console.error("Proposal send error:", err);
+    alert("⚠️ Proposal failed to send.");
+  }
+}
+
+  function openProposalInboxModal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing.");
+
+  document.getElementById("proposalInboxModal").style.display = "flex";
+  const inboxBox = document.getElementById("proposalInboxContent");
+  inboxBox.innerHTML = "Loading...";
+
+  fetch("https://aigentsy-ame-runtime.onrender.com/get_proposals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const proposals = data.proposals || [];
+      if (proposals.length === 0) {
+        inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
+      } else {
+        inboxBox.innerHTML = proposals.map(p => `
+          <div style="border:1px solid #333; padding:10px; margin-bottom:10px;">
+            <strong>From:</strong> ${p.sender}<br>
+            <strong>Title:</strong> ${p.title}<br>
+            <p>${p.details}</p>
+            <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
+            ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow">🔗 View Link</a></div>` : ""}
+          </div>
+        `).join("");
+      }
+    })
+    .catch(err => {
+      console.error("Inbox error:", err);
+      inboxBox.innerHTML = "<p>Error loading proposals.</p>";
+    });
+}
+
+function closeProposalInboxModal() {
+  document.getElementById("proposalInboxModal").style.display = "none";
+}
+
+</script>
+  <div id="moduleModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center;">
+  <div style="background: #111; border: 1px solid #444; padding: 20px; max-width: 480px; color: #eee; border-radius: 10px; box-shadow: 0 0 12px #0ff;">
+    <div id="modalContent"></div>
+    <div style="text-align: right; margin-top: 12px;">
+      <button class="btn-glow" onclick="document.getElementById('moduleModal').style.display='none'">Close</button>
+    </div>
+  </div>
+</div>
+<!-- ✅ Packaging Modal -->
+<div id="packagingModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:480px; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff;">
+    <h3>📦 Set Up Your Packaging Flow</h3>
+    <p>This creates the delivery logic for your offering — client-ready kits, guides, or downloads.</p>
+    <ul style="font-size:0.9rem; line-height:1.6;">
+      <li>🧬 Link to your SDK or Clone</li>
+      <li>📄 Attach delivery PDFs or .zip assets</li>
+      <li>🔗 Create external delivery links</li>
+      <li>🎯 Target your ideal client or use case</li>
+    </ul>
+    <div style="margin-top:12px;">
+      <textarea id="packagingNotes" placeholder="Describe what the client will receive..." style="width:100%; padding:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;"></textarea>
+    </div>
+    <div style="margin-top:12px; text-align:right;">
+      <button class="btn-glow" onclick="submitPackaging()">Save</button>
+      <button class="btn-glow" onclick="closePackagingModal()">Close</button>
+    </div>
+  </div>
+</div>
+<!-- 📦 Packaging Modal -->
+<div id="packagingModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:540px; width:100%; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff;">
+    <h3>📦 Create Client Offer</h3>
+    <input id="pkgTitle" type="text" placeholder="Offering Title" style="width:100%; margin-bottom:8px; padding:6px;">
+    <textarea id="pkgDetails" placeholder="What does your offer include?" style="width:100%; height:100px; margin-bottom:8px; padding:6px;"></textarea>
+    <input id="pkgLink" type="url" placeholder="Optional Link (e.g. Google Doc, PDF, Agent Page)" style="width:100%; margin-bottom:12px; padding:6px;">
+    <button class="btn-glow" onclick="submitPackage()">📤 Submit Offer</button>
+    <button style="margin-left:10px;" onclick="closePackagingModal()">Cancel</button>
+  </div>
+</div>
+<!-- ✅ Proposal Modal -->
+<div id="proposalModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:500px; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff;">
+    <h3>📤 Propose Deal</h3>
+    <input id="proposalTitle" placeholder="Proposal Title" style="width:100%; margin:6px 0; padding:6px;" />
+    <textarea id="proposalBody" placeholder="Describe your offer..." rows="4" style="width:100%; margin:6px 0; padding:6px;"></textarea>
+    <input id="proposalLink" placeholder="Optional Link (e.g. Stripe, PDF)" style="width:100%; margin:6px 0; padding:6px;" />
+    <div style="text-align:right; margin-top:10px;">
+      <button onclick="submitProposal()" class="btn-glow">Send</button>
+      <button onclick="document.getElementById('proposalModal').style.display='none'" class="btn-glow">Close</button>
+    </div>
+  </div>
+</div>
+<!-- 📬 Proposal Inbox Modal -->
+<div id="proposalInboxModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:520px; width:90%; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff; max-height:80%; overflow-y:auto;">
+    <h3>📬 Proposal Inbox</h3>
+    <div id="proposalInboxContent" style="margin-top:10px; font-size:0.9rem;">Loading...</div>
+    <div style="text-align:right; margin-top:12px;">
+      <button class="btn-glow" onclick="closeProposalInboxModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
