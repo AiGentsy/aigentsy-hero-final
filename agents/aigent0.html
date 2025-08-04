@@ -794,7 +794,14 @@ console.log("📡 Fetching data from JSONBin...");
 const data = await res.json();
 const user = data.record || data.user || null;
 window.aigentsyUser = user; // ✅ Global reference for runtime access
- // ✅ "Your AiGentsy Includes" Summary Injection
+
+console.log("🧠 Full user record:", user);
+console.log("💰 wallet.aigx:", user?.wallet?.aigx);
+console.log("💼 wallet.staked:", user?.wallet?.staked);
+console.log("🚀 runtimeFlags:", user?.runtimeFlags);
+console.log("🏷 traits:", user?.traits);
+
+// ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
