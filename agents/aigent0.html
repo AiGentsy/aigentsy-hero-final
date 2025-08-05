@@ -797,24 +797,22 @@ async function injectUserDashboard() {
     const user = data.record || data.user || null;
     window.aigentsyUser = user; // ✅ Global reference for runtime access
 
-    // 🔁 Sync all runtimeFlags and unlocks to traits for UI consistency
+// 🛠 Ensure runtimeFlags unlocks sync with traits
 if (user) {
   user.traits = user.traits || [];
 
   const traitMap = [
-    { flagPath: "runtimeFlags.sdkAccess_eligible", trait: "sdk" },
-    { flagPath: "runtimeFlags.vaultAccess", trait: "vault" },
-    { flagPath: "runtimeFlags.remixUnlocked", trait: "remix" },
-    { flagPath: "cloneLicenseUnlocked", trait: "clone" },
-    { flagPath: "legalKitUnlocked", trait: "legal" },
-    { flagPath: "runtimeFlags.brandingKitUnlocked", trait: "marketing" }  // if you use this flag
+    { path: "runtimeFlags.sdkAccess_eligible", trait: "sdk" },
+    { path: "runtimeFlags.vaultAccess", trait: "vault" },
+    { path: "runtimeFlags.remixUnlocked", trait: "remix" },
+    { path: "cloneLicenseUnlocked", trait: "clone" },
+    { path: "legalKitUnlocked", trait: "legal" },
+    { path: "runtimeFlags.brandingKitUnlocked", trait: "marketing" }
   ];
 
-  traitMap.forEach(({ flagPath, trait }) => {
-    const value = flagPath.split('.').reduce((obj, key) => obj?.[key], user);
-    if (value && !user.traits.includes(trait)) {
-      user.traits.push(trait);
-    }
+  traitMap.forEach(({ path, trait }) => {
+    const value = path.split('.').reduce((o, k) => o?.[k], user);
+    if (value && !user.traits.includes(trait)) user.traits.push(trait);
   });
 }
 
