@@ -777,7 +777,7 @@ async function injectUserDashboard() {
 
   const username = localStorage.getItem("aigentsyUsername");
   console.log("📌 Username from localStorage:", username);
-  console.log("📡 Fetching data from JSONBin...");
+  console.log("📡 Fetching data from backend...");
 
   if (!username) {
     console.warn("⚠️ No username found. Skipping user injection.");
@@ -792,28 +792,41 @@ async function injectUserDashboard() {
     });
 
     const data = await res.json();
-    console.log("🧠 Returned from backend:", data); // 🔍 Patch goes here
+    console.log("🧠 Returned from backend:", data);
 
     const user = data.record || data.user || null;
     window.aigentsyUser = user; // ✅ Global reference for runtime access
 
-// 🛠 Ensure runtimeFlags unlocks sync with traits
-if (user) {
-  user.traits = user.traits || [];
+    // 🛠 Sync traits with unlocks — fallback-safe
+    if (user) {
+      user.traits = user.traits || [];
 
-  const traitMap = [
-    { path: "runtimeFlags.sdkAccess_eligible", trait: "sdk" },
-    { path: "runtimeFlags.vaultAccess", trait: "vault" },
-    { path: "runtimeFlags.remixUnlocked", trait: "remix" },
-    { path: "cloneLicenseUnlocked", trait: "clone" },
-    { path: "legalKitUnlocked", trait: "legal" },
-    { path: "runtimeFlags.brandingKitUnlocked", trait: "marketing" }
-  ];
+      const traitChecks = [
+        { value: user?.cloneLicenseUnlocked || user?.licenses?.clone, trait: "clone" },
+        { value: user?.legalKitUnlocked || user?.kits?.legal?.unlocked, trait: "legal" },
+        { value: user?.runtimeFlags?.vaultAccess || user?.licenses?.vault || user?.kits?.universal?.unlocked, trait: "vault" },
+        { value: user?.runtimeFlags?.sdkAccess_eligible || user?.licenses?.sdk, trait: "sdk" },
+        { value: user?.runtimeFlags?.remixUnlocked || user?.licenses?.remix, trait: "remix" },
+        { value: user?.runtimeFlags?.brandingKitUnlocked || user?.kits?.branding?.unlocked, trait: "marketing" }
+      ];
 
-  traitMap.forEach(({ path, trait }) => {
-    const value = path.split('.').reduce((o, k) => o?.[k], user);
-    if (value && !user.traits.includes(trait)) user.traits.push(trait);
-  });
+      traitChecks.forEach(({ value, trait }) => {
+        if (value && !user.traits.includes(trait)) {
+          user.traits.push(trait);
+        }
+      });
+    }
+
+    console.log("🧠 Full user record:", user);
+    console.log("💰 wallet.aigx:", user?.wallet?.aigx);
+    console.log("💼 wallet.staked:", user?.wallet?.staked);
+    console.log("🚀 runtimeFlags:", user?.runtimeFlags);
+    console.log("🏷 traits:", user?.traits);
+
+    // 👉 Your chart/summary box logic comes after this
+  } catch (error) {
+    console.error("❌ Error fetching user dashboard data:", error);
+  }
 }
 
     console.log("🧠 Full user record:", user);
