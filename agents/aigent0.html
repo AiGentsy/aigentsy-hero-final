@@ -777,7 +777,7 @@ async function injectUserDashboard() {
 
   const username = localStorage.getItem("aigentsyUsername");
   console.log("📌 Username from localStorage:", username);
-  console.log("📡 Fetching data from backend...");
+console.log("📡 Fetching data from JSONBin...");
 
   if (!username) {
     console.warn("⚠️ No username found. Skipping user injection.");
@@ -785,59 +785,16 @@ async function injectUserDashboard() {
   }
 
   try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
+   const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username })
+});
 
-    const data = await res.json();
-    console.log("🧠 Returned from backend:", data);
-
-    const user = data.record || data.user || null;
-    window.aigentsyUser = user; // ✅ Global reference for runtime access
-
-    // 🛠 Sync traits with unlocks — fallback-safe
-    if (user) {
-      user.traits = user.traits || [];
-
-      const traitChecks = [
-        { value: user?.cloneLicenseUnlocked || user?.licenses?.clone, trait: "clone" },
-        { value: user?.legalKitUnlocked || user?.kits?.legal?.unlocked, trait: "legal" },
-        { value: user?.runtimeFlags?.vaultAccess || user?.licenses?.vault || user?.kits?.universal?.unlocked, trait: "vault" },
-        { value: user?.runtimeFlags?.sdkAccess_eligible || user?.licenses?.sdk, trait: "sdk" },
-        { value: user?.runtimeFlags?.remixUnlocked || user?.licenses?.remix, trait: "remix" },
-        { value: user?.runtimeFlags?.brandingKitUnlocked || user?.kits?.branding?.unlocked, trait: "marketing" }
-      ];
-
-      traitChecks.forEach(({ value, trait }) => {
-        if (value && !user.traits.includes(trait)) {
-          user.traits.push(trait);
-        }
-      });
-    }
-
-    console.log("🧠 Full user record:", user);
-    console.log("💰 wallet.aigx:", user?.wallet?.aigx);
-    console.log("💼 wallet.staked:", user?.wallet?.staked);
-    console.log("🚀 runtimeFlags:", user?.runtimeFlags);
-    console.log("🏷 traits:", user?.traits);
-
-    // 👉 Your chart/summary box logic comes after this
-  } catch (error) {
-    console.error("❌ Error fetching user dashboard data:", error);
-  }
-}
-
-    console.log("🧠 Full user record:", user);
-    console.log("💰 wallet.aigx:", user?.wallet?.aigx);
-    console.log("💼 wallet.staked:", user?.wallet?.staked);
-    console.log("🚀 runtimeFlags:", user?.runtimeFlags);
-    console.log("🏷 traits:", user?.traits);
-
-    // ... (rest of your summaryBox, trait logic, etc.)
-
-// ✅ "Your AiGentsy Includes" Summary Injection
+const data = await res.json();
+const user = data.record || data.user || null;
+window.aigentsyUser = user; // ✅ Global reference for runtime access
+ // ✅ "Your AiGentsy Includes" Summary Injection
 const summaryBox = document.getElementById("businessSummaryList");
 if (summaryBox && user) {
   const summaryItems = [
@@ -1621,11 +1578,13 @@ function submitPackaging() {
     sdk: `<h3>🧬 Developer SDK</h3><p><a href="/kits/sdk.zip" target="_blank">Download SDK Toolkit</a></p>`,
     vault: `<h3>💼 Vault Access</h3><p><a href="/kits/vault-guide.pdf" target="_blank">Vault Guide (PDF)</a></p>`,
     legal: `<h3>📜 Legal Kit</h3>
-      <ul>
-        <li><a href="/kits/legal.pdf" target="_blank">IP Assignment Templates</a></li>
-        <li><a href="/kits/ncnda.pdf" target="_blank">Standard NCNDA</a></li>
-        <li><a href="/kits/legal-agent.html" target="_blank">Legal Agent Companion</a></li>
-      </ul>`,
+  <ul>
+    <li><a href="/kits/legal-kit/aigentsy_ip_assignment.pdf" target="_blank">IP Assignment Agreement</a></li>
+    <li><a href="/kits/legal-kit/aigentsy_output_license.pdf" target="_blank">AI Output Licensing Terms</a></li>
+    <li><a href="/kits/legal-kit/aigentsy_compliance_policy.pdf" target="_blank">Platform Compliance Policy</a></li>
+    <li><a href="/kits/legal-kit/aigentsy_ncnca_2yr.pdf" target="_blank">Mutual NCNDA (2-Year Non-Compete)</a></li>
+    <li><a href="/kits/aigentsy_legal_kit_bundle.zip" target="_blank" class="btn-glow">📦 Download Full Legal Kit</a></li>
+  </ul>`
     branding: `<h3>🎨 Branding Pack</h3>
       <ul>
         <li><a href="/kits/branding.zip" target="_blank">Brand Assets (ZIP)</a></li>
