@@ -237,68 +237,101 @@ function openPackagingModal(){ document.getElementById("packagingModal").style.d
 function closePackagingModal(){ document.getElementById("packagingModal").style.display="none"; }
 function closeProposalModal(){ document.getElementById("proposalModal").style.display="none"; }
 
-// --- overlay: resolve username from ?user= and persist
+// --- Username resolver (query -> localStorage)
 function resolveUsername(){
   const qp = new URLSearchParams(window.location.search);
-  const fromQuery = qp.get("user");
-  if (fromQuery && fromQuery !== localStorage.getItem("aigentsyUsername")){
-    localStorage.setItem("aigentsyUsername", fromQuery);
+  const qUser = qp.get("user");
+  if (qUser && qUser !== localStorage.getItem("aigentsyUsername")){
+    localStorage.setItem("aigentsyUsername", qUser);
   }
   return localStorage.getItem("aigentsyUsername") || null;
 }
 
-// --- overlay: bootstrap user (auto-mint if missing)
-async function bootstrapUser(username){
-  if (!username) return null;
-  // try load
+/* ===========================
+   Mint-on-first-load overlay
+=========================== */
+// --- Fetch or mint a record for this user
+async function getOrMintUser(username){
+  // 1) Try existing user
   let res = await fetch(`${API_BASE}/user`,{
-    method:"POST", headers:{ "Content-Type":"application/json" },
+    method:"POST", headers:{"Content-Type":"application/json"},
     body: JSON.stringify({ username })
   });
   let data = await res.json();
-  if (!data || data.error === "User not found"){
-    const companyType = localStorage.getItem("aigentsyUserAgent") || "general";
-    const referral = localStorage.getItem("aigentsyReferral") || "origin/dashboard";
-    try{
-      await fetch(`${API_BASE}/mint`,{
-        method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ username, companyType, referral })
-      });
-      // re-fetch after mint
-      res = await fetch(`${API_BASE}/user`,{
-        method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ username })
-      });
-      data = await res.json();
-      showToast("✅ Account minted and loaded.");
-    }catch(e){
-      console.error("Mint failed", e);
-      showToast("❌ Couldn’t mint your account.");
-    }
-  }
-  return (data && (data.record || data)) || {};
+  if (data && data.record) return data.record;
+
+  // 2) Not found → mint from server (server will use wade4 as base)
+  const selectedAgent = localStorage.getItem("aigentsyUserAgent") || null;
+  const referral = localStorage.getItem("aigentsyReferral") || "origin/hero";
+
+  res = await fetch(`${API_BASE}/mint`,{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ username, selectedAgent, referral })
+  });
+  data = await res.json();
+  if (data && data.record) return data.record;
+
+  throw new Error((data && data.error) || "Mint failed");
 }
 
-const stripeLinks = {
-  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
-  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
-  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
-  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
-  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
-  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
-  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
-};
-const unlockDescriptions = {
-  sdk: "Gain access to your SDK toolkit. Others can integrate or build on your work; you earn each time it’s used.",
-  vault: "Unlock your Vault — store, license, and protect agents, toolkits, and business logic.",
-  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your work.",
-  clone: "Allow your agents to be cloned. Clones track lineage and generate royalties.",
-  aigx: "Activate real-world earnings from AIGx token routing. Required for payout and partner shares.",
-  branding: "Branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
-  legal: "Full legal toolkit — licensing contracts, NDAs, and IP protection."
-};
+// --- Normalize shapes so widgets never crash
+function normalizeForUI(user){
+  user = user || {};
+  user.traits = user.traits || [];
+  user.kits = user.kits || {};
+  user.licenses = user.licenses || {};
+  user.runtimeFlags = user.runtimeFlags || {};
+  user.wallet = user.wallet || { staked: 0 };
+  user.yield = user.yield || { aigxEarned: 0, vaultYield: 0, remixYield: 0 };
 
-// Unified access resolver (works with canonical schema + legacy)
+  // Flatten unlock flags across old/new schemas
+  user.sdkAccess_eligible = Boolean(user.sdkAccess_eligible || user.licenses.sdk);
+  user.vaultAccess = Boolean(
+    user.vaultAccess ||
+    user.runtimeFlags.vaultAccess ||
+    (user.kits.universal && user.kits.universal.unlocked) ||
+    user.licenses.vault
+  );
+  user.cloneLicenseUnlocked = Boolean(user.cloneLicenseUnlocked || user.licenses.clone);
+
+  // remixUnlocked may be boolean; normalize to object with counts when needed
+  if (typeof user.remixUnlocked !== "object"){
+    user.remix = user.remix || {};
+    user.remixUnlocked = {
+      remixCount: Number(user.remix.remixCount || 0),
+      remixCredits: Number(user.remix.remixCredits || 0)
+    };
+  }
+  return user;
+}
+
+// --- One-button bootstrap for the whole page
+async function bootstrapDashboard(){
+  try{
+    let username = resolveUsername();
+    if (!username){
+      // allow direct open without query: give a temp name so mint works
+      username = `guest-${Date.now()}`;
+      localStorage.setItem("aigentsyUsername", username);
+    }
+
+    const record = await getOrMintUser(username);
+    const user = normalizeForUI(record);
+
+    // expose globally and hydrate UI
+    window.aigentsyUser = user;
+    injectUserDashboard(user);
+    autoMatchEngine(user.consent?.username || user.username || username, user);
+  }catch(e){
+    console.error("Dashboard bootstrap error:", e);
+    const box = document.getElementById("businessSummaryList");
+    if (box) box.innerHTML = "<li>⚠️ Could not load your profile. Try refresh.</li>";
+  }
+}
+
+/* ===========================
+   Flags & traits helpers
+=========================== */
 function getFlag(user, key){
   if(!user) return false;
   if (user[key] !== undefined) return !!user[key];                                        // legacy at root
@@ -378,14 +411,11 @@ async function runAgent(){
 if (sendBtn) sendBtn.onclick = runAgent;
 
 /* ===========================
-   Dashboard data injection
+   Dashboard data injection (accepts user)
 =========================== */
-async function injectUserDashboard(){
-  const username = resolveUsername();
-  if (!username){ showToast("⚠️ No username found. Use ?user=YOURNAME in the URL."); return; }
-
-  const user = await bootstrapUser(username);
-  window.aigentsyUser = user || {};
+async function injectUserDashboard(user){
+  user = user || window.aigentsyUser || {};
+  const username = user.consent?.username || user.username || resolveUsername() || "You";
 
   // Sidebar team names
   const csuiteBox = document.getElementById("csuiteBox");
@@ -398,11 +428,11 @@ async function injectUserDashboard(){
       { role: "CFO", name: "AiGent0" }
     ];
     csuiteBox.innerHTML = `
-      <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
-      <ul style="padding-left: 18px; font-size: 0.9rem;">
+      <h4 style=\"color:#00bfff; margin-bottom:6px;\">🏢 C-Suite Team</h4>
+      <ul style=\"padding-left: 18px; font-size: 0.9rem;\">
         ${roles.map(r=>`<li><strong>${r.role}:</strong> ${r.name}</li>`).join("")}
       </ul>
-      <p style="font-size:0.85rem;color:#888;">Each AiGent executes key executive functions across your venture.</p>
+      <p style=\"font-size:0.85rem;color:#888;\">Each AiGent executes key executive functions across your venture.</p>
     `;
   }
 
@@ -429,27 +459,27 @@ async function injectUserDashboard(){
   if (kitDocBox){
     let doc = "";
     if (hasTrait(user,"legal")) doc += `
-      <div style="margin-bottom:12px;">
+      <div style=\"margin-bottom:12px;\">
         <strong>📜 Legal Kit:</strong>
-        <ul style="padding-left:16px;">
+        <ul style=\"padding-left:16px;\">
           <li>IP Assignment & Licensing Templates</li>
           <li>Legal Agent Companion</li>
           <li>Trust Layer Hooks</li>
         </ul>
       </div>`;
     if (hasTrait(user,"saas")) doc += `
-      <div style="margin-bottom:12px;">
+      <div style=\"margin-bottom:12px;\">
         <strong>💻 SaaS Kit:</strong>
-        <ul style="padding-left:16px;">
+        <ul style=\"padding-left:16px;\">
           <li>Auth & Subscriptions</li>
           <li>Stripe Monetization</li>
           <li>Auto-routing AiGents</li>
         </ul>
       </div>`;
     if (hasTrait(user,"marketing")) doc += `
-      <div style="margin-bottom:12px;">
+      <div style=\"margin-bottom:12px;\">
         <strong>🎨 Branding Pack:</strong>
-        <ul style="padding-left:16px;">
+        <ul style=\"padding-left:16px;\">
           <li>Logo Templates (.svg)</li>
           <li>Brand Guidelines</li>
           <li>Social Media Kit</li>
@@ -457,9 +487,9 @@ async function injectUserDashboard(){
         </ul>
       </div>`;
     if (hasTrait(user,"custom")) doc += `
-      <div style="margin-bottom:12px;">
+      <div style=\"margin-bottom:12px;\">
         <strong>🧠 Custom Startup Kit:</strong>
-        <ul style="padding-left:16px;">
+        <ul style=\"padding-left:16px;\">
           <li>Generated from your input</li>
           <li>Matched C-Suite roles</li>
           <li>Pre-filled deploy templates</li>
@@ -480,7 +510,7 @@ async function injectUserDashboard(){
     achievementBox.innerHTML = achievements.length? achievements.map(a=>`<li>${a}</li>`).join('') : "<li>🚧 No achievements yet. Unlock modules to get started.</li>";
   }
 
-  // Chart
+  // Wallet chart
   const walletChartEl = document.getElementById('walletChart');
   if (walletChartEl && window.Chart){
     const remixCount    = user.remix?.remixCount || 0;
@@ -500,14 +530,30 @@ async function injectUserDashboard(){
         scales:{ y:{ beginAtZero:true, ticks:{color:'#888'}, grid:{color:'#222'} }, x:{ ticks:{color:'#aaa'}, grid:{display:false} } } }
     });
   }
-
-  // Populate unlock buttons
-  autoMatchEngine(username, user);
 }
 
 /* ===========================
    Unlocks / Stripe flow
 =========================== */
+const stripeLinks = {
+  sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
+  vault: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08",
+  remix: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07",
+  clone: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09",
+  aigx: "https://buy.stripe.com/7sI4hY9bN2kfbkU6oo",
+  branding: "https://buy.stripe.com/eVa9BXfWd5h1aQY5kn",
+  legal: "https://buy.stripe.com/6oE7sQ1GN7RRdMI6op"
+};
+const unlockDescriptions = {
+  sdk: "Gain access to your SDK toolkit. Others can integrate or build on your work; you earn each time it’s used.",
+  vault: "Unlock your Vault — store, license, and protect agents, toolkits, and business logic.",
+  remix: "Enable others to fork your offerings — and earn recurring yield as they remix your work.",
+  clone: "Allow your agents to be cloned. Clones track lineage and generate royalties.",
+  aigx: "Activate real-world earnings from AIGx token routing. Required for payout and partner shares.",
+  branding: "Branding pack (logo, kit, assets) for showcasing or reselling your AiGentsy work.",
+  legal: "Full legal toolkit — licensing contracts, NDAs, and IP protection."
+};
+
 function showUnlockModal(type){
   const titleMap = { sdk:"Unlock SDK Toolkit", vault:"Unlock Vault Access", remix:"Unlock Remix License", clone:"Unlock Clone License", aigx:"Unlock AIGx Earnings", branding:"Unlock Branding Pack", legal:"Unlock Legal Kit" };
   document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
@@ -516,7 +562,7 @@ function showUnlockModal(type){
     window.open(stripeLinks[type], "_blank");
     closeUnlockModal();
     // UI refresh — persistence handled server-side (once you add /update_unlock)
-    setTimeout(()=>injectUserDashboard(), 1200);
+    setTimeout(()=>bootstrapDashboard(), 1200);
   };
   document.getElementById("unlockModal").style.display = "flex";
 }
@@ -541,7 +587,7 @@ function autoMatchEngine(username, user){
     if (o.check()){
       li.innerHTML = `✅ ${o.label} Unlocked`;
     } else {
-      li.innerHTML = `<button class="btn-glow" onclick="showUnlockModal('${o.id}')">🔓 Unlock ${o.label}</button>`;
+      li.innerHTML = `<button class=\"btn-glow\" onclick=\"showUnlockModal('${o.id}')\">🔓 Unlock ${o.label}</button>`;
     }
     list.appendChild(li);
   });
@@ -552,7 +598,8 @@ function autoMatchEngine(username, user){
 =========================== */
 function openProposalModal(partner){ window.currentProposalPartner = partner; document.getElementById("proposalModal").style.display="flex"; }
 async function submitProposal(){
-  const username = resolveUsername();
+  const user = window.aigentsyUser || {};
+  const username = user.consent?.username || user.username || resolveUsername();
   const target = window.currentProposalPartner;
   const title = document.getElementById("proposalTitle").value.trim();
   const body  = document.getElementById("proposalBody").value.trim();
@@ -569,7 +616,8 @@ async function submitProposal(){
 }
 
 function openProposalInboxModal(){
-  const username = resolveUsername();
+  const user = window.aigentsyUser || {};
+  const username = user.consent?.username || user.username || resolveUsername();
   if (!username) return alert("Username missing.");
   document.getElementById("proposalInboxModal").style.display="flex";
   const box = document.getElementById("proposalInboxContent");
@@ -600,7 +648,8 @@ function triggerSDK(){
 }
 
 async function matchClients(){
-  const username = resolveUsername() || "growth_default";
+  const user = window.aigentsyUser || {};
+  const username = user.consent?.username || user.username || resolveUsername() || "growth_default";
   const loader = document.createElement("div");
   loader.className = "chat-agent";
   loader.textContent = "🤖 Matching clients via MetaBridge...";
@@ -646,7 +695,8 @@ window.triggerClientMatch = matchClients;
    Packaging submit
 =========================== */
 async function submitPackage(){
-  const username = resolveUsername() || "unknown";
+  const user = window.aigentsyUser || {};
+  const username = user.consent?.username || user.username || resolveUsername() || "unknown";
   const title = document.getElementById("pkgTitle").value.trim();
   const details = document.getElementById("pkgDetails").value.trim();
   const link = document.getElementById("pkgLink").value.trim();
@@ -679,21 +729,17 @@ if (dropZone) {
 }
 
 /* ===========================
-   Startup
+   Startup (single entry)
 =========================== */
-window.addEventListener("DOMContentLoaded", ()=>{
-  const username = resolveUsername();
-  // preload message
+window.addEventListener("DOMContentLoaded", () => {
+  // preload chat line
   const preload = document.createElement("div");
   preload.className = "chat-agent";
   preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
   document.getElementById("chatLog").appendChild(preload);
 
-  if (!username){
-    showToast("⚠️ No username found. Use ?user=YOURNAME in the URL.");
-    return;
-  }
-  injectUserDashboard();
+  // always bootstrap (creates guest-* if none, then mints)
+  bootstrapDashboard();
 });
 
 // utility: invites (local-only demo)
