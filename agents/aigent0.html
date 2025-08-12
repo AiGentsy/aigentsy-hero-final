@@ -232,11 +232,52 @@
 const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
 
 function showToast(message){ const t=document.getElementById("toast"); if(!t) return; t.textContent=message; t.style.display="block"; setTimeout(()=>t.style.display="none",3000); }
-
 function closeModal(){ document.getElementById("modalOverlay").style.display="none"; }
 function openPackagingModal(){ document.getElementById("packagingModal").style.display="flex"; }
 function closePackagingModal(){ document.getElementById("packagingModal").style.display="none"; }
 function closeProposalModal(){ document.getElementById("proposalModal").style.display="none"; }
+
+// --- overlay: resolve username from ?user= and persist
+function resolveUsername(){
+  const qp = new URLSearchParams(window.location.search);
+  const fromQuery = qp.get("user");
+  if (fromQuery && fromQuery !== localStorage.getItem("aigentsyUsername")){
+    localStorage.setItem("aigentsyUsername", fromQuery);
+  }
+  return localStorage.getItem("aigentsyUsername") || null;
+}
+
+// --- overlay: bootstrap user (auto-mint if missing)
+async function bootstrapUser(username){
+  if (!username) return null;
+  // try load
+  let res = await fetch(`${API_BASE}/user`,{
+    method:"POST", headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ username })
+  });
+  let data = await res.json();
+  if (!data || data.error === "User not found"){
+    const companyType = localStorage.getItem("aigentsyUserAgent") || "general";
+    const referral = localStorage.getItem("aigentsyReferral") || "origin/dashboard";
+    try{
+      await fetch(`${API_BASE}/mint`,{
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ username, companyType, referral })
+      });
+      // re-fetch after mint
+      res = await fetch(`${API_BASE}/user`,{
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ username })
+      });
+      data = await res.json();
+      showToast("✅ Account minted and loaded.");
+    }catch(e){
+      console.error("Mint failed", e);
+      showToast("❌ Couldn’t mint your account.");
+    }
+  }
+  return (data && (data.record || data)) || {};
+}
 
 const stripeLinks = {
   sdk: "https://buy.stripe.com/3cIaEWdnR1RV1GZ4iC6AM0a",
@@ -260,18 +301,13 @@ const unlockDescriptions = {
 // Unified access resolver (works with canonical schema + legacy)
 function getFlag(user, key){
   if(!user) return false;
-  // direct (legacy/top-level)
-  if (user[key] !== undefined) return !!user[key];
-  // runtimeFlags
-  if (user.runtimeFlags && user.runtimeFlags[key] !== undefined) return !!user.runtimeFlags[key];
-  // licenses map
-  if (user.licenses && user.licenses[key] !== undefined) return !!user.licenses[key];
-  // kits that imply access
+  if (user[key] !== undefined) return !!user[key];                                        // legacy at root
+  if (user.runtimeFlags && user.runtimeFlags[key] !== undefined) return !!user.runtimeFlags[key]; // runtimeFlags
+  if (user.licenses && user.licenses[key] !== undefined) return !!user.licenses[key];     // licenses map
   if (key === "vaultAccess") return !!(user.kits && user.kits.universal && user.kits.universal.unlocked);
   if (key === "brandingKitUnlocked") return !!(user.kits && user.kits.branding && user.kits.branding.unlocked);
   return false;
 }
-
 function hasTrait(user, trait){ return Array.isArray(user?.traits) && user.traits.includes(trait); }
 
 /* ===========================
@@ -289,7 +325,6 @@ function appendChat(role, text){
   chatLog.appendChild(div);
   chatLog.scrollTop = chatLog.scrollHeight;
 }
-
 function formatResponseEnhanced(text){
   let cleaned = (text || "")
     .replace(/[*_~`>#-]/g,'')
@@ -300,7 +335,6 @@ function formatResponseEnhanced(text){
   const wrapped = cleaned.match(/.{1,90}(\s|$)/g)?.join('\n') || cleaned;
   return wrapped;
 }
-
 async function runAgent(){
   const input = (textarea.value || "").trim();
   if(!input) return;
@@ -312,8 +346,8 @@ async function runAgent(){
   chatLog.appendChild(loader); chatLog.scrollTop = chatLog.scrollHeight;
 
   try {
-    // route by content (simple)
-    let endpoint = `${API_BASE}/agent`; // default: CFO/venture agent via your backend
+    // simple router
+    let endpoint = `${API_BASE}/agent`;
     const q = input.toLowerCase();
     if (/(sdk|developer|api|tech|integration|product|feature|tool)/.test(q)) endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
     else if (/(growth|marketing|campaign|promotion|audience|outreach)/.test(q)) endpoint = "https://aigent-growth-runtime.onrender.com/agent";
@@ -346,19 +380,12 @@ if (sendBtn) sendBtn.onclick = runAgent;
 /* ===========================
    Dashboard data injection
 =========================== */
-async function fetchUser(username){
-  const res = await fetch(`${API_BASE}/user`,{ method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify({ username })});
-  const data = await res.json();
-  return data.record || data;
-}
-
 async function injectUserDashboard(){
-  const username = localStorage.getItem("aigentsyUsername");
-  if(!username) return;
+  const username = resolveUsername();
+  if (!username){ showToast("⚠️ No username found. Use ?user=YOURNAME in the URL."); return; }
 
-  const data = await fetchUser(username);
-  const user = data || {};
-  window.aigentsyUser = user;
+  const user = await bootstrapUser(username);
+  window.aigentsyUser = user || {};
 
   // Sidebar team names
   const csuiteBox = document.getElementById("csuiteBox");
@@ -485,25 +512,11 @@ function showUnlockModal(type){
   const titleMap = { sdk:"Unlock SDK Toolkit", vault:"Unlock Vault Access", remix:"Unlock Remix License", clone:"Unlock Clone License", aigx:"Unlock AIGx Earnings", branding:"Unlock Branding Pack", legal:"Unlock Legal Kit" };
   document.getElementById("modalTitle").textContent = titleMap[type] || "Unlock";
   document.getElementById("modalBody").textContent = unlockDescriptions[type] || "No description available.";
-  document.getElementById("confirmUnlockBtn").onclick = async () => {
+  document.getElementById("confirmUnlockBtn").onclick = () => {
     window.open(stripeLinks[type], "_blank");
     closeUnlockModal();
-    // Confirm unlock immediately (user will return after Stripe)
-    try {
-      const username = localStorage.getItem("aigentsyUsername");
-      const res = await fetch(`${API_BASE}/update_unlock`, {
-        method:"POST", headers:{ "Content-Type":"application/json" },
-        body: JSON.stringify({ username, unlock: type === "branding" ? "brandingKitUnlocked" : (["sdk","vault","remix","clone","aigx"].includes(type) ? type : type) })
-      });
-      const data = await res.json();
-      if (data.ok) {
-        showToast(`✅ ${titleMap[type] || "Unlock"} confirmed`);
-        // refresh UI
-        injectUserDashboard();
-      } else {
-        showToast("⚠️ Unlock marked but not confirmed on server.");
-      }
-    } catch (e) { console.error(e); }
+    // UI refresh — persistence handled server-side (once you add /update_unlock)
+    setTimeout(()=>injectUserDashboard(), 1200);
   };
   document.getElementById("unlockModal").style.display = "flex";
 }
@@ -539,7 +552,7 @@ function autoMatchEngine(username, user){
 =========================== */
 function openProposalModal(partner){ window.currentProposalPartner = partner; document.getElementById("proposalModal").style.display="flex"; }
 async function submitProposal(){
-  const username = localStorage.getItem("aigentsyUsername");
+  const username = resolveUsername();
   const target = window.currentProposalPartner;
   const title = document.getElementById("proposalTitle").value.trim();
   const body  = document.getElementById("proposalBody").value.trim();
@@ -556,16 +569,12 @@ async function submitProposal(){
 }
 
 function openProposalInboxModal(){
-  const username = localStorage.getItem("aigentsyUsername");
+  const username = resolveUsername();
   if (!username) return alert("Username missing.");
   document.getElementById("proposalInboxModal").style.display="flex";
   const box = document.getElementById("proposalInboxContent");
   box.innerHTML = "Loading...";
-
-  // Demo placeholder (wire to your inbox endpoint if available)
-  setTimeout(()=>{
-    box.innerHTML = "<p>No incoming proposals yet.</p>";
-  }, 400);
+  setTimeout(()=>{ box.innerHTML = "<p>No incoming proposals yet.</p>"; }, 400);
 }
 function closeProposalInboxModal(){ document.getElementById("proposalInboxModal").style.display="none"; }
 
@@ -591,7 +600,7 @@ function triggerSDK(){
 }
 
 async function matchClients(){
-  const username = localStorage.getItem("aigentsyUsername") || "growth_default";
+  const username = resolveUsername() || "growth_default";
   const loader = document.createElement("div");
   loader.className = "chat-agent";
   loader.textContent = "🤖 Matching clients via MetaBridge...";
@@ -631,14 +640,13 @@ async function matchClients(){
     loader.textContent = "❌ Error matching clients: " + err.message;
   }
 }
-// Back-compat alias if anything still calls triggerClientMatch()
 window.triggerClientMatch = matchClients;
 
 /* ===========================
    Packaging submit
 =========================== */
 async function submitPackage(){
-  const username = localStorage.getItem("aigentsyUsername") || "unknown";
+  const username = resolveUsername() || "unknown";
   const title = document.getElementById("pkgTitle").value.trim();
   const details = document.getElementById("pkgDetails").value.trim();
   const link = document.getElementById("pkgLink").value.trim();
@@ -674,13 +682,17 @@ if (dropZone) {
    Startup
 =========================== */
 window.addEventListener("DOMContentLoaded", ()=>{
-  const username = localStorage.getItem("aigentsyUsername") || "admin4";
+  const username = resolveUsername();
   // preload message
   const preload = document.createElement("div");
   preload.className = "chat-agent";
   preload.innerHTML = `🤖 <strong>AiGent0:</strong><br/>Ready to launch your AiGentsy business? Just ask.`;
-  chatLog.appendChild(preload);
+  document.getElementById("chatLog").appendChild(preload);
 
+  if (!username){
+    showToast("⚠️ No username found. Use ?user=YOURNAME in the URL.");
+    return;
+  }
   injectUserDashboard();
 });
 
