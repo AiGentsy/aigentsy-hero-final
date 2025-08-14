@@ -153,9 +153,9 @@
 
       <div class="aigent-options">
         <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
-        <div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
-        <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
-        <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
+<div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
+<div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+<div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
       </div>
 
       <div id="aigentsySearchWrapper" style="margin-top: 30px;">
@@ -173,9 +173,6 @@
   </div>
 
   <script>
-  // =========================
-  // State & UI wiring
-  // =========================
   let authMode = "login";
   const usernameInput = document.getElementById('usernameInput');
   const passwordInput = document.getElementById('passwordInput');
@@ -186,7 +183,6 @@
   const aigentsySearch = document.getElementById("aigentsySearch");
   let selectedAgent = null;
 
-  // Referral tracking
   const urlParams = new URLSearchParams(window.location.search);
   const refCode = urlParams.get("ref");
   if (refCode) localStorage.setItem("aigentsyReferral", refCode);
@@ -201,7 +197,7 @@
   });
 
   function updateButtonState() {
-    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && (selectedAgent || aigentsySearch.value.trim());
+    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
     enterBtn.disabled = !valid;
   }
 
@@ -246,113 +242,186 @@
     agreeCheckbox.addEventListener('change', maybeShowSearch);
     aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
   });
+    
+  // ... your existing login/signup logic above ...
 
-  // =========================
-  // Backend API (new flow)
-  // =========================
-  const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
+  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+    const now = new Date().toISOString();
+    const roleMap = {
+  "legal": "CLO",
+  "social": "CSO",
+  "saas": "CTO",
+  "marketing": "CMO",
+  "universal": "COO"
+    };
 
-  async function mintUser(username, companyType, referral, customInput) {
-    const res = await fetch(`${API_BASE}/mint`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username,
-        companyType,
-        referral,
-        customInput: (customInput || "").trim()
-      })
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || `Mint failed (${res.status})`);
-    return data.record || data;
+   const entry = {
+  id: `User #${Date.now()}`,
+  consent: {
+    agreed: true,
+    username,
+    timestamp: now
+  },
+  trait: selectedAgent || "founder",
+  traits: [selectedAgent, "founder", "autonomous", "aigentsy"],
+  prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
+  offeringType: "kit",
+  offeringKeywords: selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
+    : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
+    : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
+    : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
+    : ["custom", "idea", "autonomous", "builder"],
+  referral: referralCode || "origin/hero",
+  runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+  mintTime: now,
+  role: roleMap[selectedAgent] || "CEO",
+  protocol: "MetaUpgrade25",
+  realm: {
+    name: "Realm 101 — Strategic Expansion",
+    joinedAt: now
+  },
+  metaVenture: {
+    ventureHive: "Autonomous Launch",
+    ventureRole: roleMap[selectedAgent] || "CEO",
+    ventureStatus: "Pending",
+    ventureID: `MV-${Date.now()}`
+  },
+  remix: {
+    remixCount: 0,
+    remixCredits: 1000,
+    lineageDepth: 0,
+    royaltyTerms: "Standard 30%"
+  },
+  mirror: {
+    mirroredInRealms: ["Realm 101 — Strategic Expansion"],
+    mirrorIntegrity: "Pending",
+    sentinelAlert: false
+  },
+  yield: {
+    autoStake: false,
+    aigxEarned: 0,
+    vaultYield: 0,
+    remixYield: 0
+  },
+  earningsEnabled: true,
+  listingStatus: "Active",
+  protocolStatus: "Bound",
+  tethered: true,
+  name: `AiGent ${roleMap[selectedAgent] || "Founder"}`,
+  sdkAccess_eligible: selectedAgent === "saas",
+  sdkAccess: false,
+  vaultAccess: true,  // ✅ Force unlock on mint
+  remixUnlocked: false,
+  cloneLicenseUnlocked: false,
+  licensingApproved: false,
+  stripeUnlocked: false,
+  productsPurchased: [],
+  teachStage: 1,
+  teachInComplete: false,
+  complianceReviewed: false,
+  complianceLog: [],
+  teachInLog: [],
+  runtimeFlags: {
+    flagged: false,
+    eligibleForAudit: true,
+    needsReview: false,
+    vaultAccess: true  // ✅ Ensure charts/unlocks render
   }
-
-  async function fetchUser(username) {
-    const res = await fetch(`${API_BASE}/user`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error || `User fetch failed (${res.status})`);
-    return data.record || data;
-  }
-
-  function getCompanyType() {
-    if (selectedAgent) return selectedAgent; // "legal" | "social" | "saas" | "marketing"
-    const q = (aigentsySearch.value || "").toLowerCase();
-    if (!q) return "general";
-    if (q.includes("legal")) return "legal";
-    if (q.includes("saas") || q.includes("software") || q.includes("app")) return "saas";
-    if (q.includes("marketing") || q.includes("ads") || q.includes("seo")) return "marketing";
-    if (q.includes("social") || q.includes("tiktok") || q.includes("reels") || q.includes("instagram")) return "social";
-    return "custom";
-  }
-
-  // Guard: only call if modal function exists on this page
-  function safeOpenKitModal(type) {
-    if (typeof openKitModal === "function") openKitModal(type);
-  }
-
-  // =========================
-  // Auth + Mint handler (patched)
-  // =========================
-  enterBtn.addEventListener('click', async () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value;
-
-    if (!user || pass.length < 4 || !agreeCheckbox.checked) {
-      alert("Please complete all fields and accept the terms.");
-      return;
-    }
-
+};
+    
     try {
-      let record;
-      if (authMode === "signup") {
-        const companyType = getCompanyType();
-        const referral = localStorage.getItem("aigentsyReferral") || "origin/hero";
-        record = await mintUser(user, companyType, referral, aigentsySearch.value);
-      } else {
-        record = await fetchUser(user);
+      const getRes = await fetch(JSONBIN_URL, {
+        headers: {
+          "X-Master-Key": JSONBIN_SECRET
+        }
+      });
+
+      if (!getRes.ok) {
+        console.error("JSONBin GET failed:", await getRes.text());
+        return;
       }
 
-      // Local session (kept for continuity with your dashboard)
+      const currentData = await getRes.json();
+      const updatedArray = [...currentData.record, entry];
+
+      const putRes = await fetch(JSONBIN_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": JSONBIN_SECRET
+        },
+        body: JSON.stringify(updatedArray)
+      });
+
+      if (!putRes.ok) {
+        console.error("JSONBin PUT failed:", await putRes.text());
+      } else {
+        console.log("✅ New user saved to JSONBin:", username);
+      }
+    } catch (err) {
+      console.error("JSONBin error:", err);
+    }
+  }
+   
+   enterBtn.addEventListener('click', async () => {
+  const user = usernameInput.value.trim();
+  const pass = passwordInput.value;
+
+  const storedUser = localStorage.getItem(`user:${user}`);
+  const storedPass = localStorage.getItem(`pass:${user}`);
+
+  const isNewUser = !storedUser || storedPass !== pass;
+
+  if (isNewUser) {
+    if (authMode === "signup") {
       localStorage.setItem(`user:${user}`, user);
       localStorage.setItem(`pass:${user}`, pass);
-      localStorage.setItem("aigentsyUsername", user);
-      localStorage.setItem("aigentsyUserConsent", "true");
-      localStorage.setItem("aigentsyUserAgent", selectedAgent || getCompanyType() || "general");
-      localStorage.setItem("aigentsyAuthMode", authMode);
 
-      // Redirect to dashboard
-      window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(user)}`);
-    } catch (err) {
-      console.error("Mint/Login error:", err);
-      alert(`❌ ${err.message || "Mint/Login failed"}`);
-    }
-  });
-
-  // =========================
-  // Modal triggers (guarded)
-  // =========================
-  // Auto-open kit modal when a hero card is chosen
-  aigentCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const type = card.getAttribute('data-agent');
-      if (["legal", "saas", "marketing", "social"].includes(type)) {
-        safeOpenKitModal(type); // guarded
+      try {
+        await registerUserToJSONBin(
+          user,
+          selectedAgent,
+          aigentsySearch.value,
+          localStorage.getItem("aigentsyReferral")
+        );
+      } catch (err) {
+        alert("❌ Registration failed. Please try again.");
+        return; // Stop execution
       }
-    });
-  });
-
-  // Also open custom modal if user types a new idea
-  aigentsySearch.addEventListener("input", (e) => {
-    const value = e.target.value.toLowerCase();
-    if (value.length > 8 && !["legal", "saas", "marketing", "social"].some(v => value.includes(v))) {
-      safeOpenKitModal("custom"); // guarded
+    } else {
+      alert("❌ Incorrect login. Switch to Sign Up if you're new.");
+      return; // Stop execution
     }
+  } else {
+    authMode = "login";
+  }
+
+  localStorage.setItem("aigentsyUsername", user);
+  localStorage.setItem("aigentsyUserConsent", "true");
+  localStorage.setItem("aigentsyUserAgent", selectedAgent);
+  localStorage.setItem("aigentsyAuthMode", authMode);
+
+  // ✅ Safer redirect
+  window.location.assign(`/agents/aigent0.html?user=${user}`);
+});
+// 🧠 Launch Kit Modal Automatically on Hero Selection
+aigentCards.forEach(card => {
+  card.addEventListener('click', () => {
+    const type = card.getAttribute('data-agent');
+    if (["legal", "saas", "marketing", "social"].includes(type)) {
+  openKitModal(type);
+}
   });
-  </script>
+});
+
+// 🧠 Also open custom modal if user types a new idea
+aigentsySearch.addEventListener("input", (e) => {
+  const value = e.target.value.toLowerCase();
+  if (value.length > 8 && !["legal", "saas", "marketing", "social"].some(v => value.includes(v))) {
+    openKitModal("custom");
+  }
+});
+
+</script>
 </body>
 </html>
