@@ -2119,5 +2119,354 @@ function closeProposalInboxModal() {
   </div>
 </div>
 
+
+<!-- AIGENTSY OVERLAY START -->
+<script id="aigentsy-boot-overlay">
+(() => {
+  if (window.__AIGENTSY_BOOTED__) return;
+  window.__AIGENTSY_BOOTED__ = true;
+
+  const API = {
+    user: "/user",
+    mint: "/mint",
+    unlock: "/unlock",
+    amgSync: "/amg/sync",
+    autonomy: "/autonomy",
+    aigxCredit: "/aigx/credit",
+    contactsOptin: "/contacts/optin",
+    contactsSend: "/contacts/send",
+    metabridge: "/metabridge",
+    jvCreate: "/jv/create",
+    agent: "/agent",
+    // stubs that backend will add next:
+    routerDecide: "/router/decide",
+    consentUpsert: "/consent/upsert",
+    consentList: "/consent/list",
+    pricingNudge: "/pricing/nudge",
+    metahiveOptin: "/metahive/optin",
+    metahiveSummary: "/metahive/summary",
+    earnList: "/earn/task/list",
+    earnComplete: "/earn/task/complete"
+  };
+
+  // ---- helpers ----
+  const qs = (s, r=document) => r.querySelector(s);
+  const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
+
+  function getParam(name) {
+    const u = new URL(window.location.href);
+    return u.searchParams.get(name);
+  }
+
+  function toast(msg, type="info") {
+    console && console.log(`[AiGentsy] ${type.toUpperCase()}:`, msg);
+    // non-intrusive: if a #toast or .toast element exists, reuse it
+    const t = qs("#toast") || qs(".toast");
+    if (t) { t.textContent = msg; t.dataset.type = type; t.style.opacity = 1; setTimeout(()=> t.style.opacity=0, 2500); }
+  }
+
+  // ---- v1.1 normalizer ----
+  function normalizeV11(raw) {
+    if (!raw || typeof raw !== "object") return {};
+    const kits = raw.kits || {
+      universal:{unlocked:false}, growth:{unlocked:false}, legal:{unlocked:false},
+      sdk:{unlocked:false}, branding:{unlocked:false}, marketing:{unlocked:false}, social:{unlocked:false}
+    };
+    const licenses = raw.licenses || { sdk:false, vault:false, remix:false, clone:false, aigx:false };
+    const rf = raw.runtimeFlags || {};
+    const vaultAccess = !!(rf.vaultAccess || raw.vaultAccess || licenses.vault || (kits.universal && kits.universal.unlocked));
+    const remixUnlocked = !!(rf.remixUnlocked || raw.remixUnlocked || licenses.remix);
+    const cloneLicenseUnlocked = !!(rf.cloneLicenseUnlocked || raw.cloneLicenseUnlocked || licenses.clone);
+    const sdkEligible = !!(rf.sdkAccess_eligible || raw.sdkAccess_eligible || raw.sdkAccess || licenses.sdk);
+    const proposals = Array.isArray(raw.proposals) && raw.proposals.length ? raw.proposals :
+      (raw.proposal ? [...(raw.proposal.proposalsSent||[]), ...(raw.proposal.proposalsReceived||[])] : []);
+
+    raw.amg ||= {apps:[], capabilities:[], lastSync:null};
+    raw.ownership ||= {aigx:0, royalties:0, ledger:[]};
+    raw.jvMesh ||= [];
+    raw.contacts ||= {sources:[], counts:{}, lastSync:null};
+
+    return {
+      ...raw,
+      schemaVersion: raw.schemaVersion || "v1.1",
+      kits, licenses, proposals,
+      runtimeFlags: {
+        flagged:false, eligibleForAudit:true, needsReview:false,
+        autonomyLevel:(rf.autonomyLevel || "AL1"),
+        ...rf,
+        vaultAccess, remixUnlocked, cloneLicenseUnlocked, sdkAccess_eligible:sdkEligible
+      }
+    };
+  }
+
+  // ---- boot: resolve user → /user → fallback /mint → expose window.aigentsyUser ----
+  async function getOrMint(username) {
+    try {
+      let r = await fetch(API.user, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username})});
+      let j = await r.json();
+      if (j && j.record) return j.record;
+      // fallback mint
+      r = await fetch(API.mint, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username, referral:"dashboard"})});
+      j = await r.json();
+      if (j && j.record) return j.record;
+      throw new Error(j?.error || "No record");
+    } catch (e) {
+      toast("User lookup failed. See console.", "error");
+      console.error(e);
+      return {};
+    }
+  }
+
+  async function hydrate() {
+    const username = getParam("user") || localStorage.getItem("aigentsy.username") || "guest";
+    if (username && username !== "guest") localStorage.setItem("aigentsy.username", username);
+
+    const raw = await getOrMint(username);
+    const record = normalizeV11(raw);
+    window.aigentsyUser = record;
+
+    // Emit event for any existing renderers
+    document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record}}));
+
+    // Re-render charts/unlocks/traits if functions exist
+    if (typeof window.renderCharts === "function") try { window.renderCharts(record); } catch(e) {}
+    if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(record); } catch(e) {}
+    if (typeof window.renderTraits === "function") try { window.renderTraits(record); } catch(e) {}
+
+    // Fill C‑Suite expansion if container exists
+    enhanceCSuite(record);
+
+    // Prime Proposal Inbox refresh loop
+    initProposalInbox(record);
+
+    // Wire AMG sync + contacts hooks once on first hydrate
+    wireAMG();
+    wireContacts();
+    wireUnlocks();
+    wireChat();
+  }
+
+  // ---- unlock binder ----
+  function wireUnlocks() {
+    document.addEventListener("click", async (ev) => {
+      const target = ev.target.closest("[data-unlock-kind][data-unlock-target]");
+      if (!target) return;
+      ev.preventDefault();
+      const kind = target.getAttribute("data-unlock-kind");   // kit | license | flag
+      const t    = target.getAttribute("data-unlock-target"); // e.g. branding | sdk | vaultAccess
+      const value = !(target.getAttribute("aria-pressed") === "true");
+      const username = window.aigentsyUser?.username;
+      if (!username) return toast("No user in session", "error");
+      try {
+        const r = await fetch(API.unlock, {
+          method:"POST", headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({username, kind, target: t, value})
+        });
+        const j = await r.json();
+        if (j && j.record) {
+          window.aigentsyUser = normalizeV11(j.record);
+          document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:window.aigentsyUser}}));
+          // optional: toggle pressed states
+          target.setAttribute("aria-pressed", String(value));
+          if (typeof window.renderCharts === "function") try { window.renderCharts(window.aigentsyUser); } catch(e) {}
+          if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(window.aigentsyUser); } catch(e) {}
+          toast("Unlocked ✓", "success");
+        } else {
+          toast(j?.error || "Unlock failed", "error");
+        }
+      } catch (e) {
+        console.error(e); toast("Unlock error", "error");
+      }
+    }, {capture:true});
+  }
+
+  // ---- chat wiring (C‑Suite routes preserved) ----
+  function wireChat() {
+    const input = qs("#chatInput");
+    const send  = qs("#chatSend");
+    const logEl = qs("#chatLog");
+    async function sendMsg() {
+      const text = (input && input.value || "").trim();
+      if (!text) return;
+      input.value = "";
+      if (logEl) {
+        const li = document.createElement("div");
+        li.className = "chat-line me";
+        li.textContent = text;
+        logEl.appendChild(li);
+      }
+      try {
+        const r = await fetch(API.agent, {
+          method:"POST", headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({input: text})
+        });
+        const j = await r.json();
+        const out = j.output || j.error || "No response.";
+        if (logEl) {
+          const li = document.createElement("div");
+          li.className = "chat-line agent";
+          li.textContent = out;
+          logEl.appendChild(li);
+          logEl.scrollTop = logEl.scrollHeight;
+        }
+      } catch (e) {
+        console.error(e); toast("Chat error", "error");
+      }
+    }
+    on(send, "click", sendMsg);
+    on(qs("#chatInput"), "keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
+  }
+
+  // ---- AMG sync (checkboxes or inputs named connect_app) ----
+  function wireAMG() {
+    const appInputs = qsa('input[name="connect_app"]');
+    if (!appInputs.length) return;
+    const username = window.aigentsyUser?.username;
+
+    function harvest() {
+      const apps = [];
+      appInputs.forEach(el => {
+        if ((el.type === "checkbox" && el.checked) || (el.type !== "checkbox" && el.value)) {
+          const name = el.value || el.dataset.app || el.name || "app";
+          const scopes = (el.dataset.scopes || "").split(",").filter(Boolean);
+          apps.push({name, scopes});
+        }
+      });
+      return apps;
+    }
+    async function sync() {
+      try {
+        const apps = harvest();
+        if (!apps.length || !username) return;
+        const r = await fetch(API.amgSync, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username, apps})});
+        const j = await r.json();
+        if (j && j.amg) {
+          window.aigentsyUser = normalizeV11(j.record || window.aigentsyUser);
+          document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:window.aigentsyUser}}));
+          toast("Apps synced ✓", "success");
+        }
+      } catch (e) { console.error(e); toast("AMG sync failed","error"); }
+    }
+    appInputs.forEach(el => on(el, "change", sync));
+  }
+
+  // ---- Contacts Growth (privacy-first, warm leads from user assets) ----
+  function wireContacts() {
+    const csv = qs("#contactsCSV");
+    const channelSel = qs("#contactsChannel");
+    const previewBtn = qs("#contactsPreview");
+    const sendBtn = qs("#contactsSend");
+    async function connectContacts() {
+      const username = window.aigentsyUser?.username;
+      if (!username) return;
+      const text = (csv && csv.value || "").trim();
+      if (!text) return toast("Paste emails or phone numbers first.");
+      const emails = (text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []);
+      const phones = (text.match(/\+?\d[\d\-\s]{6,}\d/g) || []);
+      const sources = [];
+      if (emails.length) sources.push({source:"upload/emails", count:emails.length});
+      if (phones.length) sources.push({source:"upload/phones", count:phones.length});
+      if (!sources.length) return toast("No contacts detected.", "warn");
+      try {
+        const r = await fetch(API.contactsOptin, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username, sources})});
+        const j = await r.json();
+        if (j && j.ok) { window.aigentsyUser = normalizeV11(j.record); toast("Contacts counted ✓", "success"); }
+      } catch (e) { console.error(e); toast("Contacts opt‑in failed","error"); }
+    }
+    async function sendContactsBlast(previewOnly=true) {
+      const username = window.aigentsyUser?.username;
+      if (!username) return;
+      const tmpl = qs("#contactsTemplate")?.value || "Hi — quick intro from my AiGentsy business.";
+      const channel = (channelSel && channelSel.value) || "email";
+      try {
+        const r = await fetch(API.contactsSend, {method:"POST", headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({username, channel, template: tmpl, previewOnly})});
+        const j = await r.json();
+        if (j && j.ok) toast(previewOnly ? "Preview logged ✓" : "Outreach sent ✓", "success");
+      } catch (e) { console.error(e); toast("Outreach failed","error"); }
+    }
+    on(qs("#contactsConnect"), "click", connectContacts);
+    on(previewBtn, "click", (e)=>{ e.preventDefault(); sendContactsBlast(true); });
+    on(sendBtn, "click", (e)=>{ e.preventDefault(); sendContactsBlast(false); });
+  }
+
+  // ---- Proposal Inbox (Cmd/Ctrl+P, 20s refresh if container exists) ----
+  function initProposalInbox(record) {
+    const modal = qs("#proposalInboxModal");
+    const list  = qs("#proposalInboxList");
+    if (!modal || !list) return;
+
+    async function refresh() {
+      const username = window.aigentsyUser?.username;
+      if (!username) return;
+      try {
+        const r = await fetch(API.user, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username})});
+        const j = await r.json();
+        const rec = normalizeV11(j.record || {});
+        const proposals = (rec.proposals || []).slice().sort((a,b)=> (b.score||0) - (a.score||0));
+        list.innerHTML = "";
+        proposals.forEach(p => {
+          const li = document.createElement("li");
+          li.className = "proposal-line";
+          li.textContent = (p.title || p.body || JSON.stringify(p)).slice(0,280);
+          list.appendChild(li);
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    // Shortcut
+    on(document, "keydown", (e)=>{
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+        e.preventDefault();
+        modal.style.display = "block";
+        refresh();
+      }
+    });
+    // 20s refresh loop
+    setInterval(refresh, 20000);
+  }
+
+  // ---- C‑Suite expansion (progressive enhancement: only fills if container exists) ----
+  function enhanceCSuite(record) {
+    const box = qs("#cSuiteList");
+    if (!box) return;
+    const roles = [
+      // Core
+      {k:"CEO", d:"You", a:"—"},
+      {k:"CFO / Venture", d:"AiGent0 (Venture Builder)", a:"Finance, mint, launch"},
+      {k:"CMO / Growth", d:"AiGent Growth", a:"MetaMatch, proposals, outreach"},
+      {k:"CTO / SDK", d:"AiGent SDK", a:"SDK licensing, clone logic"},
+      {k:"CLO / Creative+Legal", d:"AiGent Remix", a:"Remix lineage, branding, IP"},
+      // Expansion
+      {k:"CSO", d:"Strategy", a:"Roadmap, JV Mesh"},
+      {k:"CXO", d:"Experience", a:"Teach‑In, UX, packaging polish"},
+      {k:"CAO", d:"Autonomy", a:"AL0–AL5, guardrails"},
+      {k:"CCO", d:"Compliance", a:"Consent Vault, privacy"},
+      {k:"CHO", d:"Human Growth", a:"Invites, referrals, Phone‑Earn"},
+      {k:"CIO", d:"Integrations", a:"AMG connectors, apps"},
+      {k:"CRO", d:"Revenue", a:"Pricing tests, unlock funnels"},
+      {k:"COO", d:"Operations", a:"JV → settlement choreography"},
+      {k:"CPO", d:"Packaging", a:"Offers, playbooks, delivery"},
+      {k:"CDO", d:"Data/Insights", a:"Intent Ledger, uplift diffs"},
+      {k:"CISO", d:"Security/Consent", a:"Scopes, safelist/blocklist"},
+      {k:"CSRO", d:"Responsibility", a:"Reputation, safe tasks"}
+    ];
+    // idempotent fill
+    if (!box.dataset.filled) {
+      roles.forEach(r => {
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${r.k}</strong> — ${r.d}<span class="muted"> · ${r.a}</span>`;
+        box.appendChild(li);
+      });
+      box.dataset.filled = "true";
+    }
+  }
+
+  // Kick off
+  document.addEventListener("DOMContentLoaded", hydrate);
+})();
+</script>
+<!-- AIGENTSY OVERLAY END -->
 </body>
 </html>
