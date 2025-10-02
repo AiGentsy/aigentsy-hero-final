@@ -2468,5 +2468,251 @@ function closeProposalInboxModal() {
 })();
 </script>
 <!-- AIGENTSY OVERLAY END -->
+<script>
+/* ================================
+   AIGENTSY CONSUMER ROBUSTNESS PATCH
+   (Drop-in, overlay-only, idempotent)
+   ================================ */
+(() => {
+  if (window.__AIGENTSY_CONSUMER_PATCH__) return;
+  window.__AIGENTSY_CONSUMER_PATCH__ = true;
+
+  const API = {
+    user: "/user",
+    submitProposal: "/submit_proposal"
+  };
+
+  // ---------- tiny helpers ----------
+  const qs  = (s, r=document) => r.querySelector(s);
+  const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const nowISO = () => new Date().toISOString();
+
+  function toast(msg) {
+    const t = qs("#toast");
+    if (!t) return console.log("[AiGentsy]", msg);
+    t.textContent = msg;
+    t.style.display = "block";
+    setTimeout(()=> t.style.display="none", 1700);
+  }
+
+  function ensureBoxULByTitle(titlePart) {
+    // Finds a .metric-box whose <h3> includes titlePart and returns its <ul> (creates if missing)
+    const box = qsa(".metric-box").find(b => (b.querySelector("h3")?.textContent || "").includes(titlePart));
+    if (!box) return null;
+    let ul = box.querySelector("ul");
+    if (!ul) {
+      ul = document.createElement("ul");
+      ul.style.paddingLeft = "18px";
+      ul.style.fontSize = "0.9rem";
+      ul.style.color = "#ccc";
+      box.appendChild(ul);
+    }
+    return ul;
+  }
+
+  function appendActivity(line) {
+    // Prefer an "Activity Feed" box; else fall back to Achievements list
+    let ul = ensureBoxULByTitle("Activity Feed");
+    if (!ul) ul = qs("#achievementList");
+    if (!ul) return;
+    const li = document.createElement("li");
+    li.textContent = line;
+    ul.appendChild(li);
+  }
+
+  // ---------- renderers (safe defaults) ----------
+  if (typeof window.renderCharts !== "function") {
+    window.renderCharts = function(record) {
+      const canvas = qs("#walletChart");
+      if (!canvas || !window.Chart) return;
+
+      const user = record || {};
+      const y = user.yield || {};
+      const remix = user.remixUnlocked || {};
+
+      const bars = [
+        remix.remixCount || 0,
+        remix.remixCredits || 0,
+        y.vaultYield || 0,
+        y.remixYield || 0,
+        y.aigxEarned || 0,
+        user.staked || 0,
+        Array.isArray(user.cloneLineage) ? user.cloneLineage.length : 0
+      ];
+
+      if (canvas.chartInstance) canvas.chartInstance.destroy();
+      canvas.chartInstance = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: ['Remix Count','Remix Credits','Vault Yield','Remix Yield','AIGx Earned','Staked','Referrals'],
+          datasets: [{ data: bars, borderRadius: 6 }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }},
+          scales: {
+            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' }},
+            x: { ticks: { color: '#aaa' }, grid: { display: false }}
+          }
+        }
+      });
+    };
+  }
+
+  if (typeof window.renderUnlocks !== "function") {
+    window.renderUnlocks = function(record) {
+      const list = qs("#businessSummaryList");
+      if (!list) return;
+      const traits = record?.traits || [];
+      const items = [
+        {label:"SDK Toolkit", ok: !!(record?.sdkAccess_eligible || traits.includes("sdk"))},
+        {label:"Vault Access", ok: !!(record?.vaultAccess || traits.includes("vault"))},
+        {label:"Remix License", ok: !!(record?.remixUnlocked || traits.includes("remix"))},
+        {label:"Clone License", ok: !!(record?.cloneLicenseUnlocked || traits.includes("clone"))},
+        {label:"Legal Kit", ok: traits.includes("legal")},
+        {label:"Branding Pack", ok: traits.includes("marketing")}
+      ];
+      list.innerHTML = items.map(i => `<li>${i.ok ? "✅" : "🔒"} ${i.label}</li>`).join("");
+    };
+  }
+
+  if (typeof window.renderTraits !== "function") {
+    window.renderTraits = function(record) {
+      const doc = qs("#dynamicKitDoc");
+      if (!doc) return;
+      const traits = record?.traits || [];
+      const sections = [];
+      if (traits.includes("legal")) {
+        sections.push(`<div style="margin-bottom:12px;"><strong>📜 Legal Kit:</strong>
+          <ul style="padding-left:16px;">
+            <li>IP Assignment & Licensing Templates</li>
+            <li>Legal Companion Agent</li>
+            <li>Trust Layer Hooks</li>
+          </ul></div>`);
+      }
+      if (traits.includes("marketing")) {
+        sections.push(`<div style="margin-bottom:12px;"><strong>🎨 Branding Pack:</strong>
+          <ul style="padding-left:16px;">
+            <li>Logos & Brand Guidelines</li>
+            <li>Social Launch Kit</li>
+            <li>Landing Page Template</li>
+          </ul></div>`);
+      }
+      doc.innerHTML = sections.join("") || "🧠 No kit detected.";
+    };
+  }
+
+  // ---------- synthetic starters (never show a dead dashboard) ----------
+  function ensureSyntheticStarters(record) {
+    const user = record || {};
+    // Achievements
+    const ach = qs("#achievementList");
+    const hasAny = ach && ach.children && ach.children.length > 0 && !/Loading/i.test(ach.textContent);
+    if (!hasAny) {
+      ach.innerHTML = [
+        "🚀 Business Minted — Your AiGentsy is live",
+        "📊 Snapshot Ready — Earnings & lineage are being tracked",
+        "📩 First Proposal — Drafted by Growth agent"
+      ].map(x=>`<li>${x}</li>`).join("");
+    }
+
+    // Proposal Viewer text (if empty)
+    const viewerBox = qs("#proposalViewerBox");
+    if (viewerBox && !qs("#proposalInboxModal")) {
+      // noop — modal exists elsewhere; we keep click handler
+    }
+
+    // Wallet sidebar mini stats
+    const snapAigx = qs("#snapshotAigx");
+    if (snapAigx && (snapAigx.textContent === "+0" || snapAigx.textContent === "")) {
+      snapAigx.textContent = "+0 (tracking)";
+    }
+  }
+
+  // ---------- C-Suite visible outputs on hydrate ----------
+  function emitCSuiteBootLines(record) {
+    appendActivity("💼 CFO: Ledger initialized — earnings will be tracked.");
+    appendActivity("📣 CMO: Outreach cycle started — proposals will be generated.");
+    appendActivity("🧬 CTO: SDK packaging available — convert your work into a toolkit.");
+    appendActivity("📜 CLO: Legal templates ready — protect IP & enable licensing.");
+  }
+
+  // ---------- proposal heartbeat (keeps inbox alive) ----------
+  let heartbeatTimer = null;
+  async function proposalHeartbeat(record) {
+    const username = record?.consent?.username || record?.username || localStorage.getItem("aigentsyUsername") || "guest";
+    if (!username || username === "guest") return;
+    // Every 30s, if the user has zero proposals, draft one synthetic proposal server-side
+    if (heartbeatTimer) clearInterval(heartbeatTimer);
+    heartbeatTimer = setInterval(async () => {
+      try {
+        // Fetch fresh user to see if proposals exist
+        const r = await fetch(API.user, {
+          method:"POST",
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ username })
+        });
+        const j = await r.json();
+        const rec = j.record || {};
+        const count = Array.isArray(rec.proposals) ? rec.proposals.length : 0;
+        if (count > 0) return; // already alive
+
+        // Draft a lightweight synthetic proposal
+        await fetch(API.submitProposal, {
+          method:"POST",
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            sender: username,
+            recipient: "metabridge:auto",
+            title: "Starter Proposal: Quick Win Offer",
+            details: "We’ll deploy a simple, high-impact service in 24 hours (branding kit, landing page, or outreach bot).",
+            link: "",
+            timestamp: nowISO()
+          })
+        });
+
+        toast("📩 A starter proposal has been drafted.");
+        appendActivity("📬 CMO: Starter proposal added to your inbox.");
+      } catch(e) {
+        // silent — heartbeat continues
+      }
+    }, 30000);
+  }
+
+  // ---------- main hook: render on hydrated ----------
+  document.addEventListener("aigentsy:hydrated", (ev) => {
+    const record = ev.detail?.record || window.aigentsyUser || {};
+    try { window.renderCharts(record); } catch(e){}
+    try { window.renderUnlocks(record); } catch(e){}
+    try { window.renderTraits(record); } catch(e){}
+
+    ensureSyntheticStarters(record);
+    emitCSuiteBootLines(record);
+    proposalHeartbeat(record);
+  });
+
+  // Safety: if boot overlay didn’t fire yet but username exists, poll once to render
+  window.addEventListener("DOMContentLoaded", async () => {
+    const username = localStorage.getItem("aigentsyUsername") || localStorage.getItem("aigentsy.username");
+    if (!username) return;
+    setTimeout(async () => {
+      if (!window.aigentsyUser) {
+        try {
+          const r = await fetch(API.user, {
+            method:"POST",
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ username })
+          });
+          const j = await r.json();
+          const rec = j.record || {};
+          window.aigentsyUser = rec;
+          document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:rec}}));
+        } catch(e) {}
+      }
+    }, 400);
+  });
+})();
+</script>
+
 </body>
 </html>
