@@ -2713,6 +2713,141 @@ function closeProposalInboxModal() {
   });
 })();
 </script>
+<script>
+(() => {
+  if (window.__AIGENTSY_DASH_UPGRADE__) return;
+  window.__AIGENTSY_DASH_UPGRADE__ = true;
+
+  // ---- 0) Central API (flip BASE to swap envs) ----
+  const BASE = ""; // keep "" for same-origin API; or "https://your-runtime.onrender.com"
+  const API = {
+    quoteCreate: `${BASE}/quote/create`,
+    orderAccept: `${BASE}/order/accept`,
+    invoiceCreate: `${BASE}/invoice/create`,
+    payLink:      `${BASE}/pay/link`,
+    revenueRec:   `${BASE}/revenue/recognize`,
+    followSched:  (id) => `${BASE}/proposal/${encodeURIComponent(id)}/followup/schedule`,
+    consentList:  `${BASE}/consent/list`
+  };
+
+  // ---- 1) Normalize selectors & dedupe duplicate DOM ----
+  const chatLogEl = document.querySelector(".chat-log");
+  if (chatLogEl && !chatLogEl.id) chatLogEl.id = "chatLog";
+
+  ["modalOverlay","packagingModal"].forEach((id) => {
+    const nodes = Array.from(document.querySelectorAll(`#${id}`));
+    nodes.slice(1).forEach(n => n.remove()); // keep first, remove extras
+  });
+
+  // ---- 2) Single, global packaging modal handlers ----
+  window.openPackagingModal = function () {
+    const m = document.getElementById("packagingModal");
+    if (m) m.style.display = "flex";
+  };
+  window.closePackagingModal = function () {
+    const m = document.getElementById("packagingModal");
+    if (m) m.style.display = "none";
+  };
+
+  // ---- 3) Proposal Inbox: add O2C & follow-up actions ----
+  function attachProposalActions(container) {
+    if (!container) return;
+    container.querySelectorAll("[data-proposal-id]").forEach(card => {
+      if (card.dataset.o2cWired) return;
+      card.dataset.o2cWired = "1";
+      const pid = card.dataset.proposalId;
+
+      const bar = document.createElement("div");
+      bar.style.marginTop = "8px";
+      bar.innerHTML = `
+        <button class="btn-glow" data-act="accept">✅ Accept</button>
+        <button class="btn-glow" data-act="invoice">🧾 Invoice</button>
+        <button class="btn-glow" data-act="pay">💳 Pay</button>
+        <button class="btn-glow" data-act="follow">🔔 3-touch</button>
+      `;
+      card.appendChild(bar);
+
+      bar.addEventListener("click", async (e) => {
+        const act = e.target?.dataset?.act;
+        if (!act) return;
+        try {
+          if (act === "accept") {
+            // 1) create quote -> 2) accept -> order
+            const q = await (await fetch(API.quoteCreate, {
+              method: "POST", headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({ proposalId: pid, price: card.dataset.price || 0, scope: "standard", terms: "standard" })
+            })).json();
+
+            await fetch(API.orderAccept, {
+              method: "POST", headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({ quoteId: q.id || q.quoteId || pid })
+            });
+
+            toast?.("Order created ✓");
+          }
+          else if (act === "invoice") {
+            await fetch(API.invoiceCreate, {
+              method: "POST", headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({ orderId: pid, amount: card.dataset.amount || 0, currency: "USD" })
+            });
+            toast?.("Invoice issued ✓");
+          }
+          else if (act === "pay") {
+            const r = await (await fetch(API.payLink, { method: "POST" })).json();
+            if (r && r.url) window.open(r.url, "_blank");
+          }
+          else if (act === "follow") {
+            await fetch(API.followSched(pid), {
+              method: "POST", headers: {"Content-Type":"application/json"},
+              body: JSON.stringify({ sequence: "standard" })
+            });
+            toast?.("Follow-ups scheduled ✓");
+          }
+        } catch (err) {
+          console.error(err);
+          toast?.("O2C action failed", "error");
+        }
+      });
+    });
+  }
+
+  // Observe inbox for content (works with your existing loader)
+  const inbox = document.getElementById("proposalInboxContent");
+  if (inbox) {
+    const mo = new MutationObserver(() => attachProposalActions(inbox));
+    mo.observe(inbox, { childList: true, subtree: true });
+    attachProposalActions(inbox);
+  }
+
+  // ---- 4) Consent Vault badge in sidebar ----
+  const csuite = document.getElementById("csuiteBox");
+  if (csuite && !document.getElementById("consentBadge")) {
+    const b = document.createElement("div");
+    b.id = "consentBadge";
+    b.style.marginTop = "8px";
+    b.style.fontSize = ".8rem";
+    b.style.color = "#9cf";
+    b.innerHTML = `🛡️ Consent Vault: <span id="consentState">checking…</span>`;
+    csuite.appendChild(b);
+
+    fetch(API.consentList, { method: "POST" })
+      .then(r => r.json())
+      .then(j => { document.getElementById("consentState").textContent = (j && j.count > 0) ? "active" : "empty"; })
+      .catch(() => { document.getElementById("consentState").textContent = "n/a"; });
+  }
+
+  // ---- 5) Guard optional elements used elsewhere ----
+  ["cSuiteList","overviewBox","proposalInboxList"].forEach(id => {
+    if (!document.getElementById(id)) {
+      const holder = document.createElement("ul");
+      holder.id = id;
+      holder.style.display = "none";
+      document.body.appendChild(holder);
+    }
+  });
+})();
+</script>
+
 
 </body>
 </html>
