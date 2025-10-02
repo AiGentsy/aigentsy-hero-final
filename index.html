@@ -422,5 +422,178 @@ aigentsySearch.addEventListener("input", (e) => {
 });
 
 </script>
+<script>
+(() => {
+  // -----------------------------
+  // Config
+  // -----------------------------
+  const BASE = ""; // set to e.g. "https://your-api.onrender.com" if API is on a different host
+  const API = {
+    mint:         `${BASE}/mint`,
+    offerPublish: `${BASE}/offer/publish`,
+    kpiRollup:    `${BASE}/kpi/rollup`
+  };
+
+  // -----------------------------
+  // Elements
+  // -----------------------------
+  const usernameInput  = document.getElementById('usernameInput');
+  const passwordInput  = document.getElementById('passwordInput'); // UI only; not sent to server
+  const agreeCheckbox  = document.getElementById('agreeCheckbox');
+  const enterBtn       = document.getElementById('enterBtn');
+  const aigentCards    = document.querySelectorAll('.aigent-card');
+  const searchInput    = document.getElementById('aigentsySearch');
+  const suggestionBox  = document.getElementById('aigentsySuggestion');
+
+  // -----------------------------
+  // State
+  // -----------------------------
+  let authMode = "login";             // we still show login/signup UX, but /mint is idempotent
+  let selectedAgent = null;           // legal | social | saas | marketing | custom
+  // capture ?ref and basic UTMs into one referral string
+  const params = new URLSearchParams(location.search);
+  const referral = params.get("ref") ||
+                   [params.get("utm_source"), params.get("utm_medium"), params.get("utm_campaign")]
+                     .filter(Boolean).join("/") || "origin/hero";
+  localStorage.setItem("aigentsyReferral", referral);
+
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+  const companyTypeMap = (agent) => {
+    switch ((agent || "").toLowerCase()) {
+      case "legal":     return "legal";
+      case "social":    return "social";
+      case "saas":      return "saas";
+      case "marketing": return "marketing";
+      case "custom":    return "custom";
+      default:          return "general";
+    }
+  };
+
+  function updateButtonState() {
+    const valid =
+      usernameInput.value.trim().length > 0 &&
+      agreeCheckbox.checked &&
+      !!selectedAgent;
+    // (password length check removed from gating server call; keep if you want stricter UI)
+    enterBtn.disabled = !valid;
+  }
+
+  function showSuggestion(value) {
+    const v = (value || "").toLowerCase();
+    let msg = "We’ll build you a custom AiGentsy based on your input.";
+    if (v.includes("legal"))        msg = "Try the Legal AiGentsy — IP, licensing, contracts.";
+    else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
+    else if (v.includes("saas"))    msg = "Try the SaaS AiGentsy — agent-powered web tools.";
+    else if (v.includes("ads") || v.includes("marketing")) msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
+    else if (v.includes("agency"))  msg = "Sounds like a services AiGentsy — we can assemble one.";
+    suggestionBox.textContent = msg;
+  }
+
+  // No-op stub to avoid errors from old code references
+  window.openKitModal = function(){};
+
+  // -----------------------------
+  // Event wiring
+  // -----------------------------
+  aigentCards.forEach(card => {
+    card.addEventListener('click', () => {
+      aigentCards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedAgent = card.getAttribute('data-agent');
+      updateButtonState();
+      // seed search suggestions by selected agent
+      showSuggestion(selectedAgent);
+    });
+  });
+
+  usernameInput.addEventListener('input', updateButtonState);
+  agreeCheckbox.addEventListener('change', updateButtonState);
+  passwordInput.addEventListener('input', updateButtonState);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // turn search on when the form is valid
+    function maybeShowSearch() {
+      const valid = !enterBtn.disabled;
+      document.getElementById("aigentsySearchWrapper").style.display = valid ? "block" : "none";
+    }
+    usernameInput.addEventListener('input', maybeShowSearch);
+    agreeCheckbox.addEventListener('change', maybeShowSearch);
+    aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
+
+    searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+  });
+
+  // Toggle login/signup label
+  window.toggleAuthMode = function () {
+    authMode = (authMode === "login") ? "signup" : "login";
+    document.querySelector('.toggle-auth').textContent =
+      (authMode === "login") ? "Don't have an account? Sign up" : "Already have an account? Log in";
+    updateButtonState();
+  };
+
+  // -----------------------------
+  // Main action: Mint → (optional offer publish) → redirect
+  // -----------------------------
+  enterBtn.addEventListener('click', async () => {
+    if (enterBtn.disabled) return;
+
+    const username    = usernameInput.value.trim();
+    const companyType = companyTypeMap(selectedAgent);
+    const idea        = searchInput.value.trim();
+
+    // Persist local session hints (no passwords)
+    localStorage.setItem("aigentsyUsername", username);
+    localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false");
+    localStorage.setItem("aigentsyUserAgent", selectedAgent);
+    localStorage.setItem("aigentsyAuthMode", authMode);
+
+    // 1) Mint (idempotent: creates if new, returns existing if already minted)
+    try {
+      const res = await fetch(API.mint, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, companyType, referral })
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "Mint failed");
+    } catch (e) {
+      alert("❌ Could not mint your AiGentsy. Please try again.");
+      console.error(e);
+      return;
+    }
+
+    // 2) Optionally publish a starter offer for a “live” first impression
+    try {
+      await fetch(API.offerPublish, {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          username,
+          title: idea ? `Quick Win: ${idea.slice(0, 40)}` : "Quick Win Offer",
+          price: companyType === "saas" ? 199 : 149,
+          scope: companyType === "saas" ? "Prototype a micro-SaaS module (48h)" : "Starter branding/launch asset (24h)",
+          terms: "Standard terms",
+          src: "hero"
+        })
+      });
+      // small KPI snapshot so tiles are populated
+      fetch(API.kpiRollup, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ username })
+      }).catch(()=>{});
+    } catch (e) {
+      // non-fatal
+      console.warn("offerPublish/kpiRollup skipped:", e);
+    }
+
+    // 3) Redirect to dashboard
+    window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+  });
+})();
+</script>
+
 </body>
 </html>
