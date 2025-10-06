@@ -594,6 +594,63 @@ aigentsySearch.addEventListener("input", (e) => {
   });
 })();
 </script>
+<script>
+  // Point to your API
+  const BASE = "https://aigentsy-ame-runtime.onrender.com";
+
+  async function mintFromHero({ username, companyType, referral, customInput, meta_role }) {
+    const body = { username, companyType, referral, customInput, meta_role };
+    const res = await fetch(BASE + "/mint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.detail || "mint failed");
+    return json.record || json; // server returns { ok, record }
+  }
+
+  // Hook up the Launch button
+  (function wireMint() {
+    const enterBtn = document.getElementById("enterBtn");
+    const usernameInput = document.getElementById("usernameInput");
+    const searchInput = document.getElementById("aigentsySearch");
+    // assuming you already set window.selectedAgent when the user picks a card:
+    let selectedAgent = window.selectedAgent || "general";
+
+    // if your code uses a different variable, update this assignment:
+    document.querySelectorAll(".aigent-card").forEach(card => {
+      card.addEventListener("click", () => {
+        selectedAgent = card.getAttribute("data-agent") || "general";
+      });
+    });
+
+    enterBtn.addEventListener("click", async () => {
+      const username = (usernameInput.value || "").trim();
+      const companyType = (selectedAgent || "general").toLowerCase();
+      const referral = localStorage.getItem("aigentsyReferral") || "origin/hero";
+      const customInput = (searchInput && searchInput.value) || "";
+
+      if (!username) { alert("Enter a username"); return; }
+
+      enterBtn.disabled = true; enterBtn.textContent = "Minting…";
+      try {
+        const rec = await mintFromHero({ username, companyType, referral, customInput });
+        // minimal local session
+        localStorage.setItem("aigentsyUsername", rec.username || username);
+        localStorage.setItem("aigentsyUserAgent", companyType);
+        localStorage.setItem("aigentsyUserConsent", "true");
+        // go to dashboard
+        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+      } catch (e) {
+        console.error(e);
+        alert("❌ Mint error: " + e.message);
+      } finally {
+        enterBtn.disabled = false; enterBtn.textContent = "🚀 Launch Your AiGentsy";
+      }
+    });
+  })();
+</script>
 
 </body>
 </html>
