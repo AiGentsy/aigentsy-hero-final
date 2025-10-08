@@ -2860,10 +2860,7 @@ function closeProposalInboxModal() {
 </style>
 
 <button id="aig-set-key-btn" onclick="setApiKey()">🔑 Set API Key</button>
-
-<div id="aig-inline-blocks" class="aig-inline-controls">
-  <div><b>Platform Fee:</b> <span id="platformFee">—</span></div>
-  <div>
+<div>
     <input id="payoutAmt" type="number" placeholder="Payout amount">
     <button onclick="requestPayout()">💸 Request Payout</button>
   </div>
@@ -3015,5 +3012,291 @@ function closeProposalInboxModal() {
   }catch{} }, 0);
 })();
 </script>
+
+<div id="aig-actions-toolbar" style="display:none" class="aig-inline-controls" style="margin-top:16px;">
+  <div style="align-self:center"><b>Actions</b> • Platform Fee: <span id="platformFee">—</span></div>
+  <div>
+    <button class="btn-glow" onclick="AIGUI.open('payout')">💸 Request Payout</button>
+    <button class="btn-glow" onclick="AIGUI.open('register')">📡 Register Hook</button>
+    <button class="btn-glow" onclick="AIGUI.open('push')">🚀 Push Distribution</button>
+    <button class="btn-glow" onclick="AIGUI.open('jv')">🤝 Create JV</button>
+    <button class="btn-glow" onclick="AIGUI.open('split')">💠 Split Revenue</button>
+  </div>
+</div>
+
+<style id="aig-modal-style">
+.aig-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9998}
+.aig-modal{width:min(560px,96vw);background:#0e0f13;color:#f2f2f2;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.aig-modal header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
+.aig-modal header h3{margin:0;font-size:16px}
+.aig-modal .body{padding:16px}
+.aig-modal .row{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+.aig-modal input, .aig-modal select{flex:1;min-width:180px;padding:10px;border-radius:10px;border:1px solid #2a2d36;background:#14161b;color:#fff}
+.aig-modal footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:flex-end}
+.aig-btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer}
+.aig-btn.primary{background:#3a7afe;color:#fff}
+.aig-btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.15)}
+</style>
+
+<div id="aig-overlay" class="aig-modal-overlay" onclick="if(event.target.id==='aig-overlay')AIGUI.close()">
+  <div class="aig-modal" role="dialog" aria-modal="true" aria-labelledby="aig-modal-title">
+    <header>
+      <h3 id="aig-modal-title">Action</h3>
+      <button class="aig-btn ghost" onclick="AIGUI.close()">✕</button>
+    </header>
+    <div class="body" id="aig-modal-body"></div>
+    <footer id="aig-modal-footer"></footer>
+  </div>
+</div>
+
+<script>
+// Ensure AiG wrapper exists (from earlier patch); otherwise define a minimal one
+window.AiG = window.AiG || {
+  get apiKey(){ return localStorage.getItem("AIG_API_KEY")||""; },
+  set apiKey(v){ localStorage.setItem("AIG_API_KEY", v||""); },
+  uname(){ return (window.aigentsyUser?.username || window.aigentsyUser?.consent?.username || localStorage.getItem("aigentsyUsername") || "").trim(); },
+  uuid(){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); },
+  async post(path, body={}, {idempotent}={}){
+    const headers={"Content-Type":"application/json"};
+    if (AiG.apiKey) headers["X-API-Key"]=AiG.apiKey;
+    if (idempotent) headers["Idempotency-Key"]=idempotent;
+    const r=await fetch(path,{method:"POST",headers,body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.detail||j.error||`${r.status} ${r.statusText}`);
+    return j;
+  }
+};
+
+const AIGUI = (function(){
+  const overlay = () => document.getElementById('aig-overlay');
+  const title = () => document.getElementById('aig-modal-title');
+  const body = () => document.getElementById('aig-modal-body');
+  const footer = () => document.getElementById('aig-modal-footer');
+
+  const views = {
+    payout: {
+      title: "Request Payout",
+      render(){
+        body().innerHTML = \`
+          <div class="row">
+            <input id="m-payout-amt" type="number" step="0.01" placeholder="Amount">
+          </div>\`;
+        footer().innerHTML = \`
+          <button class="aig-btn ghost" onclick="AIGUI.close()">Cancel</button>
+          <button class="aig-btn primary" onclick="AIGUI.submit('payout')">Request Payout</button>\`;
+      },
+      async submit(){
+        const amt = Number(document.getElementById('m-payout-amt').value||0);
+        if(!amt) return alert("Enter an amount");
+        const idemp = AiG.uuid();
+        const res = await AiG.post("/payout/request",{username:AiG.uname(), amount: amt},{idempotent:idemp});
+        alert(\`Requested payout: net \${res?.payment?.net}\`);
+        AIGUI.close();
+      }
+    },
+    register: {
+      title: "Register Distribution Webhook",
+      render(){
+        body().innerHTML = \`
+          <div class="row">
+            <input id="m-reg-url" placeholder="https://hooks.slack.com/...">
+            <input id="m-reg-token" placeholder="Token (optional)">
+          </div>\`;
+        footer().innerHTML = \`
+          <button class="aig-btn ghost" onclick="AIGUI.close()">Cancel</button>
+          <button class="aig-btn primary" onclick="AIGUI.submit('register')">Register</button>\`;
+      },
+      async submit(){
+        const url = (document.getElementById('m-reg-url').value||'').trim();
+        const token = (document.getElementById('m-reg-token').value||'').trim();
+        try{ const u = new URL(url); if(!/^https?:$/.test(u.protocol)) throw 0; }catch{ return alert("Enter a valid https:// URL"); }
+        await AiG.post("/distribution/register",{username:AiG.uname(), channel:"webhook", endpoint_url:url, token});
+        alert("Webhook registered.");
+        AIGUI.close();
+      }
+    },
+    push: {
+      title: "Push Distribution",
+      render(){
+        body().innerHTML = \`
+          <div class="row">
+            <input id="m-push-lid" placeholder="Listing ID">
+          </div>\`;
+        footer().innerHTML = \`
+          <button class="aig-btn ghost" onclick="AIGUI.close()">Cancel</button>
+          <button class="aig-btn primary" onclick="AIGUI.submit('push')">Send</button>\`;
+      },
+      async submit(){
+        const lid = (document.getElementById('m-push-lid').value||'').trim();
+        if(!lid) return alert("Enter a listing ID");
+        const res = await AiG.post("/distribution/push",{username:AiG.uname(), listingId: lid});
+        alert(res.ok ? "Push sent." : "Push failed.");
+        AIGUI.close();
+      }
+    },
+    jv: {
+      title: "Create Joint Venture",
+      render(){
+        body().innerHTML = \`
+          <div class="row">
+            <input id="m-jv-title" placeholder="JV Title" value="JV">
+          </div>
+          <div class="row">
+            <input id="m-jv-a" placeholder="Member A (default: you)" value="\${AiG.uname()}">
+            <input id="m-jv-aS" type="number" step="0.01" value="0.5">
+          </div>
+          <div class="row">
+            <input id="m-jv-b" placeholder="Member B (optional)">
+            <input id="m-jv-bS" type="number" step="0.01" value="0.5">
+          </div>\`;
+        footer().innerHTML = \`
+          <button class="aig-btn ghost" onclick="AIGUI.close()">Cancel</button>
+          <button class="aig-btn primary" onclick="AIGUI.submit('jv')">Create JV</button>\`;
+      },
+      async submit(){
+        const title = (document.getElementById('m-jv-title').value||'JV').trim();
+        const a = (document.getElementById('m-jv-a').value||AiG.uname()).trim();
+        const b = (document.getElementById('m-jv-b').value||'').trim() || null;
+        const split = { a: Number(document.getElementById('m-jv-aS').value||0.5), b: Number(document.getElementById('m-jv-bS').value||0.5) };
+        const res = await AiG.post("/jv/create",{username:AiG.uname(), title, a, b, split});
+        alert("JV created: "+ (res?.jv?.id||'(no id)'));
+        AIGUI.close();
+      }
+    },
+    split: {
+      title: "Split Revenue",
+      render(){
+        body().innerHTML = \`
+          <div class="row">
+            <input id="m-split-jv" placeholder="JV ID">
+          </div>
+          <div class="row">
+            <input id="m-split-amt" type="number" step="0.01" placeholder="Amount">
+          </div>\`;
+        footer().innerHTML = \`
+          <button class="aig-btn ghost" onclick="AIGUI.close()">Cancel</button>
+          <button class="aig-btn primary" onclick="AIGUI.submit('split')">Split</button>\`;
+      },
+      async submit(){
+        const jvId = (document.getElementById('m-split-jv').value||'').trim();
+        const amt = Number(document.getElementById('m-split-amt').value||0);
+        if(!amt) return alert("Enter an amount");
+        const res = await AiG.post("/revenue/split",{username:AiG.uname(), jvId, amount: amt});
+        alert("Split posted: "+ JSON.stringify(res.split||[]));
+        AIGUI.close();
+      }
+    }
+  };
+
+  function open(kind){
+    const v = views[kind]; if(!v) return;
+    title().textContent = v.title;
+    v.render();
+    overlay().style.display = "flex";
+    overlay().dataset.view = kind;
+  }
+  function close(){ overlay().style.display = "none"; body().innerHTML=""; footer().innerHTML=""; }
+  async function submit(kind){ const v=views[kind||overlay().dataset.view]; if(!v) return; await v.submit(); }
+
+  // expose
+  return { open, close, submit };
+})();
+
+// Upgrade C‑Suite panel if present
+(function upgradeCSuite(){
+  try{
+    const textMatch = (el) => (el.textContent||"").trim().toLowerCase() === "c-suite team";
+    const headers = Array.from(document.querySelectorAll("h1,h2,h3,h4,h5,div,strong,span")).filter(textMatch);
+    if (headers.length){
+      const panel = headers[0].closest("div");
+      if (panel){
+        panel.innerHTML = `<div style="padding:8px 0;"><b>C‑Suite Team</b></div>
+          <ul style="list-style: none; padding-left: 0; line-height:1.6;">
+            <li>CEO: You</li>
+            <li>CTO: AiGent Tech</li>
+            <li>CMO: AiGent Marketing</li>
+            <li>CFO: AiGent Finance</li>
+            <li>COO: AiGent Operations</li>
+            <li>CLO: AiGent IP & Legal</li>
+            <li>CSO: Security & Trust</li>
+            <li>CPO: Product</li>
+            <li>CHRO: People Ops</li>
+          </ul>
+          <div style="font-size:12px;opacity:.8;">Each AiGent executes executive functions across your venture. Consent Vault: n/a.</div>`;
+      }
+    }
+  }catch{}
+})();
+</script>
 </body>
 </html>
+
+<script>
+// Place actions into existing tiles by heading text, preserving layout.
+(function(){
+  function findTileByHeading(text){
+    const heads = Array.from(document.querySelectorAll("h1,h2,h3,h4,div,section,header")).filter(el => (el.textContent||"").trim().toLowerCase() === text.toLowerCase());
+    if (!heads.length) return null;
+    // prefer a container card around the header
+    let node = heads[0];
+    while (node && node !== document.body){
+      if (node.classList && (node.classList.contains("card") || node.style.borderRadius || node.style.boxShadow)){
+        return node;
+      }
+      node = node.parentElement;
+    }
+    // fallback: use header's parent
+    return heads[0].parentElement;
+  }
+
+  function mk(btnText, onclick){
+    const b = document.createElement("button");
+    b.className = "btn-glow";
+    b.style.marginRight = "8px";
+    b.textContent = btnText;
+    b.onclick = onclick;
+    return b;
+  }
+
+  function addToolbarInto(tile, title){
+    if (!tile) return;
+    const bar = document.createElement("div");
+    bar.style.marginTop = "10px";
+    bar.style.display = "flex";
+    bar.style.flexWrap = "wrap";
+    bar.style.gap = "8px";
+    const label = document.createElement("div");
+    label.style.alignSelf = "center";
+    label.innerHTML = `<b>${title}</b> • Platform Fee: <span id="platformFee">—</span>`;
+    bar.appendChild(label);
+
+    const grp = document.createElement("div");
+    grp.appendChild(mk("💸 Request Payout", ()=>AIGUI.open('payout')));
+    grp.appendChild(mk("📡 Register Hook", ()=>AIGUI.open('register')));
+    grp.appendChild(mk("🚀 Push Distribution", ()=>AIGUI.open('push')));
+    grp.appendChild(mk("🤝 Create JV", ()=>AIGUI.open('jv')));
+    grp.appendChild(mk("💠 Split Revenue", ()=>AIGUI.open('split')));
+    bar.appendChild(grp);
+
+    // insert bar near the footer or bottom of tile
+    tile.appendChild(bar);
+  }
+
+  // Target tiles
+  const walletTile = findTileByHeading("Wallet & Off-Ramp") || findTileByHeading("Wallet");
+  if (walletTile) addToolbarInto(walletTile, "Actions");
+
+  // Optionally add JV buttons under Team Achievements if wallet tile missing
+  const teamTile = findTileByHeading("Team Achievements");
+  if (!walletTile && teamTile) addToolbarInto(teamTile, "Actions");
+
+  // Also enhance "Expand Your Business Circle" with Register Hook (for partner webhooks)
+  const expandTile = findTileByHeading("Expand Your Business Circle");
+  if (expandTile){
+    const row = document.createElement("div");
+    row.style.marginTop = "10px";
+    row.appendChild(mk("📡 Register Hook", ()=>AIGUI.open('register')));
+    expandTile.appendChild(row);
+  }
+})();
+</script>
