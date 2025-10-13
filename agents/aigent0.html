@@ -4325,6 +4325,117 @@ setTimeout(()=>{
   }
 })();
 </script>
+<script>
+/* ==== AiGentsy C-Suite Router (Human-friendly) ==== */
+/* CEO is the user — not an agent. */
+const ROLE_ENDPOINT = {
+  COO:  '/api/ops/chat',
+  CTO:  '/api/sdk/chat',
+  CPO:  '/api/product/chat',
+  CMO:  '/api/growth/chat',   // default speaker
+  CRO:  '/api/revenue/chat',
+  CLO:  '/api/remix/chat',
+  CFO:  '/api/venture/chat',
+  CAIO: '/api/research/chat'
+};
+
+/* Everyday phrases → role (first match wins) */
+const RULES = [
+  // Money, pricing, payouts
+  { role:'CFO',  keys:[
+    'price','pricing','how much','cost','quote','estimate','budget','roi','margin',
+    'profit','revenue plan','invoice','billing','cash out','withdraw','payout','fiat'
+  ]},
+  // Legal & IP
+  { role:'CLO',  keys:[
+    'legal','contract','agreement','terms','policy','license','licensing','permission',
+    'ip','intellectual property','copyright','trademark','nda','non disclosure','ownership','compliance'
+  ]},
+  // Tech & integrations (no jargon required)
+  { role:'CTO',  keys:[
+    'tech setup','technical','connect to','integration','hook up','plug in','api','webhook',
+    'build this','code','developer','bug','error','deploy','ship','runtime','stack',
+    'clone my agent','install','set up','configure'
+  ]},
+  // Operations & delivery
+  { role:'COO',  keys:[
+    'operations','ops','fulfillment','deliver','delivery','turnaround','timeline','schedule',
+    'onboarding','handoff','process','workflow','sop','runbook','checklist','capacity'
+  ]},
+  // Product & UX
+  { role:'CPO',  keys:[
+    'feature','roadmap','spec','specs','scope','prototype','wireframe','mockup',
+    'design','ux','ui','layout','rename','wording','copy','make this simpler'
+  ]},
+  // Sales & pipeline
+  { role:'CRO',  keys:[
+    'sales','close','closing','deal','prospect','lead','crm','demo','follow up',
+    'proposal','pricing page','quote request','pipeline','qualification'
+  ]},
+  // Research & analysis
+  { role:'CAIO', keys:[
+    'research','study','compare','benchmark','analysis','insights','summary','sources',
+    'data','literature review','report','find papers','trend','market size'
+  ]}
+];
+
+const DEFAULT_ROLE = 'CMO'; // strongest conversationalist
+
+function decideRole(text){
+  const t = (text||'').toLowerCase();
+  for (const r of RULES){
+    if (r.keys.some(k => t.includes(k))) return r.role;
+  }
+  return DEFAULT_ROLE;
+}
+
+/* --- Wrapper: one lead responder; labels the bubble with role --- */
+async function runAgent(){
+  const ta = document.getElementById('agentInput');
+  const msg = (ta?.value||'').trim();
+  if(!msg) return;
+
+  const role = decideRole(msg);
+  appendBubble({ who:'you', text: msg });
+
+  const endpoint = ROLE_ENDPOINT[role] || ROLE_ENDPOINT[DEFAULT_ROLE];
+  let text = 'Runtime error — please try again.';
+  try{
+    const res  = await fetch(endpoint, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ prompt: msg, role }) // include role for the backend
+    });
+    const data = await res.json().catch(()=>null);
+    text = (data && (data.text || data.output)) || text;
+  }catch(e){/* no-op */}
+  appendBubble({ who:'agent', role, text });
+}
+
+/* Uses your existing styles; creates a simple stream if none exists */
+function appendBubble({who, role, text}){
+  const box = document.getElementById('chatStream') || (()=>{
+    const card = document.querySelector('.metric-box h3')?.parentElement;
+    const s = document.createElement('div'); s.id='chatStream';
+    s.style.cssText='margin-bottom:8px;max-height:240px;overflow:auto;';
+    card.insertBefore(s, document.getElementById('agentInput')); return s;
+  })();
+  const row = document.createElement('div');
+  row.className = who==='you' ? 'chat-row you' : 'chat-row agent';
+  if (who!=='you'){
+    const tag = document.createElement('div'); tag.className='role-tag'; tag.textContent=role;
+    row.appendChild(tag);
+  }
+  const p = document.createElement('div'); p.className='chat-bubble'; p.textContent=text;
+  row.appendChild(p); box.appendChild(row); box.scrollTop = box.scrollHeight;
+}
+</script>
+<style>
+.role-tag{display:inline-block;margin-bottom:4px;padding:2px 8px;border:1px solid #2a2a2a;border-radius:999px;font-size:.75rem;color:#7ecbff}
+.chat-row{margin:8px 0}.chat-row.you .chat-bubble{background:#0f0f0f;border:1px solid #333}
+.chat-row.agent .chat-bubble{background:#0c1116;border:1px solid #1f2a33}
+.chat-bubble{padding:10px 12px;border-radius:8px;line-height:1.4}
+</style>
 
 </body>
 </html>
