@@ -440,42 +440,14 @@ async function runAgent() {
   try {
 
 // 🔁 Post to selected agent runtime
-    // 🧠 ROUTING PATCH: Delegate to correct runtime based on traits
-let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // default = Your AiGentsy
+    
+// 🧠 ROUTING PATCH (human-friendly): One speaker per message, CEO is the user
+const { decideRole, ROLE_ENDPOINT, DEFAULT_ROLE } = window.AIG_HUMAN_ROUTER || {};
+const role = decideRole ? decideRole(conditionedInput) : 'CMO';
+let endpoint = (ROLE_ENDPOINT && ROLE_ENDPOINT[role]) || "https://aigent-growth-agent.onrender.com/agent"; // default CMO
+loader.textContent = `🤖 (${role}) Thinking…`;
 
-const lower = conditionedInput.toLowerCase();
-if (
-  lower.includes("sdk") || lower.includes("developer") || lower.includes("api") || lower.includes("tech") ||
-  lower.includes("tools") || lower.includes("integration") || lower.includes("product") || lower.includes("feature")
-) {
-  endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
-} else if (
-  lower.includes("growth") || lower.includes("scale") || lower.includes("marketing") || lower.includes("market") ||
-  lower.includes("outreach") || lower.includes("campaign") || lower.includes("promotion") || lower.includes("audience")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
-} else if (
-  lower.includes("remix") || lower.includes("clone") || lower.includes("license") || lower.includes("legal") ||
-  lower.includes("ip") || lower.includes("compliance") || lower.includes("contract") || lower.includes("branding")
-) {
-  endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO / Legal
-} else if (
-  lower.includes("finance") || lower.includes("wallet") || lower.includes("cashout") || lower.includes("budget") ||
-  lower.includes("yield") || lower.includes("payment") || lower.includes("profit") || lower.includes("revenue") ||
-  lower.includes("token") || lower.includes("earn")
-) {
-  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO / Venture Agent
-} else if (
-  lower.includes("partner") || lower.includes("alliance") || lower.includes("joint venture")
-) {
-  endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CEO handles Partner logic
-} else if (
-  lower.includes("assistant") || lower.includes("schedule") || lower.includes("follow-up")
-) {
-  endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // Assistant logic = CMO fallback
-}
-
-  const res = await fetch(endpoint, {
+const res = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ input: conditionedInput, memory })
@@ -608,7 +580,7 @@ if (agentRole && !reply.toLowerCase().includes("as your")) {
 }
 
 // 🧾 Final display
-loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
+loader.textContent = `🤖 (${typeof(role)!=='undefined'?role:'CMO'}) Your AiGentsy:\n${reply}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
@@ -629,7 +601,16 @@ buttons.innerHTML = `
 `;
 chatLog.appendChild(buttons); // or loader.appendChild(buttons), depending on context
 
-    memory.push(`🤖 ${reply}`);
+    
+// 😊 Friendly closer: add a polite prompt for next step if reply is short
+try{
+  const plain = reply.replace(/<[^>]*>/g,'').trim();
+  if (plain.split(/\s+/).length < 24 && !/next step|here'?s/i.test(plain)){
+    reply += "\n\nWant me to take the next step for you?";
+    loader.textContent = `🤖 (${typeof(role)!=='undefined'?role:'CMO'}) Your AiGentsy:\n${reply}`;
+  }
+}catch{}
+memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
   } catch (err) {
@@ -4326,6 +4307,40 @@ setTimeout(()=>{
 })();
 </script>
   
+
+<!-- 👤 Human-friendly C‑Suite Router (CEO is the user; one-speaker-per-message) -->
+<script id="aig-humanspeak-router">
+(function(){
+  if (window.__AIG_ROUTER_PATCH__) return; window.__AIG_ROUTER_PATCH__ = true;
+  const ROLE_ENDPOINT = {
+    COO:  "https://aigentsy-ame-runtime.onrender.com/agent",
+    CTO:  "https://aigent-sdk-runtime.onrender.com/agent",
+    CPO:  "https://aigentsy-ame-runtime.onrender.com/agent",
+    CMO:  "https://aigent-growth-agent.onrender.com/agent",
+    CRO:  "https://aigentsy-ame-runtime.onrender.com/agent",
+    CLO:  "https://aigent-remix-runtime.onrender.com/agent",
+    CFO:  "https://aigentsy-ame-runtime.onrender.com/agent",
+    CAIO: "https://aigentsy-ame-runtime.onrender.com/agent"
+  };
+  const RULES = [
+    { role:'CFO',  keys:['price','pricing','how much','cost','quote','estimate','budget','roi','margin','profit','revenue plan','invoice','billing','cash out','withdraw','payout','fiat','pay me'] },
+    { role:'CLO',  keys:['legal','contract','agreement','terms','policy','license','licensing','permission','ip','intellectual property','copyright','trademark','nda','non disclosure','ownership','compliance','rights'] },
+    { role:'CTO',  keys:['tech setup','technical','connect to','integration','hook up','plug in','api','webhook','build this','code','developer','bug','error','deploy','ship','runtime','stack','clone my agent','install','set up','configure','breaks','doesn\'t work','fix'] },
+    { role:'COO',  keys:['operations','ops','fulfillment','deliver','delivery','turnaround','timeline','schedule','onboarding','handoff','process','workflow','sop','runbook','checklist','capacity'] },
+    { role:'CPO',  keys:['feature','roadmap','spec','specs','scope','prototype','wireframe','mockup','design','ux','ui','layout','rename','wording','copy','make this simpler'] },
+    { role:'CRO',  keys:['sales','close','closing','deal','prospect','lead','crm','demo','follow up','proposal','pricing page','quote request','pipeline','qualification'] },
+    { role:'CAIO', keys:['research','study','compare','benchmark','analysis','insights','summary','sources','data','literature review','report','find papers','trend','market size'] }
+  ];
+  const DEFAULT_ROLE = 'CMO';
+  function decideRole(text){
+    const t = (text||'').toLowerCase();
+    for (const r of RULES){ if (r.keys.some(k => t.includes(k))) return r.role; }
+    return DEFAULT_ROLE;
+  }
+  window.AIG_HUMAN_ROUTER = { decideRole, ROLE_ENDPOINT, DEFAULT_ROLE };
+})();
+</script>
+
 </body>
 </html>
 
