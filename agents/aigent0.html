@@ -4351,6 +4351,32 @@ setTimeout(()=>{
   };
 })();
 </script>
+
+<!-- Mini router: add explicit role recognition (CAIO, etc.) -->
+<script>
+(function(){
+  if (window.__AIG_ROUTER_EXPL_MENTION__) return; window.__AIG_ROUTER_EXPL_MENTION__=true;
+  const DEFAULT_ROLE='CMO';
+  function decideRole(text){
+    const t=(text||'').toLowerCase();
+    const map={
+      'cfo':'CFO','finance':'CFO',
+      'clo':'CLO','legal':'CLO','counsel':'CLO',
+      'cmo':'CMO','marketing':'CMO','growth':'CMO',
+      'cto':'CTO','tech':'CTO','developer':'CTO','engineer':'CTO','sdk':'CTO','integration':'CTO',
+      'coo':'COO','operations':'COO','ops':'COO',
+      'cpo':'CPO','product':'CPO','ux':'CPO','ui':'CPO',
+      'cro':'CRO','sales':'CRO','revenue':'CRO',
+      'caio':'CAIO','research':'CAIO','ai research':'CAIO','analysis':'CAIO','analytics':'CAIO'
+    };
+    for (const k in map){ if (t.includes(k)) return map[k]; }
+    return DEFAULT_ROLE;
+  }
+  window.AIGENTS_ROUTER = window.AIGENTS_ROUTER || {};
+  window.AIGENTS_ROUTER.decideRole = decideRole;
+  window.AIGENTS_ROUTER.DEFAULT_ROLE = window.AIGENTS_ROUTER.DEFAULT_ROLE || DEFAULT_ROLE;
+})();
+</script>
 </body>
 </html>
 
