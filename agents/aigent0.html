@@ -4432,6 +4432,167 @@ setTimeout(()=>{
   };
 })();
 </script>
+<script>
+/* ========= C-Suite Conversational Router (overlay) ========= */
+(() => {
+  if (window.__CSUITE_ROUTER__) return; window.__CSUITE_ROUTER__ = true;
+
+  // 1) Friendly keyword maps (broad + human)
+  const ROLE_ENDPOINT = {
+    CTO:  "https://aigent-sdk-runtime.onrender.com/agent",
+    CMO:  "https://aigent-growth-runtime.onrender.com/agent",
+    CLO:  "https://aigent-remix-runtime.onrender.com/agent",
+    CFO:  "https://aigentsy-ame-runtime.onrender.com/agent",
+    COO:  "https://aigentsy-ame-runtime.onrender.com/agent",   // ops: safe default
+    CSO:  "https://aigentsy-ame-runtime.onrender.com/agent",   // strategy: safe default
+    CAIO: "https://aigent-sdk-runtime.onrender.com/agent"      // Chief AI Officer → tech hub
+  };
+
+  const LEX = {
+    CTO: [
+      /(^|\W)(cto|caio|engineer|dev(?:\s?kit)?|sdk|api|integrat(e|ion)|build|feature|product|tech|platform|tool(s|kit)?)(\W|$)/i
+    ],
+    CMO: [
+      /(^|\W)(cmo|growth|marketing|campaign|promot(e|ion)|audience|leads?|sales|brand|social|email)(\W|$)/i
+    ],
+    CLO: [
+      /(^|\W)(clo|legal|ip|license|licensing|contract|terms|compliance|trademark|remix|fork|brand(ing)?)(\W|$)/i
+    ],
+    CFO: [
+      /(^|\W)(cfo|finance|money|wallet|cash(\s?out)?|off[-\s]?ramp|budget|pricing|rev(?:enue)?|profit|payout|token|earn|payment)(\W|$)/i
+    ],
+    COO: [
+      /(^|\W)(coo|ops?|operations?|delivery|process|runbook|sla|handoff|fulfillment)(\W|$)/i
+    ],
+    CSO: [
+      /(^|\W)(cso|strategy|roadmap|gtm|positioning|competitive|vision)(\W|$)/i
+    ],
+    CAIO: [
+      /(^|\W)(caio|chief\s*ai\s*officer|ai\s*officer)(\W|$)/i
+    ],
+    CEO_USER: [
+      /(^|\W)(ceo|talk to the ceo|ask the ceo)(\W|$)/i
+    ]
+  };
+
+  // 2) Role “hello” lines (kept short + human)
+  const OPENERS = {
+    CTO:  "👩‍💻 (CTO) I’ve got the tech. Here’s how I’d handle it:",
+    CMO:  "📣 (CMO) Growth brain on. Here’s my take:",
+    CLO:  "📜 (CLO) Legal & licensing covered. Here’s what to do:",
+    CFO:  "💰 (CFO) Money hat on. Here’s how I’d approach it:",
+    COO:  "🧭 (COO) Ops & delivery. Here’s the plan:",
+    CSO:  "🧠 (CSO) Strategy view. Here’s how I’d frame it:",
+    CAIO: "🧪 (CAIO) AI capabilities & orchestration. Here’s what unlocks:"
+  };
+
+  // 3) Friendly term expansion (less “protocol”, more people)
+  function humanize(text) {
+    return text
+      .replace(/\bSDK\b/gi, "developer toolkit")
+      .replace(/\bRemix\b/gi, "fork")
+      .replace(/\bMetaHive\b/gi, "your agent team")
+      .replace(/\bYield Memory\b/gi, "your learning system")
+      .replace(/\bautonomously\b/gi, "automatically")
+      .replace(/\bprotocol\b/gi, "platform")
+      .replace(/\bconversion rates\b/gi, "signups")
+      .replace(/\bvalue proposition\b/gi, "main selling point");
+  }
+
+  // 4) Detect the role from a message
+  function detectRole(s) {
+    const t = (s || "").toLowerCase();
+    if (LEX.CEO_USER.some(r => r.test(t))) return "CEO_USER";
+    for (const role of ["CAIO","CTO","CMO","CLO","CFO","COO","CSO"]) {
+      if (LEX[role].some(r => r.test(t))) return role;
+    }
+    // fallback: infer by topic clusters
+    if (/(price|budget|cash|revenue|earn|payout)/i.test(t)) return "CFO";
+    if (/(legal|license|contract|ip|compliance)/i.test(t)) return "CLO";
+    if (/(marketing|growth|audience|leads|campaign)/i.test(t)) return "CMO";
+    if (/(build|api|integrat|feature|tool|sdk|dev)/i.test(t)) return "CTO";
+    return null; // let your existing default agent handle it
+  }
+
+  // 5) Make replies look like a person in the room
+  function wrapAsRole(role, body) {
+    if (!role) return body;
+    const opener = OPENERS[role] || "";
+    let txt = (body || "").trim();
+    txt = humanize(txt);
+    // small formatting for readability in your chat log
+    return `${opener}\n${txt}`.replace(/\s{2,}/g, " ").replace(/\. (?=[A-Z])/g, ".\n\n");
+  }
+
+  // 6) Single arrow sender (if a second button sneaks in, remove it)
+  const maybeDup = document.querySelectorAll("#chatSendRow .btn-glow");
+  if (maybeDup.length > 1) {
+    [...maybeDup].slice(1).forEach(n => n.remove());
+  }
+
+  // 7) Hook your existing runAgent to inject role routing + voice
+  const _runAgent = window.runAgent;
+  window.runAgent = async function patchedRunAgent() {
+    const inputEl = document.getElementById("agentInput");
+    const log      = document.querySelector(".chat-log");
+    const text     = (inputEl?.value || "").trim();
+    if (!text) { _runAgent && _runAgent(); return; }
+
+    // CEO is the user → gently route
+    const role = detectRole(text);
+    if (role === "CEO_USER") {
+      const li = document.createElement("div");
+      li.className = "chat-agent";
+      li.textContent = "🧑‍✈️ (CEO) That’s you. Tell me where to point the team: tech (CTO), growth (CMO), legal (CLO), or finance (CFO)?";
+      log?.appendChild(li);
+      log.scrollTop = log.scrollHeight;
+      inputEl.value = "";
+      return;
+    }
+
+    // pick endpoint by role (only if we recognized one)
+    let endpointOverride = null;
+    if (role && ROLE_ENDPOINT[role]) endpointOverride = ROLE_ENDPOINT[role];
+
+    // temporary “typing” line with role chip
+    const typing = document.createElement("div");
+    typing.className = "chat-agent";
+    typing.textContent = role ? `${OPENERS[role].replace(/:.*$/, ":")} typing…` : "🤖 Your AiGentsy: typing…";
+    log?.appendChild(typing);
+    log.scrollTop = log.scrollHeight;
+
+    // let your original sender do the heavy lifting
+    // but monkey-patch fetch target if we decided on a role
+    const _fetch = window.fetch;
+    let patched = false;
+    if (endpointOverride) {
+      window.fetch = async (url, init={}) => {
+        // Swap only when posting to an /agent endpoint
+        try {
+          const u = (typeof url === "string") ? url : url?.url || "";
+          if (/\/agent(?:\b|$)/.test(u) || /onrender\.com\/agent/.test(u)) {
+            patched = true;
+            return _fetch(endpointOverride, init);
+          }
+        } catch {}
+        return _fetch(url, init);
+      };
+    }
+
+    try {
+      await _runAgent(); // calls your existing flow
+      // last line in the log is the raw reply; rewrite it in-voice
+      const lines = Array.from(log?.querySelectorAll(".chat-agent") || []);
+      const last  = lines[lines.length - 1];
+      if (last) last.textContent = wrapAsRole(role, last.textContent.replace(/^🤖\s*Your AiGentsy:\s*/i, ""));
+    } catch (e) {
+      if (typing) typing.textContent = "⚠️ Error talking to that exec.";
+    } finally {
+      if (patched) window.fetch = _fetch; // restore
+    }
+  };
+})();
+</script>
 
 </body>
 </html>
