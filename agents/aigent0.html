@@ -4593,6 +4593,108 @@ setTimeout(()=>{
   };
 })();
 </script>
+<script>
+/* ==== C-Suite UX polish: single typing line + first-person voice ==== */
+(() => {
+  if (window.__CSUITE_POLISH__) return; window.__CSUITE_POLISH__ = true;
+
+  // Role intros in first-person
+  const OPENERS = {
+    CTO:  "👩‍💻 (CTO) I’m your technical lead. Here’s how I’ll handle it:",
+    CMO:  "📣 (CMO) I lead growth. Here’s my plan:",
+    CLO:  "📜 (CLO) I’m your counsel. Here’s what I recommend:",
+    CFO:  "💰 (CFO) I manage the numbers. Here’s how I’d approach this:",
+    COO:  "🧭 (COO) I run ops. Here’s the execution plan:",
+    CSO:  "🧠 (CSO) I cover strategy. Here’s the framing:",
+    CAIO: "🧪 (CAIO) I lead AI capabilities. Here’s what I can unlock:"
+  };
+
+  // Gentle humanization of platform-y phrasing
+  function humanize(txt=""){
+    return txt
+      .replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "")
+      .replace(/\bSDK\b/gi, "developer toolkit")
+      .replace(/\bautonomously\b/gi, "automatically")
+      .replace(/\bprotocol\b/gi, "platform")
+      .replace(/\bvalue proposition\b/gi, "main selling point")
+      .replace(/\bconversion rates\b/gi, "signups");
+  }
+
+  // Convert neutral “we” → first-person when a single exec is speaking
+  function firstPersonize(txt=""){
+    // Light-touch; don’t overcorrect inside quotes or proper nouns
+    return txt
+      .replace(/\bwe can\b/gi, "I can")
+      .replace(/\bwe will\b/gi, "I will")
+      .replace(/\bwe’ll\b/gi, "I’ll")
+      .replace(/\bwe\b/gi, "I");
+  }
+
+  // Create/reuse a single typing line; avoid duplicates
+  function setTyping(role){
+    const log = document.querySelector(".chat-log");
+    if (!log) return null;
+    let node = log.querySelector('[data-typing="1"]');
+    const label = role ? (OPENERS[role] || `🤖 (${role})`) : "🤖";
+    if (!node){
+      node = document.createElement("div");
+      node.className = "chat-agent";
+      node.setAttribute("data-typing","1");
+      log.appendChild(node);
+    }
+    node.textContent = `${label.replace(/:.*$/, ":")} typing…`;
+    log.scrollTop = log.scrollHeight;
+    return node;
+  }
+
+  // Replace the typing line with the final, polished message
+  function finalizeTyping(node, role, rawReply){
+    if (!node) return;
+    let body = humanize(rawReply || "");
+    body = firstPersonize(body);
+    const opener = OPENERS[role] || "";
+    node.removeAttribute("data-typing");
+    node.textContent = opener ? `${opener}\n${body}` : body;
+  }
+
+  // Patch runAgent to reuse one typing node (instead of adding another)
+  const _runAgent = window.runAgent;
+  if (!_runAgent) return;
+
+  window.runAgent = async function(){
+    // If your router exposes role, grab it; otherwise leave null (no label).
+    let role = (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.__lastRole) || null;
+
+    // If your router computes role on send, try to recompute quickly from input:
+    try{
+      const ta = document.getElementById('agentInput');
+      const dec = window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.decideRole;
+      if (!role && dec && ta) role = dec(ta.value || "");
+      // stash for other hooks
+      if (window.AIGENTS_ROUTER) window.AIGENTS_ROUTER.__lastRole = role;
+    }catch{}
+
+    // Show a SINGLE typing line and let your original flow do the fetch
+    const typingNode = setTyping(role);
+    let beforeCount = (document.querySelectorAll(".chat-agent")||[]).length;
+
+    try{
+      await _runAgent();  // your code writes the final reply at the end
+      // The newest agent line is the last .chat-agent after our typing line
+      const lines = Array.from(document.querySelectorAll(".chat-agent"));
+      const afterCount = lines.length;
+      // If your original flow appended a new agent line, grab it; else reuse typing node
+      const last = (afterCount > beforeCount) ? lines[afterCount - 1] : typingNode;
+      const raw = last ? last.textContent : "";
+      finalizeTyping(typingNode, role, raw);
+      // If a duplicate final line exists, remove it (we already replaced typing node)
+      if (last && last !== typingNode) last.remove();
+    } catch (e){
+      if (typingNode) typingNode.textContent = "⚠️ Something went wrong. Please try again.";
+    }
+  };
+})();
+</script>
 
 </body>
 </html>
