@@ -4358,17 +4358,39 @@ setTimeout(()=>{
   if (window.__AIG_ROUTER_EXPL_MENTION__) return; window.__AIG_ROUTER_EXPL_MENTION__=true;
   const DEFAULT_ROLE='CMO';
   function decideRole(text){
-    const t=(text||'').toLowerCase();
-    const map={
-      'cfo':'CFO','finance':'CFO',
-      'clo':'CLO','legal':'CLO','counsel':'CLO',
-      'cmo':'CMO','marketing':'CMO','growth':'CMO',
-      'cto':'CTO','tech':'CTO','developer':'CTO','engineer':'CTO','sdk':'CTO','integration':'CTO',
-      'coo':'COO','operations':'COO','ops':'COO',
-      'cpo':'CPO','product':'CPO','ux':'CPO','ui':'CPO',
-      'cro':'CRO','sales':'CRO','revenue':'CRO',
-      'caio':'CAIO','research':'CAIO','ai research':'CAIO','analysis':'CAIO','analytics':'CAIO'
-    };
+  const t = (text||'').toLowerCase();
+
+  // 1) Exact acronym / title mentions with word boundaries
+  const acrMap = {
+    'cfo':'CFO','chief financial officer':'CFO','finance lead':'CFO',
+    'clo':'CLO','chief legal officer':'CLO','general counsel':'CLO','legal lead':'CLO',
+    'cto':'CTO','chief technology officer':'CTO','tech lead':'CTO','developer lead':'CTO',
+    'coo':'COO','chief operating officer':'COO','ops lead':'COO',
+    'cpo':'CPO','chief product officer':'CPO','product lead':'CPO','head of product':'CPO',
+    'cro':'CRO','chief revenue officer':'CRO','sales lead':'CRO',
+    'caio':'CAIO','chief ai officer':'CAIO','ai research lead':'CAIO',
+    'cmo':'CMO','chief marketing officer':'CMO','marketing lead':'CMO','growth lead':'CMO'
+  };
+  for (const key in acrMap){
+    const re = new RegExp('(^|\\b|[^a-z])' + key.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '($|\\b|[^a-z])', 'i');
+    if (re.test(text)) return acrMap[key];
+  }
+
+  // 2) Human-friendly keywords fallback (kept from previous router)
+  const RULES = [
+    { role:'CFO',  keys:['price','pricing','how much','cost','quote','estimate','budget','roi','margin','profit','revenue plan','invoice','billing','cash out','withdraw','payout','fiat','pay me'] },
+    { role:'CLO',  keys:['legal','contract','agreement','terms','policy','license','licensing','permission','ip','intellectual property','copyright','trademark','nda','non disclosure','ownership','compliance','rights'] },
+    { role:'CTO',  keys:['tech setup','technical','connect to','integration','hook up','plug in','api','webhook','build this','code','developer','bug','error','deploy','ship','runtime','stack','clone my agent','install','set up','configure','doesn’t work','doesnt work','fix'] },
+    { role:'COO',  keys:['operations','ops','fulfillment','deliver','delivery','turnaround','timeline','schedule','onboarding','handoff','process','workflow','sop','runbook','checklist','capacity'] },
+    { role:'CPO',  keys:['feature','roadmap','spec','specs','scope','prototype','wireframe','mockup','design','ux','ui','layout','rename','wording','copy','make this simpler'] },
+    { role:'CRO',  keys:['sales','close','closing','deal','prospect','lead','crm','demo','follow up','proposal','pricing page','quote request','pipeline','qualification'] },
+    { role:'CAIO', keys:['research','study','compare','benchmark','analysis','insights','summary','sources','data','literature review','report','find papers','trend','market size'] }
+  ];
+  for (const r of RULES){
+    if (r.keys.some(k => t.includes(k))) return r.role;
+  }
+  return (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.DEFAULT_ROLE) || 'CMO';
+};
     for (const k in map){ if (t.includes(k)) return map[k]; }
     return DEFAULT_ROLE;
   }
