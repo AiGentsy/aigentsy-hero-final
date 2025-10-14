@@ -4399,6 +4399,40 @@ setTimeout(()=>{
   window.AIGENTS_ROUTER.DEFAULT_ROLE = window.AIGENTS_ROUTER.DEFAULT_ROLE || DEFAULT_ROLE;
 })();
 </script>
+<!-- Role badge helper -->
+<style>
+  #aig-role-badge{
+    font-size:.78rem; color:#8fd3ff; margin-bottom:6px;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  #aig-role-badge .dot{
+    width:6px; height:6px; border-radius:999px; background:#29b6f6; display:inline-block;
+  }
+</style>
+<script>
+(function(){
+  if(window.__AIG_ShowRoleBadge) return;
+  // Create/update a small "(ROLE) typing…" badge right above #agentInput
+  window.__AIG_ShowRoleBadge = function(role){
+    try{
+      var ta = document.getElementById('agentInput');
+      if(!ta) return;
+      var parent = ta.closest('.metric-box') || ta.parentElement;
+      var badge = document.getElementById('aig-role-badge');
+      if(!badge){
+        badge = document.createElement('div');
+        badge.id = 'aig-role-badge';
+        parent.insertBefore(badge, ta);       // insert just above the textarea
+        var dot = document.createElement('span'); dot.className='dot'; badge.appendChild(dot);
+        var txt = document.createElement('span'); txt.className='txt'; badge.appendChild(txt);
+      }
+      var txtNode = badge.querySelector('.txt');
+      if(txtNode) txtNode.textContent = '(' + role + ') typing…';
+    }catch(e){/* no-op */}
+  };
+})();
+</script>
+
 </body>
 </html>
 
