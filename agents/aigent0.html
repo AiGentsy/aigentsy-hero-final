@@ -232,9 +232,7 @@
   <h3>AiGentsy Chat</h3>
   <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); runAgent();}"></textarea>
 
-<div id="chatSendRow" style="margin-top:8px;">
-  <button class="btn-glow" id="sendBtn" onclick="runAgent()" aria-label="Send">➤</button>
-</div>
+<div id="chatSendRow" style="margin-top:8px;"><button class="btn-glow" id="sendBtn" onclick="runAgent()" aria-label="Send">➤</button></div>
   <div id="fileDropZone"
        style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;cursor:pointer"
        onclick="document.getElementById('fileInput').click()">
@@ -357,7 +355,7 @@ chatLog.style.maxHeight = "240px";
 chatLog.style.overflowY = "auto";
 chatLog.style.marginTop = "10px";
 if (chatContainer && chatContainer.querySelector("textarea")) {
-  chatContainer.insertBefore(chatLog, chatContainer.querySelector("textarea"));
+  const __tx = chatContainer.querySelector("textarea"); if (__tx) __tx.insertAdjacentElement("afterend", chatLog);
 }
 
 const textarea = document.querySelector("#agentInput");
@@ -387,6 +385,33 @@ function explainTerms(text) {
 
   return text;
 }
+
+
+// ===== Role & Tone Helpers =====
+function roleBadgeFor(endpoint, inferredRole) {
+  const map = {
+    CTO: "🧬 (CTO)",
+    CMO: "📣 (CMO)",
+    CLO: "📜 (CLO)",
+    CFO: "💰 (CFO)",
+    CEO: "🧭 (CEO)",
+    TEAM: "🤝 (Team)"
+  };
+  let role = inferredRole || "TEAM";
+  if (endpoint && /sdk|toolkit|dev/i.test(endpoint)) role = "CTO";
+  else if (endpoint && /growth|marketing|campaign/i.test(endpoint)) role = "CMO";
+  else if (endpoint && /remix|license|ip|legal/i.test(endpoint)) role = "CLO";
+  else if (endpoint && /aigent0|venture|finance|ledger/i.test(endpoint)) role = "CFO";
+  return map[role] || map.TEAM;
+}
+function humanizeFirstPerson(text) {
+  let t = text || "";
+  t = t.replace(/\bYour AiGentsy\b/gi, "your business");
+  t = t.replace(/\bSDK\b/g, "toolkit");
+  t = t.replace(/\bautonomously\b/g, "automatically");
+  return t;
+}
+// ===============================
 
 function formatResponseEnhanced(text) {
   let cleaned = text
@@ -425,7 +450,7 @@ async function runAgent() {
 
   const loader = document.createElement("div");
   loader.className = "chat-agent";
-  loader.textContent = "🤖 Your AiGentsy: Thinking...";
+  loader.textContent = "⌛ typing…";
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
 
