@@ -4426,6 +4426,88 @@ setTimeout(()=>{
   };
 })();
 </script>
+<script>
+/* ==== C-Suite Persona Prime: inject first-person expertise into the prompt ==== */
+(() => {
+  if (window.__CSUITE_PERSONA_PRIME__) return; window.__CSUITE_PERSONA_PRIME__ = true;
+
+  // Short, action-oriented briefs per role (first person, expert voice)
+  const BRIEF = {
+    CTO: `You are the CTO. Speak in first person. Diagnose tech needs, suggest build/integration steps,
+          surface risks, and give a 3–5 step implementation plan with options. Offer one clarifying question at the end.`,
+    CMO: `You are the CMO. Speak in first person. Pick a growth play, define target, message, channels,
+          simple funnel metrics, and next 3 actions. Offer one clarifying question at the end.`,
+    CLO: `You are the CLO (counsel). Speak in first person. Identify legal risks, the right instrument (NDA, license, ToS),
+          key clauses to include, and a simple path to execution. Offer one clarifying question at the end.`,
+    CFO: `You are the CFO. Speak in first person. Frame pricing or ROI, unit economics, cash implications,
+          and a simple financial next step (e.g., quote template or off-ramp step). Ask one clarifying question.`,
+    COO: `You are the COO. Speak in first person. Turn the request into an SOP with owners, timing, and handoffs.
+          Flag dependencies/risks. Ask one clarifying question.`,
+    CPO: `You are the CPO. Speak in first person. Translate the ask into a crisp PRD slice: problem, users,
+          acceptance criteria, and a minimal prototype path. Ask one clarifying question.`,
+    CRO: `You are the CRO. Speak in first person. Choose a sales motion, define ICP, talk track/objection handling,
+          and the next 3 pipeline actions. Ask one clarifying question.`,
+    CAIO:`You are the CAIO. Speak in first person. Propose an AI capability map, data/guardrails, and orchestration plan
+          (tools, models, routes). End with the next 3 engineering or data steps and one clarifying question.`
+  };
+
+  // Try to reuse your router’s role; otherwise re-infer quickly
+  function activeRole(text){
+    const r = (window.AIGENTS_ROUTER && (window.AIGENTS_ROUTER.__lastRole ||
+              (window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(text)))) || null;
+    if (r && BRIEF[r]) return r;
+    const t = (text||"").toLowerCase();
+    if (/\bcto\b|sdk|api|integrat|build|deploy|tech/.test(t)) return "CTO";
+    if (/\bcmo\b|marketing|growth|leads|campaign|brand/.test(t)) return "CMO";
+    if (/\bclo\b|legal|license|ip|contract|compliance|remix|fork/.test(t)) return "CLO";
+    if (/\bcfo\b|price|budget|revenue|profit|payout|cash|off-?ramp/.test(t)) return "CFO";
+    if (/\bcoo\b|ops|operations|timeline|handoff|sop/.test(t)) return "COO";
+    if (/\bcpo\b|product|feature|spec|ux|ui|roadmap/.test(t)) return "CPO";
+    if (/\bcro\b|sales|pipeline|demo|quote|close/.test(t)) return "CRO";
+    if (/\bcaio\b|chief ai officer|orchestr|multi-?agent|llm/.test(t)) return "CAIO";
+    return null;
+  }
+
+  // Wrap fetch-call sites used by runAgent() to inject the brief once per send
+  const _send = window.runAgent;
+  if (!_send) return;
+
+  window.runAgent = async function(){
+    const ta = document.getElementById('agentInput');
+    const raw = (ta?.value || '').trim();
+    const role = activeRole(raw);
+    // Prime the message without changing your UI memory/logs
+    if (role && BRIEF[role]) {
+      // Expose for the code that builds the request body
+      window.__CSUITE_PERSONA_PREFIX__ = `[ROLE:${role}] ${BRIEF[role].replace(/\s+/g,' ').trim()}\n\nUser: `;
+    } else {
+      window.__CSUITE_PERSONA_PREFIX__ = null;
+    }
+
+    // Monkey-patch fetch to prepend the persona to the "input" field only for this turn
+    const _fetch = window.fetch;
+    window.fetch = async (url, init) => {
+      try {
+        if (init && typeof init.body === 'string' && init.headers && /json/i.test(init.headers['Content-Type']||'')) {
+          const body = JSON.parse(init.body);
+          if (body && body.input && !body.__primed && window.__CSUITE_PERSONA_PREFIX__) {
+            body.input = `${window.__CSUITE_PERSONA_PREFIX__}${body.input}`;
+            body.__primed = true;                // avoid double-priming
+            init.body = JSON.stringify(body);
+          }
+        }
+      } catch {}
+      return _fetch(url, init);
+    };
+
+    try { await _send(); }
+    finally {
+      window.fetch = _fetch;
+      window.__CSUITE_PERSONA_PREFIX__ = null;
+    }
+  };
+})();
+</script>
 
 </body>
 </html>
