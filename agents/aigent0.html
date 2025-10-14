@@ -4325,7 +4325,140 @@ setTimeout(()=>{
   }
 })();
 </script>
-  
+
+  <!-- 🔧 C-Suite Chat Persona Patch (non-destructive override) -->
+<script>
+(function () {
+  if (window.__CSUITE_CHAT_PATCH__) return;
+  window.__CSUITE_CHAT_PATCH__ = true;
+
+  const ta  = document.querySelector("#agentInput");
+  const log = document.getElementById("chatLog");
+
+  // Shared memory across turns
+  window.aigChatMemory = window.aigChatMemory || [];
+
+  function detectCSuiteRole(text) {
+    const t = (text || "").toLowerCase();
+    if (/\bcaio\b|chief ai officer|orchestrat|multi-?agent/.test(t)) return "CAIO";
+    if (/\bcfo\b|chief financial|pricing|budget|revenue|profit|cash|wallet|earn|off[- ]?ramp/.test(t)) return "CFO";
+    if (/\bcmo\b|marketing|audience|growth|campaign|promot|leads|outreach/.test(t)) return "CMO";
+    if (/\bcto\b|sdk|developer|api|integration|tech|build|platform|deploy|feature|tools?/.test(t)) return "CTO";
+    if (/\bclo\b|legal|licen[cs]e|ip|contract|compliance|brand(ing)?/.test(t)) return "CLO";
+    if (/\bcoo\b|operations|ops|delivery|process|runbook|handoff/.test(t)) return "COO";
+    if (/\bcpo\b|product|roadmap|spec|ux backlog/.test(t)) return "CPO";
+    if (/\bcro\b|sales|close|quot(e|ing)|pipeline|arpu/.test(t)) return "CRO";
+    if (/\bcio\b|integrations|connectors|crm|zapier|webhook/.test(t)) return "CIO";
+    if (/\bcdo\b|data|analytics|insights|kpi|metric/.test(t)) return "CDO";
+    if (/\bciso\b|security|privacy|consent|guardrail|policy/.test(t)) return "CISO";
+    if (/\bcso\b|strategy|moat|positioning|plan/.test(t)) return "CSO";
+    if (/\bcxo\b|experience|onboarding|tone|polish/.test(t)) return "CXO";
+    return null;
+  }
+
+  function personaHeader(role) {
+    const map = {
+      CFO:  "💰 CFO — Money hat on. Here’s how I’d approach it:",
+      CMO:  "📣 CMO — Growth mode. Here’s my plan:",
+      CTO:  "🧬 CTO — Tech & toolkit. Here’s how I’d build it:",
+      CLO:  "📜 CLO — Legal/IP. Here’s what I’d lock in:",
+      COO:  "🛠 COO — Ops. Here’s how I’d run it:",
+      CPO:  "🧪 CPO — Product. Here’s the product gameplan:",
+      CRO:  "💼 CRO — Revenue. Here’s how I’d drive sales:",
+      CIO:  "🔌 CIO — Integrations. Here’s how I’d connect it:",
+      CSO:  "🧭 CSO — Strategy. Here’s my take:",
+      CXO:  "✨ CXO — Experience. Here’s how I’d polish it:",
+      CDO:  "📊 CDO — Data. Here’s the insight path:",
+      CISO: "🔐 CISO — Security/Consent. Here’s what I’d safeguard:",
+      CAO:  "🧠 CAO — Autonomy. Here’s how I’d orchestrate agents:",
+      CAIO: "🤖 CAIO — AI Orchestration. Here’s how I’d help:"
+    };
+    return map[role] || "🤝 Team — Here’s how we can help:";
+  }
+
+  function routeEndpoint(text) {
+    const t = (text || "").toLowerCase();
+    if (/\bcaio\b|chief ai officer|orchestrat|multi-?agent/.test(t))
+      return "https://aigentsy-ame-runtime.onrender.com/agent";          // Orchestrator / venture
+    if (/(sdk|developer|api|integration|tech|build|platform|deploy|feature|tool)/.test(t))
+      return "https://aigent-sdk-runtime.onrender.com/agent";             // CTO
+    if (/(growth|scale|marketing|market|outreach|campaign|promotion|audience|leads)/.test(t))
+      return "https://aigent-growth-runtime.onrender.com/agent";          // CMO
+    if (/(remix|clone|license|legal|ip|compliance|contract|branding)/.test(t))
+      return "https://aigent-remix-runtime.onrender.com/agent";           // CLO
+    if (/(finance|wallet|cashout|budget|yield|payment|profit|revenue|token|earn)/.test(t))
+      return "https://aigentsy-ame-runtime.onrender.com/agent";           // CFO (venture handles off-ramp, too)
+    if (/(partner|alliance|joint venture)/.test(t))
+      return "https://aigentsy-ame-runtime.onrender.com/agent";           // CEO/JV via venture
+    if (/(assistant|schedule|follow-up)/.test(t))
+      return "https://aigent-growth-runtime.onrender.com/agent";          // general help
+    return "https://aigentsy-ame-runtime.onrender.com/agent";             // sensible default
+  }
+
+  function fmt(text) {
+    try { return (window.formatResponseEnhanced ? window.formatResponseEnhanced(text) : String(text||"")).trim(); }
+    catch { return String(text||"").trim(); }
+  }
+
+  async function runAgentPatched() {
+    const input = (ta && ta.value || "").trim();
+    if (!input) return;
+    if (ta) ta.value = "";
+
+    // User line (always above agent reply)
+    if (log) {
+      const u = document.createElement("div");
+      u.className = "chat-user";
+      u.textContent = `🧠 You: ${input}`;
+      log.appendChild(u);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Single typing line
+    const role = detectCSuiteRole(input);
+    const loader = document.createElement("div");
+    loader.className = "chat-agent";
+    loader.textContent = `⌛ ${role || "Team"} is typing…`;
+    if (log) { log.appendChild(loader); log.scrollTop = log.scrollHeight; }
+
+    // Memory continuity
+    const mem = window.aigChatMemory;
+    mem.push(input);
+
+    // Call selected runtime
+    let reply = "No response.";
+    try {
+      const res = await fetch(routeEndpoint(input), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input, memory: mem })
+      });
+      const data = await res.json();
+      reply = data.output || data.message || JSON.stringify(data);
+    } catch (e) {
+      reply = "Runtime error — " + (e && e.message ? e.message : "failed to fetch");
+    }
+
+    // First-person persona + friendly header (replace typing text)
+    let out = fmt(reply);
+    if (role) out = personaHeader(role) + "\\n\\n" + out;
+    loader.textContent = out;
+    if (log) log.scrollTop = log.scrollHeight;
+
+    // Append agent turn to memory (trim long)
+    mem.push("AGENT:" + out.slice(0, 4000));
+  }
+
+  // Override original hooks
+  window.runAgent = runAgentPatched;
+  const sendBtn = document.querySelector("#sendBtn");
+  if (sendBtn) sendBtn.onclick = runAgentPatched;
+  if (ta) ta.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); runAgentPatched(); }
+  });
+})();
+</script>
+
 </body>
 </html>
 
