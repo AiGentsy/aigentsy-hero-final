@@ -4508,6 +4508,76 @@ setTimeout(()=>{
   };
 })();
 </script>
+<script>
+(() => {
+  if (window.__AIGENTS_CSUITE_HOTFIX__) return; window.__AIGENTS_CSUITE_HOTFIX__ = true;
+
+  const ta  = document.querySelector('#agentInput');
+  const log = document.querySelector('#chatLog');
+  const btn = document.querySelector('#sendBtn');
+
+  // Prevent multiple loaders / duplicate persona lines
+  function clearOldTyping() {
+    [...(log?.querySelectorAll('.typing-line') || [])].forEach(n => n.remove());
+  }
+
+  function personaFor(text='') {
+    const t = text.toLowerCase();
+    if (/\bcfo\b|pricing|budget|revenue|cash|wallet|off[- ]?ramp/.test(t)) return {key:'CFO',  label:'💰 CFO — Here’s how I’d drive revenue:'};
+    if (/\bcro\b|sales|pipeline|quote|closing/.test(t))                    return {key:'CRO',  label:'💼 CRO — Here’s my sales plan:'};
+    if (/\bcto\b|sdk|developer|api|integration|build|platform|deploy/.test(t)) return {key:'CTO',  label:'🧬 CTO — Build plan:'};
+    if (/\bclo\b|legal|license|ip|contract|compliance|brand/.test(t))      return {key:'CLO',  label:'📜 CLO — Legal/IP steps:'};
+    if (/\bcmo\b|marketing|growth|campaign|leads|outreach|seo|ads/.test(t))return {key:'CMO',  label:'📣 CMO — Growth plan:'};
+    if (/\bcoo\b|ops|delivery|runbook|handoff|process/.test(t))            return {key:'COO',  label:'🛠 COO — Ops run:'};
+    if (/\bcaio\b|chief ai|orchestr|multi-?agent/.test(t))                 return {key:'CAIO', label:'🤖 CAIO — Orchestration:'};
+    return {key:'TEAM', label:'🤝 Team — Here’s the move:'};
+  }
+
+  async function callBackend(input) {
+    const url = (window.BACKEND_BASE || 'https://aigentsy-ame-runtime.onrender.com') + '/agent';
+    try {
+      const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input})});
+      const j = await r.json().catch(()=> ({}));
+      return (j.output || j.message || '').toString().trim() || 'No response.';
+    } catch (e) {
+      return 'Runtime error — ' + (e?.message || 'failed to fetch');
+    }
+  }
+
+  async function send() {
+    const text = (ta?.value || '').trim();
+    if (!text) return;
+    ta.value = '';
+
+    // user line
+    if (log) {
+      const u = document.createElement('div');
+      u.className = 'chat-user';
+      u.textContent = '🧠 You: ' + text;
+      log.appendChild(u);
+    }
+
+    clearOldTyping();
+    const persona = personaFor(text);
+    const typing = document.createElement('div');
+    typing.className = 'chat-agent typing-line';
+    typing.textContent = `⌛ ${persona.key} is typing…`;
+    log?.appendChild(typing);
+    log && (log.scrollTop = log.scrollHeight);
+
+    const raw = await callBackend(text);
+    clearOldTyping();
+    const a = document.createElement('div');
+    a.className = 'chat-agent';
+    a.textContent = `${persona.label}\n\n${raw}`;
+    log?.appendChild(a);
+    log && (log.scrollTop = log.scrollHeight);
+  }
+
+  btn && (btn.onclick = send);
+  ta && ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+})();
+</script>
 
 </body>
 </html>
