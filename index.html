@@ -651,6 +651,250 @@ aigentsySearch.addEventListener("input", (e) => {
     });
   })();
 </script>
+<!-- ✅ AiGentsy Hero Controller (consolidated) -->
+<script>
+(() => {
+  if (window.__AIG_HERO_CONSOLIDATED__) return;
+  window.__AIG_HERO_CONSOLIDATED__ = true;
+
+  function resetNodeById(id){
+    const n = document.getElementById(id);
+    if (!n) return null;
+    const c = n.cloneNode(true);
+    n.parentNode.replaceChild(c, n);
+    return c;
+  }
+
+  const API_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+  const API = {
+    mint:         `${API_BASE}/mint`,
+    offerPublish: `${API_BASE}/offer/publish`,
+    kpiRollup:    `${API_BASE}/kpi/rollup`,
+  };
+
+  const JSONBIN_URL    = window.JSONBIN_URL    || null;
+  const JSONBIN_SECRET = window.JSONBIN_SECRET || null;
+
+  const usernameInput  = resetNodeById('usernameInput')  || document.getElementById('usernameInput');
+  const passwordInput  = resetNodeById('passwordInput')  || document.getElementById('passwordInput');
+  const agreeCheckbox  = resetNodeById('agreeCheckbox')  || document.getElementById('agreeCheckbox');
+  const enterBtn       = resetNodeById('enterBtn')       || document.getElementById('enterBtn');
+  const searchInput    = resetNodeById('aigentsySearch') || document.getElementById('aigentsySearch');
+  const suggestionBox  = document.getElementById('aigentsySuggestion');
+  const aigentCards    = document.querySelectorAll('.aigent-card');
+
+  let authMode = "login";
+  let selectedAgent = null;
+
+  const params = new URLSearchParams(location.search);
+  const referral = params.get("ref") ||
+                   [params.get("utm_source"), params.get("utm_medium"), params.get("utm_campaign")]
+                     .filter(Boolean).join("/") || "origin/hero";
+  try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
+
+  const companyTypeMap = (agent) => {
+    switch ((agent || "").toLowerCase()) {
+      case "legal":     return "legal";
+      case "social":    return "social";
+      case "saas":      return "saas";
+      case "marketing": return "marketing";
+      case "custom":    return "custom";
+      default:          return "general";
+    }
+  };
+
+  function showSuggestion(value) {
+    if (!suggestionBox) return;
+    const v = (value || "").toLowerCase();
+    let msg = "We’ll build you a custom AiGentsy based on your input.";
+    if (v.includes("legal"))        msg = "Try the Legal AiGentsy — IP, licensing, contracts.";
+    else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
+    else if (v.includes("saas"))    msg = "Try the SaaS AiGentsy — agent-powered web tools.";
+    else if (v.includes("ads") || v.includes("marketing"))
+                                   msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
+    else if (v.includes("agency"))  msg = "Sounds like a services AiGentsy — we can assemble one.";
+    suggestionBox.textContent = msg;
+  }
+
+  function updateButtonState() {
+    if (!enterBtn) return;
+    const valid =
+      usernameInput && usernameInput.value.trim().length > 0 &&
+      agreeCheckbox && agreeCheckbox.checked &&
+      !!selectedAgent;
+    enterBtn.disabled = !valid;
+    const wrapper = document.getElementById("aigentsySearchWrapper");
+    if (wrapper) wrapper.style.display = valid ? "block" : "none";
+  }
+
+  function guessTemplateFromSearch(q) {
+    const m = (q || "").toLowerCase();
+    if (/plumb|hvac|salon|local|lead|quote|book|appointment/.test(m)) {
+      return { id: 'tmpl_local_service_leads', name: 'Local Service Lead Gen' };
+    } else if (/creator|podcast|merch|shop|store|tee|shopify/.test(m)) {
+      return { id: 'tmpl_creator_merch_shop', name: 'Creator Merch Mini-Shop' };
+    } else if (/course|coach|ebook|webinar|lesson|tutorial/.test(m)) {
+      return { id: 'tmpl_digital_course', name: 'Digital Course + Upsell' };
+    } else if (/affiliate|offer|deal|partner|collab/.test(m)) {
+      return { id: 'tmpl_affiliate_hub', name: 'Affiliate Offer Hub' };
+    }
+    return null;
+  }
+
+  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+    if (!JSONBIN_URL || !JSONBIN_SECRET) return;
+    const now = new Date().toISOString();
+    const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+    const entry = {
+      id: `User #${Date.now()}`,
+      consent: { agreed: true, username, timestamp: now },
+      trait: selectedAgent || "founder",
+      traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
+      prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
+      offeringType: "kit",
+      offeringKeywords:
+        selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
+      : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
+      : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
+      : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
+      : ["custom", "idea", "autonomous", "builder"],
+      referral: referralCode || "origin/hero",
+      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+      mintTime: now,
+      role: roleMap[selectedAgent || "general"],
+      protocol: "MetaUpgrade25+26",
+      realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
+      metaVenture: { ventureHive: "Autonomous Launch", ventureRole: roleMap[selectedAgent || "general"],
+                     ventureStatus: "Pending", ventureID: `MV-${Date.now()}` },
+      remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
+      mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Pending", sentinelAlert: false },
+      yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
+      earningsEnabled: true, listingStatus: "Active", protocolStatus: "Bound", tethered: true,
+      name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
+      sdkAccess_eligible: selectedAgent === "saas",
+      sdkAccess: false, vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false,
+      licensingApproved: false, stripeUnlocked: true,
+      productsPurchased: [], teachStage: 1, teachInComplete: false,
+      complianceReviewed: false, complianceLog: [], teachInLog: [],
+      runtimeFlags: { flagged: false, eligibleForAudit: true, needsReview: false, vaultAccess: true }
+    };
+    try {
+      const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+      const currentData = await getRes.json().catch(() => ({ record: [] }));
+      const updatedArray = Array.isArray(currentData.record) ? [...currentData.record, entry] : [entry];
+      await fetch(JSONBIN_URL, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
+        body: JSON.stringify({ record: updatedArray })
+      });
+    } catch (err) {
+      console.warn("JSONBin skipped:", err);
+    }
+  }
+
+  async function mintOnce({ username, companyType, referral, customInput, template }) {
+    const res = await fetch(API.mint, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ username, companyType, referral, customInput, template })
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok || j.ok === false) throw new Error(j.error || "Mint failed");
+    return j.record || j;
+  }
+
+  async function publishStarterOffer(username, idea, companyType) {
+    try {
+      await fetch(API.offerPublish, {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          username,
+          title: idea ? `Quick Win: ${idea.slice(0, 40)}` : "Quick Win Offer",
+          price: companyType === "saas" ? 199 : 149,
+          scope: companyType === "saas" ? "Prototype a micro-SaaS module (48h)" : "Starter branding/launch asset (24h)",
+          terms: "Standard terms",
+          src: "hero"
+        })
+      });
+      await fetch(API.kpiRollup, {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ username })
+      });
+    } catch (e) {
+      console.warn("offerPublish/kpiRollup skipped:", e);
+    }
+  }
+
+  function bindEvents(){
+    if (!usernameInput || !agreeCheckbox || !enterBtn) return;
+
+    document.querySelectorAll('.aigent-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        selectedAgent = card.getAttribute('data-agent');
+        showSuggestion(selectedAgent);
+        updateButtonState();
+      });
+    });
+
+    usernameInput.addEventListener('input', updateButtonState);
+    agreeCheckbox.addEventListener('change', updateButtonState);
+    if (passwordInput) passwordInput.addEventListener('input', () => {});
+
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+    }
+
+    window.toggleAuthMode = function () {
+      const el = document.querySelector('.toggle-auth');
+      authMode = (authMode === "login") ? "signup" : "login";
+      if (el) {
+        el.textContent = (authMode === "login") ? "Don't have an account? Sign up"
+                                               : "Already have an account? Log in";
+      }
+    };
+
+    enterBtn.addEventListener('click', async () => {
+      if (enterBtn.disabled) return;
+      const username = (usernameInput.value || "").trim();
+      if (!username) { alert("Enter a username"); return; }
+      const companyType = companyTypeMap(selectedAgent);
+      const idea        = (searchInput && searchInput.value || "").trim();
+      const template    = guessTemplateFromSearch(idea);
+
+      try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
+      try { localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false"); } catch(e){}
+      try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+      try { localStorage.setItem("aigentsyAuthMode", authMode); } catch(e){}
+      if (template) { try { localStorage.setItem("aigentsyTemplate", JSON.stringify(template)); } catch(e){} }
+
+      registerUserToJSONBin(username, selectedAgent, idea, referral);
+
+      enterBtn.disabled = true;
+      const oldText = enterBtn.textContent;
+      enterBtn.textContent = "Minting…";
+      try {
+        await mintOnce({ username, companyType, referral, customInput: idea, template });
+        await publishStarterOffer(username, idea, companyType);
+        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+      } catch (e) {
+        console.error(e);
+        alert("❌ Could not mint your AiGentsy. Please try again.");
+      } finally {
+        enterBtn.disabled = false;
+        enterBtn.textContent = oldText;
+      }
+    });
+
+    updateButtonState();
+  }
+
+  bindEvents();
+})();
+</script>
 
 </body>
 </html>
