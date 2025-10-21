@@ -152,12 +152,13 @@
 
       <div class="aigent-options">
         <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
-<div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
-<div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
-<div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
+        <div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
+        <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+        <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
       </div>
 
-      <div id="aigentsySearchWrapper" style="margin-top: 30px;">
+      <!-- 🔎 White-label search: always visible -->
+      <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
         <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Tell us what type of AiGentsy to build you</label><br>
         <input type="text" id="aigentsySearch" placeholder="e.g. podcast business, saas app, coaching brand" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
         <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
@@ -171,730 +172,267 @@
     </div>
   </div>
 
+  <!-- ✅ AiGentsy Hero Controller (single, consolidated) -->
   <script>
-  let authMode = "login";
-  const usernameInput = document.getElementById('usernameInput');
-  const passwordInput = document.getElementById('passwordInput');
-  const agreeCheckbox = document.getElementById('agreeCheckbox');
-  const enterBtn = document.getElementById('enterBtn');
-  const aigentCards = document.querySelectorAll('.aigent-card');
-  const toggleAuthText = document.querySelector('.toggle-auth');
-  const aigentsySearch = document.getElementById("aigentsySearch");
-  let selectedAgent = null;
+  (() => {
+    if (window.__AIG_HERO_CONSOLIDATED__) return;
+    window.__AIG_HERO_CONSOLIDATED__ = true;
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const refCode = urlParams.get("ref");
-  if (refCode) localStorage.setItem("aigentsyReferral", refCode);
-
-  aigentCards.forEach(card => {
-    card.addEventListener('click', () => {
-      aigentCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedAgent = card.getAttribute('data-agent');
-      updateButtonState();
-    });
-  });
-
-  function updateButtonState() {
-    const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-    enterBtn.disabled = !valid;
-  }
-
-  function toggleAuthMode() {
-    authMode = authMode === "login" ? "signup" : "login";
-    toggleAuthText.textContent = authMode === "login" ? "Don't have an account? Sign up" : "Already have an account? Log in";
-    updateButtonState();
-  }
-
-  usernameInput.addEventListener('input', updateButtonState);
-  passwordInput.addEventListener('input', updateButtonState);
-  agreeCheckbox.addEventListener('change', updateButtonState);
-
-  // 💡 Search suggestion logic
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchWrapper = document.getElementById("aigentsySearchWrapper");
-    const suggestionBox = document.getElementById("aigentsySuggestion");
-
-    function showSuggestions(value) {
-      const lower = value.toLowerCase();
-      let match = "";
-      if (lower.includes("legal")) match = "Try the Legal AiGentsy – built for IP, licensing, and contracts.";
-      else if (lower.includes("podcast")) match = "Try the Podcast AiGentsy – auto-produce and distribute audio.";
-      else if (lower.includes("saas")) match = "Try the SaaS AiGentsy – build agent-powered web tools.";
-      else if (lower.includes("marketing") || lower.includes("ads")) match = "Try the Marketing AiGentsy – launch SEO, ads, and growth campaigns.";
-      else if (lower.includes("agency")) match = "Sounds like a business service AiGentsy — we can assemble one for you.";
-      else match = "We’ll build you a custom AiGentsy based on your input.";
-      suggestionBox.innerText = match;
+    // Utility: drop old listeners by cloning nodes if needed
+    function resetNodeById(id){
+      const n = document.getElementById(id);
+      if (!n) return null;
+      const c = n.cloneNode(true);
+      n.parentNode.replaceChild(c, n);
+      return c;
     }
 
-    aigentsySearch.addEventListener("input", (e) => {
-      showSuggestions(e.target.value);
-    });
-
-    function maybeShowSearch() {
-      const valid = usernameInput.value.trim() && passwordInput.value.length >= 4 && agreeCheckbox.checked && selectedAgent;
-      searchWrapper.style.display = valid ? "block" : "none";
-    }
-
-    usernameInput.addEventListener('input', maybeShowSearch);
-    passwordInput.addEventListener('input', maybeShowSearch);
-    agreeCheckbox.addEventListener('change', maybeShowSearch);
-    aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
-  });
-    
-  // ... your existing login/signup logic above ...
-
-  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-    const now = new Date().toISOString();
-    const roleMap = {
-  "legal": "CLO",
-  "social": "CSO",
-  "saas": "CTO",
-  "marketing": "CMO",
-  "universal": "COO"
+    // Config
+    const API_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+    const API = {
+      mint:         `${API_BASE}/mint`,
+      offerPublish: `${API_BASE}/offer/publish`,
+      kpiRollup:    `${API_BASE}/kpi/rollup`,
     };
 
-   const entry = {
-  id: `User #${Date.now()}`,
-  consent: {
-    agreed: true,
-    username,
-    timestamp: now
-  },
-  trait: selectedAgent || "founder",
-  traits: [selectedAgent, "founder", "autonomous", "aigentsy"],
-  prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
-  offeringType: "kit",
-  offeringKeywords: selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
-    : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
-    : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
-    : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
-    : ["custom", "idea", "autonomous", "builder"],
-  referral: referralCode || "origin/hero",
-  runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-  mintTime: now,
-  role: roleMap[selectedAgent] || "CEO",
-  protocol: "MetaUpgrade25",
-  realm: {
-    name: "Realm 101 — Strategic Expansion",
-    joinedAt: now
-  },
-  metaVenture: {
-    ventureHive: "Autonomous Launch",
-    ventureRole: roleMap[selectedAgent] || "CEO",
-    ventureStatus: "Pending",
-    ventureID: `MV-${Date.now()}`
-  },
-  remix: {
-    remixCount: 0,
-    remixCredits: 1000,
-    lineageDepth: 0,
-    royaltyTerms: "Standard 30%"
-  },
-  mirror: {
-    mirroredInRealms: ["Realm 101 — Strategic Expansion"],
-    mirrorIntegrity: "Pending",
-    sentinelAlert: false
-  },
-  yield: {
-    autoStake: false,
-    aigxEarned: 0,
-    vaultYield: 0,
-    remixYield: 0
-  },
-  earningsEnabled: true,
-  listingStatus: "Active",
-  protocolStatus: "Bound",
-  tethered: true,
-  name: `AiGent ${roleMap[selectedAgent] || "Founder"}`,
-  sdkAccess_eligible: selectedAgent === "saas",
-  sdkAccess: false,
-  vaultAccess: true,  // ✅ Force unlock on mint
-  remixUnlocked: false,
-  cloneLicenseUnlocked: false,
-  licensingApproved: false,
-  stripeUnlocked: false,
-  productsPurchased: [],
-  teachStage: 1,
-  teachInComplete: false,
-  complianceReviewed: false,
-  complianceLog: [],
-  teachInLog: [],
-  runtimeFlags: {
-    flagged: false,
-    eligibleForAudit: true,
-    needsReview: false,
-    vaultAccess: true  // ✅ Ensure charts/unlocks render
-  }
-};
-    
-    try {
-      const getRes = await fetch(JSONBIN_URL, {
-        headers: {
-          "X-Master-Key": JSONBIN_SECRET
-        }
-      });
+    // Optional JSONBin env if present on window
+    const JSONBIN_URL    = window.JSONBIN_URL    || null;
+    const JSONBIN_SECRET = window.JSONBIN_SECRET || null;
 
-      if (!getRes.ok) {
-        console.error("JSONBin GET failed:", await getRes.text());
-        return;
+    // Elements (support both legacy and new IDs)
+    const usernameInput  = resetNodeById('usernameInput')  || document.getElementById('usernameInput');
+    const passwordInput  = resetNodeById('passwordInput')  || document.getElementById('passwordInput');
+    const agreeCheckbox  = resetNodeById('agreeCheckbox')  || document.getElementById('agreeCheckbox');
+    const enterBtn       = resetNodeById('enterBtn')       || document.getElementById('enterBtn');
+
+    const searchInput    = resetNodeById('aigentsySearch') || resetNodeById('whitelabelSearch')
+                        || document.getElementById('aigentsySearch') || document.getElementById('whitelabelSearch');
+    const searchWrapper  = document.getElementById('aigentsySearchWrapper') || document.getElementById('whitelabelSearchWrapper');
+    const suggestionBox  = document.getElementById('aigentsySuggestion') || document.getElementById('whitelabelSuggestion');
+
+    const aigentCards    = document.querySelectorAll('.aigent-card');
+
+    // State
+    let authMode = "login";
+    let selectedAgent = null;
+
+    // referral capture
+    const params = new URLSearchParams(location.search);
+    const referral = params.get("ref") ||
+                    [params.get("utm_source"), params.get("utm_medium"), params.get("utm_campaign")]
+                      .filter(Boolean).join("/") || "origin/hero";
+    try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
+
+    // Helpers
+    const companyTypeMap = (agent) => {
+      switch ((agent || "").toLowerCase()) {
+        case "legal":     return "legal";
+        case "social":    return "social";
+        case "saas":      return "saas";
+        case "marketing": return "marketing";
+        case "custom":    return "custom";
+        default:          return "general";
       }
+    };
 
-      const currentData = await getRes.json();
-      const updatedArray = [...currentData.record, entry];
+    function showSuggestion(value) {
+      if (!suggestionBox) return;
+      const v = (value || "").toLowerCase();
+      let msg = "We’ll build you a custom AiGentsy based on your input.";
+      if (v.includes("legal"))        msg = "Try the Legal AiGentsy — IP, licensing, and contracts.";
+      else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
+      else if (v.includes("saas"))    msg = "Try the SaaS AiGentsy — agent-powered web tools.";
+      else if (v.includes("ads") || v.includes("marketing"))
+                                    msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
+      else if (v.includes("agency"))  msg = "Sounds like a services AiGentsy — we can assemble one.";
+      suggestionBox.textContent = msg;
+    }
 
-      const putRes = await fetch(JSONBIN_URL, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Master-Key": JSONBIN_SECRET
+    function guessTemplateFromSearch(q) {
+      const m = (q || "").toLowerCase();
+      if (/plumb|hvac|salon|local|lead|quote|book|appointment/.test(m))
+        return { id: 'tmpl_local_service_leads', name: 'Local Service Lead Gen' };
+      if (/creator|podcast|merch|shop|store|tee|shopify/.test(m))
+        return { id: 'tmpl_creator_merch_shop', name: 'Creator Merch Mini-Shop' };
+      if (/course|coach|ebook|webinar|lesson|tutorial/.test(m))
+        return { id: 'tmpl_digital_course', name: 'Digital Course + Upsell' };
+      if (/affiliate|offer|deal|partner|collab/.test(m))
+        return { id: 'tmpl_affiliate_hub', name: 'Affiliate Offer Hub' };
+      return null;
+    }
+
+    async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+      if (!JSONBIN_URL || !JSONBIN_SECRET) return; // skip if not configured
+      const now = new Date().toISOString();
+      const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+      const entry = {
+        id: `User #${Date.now()}`,
+        consent: { agreed: true, username, timestamp: now },
+        trait: selectedAgent || "founder",
+        traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
+        prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
+        offeringType: "kit",
+        offeringKeywords:
+          selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
+        : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
+        : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
+        : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
+        : ["custom", "idea", "autonomous", "builder"],
+        referral: referralCode || "origin/hero",
+        runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+        mintTime: now,
+        role: roleMap[selectedAgent || "general"],
+        protocol: "MetaUpgrade25+26",
+        realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
+        metaVenture: {
+          ventureHive: "Autonomous Launch",
+          ventureRole: roleMap[selectedAgent || "general"],
+          ventureStatus: "Pending",
+          ventureID: `MV-${Date.now()}`
         },
-        body: JSON.stringify(updatedArray)
-      });
-
-      if (!putRes.ok) {
-        console.error("JSONBin PUT failed:", await putRes.text());
-      } else {
-        console.log("✅ New user saved to JSONBin:", username);
-      }
-    } catch (err) {
-      console.error("JSONBin error:", err);
-    }
-  }
-   
-   enterBtn.addEventListener('click', async () => {
-  const user = usernameInput.value.trim();
-  const pass = passwordInput.value;
-
-  const storedUser = localStorage.getItem(`user:${user}`);
-  const storedPass = localStorage.getItem(`pass:${user}`);
-
-  const isNewUser = !storedUser || storedPass !== pass;
-
-  if (isNewUser) {
-    if (authMode === "signup") {
-      localStorage.setItem(`user:${user}`, user);
-      localStorage.setItem(`pass:${user}`, pass);
-
+        remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
+        mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Pending", sentinelAlert: false },
+        yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
+        earningsEnabled: true, listingStatus: "Active", protocolStatus: "Bound", tethered: true,
+        name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
+        sdkAccess_eligible: selectedAgent === "saas",
+        sdkAccess: false, vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false,
+        licensingApproved: false, stripeUnlocked: true,
+        productsPurchased: [], teachStage: 1, teachInComplete: false,
+        complianceReviewed: false, complianceLog: [], teachInLog: [],
+        runtimeFlags: { flagged: false, eligibleForAudit: true, needsReview: false, vaultAccess: true }
+      };
       try {
-        await registerUserToJSONBin(
-          user,
-          selectedAgent,
-          aigentsySearch.value,
-          localStorage.getItem("aigentsyReferral")
-        );
+        const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+        const currentData = await getRes.json().catch(() => ({ record: [] }));
+        const updatedArray = Array.isArray(currentData.record) ? [...currentData.record, entry] : [entry];
+        await fetch(JSONBIN_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
+          body: JSON.stringify({ record: updatedArray })
+        });
       } catch (err) {
-        alert("❌ Registration failed. Please try again.");
-        return; // Stop execution
+        console.warn("JSONBin skipped:", err);
       }
-    } else {
-      alert("❌ Incorrect login. Switch to Sign Up if you're new.");
-      return; // Stop execution
     }
-  } else {
-    authMode = "login";
-  }
 
-  localStorage.setItem("aigentsyUsername", user);
-  localStorage.setItem("aigentsyUserConsent", "true");
-  localStorage.setItem("aigentsyUserAgent", selectedAgent);
-  localStorage.setItem("aigentsyAuthMode", authMode);
-
-  // ✅ Safer redirect
-  window.location.assign(`/agents/aigent0.html?user=${user}`);
-});
-// 🧠 Launch Kit Modal Automatically on Hero Selection
-aigentCards.forEach(card => {
-  card.addEventListener('click', () => {
-    const type = card.getAttribute('data-agent');
-    if (["legal", "saas", "marketing", "social"].includes(type)) {
-  openKitModal(type);
-}
-  });
-});
-
-// 🧠 Also open custom modal if user types a new idea
-aigentsySearch.addEventListener("input", (e) => {
-  const value = e.target.value.toLowerCase();
-  if (value.length > 8 && !["legal", "saas", "marketing", "social"].some(v => value.includes(v))) {
-    openKitModal("custom");
-  }
-});
-
-</script>
-<script>
-(() => {
-  // -----------------------------
-  // Config
-  // -----------------------------
-  const BASE = ""; // set to e.g. "https://your-api.onrender.com" if API is on a different host
-  const API = {
-    mint:         `${BASE}/mint`,
-    offerPublish: `${BASE}/offer/publish`,
-    kpiRollup:    `${BASE}/kpi/rollup`
-  };
-
-  // -----------------------------
-  // Elements
-  // -----------------------------
-  const usernameInput  = document.getElementById('usernameInput');
-  const passwordInput  = document.getElementById('passwordInput'); // UI only; not sent to server
-  const agreeCheckbox  = document.getElementById('agreeCheckbox');
-  const enterBtn       = document.getElementById('enterBtn');
-  const aigentCards    = document.querySelectorAll('.aigent-card');
-  const searchInput    = document.getElementById('aigentsySearch');
-  const suggestionBox  = document.getElementById('aigentsySuggestion');
-
-  // -----------------------------
-  // State
-  // -----------------------------
-  let authMode = "login";             // we still show login/signup UX, but /mint is idempotent
-  let selectedAgent = null;           // legal | social | saas | marketing | custom
-  // capture ?ref and basic UTMs into one referral string
-  const params = new URLSearchParams(location.search);
-  const referral = params.get("ref") ||
-                   [params.get("utm_source"), params.get("utm_medium"), params.get("utm_campaign")]
-                     .filter(Boolean).join("/") || "origin/hero";
-  localStorage.setItem("aigentsyReferral", referral);
-
-  // -----------------------------
-  // Helpers
-  // -----------------------------
-  const companyTypeMap = (agent) => {
-    switch ((agent || "").toLowerCase()) {
-      case "legal":     return "legal";
-      case "social":    return "social";
-      case "saas":      return "saas";
-      case "marketing": return "marketing";
-      case "custom":    return "custom";
-      default:          return "general";
-    }
-  };
-
-  function updateButtonState() {
-    const valid =
-      usernameInput.value.trim().length > 0 &&
-      agreeCheckbox.checked &&
-      !!selectedAgent;
-    // (password length check removed from gating server call; keep if you want stricter UI)
-    enterBtn.disabled = !valid;
-  }
-
-  function showSuggestion(value) {
-    const v = (value || "").toLowerCase();
-    let msg = "We’ll build you a custom AiGentsy based on your input.";
-    if (v.includes("legal"))        msg = "Try the Legal AiGentsy — IP, licensing, contracts.";
-    else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
-    else if (v.includes("saas"))    msg = "Try the SaaS AiGentsy — agent-powered web tools.";
-    else if (v.includes("ads") || v.includes("marketing")) msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
-    else if (v.includes("agency"))  msg = "Sounds like a services AiGentsy — we can assemble one.";
-    suggestionBox.textContent = msg;
-  }
-
-  // No-op stub to avoid errors from old code references
-  window.openKitModal = function(){};
-
-  // -----------------------------
-  // Event wiring
-  // -----------------------------
-  aigentCards.forEach(card => {
-    card.addEventListener('click', () => {
-      aigentCards.forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedAgent = card.getAttribute('data-agent');
-      updateButtonState();
-      // seed search suggestions by selected agent
-      showSuggestion(selectedAgent);
-    });
-  });
-
-  usernameInput.addEventListener('input', updateButtonState);
-  agreeCheckbox.addEventListener('change', updateButtonState);
-  passwordInput.addEventListener('input', updateButtonState);
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // turn search on when the form is valid
-    function maybeShowSearch() {
-      const valid = !enterBtn.disabled;
-      document.getElementById("aigentsySearchWrapper").style.display = valid ? "block" : "none";
-    }
-    usernameInput.addEventListener('input', maybeShowSearch);
-    agreeCheckbox.addEventListener('change', maybeShowSearch);
-    aigentCards.forEach(card => card.addEventListener('click', maybeShowSearch));
-
-    searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
-  });
-
-  // Toggle login/signup label
-  window.toggleAuthMode = function () {
-    authMode = (authMode === "login") ? "signup" : "login";
-    document.querySelector('.toggle-auth').textContent =
-      (authMode === "login") ? "Don't have an account? Sign up" : "Already have an account? Log in";
-    updateButtonState();
-  };
-
-  // -----------------------------
-  // Main action: Mint → (optional offer publish) → redirect
-  // -----------------------------
-  enterBtn.addEventListener('click', async () => {
-    if (enterBtn.disabled) return;
-
-    const username    = usernameInput.value.trim();
-    const companyType = companyTypeMap(selectedAgent);
-    const idea        = searchInput.value.trim();
-
-    // Persist local session hints (no passwords)
-    localStorage.setItem("aigentsyUsername", username);
-    localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false");
-    localStorage.setItem("aigentsyUserAgent", selectedAgent);
-    localStorage.setItem("aigentsyAuthMode", authMode);
-
-    // 1) Mint (idempotent: creates if new, returns existing if already minted)
-    try {
+    async function mintOnce({ username, companyType, referral, customInput, template }) {
       const res = await fetch(API.mint, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ username, companyType, referral })
+        body: JSON.stringify({ username, companyType, referral, customInput, template })
       });
-      const j = await res.json();
-      if (!j.ok) throw new Error(j.error || "Mint failed");
-    } catch (e) {
-      alert("❌ Could not mint your AiGentsy. Please try again.");
-      console.error(e);
-      return;
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || j.ok === false) throw new Error(j.error || "Mint failed");
+      return j.record || j;
     }
 
-    // 2) Optionally publish a starter offer for a “live” first impression
-    try {
-      await fetch(API.offerPublish, {
-        method:"POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          username,
-          title: idea ? `Quick Win: ${idea.slice(0, 40)}` : "Quick Win Offer",
-          price: companyType === "saas" ? 199 : 149,
-          scope: companyType === "saas" ? "Prototype a micro-SaaS module (48h)" : "Starter branding/launch asset (24h)",
-          terms: "Standard terms",
-          src: "hero"
-        })
-      });
-      // small KPI snapshot so tiles are populated
-      fetch(API.kpiRollup, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ username })
-      }).catch(()=>{});
-    } catch (e) {
-      // non-fatal
-      console.warn("offerPublish/kpiRollup skipped:", e);
-    }
-
-    // 3) Redirect to dashboard
-    window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
-  });
-})();
-</script>
-<script>
-  // Point to your API
-  const BASE = "https://aigentsy-ame-runtime.onrender.com";
-
-  async function mintFromHero({ username, companyType, referral, customInput, meta_role }) {
-    const body = { username, companyType, referral, customInput, meta_role };
-    const res = await fetch(BASE + "/mint", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.detail || "mint failed");
-    return json.record || json; // server returns { ok, record }
-  }
-
-  // Hook up the Launch button
-  (function wireMint() {
-    const enterBtn = document.getElementById("enterBtn");
-    const usernameInput = document.getElementById("usernameInput");
-    const searchInput = document.getElementById("aigentsySearch");
-    // assuming you already set window.selectedAgent when the user picks a card:
-    let selectedAgent = window.selectedAgent || "general";
-
-    // if your code uses a different variable, update this assignment:
-    document.querySelectorAll(".aigent-card").forEach(card => {
-      card.addEventListener("click", () => {
-        selectedAgent = card.getAttribute("data-agent") || "general";
-      });
-    });
-
-    enterBtn.addEventListener("click", async () => {
-      const username = (usernameInput.value || "").trim();
-      const companyType = (selectedAgent || "general").toLowerCase();
-      const referral = localStorage.getItem("aigentsyReferral") || "origin/hero";
-      const customInput = (searchInput && searchInput.value) || "";
-
-      if (!username) { alert("Enter a username"); return; }
-
-      enterBtn.disabled = true; enterBtn.textContent = "Minting…";
+    async function publishStarterOffer(username, idea, companyType) {
       try {
-        const rec = await mintFromHero({ username, companyType, referral, customInput });
-        // minimal local session
-        localStorage.setItem("aigentsyUsername", rec.username || username);
-        localStorage.setItem("aigentsyUserAgent", companyType);
-        localStorage.setItem("aigentsyUserConsent", "true");
-        // go to dashboard
-        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        await fetch(API.offerPublish, {
+          method:"POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({
+            username,
+            title: idea ? `Quick Win: ${idea.slice(0, 40)}` : "Quick Win Offer",
+            price: companyType === "saas" ? 199 : 149,
+            scope: companyType === "saas" ? "Prototype a micro-SaaS module (48h)" : "Starter branding/launch asset (24h)",
+            terms: "Standard terms",
+            src: "hero"
+          })
+        });
+        await fetch(API.kpiRollup, {
+          method: "POST",
+          headers: {"Content-Type":"application/json"},
+          body: JSON.stringify({ username })
+        });
       } catch (e) {
-        console.error(e);
-        alert("❌ Mint error: " + e.message);
-      } finally {
-        enterBtn.disabled = false; enterBtn.textContent = "🚀 Launch Your AiGentsy";
+        console.warn("offerPublish/kpiRollup skipped:", e);
       }
-    });
+    }
+
+    // UI behavior
+    function updateButtonState() {
+      if (!enterBtn) return;
+      const valid =
+        usernameInput && usernameInput.value.trim().length > 0 &&
+        agreeCheckbox && agreeCheckbox.checked &&
+        !!selectedAgent;
+      enterBtn.disabled = !valid;
+      // Always show search bar (white-label minting)
+      if (searchWrapper) searchWrapper.style.display = 'block';
+    }
+
+    function bindEvents(){
+      if (!usernameInput || !agreeCheckbox || !enterBtn) return;
+
+      document.querySelectorAll('.aigent-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedAgent = card.getAttribute('data-agent');
+          showSuggestion(selectedAgent);
+          updateButtonState();
+        });
+      });
+
+      usernameInput.addEventListener('input', updateButtonState);
+      agreeCheckbox.addEventListener('change', updateButtonState);
+      if (passwordInput) passwordInput.addEventListener('input', () => {});
+
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+      }
+
+      window.toggleAuthMode = function () {
+        const el = document.querySelector('.toggle-auth');
+        authMode = (authMode === "login") ? "signup" : "login";
+        if (el) {
+          el.textContent = (authMode === "login") ? "Don't have an account? Sign up"
+                                                 : "Already have an account? Log in";
+        }
+      };
+
+      enterBtn.addEventListener('click', async () => {
+        if (enterBtn.disabled) return;
+        const username = (usernameInput.value || "").trim();
+        if (!username) { alert("Enter a username"); return; }
+        const companyType = companyTypeMap(selectedAgent);
+        const idea        = (searchInput && searchInput.value || "").trim();
+        const template    = guessTemplateFromSearch(idea);
+
+        try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
+        try { localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false"); } catch(e){}
+        try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+        try { localStorage.setItem("aigentsyAuthMode", authMode); } catch(e){}
+        if (template) { try { localStorage.setItem("aigentsyTemplate", JSON.stringify(template)); } catch(e){} }
+
+        registerUserToJSONBin(username, selectedAgent, idea, referral);
+
+        enterBtn.disabled = true;
+        const oldText = enterBtn.textContent;
+        enterBtn.textContent = "Minting…";
+        try {
+          await mintOnce({ username, companyType, referral, customInput: idea, template });
+          await publishStarterOffer(username, idea, companyType);
+          window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        } catch (e) {
+          console.error(e);
+          alert("❌ Could not mint your AiGentsy. Please try again.");
+        } finally {
+          enterBtn.disabled = false;
+          enterBtn.textContent = oldText;
+        }
+      });
+
+      // Ensure search is visible and seeded
+      if (searchWrapper) searchWrapper.style.display = 'block';
+      if (searchInput) showSuggestion(searchInput.value || '');
+      updateButtonState();
+    }
+
+    bindEvents();
   })();
-</script>
-<!-- ✅ AiGentsy Hero Controller (consolidated) -->
-<script>
-(() => {
-  if (window.__AIG_HERO_CONSOLIDATED__) return;
-  window.__AIG_HERO_CONSOLIDATED__ = true;
-
-  function resetNodeById(id){
-    const n = document.getElementById(id);
-    if (!n) return null;
-    const c = n.cloneNode(true);
-    n.parentNode.replaceChild(c, n);
-    return c;
-  }
-
-  const API_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
-  const API = {
-    mint:         `${API_BASE}/mint`,
-    offerPublish: `${API_BASE}/offer/publish`,
-    kpiRollup:    `${API_BASE}/kpi/rollup`,
-  };
-
-  const JSONBIN_URL    = window.JSONBIN_URL    || null;
-  const JSONBIN_SECRET = window.JSONBIN_SECRET || null;
-
-  const usernameInput  = resetNodeById('usernameInput')  || document.getElementById('usernameInput');
-  const passwordInput  = resetNodeById('passwordInput')  || document.getElementById('passwordInput');
-  const agreeCheckbox  = resetNodeById('agreeCheckbox')  || document.getElementById('agreeCheckbox');
-  const enterBtn       = resetNodeById('enterBtn')       || document.getElementById('enterBtn');
-  const searchInput    = resetNodeById('aigentsySearch') || document.getElementById('aigentsySearch');
-  const suggestionBox  = document.getElementById('aigentsySuggestion');
-  const aigentCards    = document.querySelectorAll('.aigent-card');
-
-  let authMode = "login";
-  let selectedAgent = null;
-
-  const params = new URLSearchParams(location.search);
-  const referral = params.get("ref") ||
-                   [params.get("utm_source"), params.get("utm_medium"), params.get("utm_campaign")]
-                     .filter(Boolean).join("/") || "origin/hero";
-  try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
-
-  const companyTypeMap = (agent) => {
-    switch ((agent || "").toLowerCase()) {
-      case "legal":     return "legal";
-      case "social":    return "social";
-      case "saas":      return "saas";
-      case "marketing": return "marketing";
-      case "custom":    return "custom";
-      default:          return "general";
-    }
-  };
-
-  function showSuggestion(value) {
-    if (!suggestionBox) return;
-    const v = (value || "").toLowerCase();
-    let msg = "We’ll build you a custom AiGentsy based on your input.";
-    if (v.includes("legal"))        msg = "Try the Legal AiGentsy — IP, licensing, contracts.";
-    else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
-    else if (v.includes("saas"))    msg = "Try the SaaS AiGentsy — agent-powered web tools.";
-    else if (v.includes("ads") || v.includes("marketing"))
-                                   msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
-    else if (v.includes("agency"))  msg = "Sounds like a services AiGentsy — we can assemble one.";
-    suggestionBox.textContent = msg;
-  }
-
-  function updateButtonState() {
-    if (!enterBtn) return;
-    const valid =
-      usernameInput && usernameInput.value.trim().length > 0 &&
-      agreeCheckbox && agreeCheckbox.checked &&
-      !!selectedAgent;
-    enterBtn.disabled = !valid;
-    const wrapper = document.getElementById("aigentsySearchWrapper");
-    if (wrapper) wrapper.style.display = valid ? "block" : "none";
-  }
-
-  function guessTemplateFromSearch(q) {
-    const m = (q || "").toLowerCase();
-    if (/plumb|hvac|salon|local|lead|quote|book|appointment/.test(m)) {
-      return { id: 'tmpl_local_service_leads', name: 'Local Service Lead Gen' };
-    } else if (/creator|podcast|merch|shop|store|tee|shopify/.test(m)) {
-      return { id: 'tmpl_creator_merch_shop', name: 'Creator Merch Mini-Shop' };
-    } else if (/course|coach|ebook|webinar|lesson|tutorial/.test(m)) {
-      return { id: 'tmpl_digital_course', name: 'Digital Course + Upsell' };
-    } else if (/affiliate|offer|deal|partner|collab/.test(m)) {
-      return { id: 'tmpl_affiliate_hub', name: 'Affiliate Offer Hub' };
-    }
-    return null;
-  }
-
-  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-    if (!JSONBIN_URL || !JSONBIN_SECRET) return;
-    const now = new Date().toISOString();
-    const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
-    const entry = {
-      id: `User #${Date.now()}`,
-      consent: { agreed: true, username, timestamp: now },
-      trait: selectedAgent || "founder",
-      traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-      prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
-      offeringType: "kit",
-      offeringKeywords:
-        selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
-      : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
-      : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
-      : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
-      : ["custom", "idea", "autonomous", "builder"],
-      referral: referralCode || "origin/hero",
-      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-      mintTime: now,
-      role: roleMap[selectedAgent || "general"],
-      protocol: "MetaUpgrade25+26",
-      realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
-      metaVenture: { ventureHive: "Autonomous Launch", ventureRole: roleMap[selectedAgent || "general"],
-                     ventureStatus: "Pending", ventureID: `MV-${Date.now()}` },
-      remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
-      mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Pending", sentinelAlert: false },
-      yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
-      earningsEnabled: true, listingStatus: "Active", protocolStatus: "Bound", tethered: true,
-      name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
-      sdkAccess_eligible: selectedAgent === "saas",
-      sdkAccess: false, vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false,
-      licensingApproved: false, stripeUnlocked: true,
-      productsPurchased: [], teachStage: 1, teachInComplete: false,
-      complianceReviewed: false, complianceLog: [], teachInLog: [],
-      runtimeFlags: { flagged: false, eligibleForAudit: true, needsReview: false, vaultAccess: true }
-    };
-    try {
-      const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-      const currentData = await getRes.json().catch(() => ({ record: [] }));
-      const updatedArray = Array.isArray(currentData.record) ? [...currentData.record, entry] : [entry];
-      await fetch(JSONBIN_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-        body: JSON.stringify({ record: updatedArray })
-      });
-    } catch (err) {
-      console.warn("JSONBin skipped:", err);
-    }
-  }
-
-  async function mintOnce({ username, companyType, referral, customInput, template }) {
-    const res = await fetch(API.mint, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ username, companyType, referral, customInput, template })
-    });
-    const j = await res.json().catch(() => ({}));
-    if (!res.ok || j.ok === false) throw new Error(j.error || "Mint failed");
-    return j.record || j;
-  }
-
-  async function publishStarterOffer(username, idea, companyType) {
-    try {
-      await fetch(API.offerPublish, {
-        method:"POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          username,
-          title: idea ? `Quick Win: ${idea.slice(0, 40)}` : "Quick Win Offer",
-          price: companyType === "saas" ? 199 : 149,
-          scope: companyType === "saas" ? "Prototype a micro-SaaS module (48h)" : "Starter branding/launch asset (24h)",
-          terms: "Standard terms",
-          src: "hero"
-        })
-      });
-      await fetch(API.kpiRollup, {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ username })
-      });
-    } catch (e) {
-      console.warn("offerPublish/kpiRollup skipped:", e);
-    }
-  }
-
-  function bindEvents(){
-    if (!usernameInput || !agreeCheckbox || !enterBtn) return;
-
-    document.querySelectorAll('.aigent-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        selectedAgent = card.getAttribute('data-agent');
-        showSuggestion(selectedAgent);
-        updateButtonState();
-      });
-    });
-
-    usernameInput.addEventListener('input', updateButtonState);
-    agreeCheckbox.addEventListener('change', updateButtonState);
-    if (passwordInput) passwordInput.addEventListener('input', () => {});
-
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
-    }
-
-    window.toggleAuthMode = function () {
-      const el = document.querySelector('.toggle-auth');
-      authMode = (authMode === "login") ? "signup" : "login";
-      if (el) {
-        el.textContent = (authMode === "login") ? "Don't have an account? Sign up"
-                                               : "Already have an account? Log in";
-      }
-    };
-
-    enterBtn.addEventListener('click', async () => {
-      if (enterBtn.disabled) return;
-      const username = (usernameInput.value || "").trim();
-      if (!username) { alert("Enter a username"); return; }
-      const companyType = companyTypeMap(selectedAgent);
-      const idea        = (searchInput && searchInput.value || "").trim();
-      const template    = guessTemplateFromSearch(idea);
-
-      try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
-      try { localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false"); } catch(e){}
-      try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
-      try { localStorage.setItem("aigentsyAuthMode", authMode); } catch(e){}
-      if (template) { try { localStorage.setItem("aigentsyTemplate", JSON.stringify(template)); } catch(e){} }
-
-      registerUserToJSONBin(username, selectedAgent, idea, referral);
-
-      enterBtn.disabled = true;
-      const oldText = enterBtn.textContent;
-      enterBtn.textContent = "Minting…";
-      try {
-        await mintOnce({ username, companyType, referral, customInput: idea, template });
-        await publishStarterOffer(username, idea, companyType);
-        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
-      } catch (e) {
-        console.error(e);
-        alert("❌ Could not mint your AiGentsy. Please try again.");
-      } finally {
-        enterBtn.disabled = false;
-        enterBtn.textContent = oldText;
-      }
-    });
-
-    updateButtonState();
-  }
-
-  bindEvents();
-})();
-</script>
-
+  </script>
 </body>
 </html>
