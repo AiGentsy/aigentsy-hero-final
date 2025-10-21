@@ -4325,7 +4325,190 @@ setTimeout(()=>{
   }
 })();
 </script>
-  
+
+<script>
+/* === C-Suite Persona Polisher: one expert, first-person voice === */
+(() => {
+  if (window.__CSUITE_PERSONA_POLISH__) return; window.__CSUITE_PERSONA_POLISH__ = true;
+
+  // If your router already sets the role, reuse it; else lightly infer.
+  function inferRole(txt=""){
+    const t = txt.toLowerCase();
+    if (/\bcaio\b|chief ai officer|orchestr/.test(t)) return "CAIO";
+    if (/\bcfo\b|pricing|budget|revenue|profit|cash|payout|off-?ramp|fiat/.test(t)) return "CFO";
+    if (/\bclo\b|legal|license|ip|contract|compliance|trademark|remix|fork/.test(t)) return "CLO";
+    if (/\bcto\b|sdk|developer|api|integration|build|deploy|stack|runtime|bug/.test(t)) return "CTO";
+    if (/\bcmo\b|marketing|growth|campaign|audience|leads|promote|brand/.test(t)) return "CMO";
+    if (/\bcoo\b|ops|operations|fulfillment|handoff|process|sop|timeline/.test(t)) return "COO";
+    if (/\bcpo\b|product|feature|roadmap|ux|ui|spec/.test(t)) return "CPO";
+    if (/\bcro\b|sales|pipeline|deal|crm|demo|quote/.test(t)) return "CRO";
+    return null;
+  }
+
+  const OPEN = {
+    CFO:  "💰 (CFO) I manage the numbers. Here’s how I’d handle this:",
+    CLO:  "📜 (CLO) I’m your counsel. Here’s what I recommend:",
+    CTO:  "🧬 (CTO) I’ll handle the technical side. Here’s my plan:",
+    CMO:  "📣 (CMO) I lead growth. Here’s how I’d approach it:",
+    COO:  "🧭 (COO) I’ll run ops. Here’s the execution plan:",
+    CPO:  "🧪 (CPO) Product hat on. Here’s the build path:",
+    CRO:  "💼 (CRO) I’ll drive revenue. Here’s the move:",
+    CAIO: "🧠 (CAIO) I lead AI capabilities. Here’s what I can unlock:"
+  };
+
+  // Convert neutral/collective tone → first-person expert voice
+  function personalize(role, text){
+    let t = String(text || "");
+    // Strip system-y prefaces
+    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
+    // Light humanization
+    t = t.replace(/\bSDK\b/g, "developer toolkit")
+         .replace(/\bautonomously\b/gi, "automatically");
+    // First-person pass (soft; avoids inside code blocks/backticks)
+    t = t.replace(/(^|[\s(])we can\b/gi, "$1I can")
+         .replace(/(^|[\s(])we will\b/gi, "$1I will")
+         .replace(/\bwe’ll\b/gi, "I’ll")
+         .replace(/\bour\b/gi, "my")
+         .replace(/\bwe\b/gi, "I");
+
+    // Ensure it opens with the role’s voice once
+    const opener = OPEN[role] || null;
+    if (opener && !t.startsWith(opener)) t = `${opener}\n\n${t}`;
+    // Optional: concise sign-off on long replies
+    if (t.length > 600 && role) t += `\n\n— ${role}`;
+    return t;
+  }
+
+  // Single typing indicator helper
+  function setTyping(role){
+    const log = document.getElementById("chatLog"); if (!log) return null;
+    let line = log.querySelector('[data-typing="1"]');
+    if (!line){
+      line = document.createElement("div");
+      line.className = "chat-agent"; line.dataset.typing = "1";
+      log.appendChild(line);
+    }
+    line.textContent = `⌛ ${role || "Team"} is typing…`;
+    log.scrollTop = log.scrollHeight;
+    return line;
+  }
+
+  // Patch runAgent to polish replies in-place (non-destructive)
+  const original = window.runAgent;
+  if (!original) return;
+
+  window.runAgent = async function(){
+    const ta = document.getElementById("agentInput");
+    const input = (ta?.value || "").trim();
+    const role = (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.__lastRole)
+                 || (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(input))
+                 || inferRole(input);
+
+    // show one typing line (and update, not duplicate)
+    const typing = setTyping(role);
+
+    // run your existing pipeline
+    const before = document.querySelectorAll("#chatLog .chat-agent").length;
+    await original();
+
+    // find latest agent line; if new line was appended, use it; else reuse typing
+    const lines = Array.from(document.querySelectorAll("#chatLog .chat-agent"));
+    const after = lines.length;
+    const latest = (after > before) ? lines[after - 1] : typing;
+
+    if (latest){
+      // personalize content
+      latest.dataset.typing = "0";
+      latest.textContent = personalize(role, latest.textContent);
+    }
+    // remove any extra “typing…” lines left behind
+    document.querySelectorAll('#chatLog .chat-agent[data-typing="1"]').forEach(n => n.remove());
+  };
+})();
+</script>
+<script>
+/* ==== C-Suite Persona Prime: inject first-person expertise into the prompt ==== */
+(() => {
+  if (window.__CSUITE_PERSONA_PRIME__) return; window.__CSUITE_PERSONA_PRIME__ = true;
+
+  // Short, action-oriented briefs per role (first person, expert voice)
+  const BRIEF = {
+    CTO: `You are the CTO. Speak in first person. Diagnose tech needs, suggest build/integration steps,
+          surface risks, and give a 3–5 step implementation plan with options. Offer one clarifying question at the end.`,
+    CMO: `You are the CMO. Speak in first person. Pick a growth play, define target, message, channels,
+          simple funnel metrics, and next 3 actions. Offer one clarifying question at the end.`,
+    CLO: `You are the CLO (counsel). Speak in first person. Identify legal risks, the right instrument (NDA, license, ToS),
+          key clauses to include, and a simple path to execution. Offer one clarifying question at the end.`,
+    CFO: `You are the CFO. Speak in first person. Frame pricing or ROI, unit economics, cash implications,
+          and a simple financial next step (e.g., quote template or off-ramp step). Ask one clarifying question.`,
+    COO: `You are the COO. Speak in first person. Turn the request into an SOP with owners, timing, and handoffs.
+          Flag dependencies/risks. Ask one clarifying question.`,
+    CPO: `You are the CPO. Speak in first person. Translate the ask into a crisp PRD slice: problem, users,
+          acceptance criteria, and a minimal prototype path. Ask one clarifying question.`,
+    CRO: `You are the CRO. Speak in first person. Choose a sales motion, define ICP, talk track/objection handling,
+          and the next 3 pipeline actions. Ask one clarifying question.`,
+    CAIO:`You are the CAIO. Speak in first person. Propose an AI capability map, data/guardrails, and orchestration plan
+          (tools, models, routes). End with the next 3 engineering or data steps and one clarifying question.`
+  };
+
+  // Try to reuse your router’s role; otherwise re-infer quickly
+  function activeRole(text){
+    const r = (window.AIGENTS_ROUTER && (window.AIGENTS_ROUTER.__lastRole ||
+              (window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(text)))) || null;
+    if (r && BRIEF[r]) return r;
+    const t = (text||"").toLowerCase();
+    if (/\bcto\b|sdk|api|integrat|build|deploy|tech/.test(t)) return "CTO";
+    if (/\bcmo\b|marketing|growth|leads|campaign|brand/.test(t)) return "CMO";
+    if (/\bclo\b|legal|license|ip|contract|compliance|remix|fork/.test(t)) return "CLO";
+    if (/\bcfo\b|price|budget|revenue|profit|payout|cash|off-?ramp/.test(t)) return "CFO";
+    if (/\bcoo\b|ops|operations|timeline|handoff|sop/.test(t)) return "COO";
+    if (/\bcpo\b|product|feature|spec|ux|ui|roadmap/.test(t)) return "CPO";
+    if (/\bcro\b|sales|pipeline|demo|quote|close/.test(t)) return "CRO";
+    if (/\bcaio\b|chief ai officer|orchestr|multi-?agent|llm/.test(t)) return "CAIO";
+    return null;
+  }
+
+  // Wrap fetch-call sites used by runAgent() to inject the brief once per send
+  const _send = window.runAgent;
+  if (!_send) return;
+
+  window.runAgent = async function(){
+    const ta = document.getElementById('agentInput');
+    const raw = (ta?.value || '').trim();
+    const role = activeRole(raw);
+    // Prime the message without changing your UI memory/logs
+    if (role && BRIEF[role]) {
+      // Expose for the code that builds the request body
+      window.__CSUITE_PERSONA_PREFIX__ = `[ROLE:${role}] ${BRIEF[role].replace(/\s+/g,' ').trim()}\n\nUser: `;
+    } else {
+      window.__CSUITE_PERSONA_PREFIX__ = null;
+    }
+
+    // Monkey-patch fetch to prepend the persona to the "input" field only for this turn
+    const _fetch = window.fetch;
+    window.fetch = async (url, init) => {
+      try {
+        if (init && typeof init.body === 'string' && init.headers && /json/i.test(init.headers['Content-Type']||'')) {
+          const body = JSON.parse(init.body);
+          if (body && body.input && !body.__primed && window.__CSUITE_PERSONA_PREFIX__) {
+            body.input = `${window.__CSUITE_PERSONA_PREFIX__}${body.input}`;
+            body.__primed = true;                // avoid double-priming
+            init.body = JSON.stringify(body);
+          }
+        }
+      } catch {}
+      return _fetch(url, init);
+    };
+
+    try { await _send(); }
+    finally {
+      window.fetch = _fetch;
+      window.__CSUITE_PERSONA_PREFIX__ = null;
+    }
+  };
+})();
+</script>
+
 </body>
 </html>
 
