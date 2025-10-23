@@ -4508,81 +4508,53 @@ setTimeout(()=>{
   };
 })();
 </script>
-  <script>
+  <!-- AiGentsy C-Suite Chat – persona & typing cleanup -->
+<style id="advisor-typing-patch">.typing-line{display:none!important}</style>
+<script>
 (() => {
-  if (window.__CSUITE_CHAT_PATCH_V3__) return;
-  window.__CSUITE_CHAT_PATCH_V3__ = true;
+  if (window.__AIGENTSY_CSUITE_PATCH__) return;
+  window.__AIGENTSY_CSUITE_PATCH__ = true;
 
   const ta  = document.querySelector('#agentInput');
   const log = document.querySelector('#chatLog');
   const btn = document.querySelector('#sendBtn');
+  const BACKEND = (window.BACKEND_BASE || 'https://aigentsy-ame-runtime.onrender.com') + '/agent';
 
-  // ---- persona scoring (friendlier keywords) ----
-  const LEX = {
-    CFO:  [/money|revenue|price|pricing|cash|wallet|off[ -]?ramp|profit|moneti[sz]e|earn|yield|payout|stripe|checkout|bundle|a\/?b|arm|roi/i],
-    CRO:  [/client|lead|sales|pipeline|quote|prospect|close|closing|crm|deal|demo|outbound|inbound/i],
-    CTO:  [/sdk|dev(eloper)?|api|integrat|build|ship|platform|deploy|tool|webhook|github|runtime/i],
-    CMO:  [/market|growth|campaign|seo|ads?|tiktok|instagram|reels|content|social|brand awareness|referral/i],
-    CLO:  [/legal|licen[cs]e|ip\b|contract|agreement|royalt(y|ies)|terms|compliance|privacy|consent|nda/i],
-    COO:  [/ops|operation|delivery|runbook|process|sop|fulfill|hando(ff)?|logistic/i],
-    CAIO: [/orchestr|multi-?agent|autonom|agents?\b|metabridge|auto-?match|aam\b/i],
-  };
-  const HEAD = {
-    CFO:  "💰 CFO — Here’s how I’d drive revenue:",
-    CRO:  "💼 CRO — Here’s my sales plan:",
-    CTO:  "🧬 CTO — Here’s how I’d build it:",
-    CMO:  "📣 CMO — Here’s how I’d grow it:",
-    CLO:  "📜 CLO — Here’s what I’d lock in legally:",
-    COO:  "🛠 COO — Here’s how I’d run it:",
-    CAIO: "🤖 CAIO — Here’s how I’d orchestrate it:",
-    TEAM: "🤝 Team — Here’s the move:",
-  };
-
-  function scoreRole(text) {
-    const t = (text || "").toLowerCase();
-    const score = {};
-    Object.keys(LEX).forEach(role => {
-      score[role] = LEX[role].reduce((s, rx) => s + (t.match(rx)?.length || 0), 0);
-    });
-
-    // soft defaults: “money” → CFO, “clients/sales” → CRO
-    if (/\bmoney|earn|profit|pricing|off[ -]?ramp|wallet|cash/i.test(t)) score.CFO += 1.5;
-    if (/\bclient|sales|pipeline|quote|deal/i.test(t)) score.CRO += 1.0;
-
-    // continuity bias
-    const last = window.__AIG_LAST_ROLE__;
-    if (last && score[last] !== undefined) score[last] += 0.7;
-
-    // winner
-    const entries = Object.entries(score).sort((a,b)=>b[1]-a[1]);
-    const [best, val] = entries[0] || ["TEAM", 0];
-    return val > 0 ? best : "TEAM";
+  // --- persona routing ---
+  function personaFor(text='') {
+    const t = text.toLowerCase();
+    if (/\bcfo\b|pricing|budget|revenue|cash|wallet|off[- ]?ramp/.test(t)) return 'CFO';
+    if (/\bcro\b|sales|pipeline|quote|closing|arpu|mrr/.test(t))          return 'CRO';
+    if (/\bcto\b|sdk|developer|api|integration|build|deploy|platform/.test(t)) return 'CTO';
+    if (/\bclo\b|legal|license|licen[cs]e|ip|contract|compliance|brand/.test(t)) return 'CLO';
+    if (/\bcmo\b|marketing|growth|campaign|leads|outreach|seo|ads/.test(t)) return 'CMO';
+    if (/\bcoo\b|ops|delivery|runbook|handoff|process/.test(t))            return 'COO';
+    if (/\bcaio\b|chief ai|orchestr|multi-?agent|autonomy/.test(t))        return 'CAIO';
+    return 'TEAM';
+  }
+  function personaHeader(role){
+    const map = {
+      CFO:  "💰 CFO — Here’s how I’d drive revenue:",
+      CRO:  "💼 CRO — Here’s my sales plan:",
+      CTO:  "🧬 CTO — Build plan:",
+      CLO:  "📜 CLO — Legal/IP steps:",
+      CMO:  "📣 CMO — Growth plan:",
+      COO:  "🛠 COO — Ops run:",
+      CAIO: "🤖 CAIO — Orchestration:"
+    };
+    return map[role] || "🤝 Team — Here’s the move:";
   }
 
-  // ---- runtime routing per role (override here if needed) ----
-  const ENDPOINTS = Object.assign({
-    VENTURE: "https://aigentsy-ame-runtime.onrender.com/agent", // default / CFO / CAIO / CRO fallback
-    SDK:     "https://aigent-sdk-runtime.onrender.com/agent",    // CTO
-    GROWTH:  "https://aigent-growth-runtime.onrender.com/agent", // CMO / CRO
-    REMIX:   "https://aigent-remix-runtime.onrender.com/agent",  // CLO
-  }, window.AIGENTSY_ENDPOINTS || {});
-
-  function pickEndpoint(role) {
-    if (role === "CTO") return ENDPOINTS.SDK;
-    if (role === "CMO") return ENDPOINTS.GROWTH;
-    if (role === "CRO") return ENDPOINTS.GROWTH;
-    if (role === "CLO") return ENDPOINTS.REMIX;
-    // CFO, COO, CAIO, TEAM → venture default
-    return ENDPOINTS.VENTURE;
+  // --- helpers ---
+  function killOldTyping() {
+    (log?.querySelectorAll('.typing-line') || []).forEach(n => n.remove());
   }
-
-  async function callBackend(role, input) {
-    const url = pickEndpoint(role);
+  async function callBackend(input) {
     try {
-      const r = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ input, role_hint: role })
+      const r = await fetch(BACKEND, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ input })
       });
       const j = await r.json().catch(()=> ({}));
       return (j.output || j.message || '').toString().trim() || 'No response.';
@@ -4591,55 +4563,49 @@ setTimeout(()=>{
     }
   }
 
-  // ---- de-noise: strip stray "advisor typing / Your AiGentsy: Thinking…" bubbles ----
-  const NOISE_RX = /(advisor|your aigentsy)\s*:\s*(typing|thinking)|is typing…/i;
-  const mo = new MutationObserver(muts => {
-    for (const m of muts) {
-      m.addedNodes?.forEach(n => {
-        try {
-          const txt = (n.textContent || "").trim();
-          if (NOISE_RX.test(txt)) n.remove();
-        } catch {}
-      });
-    }
-  });
-  if (log) mo.observe(log, { childList: true, subtree: true });
-
-  // ---- send flow ----
-  function addLine(cls, text) {
-    if (!log) return;
-    const d = document.createElement('div');
-    d.className = cls;
-    d.textContent = text;
-    log.appendChild(d);
-    log.scrollTop = log.scrollHeight;
-    return d;
-  }
-
   async function send() {
-    const input = (ta?.value || '').trim();
-    if (!input) return;
+    const text = (ta?.value || '').trim();
+    if (!text) return;
     ta.value = '';
 
-    addLine('chat-user', '🧠 You: ' + input);
+    // user bubble
+    if (log) {
+      const u = document.createElement('div');
+      u.className = 'chat-user';
+      u.textContent = '🧠 You: ' + text;
+      log.appendChild(u);
+      log.scrollTop = log.scrollHeight;
+    }
 
-    const role = scoreRole(input);
-    window.__AIG_LAST_ROLE__ = role;
+    // single typing line (and purge any legacy ones like “advisor typing”)
+    killOldTyping();
+    const role = personaFor(text);
+    const showRole = (role && role !== 'TEAM') ? role : 'CFO'; // never default to Team
+    const typing = document.createElement('div');
+    typing.className = 'chat-agent typing-line';
+    typing.textContent = `⌛ ${showRole} is typing…`;
+    log?.appendChild(typing);
+    log && (log.scrollTop = log.scrollHeight);
 
-    const loader = addLine('chat-agent typing-line', `⌛ ${role} is typing…`);
-    const raw = await callBackend(role, input);
-    loader?.remove();
+    // backend
+    const raw = await callBackend(text);
 
-    const head = HEAD[role] || HEAD.TEAM;
-    addLine('chat-agent', `${head}\n\n${raw}`);
+    // replace typing with persona + reply (always first-person)
+    killOldTyping();
+    const a = document.createElement('div');
+    a.className = 'chat-agent';
+    a.textContent = `${personaHeader(showRole)}\n\n${raw}`;
+    log?.appendChild(a);
+    log && (log.scrollTop = log.scrollHeight);
   }
 
   btn && (btn.onclick = send);
-  ta && ta.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  ta && ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
 })();
 </script>
+
 
 </body>
 </html>
