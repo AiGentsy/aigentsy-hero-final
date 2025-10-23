@@ -4508,139 +4508,138 @@ setTimeout(()=>{
   };
 })();
 </script>
- <script>
+  <script>
 (() => {
-  // idempotent guard
-  if (window.__CSUITE_CHAT_PATCH_V2__) return;
-  window.__CSUITE_CHAT_PATCH_V2__ = true;
+  if (window.__CSUITE_CHAT_PATCH_V3__) return;
+  window.__CSUITE_CHAT_PATCH_V3__ = true;
 
-  const input   = document.querySelector('#agentInput');
-  const log     = document.getElementById('chatLog');
-  const sendBtn = document.getElementById('sendBtn');  // your blue arrow already calls runAgent; we hard-bind as well
+  const ta  = document.querySelector('#agentInput');
+  const log = document.querySelector('#chatLog');
+  const btn = document.querySelector('#sendBtn');
 
-  // lightweight, session-scoped memory
-  const mem = (window.aigChatMemory = window.aigChatMemory || []);
-
-  // --- Role detection (friendly keywords, not protocol-y) ---
-  function detectRole(text) {
-    const t = (text || '').toLowerCase();
-
-    // Finance & payouts
-    if (/\bcfo\b|price|pricing|budget|revenue|profit|payout|stripe|cash ?out|wallet|roi|unit economics/.test(t)) return 'CFO';
-    // Growth/marketing
-    if (/\bcmo\b|marketing|leads|outreach|campaign|audience|tiktok|instagram|ads|seo|growth/.test(t)) return 'CMO';
-    // Product/SDK/tech
-    if (/\bcto\b|sdk|api|integration|ship|feature|roadmap|tech|deploy|platform|builder|toolkit|micro-?saas/.test(t)) return 'CTO';
-    // Legal/licensing/IP
-    if (/\bclo\b|legal|license|licen[sc]ing|ip|contract|terms|brand(ing)?|policy|compliance/.test(t)) return 'CLO';
-    // Ops/delivery
-    if (/\bcoo\b|ops|operations|delivery|handoff|runbook|process|sop/.test(t)) return 'COO';
-    // Revenue/sales motions
-    if (/\bcro\b|sales|pipeline|quote|close|proposal|crm/.test(t)) return 'CRO';
-    // AI orchestration / multi-agent
-    if (/\bcaio\b|chief ai officer|orchestrate|multi-?agent|autonomy|agent team|compose agents?/.test(t)) return 'CAIO';
-    // Integrations/IT
-    if (/\bcio\b|zapier|webhook|connector|crm|sync/.test(t)) return 'CIO';
-    // Security/consent
-    if (/\bciso\b|security|consent|privacy|guardrail|risk/.test(t)) return 'CISO';
-    return null;
-  }
-
-  // --- Persona headers (first-person, expert voice) ---
-  const headers = {
-    CFO:  '💰 CFO — Here’s my revenue plan:',
-    CMO:  '📣 CMO — Here’s how I’ll grow it:',
-    CTO:  '🧬 CTO — Here’s how I’ll build it:',
-    CLO:  '📜 CLO — Here’s how I’ll protect it:',
-    COO:  '🛠 COO — Here’s how I’ll run it:',
-    CRO:  '💼 CRO — Here’s how I’ll convert it:',
-    CAIO: '🤖 CAIO — Here’s how I’ll orchestrate it:',
-    CIO:  '🔌 CIO — Here’s how I’ll connect it:',
-    CISO: '🔐 CISO — Here’s how I’ll safeguard it:'
+  // ---- persona scoring (friendlier keywords) ----
+  const LEX = {
+    CFO:  [/money|revenue|price|pricing|cash|wallet|off[ -]?ramp|profit|moneti[sz]e|earn|yield|payout|stripe|checkout|bundle|a\/?b|arm|roi/i],
+    CRO:  [/client|lead|sales|pipeline|quote|prospect|close|closing|crm|deal|demo|outbound|inbound/i],
+    CTO:  [/sdk|dev(eloper)?|api|integrat|build|ship|platform|deploy|tool|webhook|github|runtime/i],
+    CMO:  [/market|growth|campaign|seo|ads?|tiktok|instagram|reels|content|social|brand awareness|referral/i],
+    CLO:  [/legal|licen[cs]e|ip\b|contract|agreement|royalt(y|ies)|terms|compliance|privacy|consent|nda/i],
+    COO:  [/ops|operation|delivery|runbook|process|sop|fulfill|hando(ff)?|logistic/i],
+    CAIO: [/orchestr|multi-?agent|autonom|agents?\b|metabridge|auto-?match|aam\b/i],
+  };
+  const HEAD = {
+    CFO:  "💰 CFO — Here’s how I’d drive revenue:",
+    CRO:  "💼 CRO — Here’s my sales plan:",
+    CTO:  "🧬 CTO — Here’s how I’d build it:",
+    CMO:  "📣 CMO — Here’s how I’d grow it:",
+    CLO:  "📜 CLO — Here’s what I’d lock in legally:",
+    COO:  "🛠 COO — Here’s how I’d run it:",
+    CAIO: "🤖 CAIO — Here’s how I’d orchestrate it:",
+    TEAM: "🤝 Team — Here’s the move:",
   };
 
-  // --- Runtime routing (keep your existing endpoints; defaults safe) ---
-  function pickEndpoint(text) {
-    const t = (text || '').toLowerCase();
-    if (/(sdk|api|integration|build|ship|feature|platform|tool)/.test(t))      return 'https://aigent-sdk-runtime.onrender.com/agent';
-    if (/(growth|marketing|outreach|leads|campaign|tiktok|ads|seo)/.test(t))   return 'https://aigent-growth-runtime.onrender.com/agent';
-    if (/(license|legal|ip|clone|remix|brand|contract)/.test(t))               return 'https://aigent-remix-runtime.onrender.com/agent';
-    // CFO/off-ramp & venture defaults
-    return 'https://aigentsy-ame-runtime.onrender.com/agent';
-  }
-
-  // --- Small helpers ---
-  function renderUserLine(text) {
-    if (!log) return;
-    const div = document.createElement('div');
-    div.className = 'chat-user';
-    div.textContent = `🧠 You: ${text}`;
-    log.appendChild(div);
-    log.scrollTop = log.scrollHeight;
-  }
-  function renderAgentTyping(role) {
-    if (!log) return null;
-    const div = document.createElement('div');
-    div.className = 'chat-agent';
-    div.textContent = `⌛ ${role || 'Advisor'} is typing…`;
-    log.appendChild(div);
-    log.scrollTop = log.scrollHeight;
-    return div;
-  }
-  function normalize(text) { try { return (window.formatResponseEnhanced? window.formatResponseEnhanced(text): String(text||'')).trim(); } catch { return String(text||'').trim(); } }
-
-  // --- The single send function (replaces any old runAgent) ---
-  async function runAgentPatched() {
-    const val = (input && input.value || '').trim();
-    if (!val) return;
-
-    // echo user
-    renderUserLine(val);
-    if (input) input.value = '';
-
-    // decide persona
-    const role = detectRole(val);
-    const header = headers[role] || '🤝 Team — Here’s the move:';
-    const typing = renderAgentTyping(role);
-
-    // remember the turn
-    mem.push(`USER:${val}`);
-
-    // call the right runtime
-    let reply = '';
-    try {
-      const res = await fetch(pickEndpoint(val), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: val, memory: mem })
-      });
-      const data = await res.json();
-      reply = data.output || data.message || JSON.stringify(data);
-    } catch (e) {
-      reply = `Runtime error — ${e && e.message ? e.message : 'failed to fetch'}`;
-    }
-
-    // replace the typing bubble with a single, expert first-person response
-    if (typing) {
-      typing.textContent = `${header}\n\n${normalize(reply)}`;
-      log.scrollTop = log.scrollHeight;
-    }
-
-    // store agent side (trimmed)
-    mem.push(`AGENT:${(reply||'').slice(0, 4000)}`);
-  }
-
-  // wire events
-  window.runAgent = runAgentPatched;
-  if (sendBtn) sendBtn.onclick = runAgentPatched;
-  if (input) {
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runAgentPatched(); }
+  function scoreRole(text) {
+    const t = (text || "").toLowerCase();
+    const score = {};
+    Object.keys(LEX).forEach(role => {
+      score[role] = LEX[role].reduce((s, rx) => s + (t.match(rx)?.length || 0), 0);
     });
+
+    // soft defaults: “money” → CFO, “clients/sales” → CRO
+    if (/\bmoney|earn|profit|pricing|off[ -]?ramp|wallet|cash/i.test(t)) score.CFO += 1.5;
+    if (/\bclient|sales|pipeline|quote|deal/i.test(t)) score.CRO += 1.0;
+
+    // continuity bias
+    const last = window.__AIG_LAST_ROLE__;
+    if (last && score[last] !== undefined) score[last] += 0.7;
+
+    // winner
+    const entries = Object.entries(score).sort((a,b)=>b[1]-a[1]);
+    const [best, val] = entries[0] || ["TEAM", 0];
+    return val > 0 ? best : "TEAM";
   }
+
+  // ---- runtime routing per role (override here if needed) ----
+  const ENDPOINTS = Object.assign({
+    VENTURE: "https://aigentsy-ame-runtime.onrender.com/agent", // default / CFO / CAIO / CRO fallback
+    SDK:     "https://aigent-sdk-runtime.onrender.com/agent",    // CTO
+    GROWTH:  "https://aigent-growth-runtime.onrender.com/agent", // CMO / CRO
+    REMIX:   "https://aigent-remix-runtime.onrender.com/agent",  // CLO
+  }, window.AIGENTSY_ENDPOINTS || {});
+
+  function pickEndpoint(role) {
+    if (role === "CTO") return ENDPOINTS.SDK;
+    if (role === "CMO") return ENDPOINTS.GROWTH;
+    if (role === "CRO") return ENDPOINTS.GROWTH;
+    if (role === "CLO") return ENDPOINTS.REMIX;
+    // CFO, COO, CAIO, TEAM → venture default
+    return ENDPOINTS.VENTURE;
+  }
+
+  async function callBackend(role, input) {
+    const url = pickEndpoint(role);
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ input, role_hint: role })
+      });
+      const j = await r.json().catch(()=> ({}));
+      return (j.output || j.message || '').toString().trim() || 'No response.';
+    } catch (e) {
+      return 'Runtime error — ' + (e?.message || 'failed to fetch');
+    }
+  }
+
+  // ---- de-noise: strip stray "advisor typing / Your AiGentsy: Thinking…" bubbles ----
+  const NOISE_RX = /(advisor|your aigentsy)\s*:\s*(typing|thinking)|is typing…/i;
+  const mo = new MutationObserver(muts => {
+    for (const m of muts) {
+      m.addedNodes?.forEach(n => {
+        try {
+          const txt = (n.textContent || "").trim();
+          if (NOISE_RX.test(txt)) n.remove();
+        } catch {}
+      });
+    }
+  });
+  if (log) mo.observe(log, { childList: true, subtree: true });
+
+  // ---- send flow ----
+  function addLine(cls, text) {
+    if (!log) return;
+    const d = document.createElement('div');
+    d.className = cls;
+    d.textContent = text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+    return d;
+  }
+
+  async function send() {
+    const input = (ta?.value || '').trim();
+    if (!input) return;
+    ta.value = '';
+
+    addLine('chat-user', '🧠 You: ' + input);
+
+    const role = scoreRole(input);
+    window.__AIG_LAST_ROLE__ = role;
+
+    const loader = addLine('chat-agent typing-line', `⌛ ${role} is typing…`);
+    const raw = await callBackend(role, input);
+    loader?.remove();
+
+    const head = HEAD[role] || HEAD.TEAM;
+    addLine('chat-agent', `${head}\n\n${raw}`);
+  }
+
+  btn && (btn.onclick = send);
+  ta && ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  });
 })();
 </script>
-
 
 </body>
 </html>
