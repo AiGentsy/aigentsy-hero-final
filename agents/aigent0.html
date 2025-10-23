@@ -4508,76 +4508,139 @@ setTimeout(()=>{
   };
 })();
 </script>
-<script>
+ <script>
 (() => {
-  if (window.__AIGENTS_CSUITE_HOTFIX__) return; window.__AIGENTS_CSUITE_HOTFIX__ = true;
+  // idempotent guard
+  if (window.__CSUITE_CHAT_PATCH_V2__) return;
+  window.__CSUITE_CHAT_PATCH_V2__ = true;
 
-  const ta  = document.querySelector('#agentInput');
-  const log = document.querySelector('#chatLog');
-  const btn = document.querySelector('#sendBtn');
+  const input   = document.querySelector('#agentInput');
+  const log     = document.getElementById('chatLog');
+  const sendBtn = document.getElementById('sendBtn');  // your blue arrow already calls runAgent; we hard-bind as well
 
-  // Prevent multiple loaders / duplicate persona lines
-  function clearOldTyping() {
-    [...(log?.querySelectorAll('.typing-line') || [])].forEach(n => n.remove());
+  // lightweight, session-scoped memory
+  const mem = (window.aigChatMemory = window.aigChatMemory || []);
+
+  // --- Role detection (friendly keywords, not protocol-y) ---
+  function detectRole(text) {
+    const t = (text || '').toLowerCase();
+
+    // Finance & payouts
+    if (/\bcfo\b|price|pricing|budget|revenue|profit|payout|stripe|cash ?out|wallet|roi|unit economics/.test(t)) return 'CFO';
+    // Growth/marketing
+    if (/\bcmo\b|marketing|leads|outreach|campaign|audience|tiktok|instagram|ads|seo|growth/.test(t)) return 'CMO';
+    // Product/SDK/tech
+    if (/\bcto\b|sdk|api|integration|ship|feature|roadmap|tech|deploy|platform|builder|toolkit|micro-?saas/.test(t)) return 'CTO';
+    // Legal/licensing/IP
+    if (/\bclo\b|legal|license|licen[sc]ing|ip|contract|terms|brand(ing)?|policy|compliance/.test(t)) return 'CLO';
+    // Ops/delivery
+    if (/\bcoo\b|ops|operations|delivery|handoff|runbook|process|sop/.test(t)) return 'COO';
+    // Revenue/sales motions
+    if (/\bcro\b|sales|pipeline|quote|close|proposal|crm/.test(t)) return 'CRO';
+    // AI orchestration / multi-agent
+    if (/\bcaio\b|chief ai officer|orchestrate|multi-?agent|autonomy|agent team|compose agents?/.test(t)) return 'CAIO';
+    // Integrations/IT
+    if (/\bcio\b|zapier|webhook|connector|crm|sync/.test(t)) return 'CIO';
+    // Security/consent
+    if (/\bciso\b|security|consent|privacy|guardrail|risk/.test(t)) return 'CISO';
+    return null;
   }
 
-  function personaFor(text='') {
-    const t = text.toLowerCase();
-    if (/\bcfo\b|pricing|budget|revenue|cash|wallet|off[- ]?ramp/.test(t)) return {key:'CFO',  label:'💰 CFO — Here’s how I’d drive revenue:'};
-    if (/\bcro\b|sales|pipeline|quote|closing/.test(t))                    return {key:'CRO',  label:'💼 CRO — Here’s my sales plan:'};
-    if (/\bcto\b|sdk|developer|api|integration|build|platform|deploy/.test(t)) return {key:'CTO',  label:'🧬 CTO — Build plan:'};
-    if (/\bclo\b|legal|license|ip|contract|compliance|brand/.test(t))      return {key:'CLO',  label:'📜 CLO — Legal/IP steps:'};
-    if (/\bcmo\b|marketing|growth|campaign|leads|outreach|seo|ads/.test(t))return {key:'CMO',  label:'📣 CMO — Growth plan:'};
-    if (/\bcoo\b|ops|delivery|runbook|handoff|process/.test(t))            return {key:'COO',  label:'🛠 COO — Ops run:'};
-    if (/\bcaio\b|chief ai|orchestr|multi-?agent/.test(t))                 return {key:'CAIO', label:'🤖 CAIO — Orchestration:'};
-    return {key:'TEAM', label:'🤝 Team — Here’s the move:'};
+  // --- Persona headers (first-person, expert voice) ---
+  const headers = {
+    CFO:  '💰 CFO — Here’s my revenue plan:',
+    CMO:  '📣 CMO — Here’s how I’ll grow it:',
+    CTO:  '🧬 CTO — Here’s how I’ll build it:',
+    CLO:  '📜 CLO — Here’s how I’ll protect it:',
+    COO:  '🛠 COO — Here’s how I’ll run it:',
+    CRO:  '💼 CRO — Here’s how I’ll convert it:',
+    CAIO: '🤖 CAIO — Here’s how I’ll orchestrate it:',
+    CIO:  '🔌 CIO — Here’s how I’ll connect it:',
+    CISO: '🔐 CISO — Here’s how I’ll safeguard it:'
+  };
+
+  // --- Runtime routing (keep your existing endpoints; defaults safe) ---
+  function pickEndpoint(text) {
+    const t = (text || '').toLowerCase();
+    if (/(sdk|api|integration|build|ship|feature|platform|tool)/.test(t))      return 'https://aigent-sdk-runtime.onrender.com/agent';
+    if (/(growth|marketing|outreach|leads|campaign|tiktok|ads|seo)/.test(t))   return 'https://aigent-growth-runtime.onrender.com/agent';
+    if (/(license|legal|ip|clone|remix|brand|contract)/.test(t))               return 'https://aigent-remix-runtime.onrender.com/agent';
+    // CFO/off-ramp & venture defaults
+    return 'https://aigentsy-ame-runtime.onrender.com/agent';
   }
 
-  async function callBackend(input) {
-    const url = (window.BACKEND_BASE || 'https://aigentsy-ame-runtime.onrender.com') + '/agent';
+  // --- Small helpers ---
+  function renderUserLine(text) {
+    if (!log) return;
+    const div = document.createElement('div');
+    div.className = 'chat-user';
+    div.textContent = `🧠 You: ${text}`;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+  function renderAgentTyping(role) {
+    if (!log) return null;
+    const div = document.createElement('div');
+    div.className = 'chat-agent';
+    div.textContent = `⌛ ${role || 'Advisor'} is typing…`;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  }
+  function normalize(text) { try { return (window.formatResponseEnhanced? window.formatResponseEnhanced(text): String(text||'')).trim(); } catch { return String(text||'').trim(); } }
+
+  // --- The single send function (replaces any old runAgent) ---
+  async function runAgentPatched() {
+    const val = (input && input.value || '').trim();
+    if (!val) return;
+
+    // echo user
+    renderUserLine(val);
+    if (input) input.value = '';
+
+    // decide persona
+    const role = detectRole(val);
+    const header = headers[role] || '🤝 Team — Here’s the move:';
+    const typing = renderAgentTyping(role);
+
+    // remember the turn
+    mem.push(`USER:${val}`);
+
+    // call the right runtime
+    let reply = '';
     try {
-      const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({input})});
-      const j = await r.json().catch(()=> ({}));
-      return (j.output || j.message || '').toString().trim() || 'No response.';
+      const res = await fetch(pickEndpoint(val), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: val, memory: mem })
+      });
+      const data = await res.json();
+      reply = data.output || data.message || JSON.stringify(data);
     } catch (e) {
-      return 'Runtime error — ' + (e?.message || 'failed to fetch');
-    }
-  }
-
-  async function send() {
-    const text = (ta?.value || '').trim();
-    if (!text) return;
-    ta.value = '';
-
-    // user line
-    if (log) {
-      const u = document.createElement('div');
-      u.className = 'chat-user';
-      u.textContent = '🧠 You: ' + text;
-      log.appendChild(u);
+      reply = `Runtime error — ${e && e.message ? e.message : 'failed to fetch'}`;
     }
 
-    clearOldTyping();
-    const persona = personaFor(text);
-    const typing = document.createElement('div');
-    typing.className = 'chat-agent typing-line';
-    typing.textContent = `⌛ ${persona.key} is typing…`;
-    log?.appendChild(typing);
-    log && (log.scrollTop = log.scrollHeight);
+    // replace the typing bubble with a single, expert first-person response
+    if (typing) {
+      typing.textContent = `${header}\n\n${normalize(reply)}`;
+      log.scrollTop = log.scrollHeight;
+    }
 
-    const raw = await callBackend(text);
-    clearOldTyping();
-    const a = document.createElement('div');
-    a.className = 'chat-agent';
-    a.textContent = `${persona.label}\n\n${raw}`;
-    log?.appendChild(a);
-    log && (log.scrollTop = log.scrollHeight);
+    // store agent side (trimmed)
+    mem.push(`AGENT:${(reply||'').slice(0, 4000)}`);
   }
 
-  btn && (btn.onclick = send);
-  ta && ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+  // wire events
+  window.runAgent = runAgentPatched;
+  if (sendBtn) sendBtn.onclick = runAgentPatched;
+  if (input) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runAgentPatched(); }
+    });
+  }
 })();
 </script>
+
 
 </body>
 </html>
