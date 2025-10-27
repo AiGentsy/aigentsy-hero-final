@@ -4708,6 +4708,74 @@ setTimeout(()=>{
   window.addEventListener('aigentsy:hydrated', ()=>{ if (!window.__AIG_PROBED__) { window.__AIG_PROBED__=true; probeAll(); }});
 })();
 </script>
+<script>
+(() => {
+  // 1) universal probe (same endpoints you added in main.py)
+  const BASE = (window.BACKEND_BASE || '').replace(/\/+$/,'');
+  const post = (p, body={}) => fetch(BASE+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const get  = (p) => fetch(BASE+p);
+
+  async function runProbe(){
+    const out = { ok:[], fail:[] };
+    const uid = (window.currentUserRecord?.id)||'test';
+    async function step(name, fn){ try { await fn(); out.ok.push(name); } catch(e){ out.fail.push(name); } }
+
+    await step('oracle:event', async () => {
+      await post('/oracle/event',{kind:'ATTRIBUTED', user:uid, meta:{src:'probe'}});
+      await post('/oracle/event',{kind:'PAID', user:uid, amount_usd:1.11, meta:{src:'probe'}});
+    });
+    await step('r3:allocate',      async () => post('/r3/allocate',{user:uid, budget_usd: Number(window.R3_BUDGET_DEFAULT)||25}));
+    await step('intents:flow',     async () => {
+      const pub = await post('/intents/publish',{id:'intent_'+Date.now(), title:'probe'}).then(r=>r.json());
+      const id = pub?.intent?.id; if(!id) throw 0;
+      await post('/intents/claim',{intent_id:id, agent:'probe', escrow_usd:1.00});
+      await post('/intents/settle',{intent_id:id, outcome:{ok:true}});
+    });
+    await step('dealgraph:create', async () => post('/metabridge/dealgraph/create',{id:'dg_'+Date.now(), opportunity:{name:'probe'}, roles_needed:['runner','sponsor'], rev_split:[{role:'runner',pct:50},{role:'sponsor',pct:50}]}));
+    await step('dealgraph:activate', async () => post('/metabridge/dealgraph/activate',{id:'dg_latest'})); // ok if no-op
+    await step('coop:sponsor',     async () => post('/coop/sponsor',{name:'ProbeCo', spend_cap_usd:5}));
+    await step('ltv:predict',      async () => post('/ltv/predict',{user:uid, channel:'tiktok'}));
+    try { const r = await get('/inventory/get?product_id=probe'); r.ok ? out.ok.push('inventory:get') : out.fail.push('inventory:get'); } catch {}
+
+    const pane = document.getElementById('aigxLiveList') || document.getElementById('liveStreamList');
+    const line = document.createElement('div'); line.className='aigx-live-item';
+    line.textContent = `Probe → OK:${out.ok.length} FAIL:${out.fail.length}${out.fail.length?(' ['+out.fail.join(', ')+']'):''}`;
+    (pane||document.body).prepend(line);
+
+    const outEl = document.querySelector('#ai-output, #chat-output, [data-chat-output]');
+    if (outEl) outEl.textContent = `🧪 SelfTest: OK ${out.ok.length} • FAIL ${out.fail.length}${out.fail.length?(' → '+out.fail.join(', ')) : ''}`;
+    return out;
+  }
+
+  // 2) capture Enter/submit before your chat posts to the agent
+  if (!window.__AIG_SELFTEST_CAPTURE__) {
+    window.__AIG_SELFTEST_CAPTURE__ = true;
+
+    window.addEventListener('submit', async (e) => {
+      const tgt = e.target;
+      const inp = tgt && (tgt.querySelector('#chat-input, [data-chat-input], textarea[name="chat"]'));
+      const val = inp && (inp.value || '').trim();
+      if (val === '/selftest') {
+        e.preventDefault();
+        inp.value = '';
+        await runProbe();
+      }
+    }, true);
+
+    window.addEventListener('keydown', async (e) => {
+      if (e.key !== 'Enter' || e.shiftKey) return;
+      const inp = document.activeElement;
+      if (!inp || !/input|textarea/i.test(inp.tagName)) return;
+      const val = (inp.value || '').trim();
+      if (val === '/selftest') {
+        e.preventDefault();
+        inp.value = '';
+        await runProbe();
+      }
+    }, true);
+  }
+})();
+</script>
 
 </body>
 </html>
