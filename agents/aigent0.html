@@ -4509,6 +4509,110 @@ setTimeout(()=>{
 })();
 </script>
 
+  <script id="csuite-chat-route-patch">
+(function () {
+  // ---- CONFIG: role → runtime key (matches your backends) ----
+  const ROLE_MAP = {
+    CEO:  { type: "user" },                // user is CEO
+    COO:  { agent: "ops" },                // if you don’t have a separate route, point to venture or growth
+    CTO:  { agent: "sdk" },                // sdk_agent runtime
+    CPO:  { agent: "product" },            // or venture if product route not split yet
+    CMO:  { agent: "growth" },             // aigent_growth_agent runtime
+    CFO:  { agent: "venture" },            // AiGent0 / venture_builder runtime
+    CLO:  { agent: "remix" },              // remix_agent runtime (IP/licensing)
+    CAIO: { agent: "ai" }                  // planning/payloads runtime (map to venture/growth if not split)
+  };
+
+  // ---- HELPERS: safely find existing chat elements (no DOM changes) ----
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const input = $('[data-chat-input], #chatInput, textarea[name="chat"]');
+  const form  = $('[data-chat-form], #chatForm, form[data-role="chat"]');
+  let typingEls = document.querySelectorAll('[data-typing],[data-thinking], .typing, .thinking');
+
+  // De-dupe typing/thinking indicators (keep the first, remove the rest)
+  if (typingEls.length > 1) [...typingEls].slice(1).forEach(el => el.remove());
+  const typingEl = typingEls[0] || null;
+  const showTyping = (on, role) => {
+    if (!typingEl) return;
+    typingEl.style.display = on ? '' : 'none';
+    typingEl.textContent = on ? ((role ? `(${role}) ` : '') + 'typing…') : '';
+  };
+
+  // Utilities to append messages to your existing chat log without creating new UI
+  const chatLog = $('[data-chat-log], .chat-log, #chatLog') || document.body;
+  const appendMsg = (html) => {
+    const div = document.createElement('div');
+    div.className = 'msg';
+    div.innerHTML = html;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  };
+  const userBubble  = (t) => `<div class="bubble you">${escapeHtml(t)}</div>`;
+  const agentBubble = (role, t) => `<div class="bubble agent"><strong>(${role})</strong> ${escapeHtml(t)}</div>`;
+  const escapeHtml  = (s)=>String(s).replace(/[&<>]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+
+  // ---- Role detection: (ROLE) prefix or “my cmo/cto/…” in the text ----
+  function detectRole(text){
+    const m = text.match(/^\s*\(([^)]+)\)\s*(.*)$/i);
+    if (m) return { role: m[1].toUpperCase(), msg: m[2] };
+    for (const r of Object.keys(ROLE_MAP)){
+      const re = new RegExp(`\\bmy\\s+${r.toLowerCase()}\\b|^\\s*${r}\\b`, 'i');
+      if (re.test(text)) return { role: r, msg: text };
+    }
+    // Default to CFO (venture) if none specified—keeps current behavior
+    return { role: 'CFO', msg: text };
+  }
+
+  // ---- First-person voice normalizer (light touch) ----
+  function toFirstPerson(role, text){
+    // Strip “As the CRO/CMO...” style preambles if present, then prepend role tag
+    const stripped = String(text).replace(/^as\s+the\s+c[a-z]{1,3}o.*?:\s*/i, '').replace(/^i am\s+the\s+c[a-z]{1,3}o[:,]?\s*/i,'I ');
+    const ensured  = stripped.replace(/\b(we|our team)\b/gi,'I'); // gentle bias to singular
+    return ensured;
+  }
+
+  // ---- Routing ----
+  const BACKEND = window.BACKEND_BASE || '';
+  async function routeToAgent(role, message){
+    // CEO is the user; respond with guidance instead of hitting an agent
+    if (role === 'CEO' || ROLE_MAP[role]?.type === 'user') {
+      return "You’re the CEO. Ask an executive directly by prefixing your question, e.g. (CMO) run a client outreach plan, (CLO) draft a licensing term, (CTO) package the SDK.";
+    }
+    const agentKey = ROLE_MAP[role]?.agent || 'growth';
+    const url = `${BACKEND}/chat/${agentKey}`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, role })
+    });
+    let data = {};
+    try { data = await res.json(); } catch(e){}
+    const text = data.text || data.reply || data.message || res.statusText || '…';
+    return toFirstPerson(role, text);
+  }
+
+  // ---- Hook submit without altering your existing markup ----
+  if (form && input) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raw = (input.value || '').trim();
+      if (!raw) return;
+      const { role, msg } = detectRole(raw);
+      appendMsg(userBubble(raw));
+      input.value = '';
+      showTyping(true, role);
+      try {
+        const reply = await routeToAgent(role, msg);
+        appendMsg(agentBubble(role, reply));
+      } catch (err) {
+        appendMsg(agentBubble(role, 'Error reaching runtime.')); 
+      } finally {
+        showTyping(false);
+      }
+    }, { capture: true });
+  }
+})();
+</script>
 </body>
 </html>
 
