@@ -411,7 +411,8 @@ function formatResponseEnhanced(text) {
   return explainTerms(wrapped.trim());
 }
   
-async function runAgent() {
+async function runAgent(){
+  if (window.__RUNAGENT_LOCK) return; window.__RUNAGENT_LOCK = true;
   const input = textarea.value.trim();
   if (!input) return;
 
@@ -425,7 +426,7 @@ async function runAgent() {
 
   const loader = document.createElement("div");
   loader.className = "chat-agent";
-  loader.textContent = "🤖 Your AiGentsy: Thinking...";
+  loader.textContent = "🤖 I — thinking…";;
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
 
@@ -484,8 +485,7 @@ if (
 let data;
 try {
   data = await res.json();
-} catch (e) {
-  console.error("❌ JSON parse error from runtime:", e);
+} catch(e){ window.__RUNAGENT_LOCK = false; console.error("❌ JSON parse error from runtime:", e);
   throw new Error("Server returned non-JSON. Check endpoint or network.");
 }
 
@@ -607,8 +607,30 @@ if (agentRole && !reply.toLowerCase().includes("as your")) {
   reply = `( ${agentRole} ) ` + reply.charAt(0).toUpperCase() + reply.slice(1);
 }
 
-// 🧾 Final display
-loader.textContent = `🤖 Your AiGentsy:\n${reply}`;
+// 🧾 Final display — first‑person, single responder
+const roleEmoji = { CMO:"📈", CTO:"🛠️", CLO:"⚖️", CFO:"💰" };
+function toFirstPerson(text){
+  try{
+    // light-touch replacements; avoid breaking code blocks
+    const zones = (text||"").split(/```/); // keep code fences intact
+    for(let i=0;i<zones.length;i+=2){
+      zones[i] = zones[i]
+        .replace(/we/gi,"I")
+        .replace(/ours/gi,"my")
+        .replace(/our/gi,"my")
+        .replace(/us/gi,"me")
+        .replace(/we\'re/gi,"I'm")
+        .replace(/we are/gi,"I am")
+        .replace(/we\'ve/gi,"I've")
+        .replace(/we will/gi,"I will")
+        .replace(/we can/gi,"I can");
+    }
+    return zones.join('```');
+  }catch{ return text; }
+}
+const header = agentRole ? `${roleEmoji[agentRole]||"🤖"} I — ${agentRole}` : "🤖 I — Your AiGentsy";
+loader.textContent = `${header}:
+${toFirstPerson(reply)}`;
 
 // Role resolver
 function getAgentRoleFromEndpoint(endpoint) {
@@ -1186,8 +1208,7 @@ if (proposalBox && user && Array.isArray(user.proposals) && user.proposals.lengt
   proposalBox.innerHTML = "<li>🚧 No proposals yet. Try unlocking a business kit or syncing your offerings.</li>";
 }
 
-  } catch (e) {
-    console.error("injectUserDashboard error:", e);
+  } catch(e){ window.__RUNAGENT_LOCK = false; console.error("injectUserDashboard error:", e);
   }
 }
 
@@ -2269,8 +2290,7 @@ function closeProposalInboxModal() {
       j = await r.json();
       if (j && j.record) return j.record;
       throw new Error(j?.error || "No record");
-    } catch (e) {
-      toast("User lookup failed. See console.", "error");
+    } catch(e){ window.__RUNAGENT_LOCK = false; toast("User lookup failed. See console.", "error");
       console.error(e);
       return {};
     }
@@ -2288,9 +2308,9 @@ function closeProposalInboxModal() {
     document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record}}));
 
     // Re-render charts/unlocks/traits if functions exist
-    if (typeof window.renderCharts === "function") try { window.renderCharts(record); } catch(e) {}
-    if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(record); } catch(e) {}
-    if (typeof window.renderTraits === "function") try { window.renderTraits(record); } catch(e) {}
+    if (typeof window.renderCharts === "function") try { window.renderCharts(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
+    if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
+    if (typeof window.renderTraits === "function") try { window.renderTraits(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
 
     // Fill C‑Suite expansion if container exists
     enhanceCSuite(record);
@@ -2327,14 +2347,13 @@ function closeProposalInboxModal() {
           document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:window.aigentsyUser}}));
           // optional: toggle pressed states
           target.setAttribute("aria-pressed", String(value));
-          if (typeof window.renderCharts === "function") try { window.renderCharts(window.aigentsyUser); } catch(e) {}
-          if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(window.aigentsyUser); } catch(e) {}
+          if (typeof window.renderCharts === "function") try { window.renderCharts(window.aigentsyUser); } catch(e){ window.__RUNAGENT_LOCK = false; }
+          if (typeof window.renderUnlocks === "function") try { window.renderUnlocks(window.aigentsyUser); } catch(e){ window.__RUNAGENT_LOCK = false; }
           toast("Unlocked ✓", "success");
         } else {
           toast(j?.error || "Unlock failed", "error");
         }
-      } catch (e) {
-        console.error(e); toast("Unlock error", "error");
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); toast("Unlock error", "error");
       }
     }, {capture:true});
   }
@@ -2368,8 +2387,7 @@ function closeProposalInboxModal() {
           logEl.appendChild(li);
           logEl.scrollTop = logEl.scrollHeight;
         }
-      } catch (e) {
-        console.error(e); toast("Chat error", "error");
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); toast("Chat error", "error");
       }
     }
     on(send, "click", sendMsg);
@@ -2404,7 +2422,7 @@ function closeProposalInboxModal() {
           document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:window.aigentsyUser}}));
           toast("Apps synced ✓", "success");
         }
-      } catch (e) { console.error(e); toast("AMG sync failed","error"); }
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); toast("AMG sync failed","error"); }
     }
     appInputs.forEach(el => on(el, "change", sync));
   }
@@ -2430,7 +2448,7 @@ function closeProposalInboxModal() {
         const r = await fetch(API.contactsOptin, {method:"POST", headers:{'Content-Type':'application/json'}, body:JSON.stringify({username, sources})});
         const j = await r.json();
         if (j && j.ok) { window.aigentsyUser = normalizeV11(j.record); toast("Contacts counted ✓", "success"); }
-      } catch (e) { console.error(e); toast("Contacts opt‑in failed","error"); }
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); toast("Contacts opt‑in failed","error"); }
     }
     async function sendContactsBlast(previewOnly=true) {
       const username = window.aigentsyUser?.username;
@@ -2442,7 +2460,7 @@ function closeProposalInboxModal() {
           body: JSON.stringify({username, channel, template: tmpl, previewOnly})});
         const j = await r.json();
         if (j && j.ok) toast(previewOnly ? "Preview logged ✓" : "Outreach sent ✓", "success");
-      } catch (e) { console.error(e); toast("Outreach failed","error"); }
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); toast("Outreach failed","error"); }
     }
     on(qs("#contactsConnect"), "click", connectContacts);
     on(previewBtn, "click", (e)=>{ e.preventDefault(); sendContactsBlast(true); });
@@ -2470,7 +2488,7 @@ function closeProposalInboxModal() {
           li.textContent = (p.title || p.body || JSON.stringify(p)).slice(0,280);
           list.appendChild(li);
         });
-      } catch (e) { console.error(e); }
+      } catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); }
     }
 
     // Shortcut
@@ -2731,8 +2749,7 @@ function closeProposalInboxModal() {
 
         toast("📩 A starter proposal has been drafted.");
         appendActivity("📬 CMO: Starter proposal added to your inbox.");
-      } catch(e) {
-        // silent — heartbeat continues
+      } catch(e){ window.__RUNAGENT_LOCK = false; // silent — heartbeat continues
       }
     }, 30000);
   }
@@ -2740,9 +2757,9 @@ function closeProposalInboxModal() {
   // ---------- main hook: render on hydrated ----------
   document.addEventListener("aigentsy:hydrated", (ev) => {
     const record = ev.detail?.record || window.aigentsyUser || {};
-    try { window.renderCharts(record); } catch(e){}
-    try { window.renderUnlocks(record); } catch(e){}
-    try { window.renderTraits(record); } catch(e){}
+    try { window.renderCharts(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
+    try { window.renderUnlocks(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
+    try { window.renderTraits(record); } catch(e){ window.__RUNAGENT_LOCK = false; }
 
     ensureSyntheticStarters(record);
     emitCSuiteBootLines(record);
@@ -2765,7 +2782,7 @@ function closeProposalInboxModal() {
           const rec = j.record || {};
           window.aigentsyUser = rec;
           document.dispatchEvent(new CustomEvent("aigentsy:hydrated", {detail:{record:rec}}));
-        } catch(e) {}
+        } catch(e){ window.__RUNAGENT_LOCK = false; }
       }
     }, 400);
   });
@@ -2955,7 +2972,7 @@ function closeProposalInboxModal() {
     uname(){ try{
       const u = (window.aigentsyUser?.username || window.aigentsyUser?.consent?.username || localStorage.getItem("aigentsyUsername") || "");
       return (u||"").trim();
-    }catch(e){ return "" } },
+    }catch(e){ window.__RUNAGENT_LOCK = false; return "" } },
     uuid(){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); },
     async post(path, body={}, {idempotent}={}){
       const headers = {"Content-Type":"application/json"};
@@ -3398,7 +3415,7 @@ const AIGUI = (function(){
       t.textContent = (typeof msg==='string'? msg : JSON.stringify(msg));
       t.style.cssText = "position:fixed;left:50%;top:20px;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:10000;box-shadow:0 8px 20px rgba(0,0,0,.2)";
       document.body.appendChild(t); setTimeout(()=>t.remove(), 2400);
-    } catch(e){}
+    } catch(e){ window.__RUNAGENT_LOCK = false; }
   }
 
   function openModal(title, html){
@@ -3437,7 +3454,7 @@ const AIGUI = (function(){
           list.prepend(item);
         }catch(_){}
       };
-    } catch(e){ console.warn("SSE failed", e); }
+    } catch(e){ window.__RUNAGENT_LOCK = false; console.warn("SSE failed", e); }
   })();
 
   // Drawer open/close
@@ -3679,7 +3696,7 @@ setTimeout(()=>{
         node = node.parentElement;
       }
     }
-  }catch(e){}
+  }catch(e){ window.__RUNAGENT_LOCK = false; }
 }, 600);
 
   setTimeout(()=>{
@@ -3695,7 +3712,7 @@ setTimeout(()=>{
         const topRight = (parseInt(cs.top)||0) < 140 && (parseInt(cs.right)||0) < 120;
         if (fixed && whiteish && rounded && short && topRight) n.style.display='none';
       }
-    }catch(e){}
+    }catch(e){ window.__RUNAGENT_LOCK = false; }
   }, 800);
 })();
 </script>
@@ -3838,7 +3855,7 @@ setTimeout(()=>{
       const txt = (typeof val === "number") ? val.toFixed(2) : val;
       const chip = qs("#aigOutcomeChip"); if (chip) chip.textContent = "OS: " + txt;
       const drawerChip = qs("#aigxOutcomeChip"); if (drawerChip) drawerChip.textContent = "OS: " + txt;
-    }catch(e){ /* silent */ }
+    }catch(e){ window.__RUNAGENT_LOCK = false; /* silent */ }
   }
   refreshOutcomeScoreV7();
   setInterval(refreshOutcomeScoreV7, 20000);
@@ -3930,7 +3947,7 @@ setTimeout(()=>{
           (j.events||[]).forEach(e=> addLine(e.kind||"log", e.data||""));
         }, 5000);
       }
-    }catch(e){ /* noop */ }
+    }catch(e){ window.__RUNAGENT_LOCK = false; /* noop */ }
   })();
 
   // 6) Execute mode in chat
@@ -3963,8 +3980,7 @@ setTimeout(()=>{
             const base = window.BACKEND_BASE || location.origin;
             const j = await jpost(base + "/agent", { input: raw, execute:true, username: uname });
             pre.textContent = JSON.stringify(j, null, 2);
-          }catch(e){
-            pre.textContent = "Error: " + e.message;
+          }catch(e){ window.__RUNAGENT_LOCK = false; pre.textContent = "Error: " + e.message;
           }
           return;
         }
@@ -4017,7 +4033,7 @@ setTimeout(()=>{
       if (chip2) chip2.textContent = "OS: " + val;
       const csnOS = document.getElementById("csnOS");
       if (csnOS) csnOS.textContent = val;
-    }catch(e){}
+    }catch(e){ window.__RUNAGENT_LOCK = false; }
   }
   refreshOutcomeScore();
   setInterval(refreshOutcomeScore, 30000);
@@ -4102,8 +4118,7 @@ setTimeout(()=>{
         pre.className = "aigx-code";
         pre.textContent = JSON.stringify(j, null, 2);
         (document.querySelector(".chat-log")||document.body).appendChild(pre);
-      }catch(e){
-        const pre = document.createElement("pre");
+      }catch(e){ window.__RUNAGENT_LOCK = false; const pre = document.createElement("pre");
         pre.className = "aigx-code";
         pre.textContent = "Exec error: " + (e?.message || e);
         (document.querySelector(".chat-log")||document.body).appendChild(pre);
@@ -4123,7 +4138,7 @@ setTimeout(()=>{
   // Helper endpoints (progressive enhancement)
   async function fetchJSON(url){
     try{ const r=await fetch(url,{credentials:'same-origin'}); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json(); }
-    catch(e){ return null; }
+    catch(e){ window.__RUNAGENT_LOCK = false; return null; }
   }
   function username(){
     return (window.aigentsyUser?.consent?.username || window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername') || 'guest');
@@ -4298,7 +4313,7 @@ setTimeout(()=>{
       pre.textContent = JSON.stringify(j, null, 2);
       (log||document.body).appendChild(pre);
       ta.value='';
-    }catch(e){ console.error(e); }
+    }catch(e){ window.__RUNAGENT_LOCK = false; console.error(e); }
   }
   if (sendBtn){
     sendBtn.addEventListener('click', (e)=>{
@@ -4558,8 +4573,7 @@ setTimeout(()=>{
       });
       const j = await r.json().catch(()=> ({}));
       return (j.output || j.message || '').toString().trim() || 'No response.';
-    } catch (e) {
-      return 'Runtime error — ' + (e?.message || 'failed to fetch');
+    } catch(e){ window.__RUNAGENT_LOCK = false; return 'Runtime error — ' + (e?.message || 'failed to fetch');
     }
   }
 
