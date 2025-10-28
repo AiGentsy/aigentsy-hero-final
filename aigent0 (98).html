@@ -4489,106 +4489,118 @@ function showTyping(label) {
   });
 })();
 </script>
+<!-- ✅ AiGentsy Tone Polisher — Safe Observer (v1.1) -->
 <script>
-/* === C-Suite Persona Polisher: one expert, first-person voice === */
 (() => {
-  if (window.__CSUITE_PERSONA_POLISH__) return; window.__CSUITE_PERSONA_POLISH__ = true;
+  if (window.__AIG_TONE_POLISH_SAFE__) return; window.__AIG_TONE_POLISH_SAFE__ = true;
+  try {
+    const log = document.querySelector('#chatLog');
+    if (!log) return;
 
-  // If your router already sets the role, reuse it; else lightly infer.
-  function inferRole(txt=""){
-    const t = txt.toLowerCase();
-    if (/\bcaio\b|chief ai officer|orchestr/.test(t)) return "CAIO";
-    if (/\bcfo\b|pricing|budget|revenue|profit|cash|payout|off-?ramp|fiat/.test(t)) return "CFO";
-    if (/\bclo\b|legal|license|ip|contract|compliance|trademark|remix|fork/.test(t)) return "CLO";
-    if (/\bcto\b|sdk|developer|api|integration|build|deploy|stack|runtime|bug/.test(t)) return "CTO";
-    if (/\bcmo\b|marketing|growth|campaign|audience|leads|promote|brand/.test(t)) return "CMO";
-    if (/\bcoo\b|ops|operations|fulfillment|handoff|process|sop|timeline/.test(t)) return "COO";
-    if (/\bcpo\b|product|feature|roadmap|ux|ui|spec/.test(t)) return "CPO";
-    if (/\bcro\b|sales|pipeline|deal|crm|demo|quote/.test(t)) return "CRO";
-    return null;
-  }
+    const HEADERS = {
+      CFO:  "💰 CFO — Pricing & payouts:",
+      CRO:  "💼 CRO — Revenue & sales:",
+      CMO:  "📣 CMO — Growth & partners:",
+      CTO:  "🧬 CTO — SDK & platform:",
+      CPO:  "🧪 CPO — Product & UX:",
+      COO:  "🛠 COO — Ops & delivery:",
+      CLO:  "📜 CLO — IP & licensing:",
+      CAIO: "🤖 CAIO — AI/agents & research:",
+      CEO_ADVICE: "👑 For you, the CEO — decision frame:",
+    };
 
-  const OPEN = {
-    CFO:  "💰 (CFO) I manage the numbers. Here’s how I’d handle this:",
-    CLO:  "📜 (CLO) I’m your counsel. Here’s what I recommend:",
-    CTO:  "🧬 (CTO) I’ll handle the technical side. Here’s my plan:",
-    CMO:  "📣 (CMO) I lead growth. Here’s how I’d approach it:",
-    COO:  "🧭 (COO) I’ll run ops. Here’s the execution plan:",
-    CPO:  "🧪 (CPO) Product hat on. Here’s the build path:",
-    CRO:  "💼 (CRO) I’ll drive revenue. Here’s the move:",
-    CAIO: "🧠 (CAIO) I lead AI capabilities. Here’s what I can unlock:"
-  };
-
-  // Convert neutral/collective tone → first-person expert voice
-  function personalize(role, text){
-    let t = String(text || "");
-    // Strip system-y prefaces
-    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
-    // Light humanization
-    t = t.replace(/\bSDK\b/g, "developer toolkit")
-         .replace(/\bautonomously\b/gi, "automatically");
-    // First-person pass (soft; avoids inside code blocks/backticks)
-    t = t.replace(/(^|[\s(])we can\b/gi, "$1I can")
-         .replace(/(^|[\s(])we will\b/gi, "$1I will")
-         .replace(/\bwe’ll\b/gi, "I’ll")
-         .replace(/\bour\b/gi, "my")
-         .replace(/\bwe\b/gi, "I");
-
-    // Ensure it opens with the role’s voice once
-    const opener = OPEN[role] || null;
-    if (opener && !t.startsWith(opener)) t = `${opener}\n\n${t}`;
-    // Optional: concise sign-off on long replies
-    if (t.length > 600 && role) t += `\n\n— ${role}`;
-    return t;
-  }
-
-  // Single typing indicator helper
-  function setTyping(role){
-    const log = document.getElementById("chatLog"); if (!log) return null;
-    let line = log.querySelector('[data-typing="1"]');
-    if (!line){
-      line = document.createElement("div");
-      line.className = "chat-agent"; line.dataset.typing = "1";
-      log.appendChild(line);
+    function inferRoleFromText(t="") {
+      const s = t.toLowerCase();
+      for (const [k, v] of Object.entries(HEADERS)) if (t.startsWith(v)) return k;
+      if (/\bpricing|margin|payout|cash|off-?ramp/.test(s)) return "CFO";
+      if (/\bsales|pipeline|quote|close|renewal/.test(s))   return "CRO";
+      if (/\bgrowth|campaign|seo|ads|tiktok|ugc|partner/.test(s)) return "CMO";
+      if (/\bapi|sdk|integration|deploy|runtime|stack/.test(s))   return "CTO";
+      if (/\bprd|acceptance criteria|ux|prototype|bundle/.test(s)) return "CPO";
+      if (/\bops|runbook|sop|handoff|sla|fulfillment/.test(s))    return "COO";
+      if (/\blicense|ip|nda|terms|compliance|trademark/.test(s))  return "CLO";
+      if (/\borchestr|multi-?agent|metabridge|aam|dealgraph/.test(s)) return "CAIO";
+      if (/\bboard|vision|fundraise|executive decision/.test(s))  return "CEO_ADVICE";
+      return null;
     }
-    line.textContent = `⌛ ${role || "Team"} is typing…`;
-    log.scrollTop = log.scrollHeight;
-    return line;
-  }
 
-  // Patch runAgent to polish replies in-place (non-destructive)
-  const original = window.runAgent;
-  if (!original) return;
+    function polish(text, role) {
+      if (!text || typeof text !== "string") return text;
+      // Split by code blocks so we never alter ```code```
+      const parts = text.split(/(```[\s\S]*?```)/g);
 
-  window.runAgent = async function(){
-    const ta = document.getElementById("agentInput");
-    const input = (ta?.value || "").trim();
-    const role = (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.__lastRole)
-                 || (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(input))
-                 || inferRole(input);
+      function tidy(chunk) {
+        let t = chunk;
+        t = t.replace(/\bAs an AI( language model)?[, ]*/gi, "")
+             .replace(/\bI will\b/gi, "I’ll")
+             .replace(/\bwe’ll\b/gi, "I’ll")
+             .replace(/\bwe can\b/gi, "I can")
+             .replace(/\bour\b/gi, "my")
+             .replace(/\bwe\b/gi, "I")
+             .replace(/\bautonomously\b/gi, "automatically")
+             .replace(/\bSDK\b/g, "developer toolkit")
+             .replace(/\bI think\b/gi, "I recommend");
+        // Ensure header exists once
+        const header = HEADERS[role] || null;
+        if (header && !t.startsWith(header)) t = header + "\n\n" + t;
+        return t.replace(/\n{3,}/g, "\n\n");
+      }
 
-    // show one typing line (and update, not duplicate)
-    const typing = setTyping(role);
-
-    // run your existing pipeline
-    const before = document.querySelectorAll("#chatLog .chat-agent").length;
-    await original();
-
-    // find latest agent line; if new line was appended, use it; else reuse typing
-    const lines = Array.from(document.querySelectorAll("#chatLog .chat-agent"));
-    const after = lines.length;
-    const latest = (after > before) ? lines[after - 1] : typing;
-
-    if (latest){
-      // personalize content
-      latest.dataset.typing = "0";
-      latest.textContent = personalize(role, latest.textContent);
+      // If no role was passed, infer once
+      role = role || inferRoleFromText(text);
+      return parts.map(p => p.startsWith("```") ? p : tidy(p)).join("");
     }
-    // remove any extra “typing…” lines left behind
-    document.querySelectorAll('#chatLog .chat-agent[data-typing="1"]').forEach(n => n.remove());
-  };
+
+    function cleanupTyping() {
+      // Keep a single typing line at most
+      const typing = [...log.querySelectorAll('.typing-line, .advisor-typing, .agent-typing')];
+      if (typing.length > 1) typing.slice(0, typing.length - 1).forEach(n => n.remove());
+      // Remove stale "thinking…" artifacts if a real line followed
+      [...log.children].forEach(n => {
+        if (n && /typing|thinking…|thinking\.\.\./i.test(n.textContent || "")) {
+          const next = n.nextElementSibling;
+          if (next && next.classList.contains('chat-agent')) n.remove();
+        }
+      });
+    }
+
+    // Process existing agent lines defensively
+    requestAnimationFrame(() => {
+      [...log.querySelectorAll('.chat-agent')].forEach(line => {
+        if (line.dataset.polished === "1") return;
+        const raw = line.textContent || "";
+        if (!raw.trim()) return;
+        line.textContent = polish(raw);
+        line.dataset.polished = "1";
+      });
+    });
+
+    // Observe new agent lines only; never touch inputs or wiring
+    const obs = new MutationObserver(muts => {
+      for (const m of muts) {
+        m.addedNodes && [...m.addedNodes].forEach(node => {
+          if (!(node instanceof HTMLElement)) return;
+          if (!node.classList.contains('chat-agent')) return;
+          // Defer polish so upstream render finishes
+          requestAnimationFrame(() => {
+            try {
+              if (node.dataset.polished === "1") return;
+              const raw = node.textContent || "";
+              node.textContent = polish(raw);
+              node.dataset.polished = "1";
+              cleanupTyping();
+            } catch {}
+          });
+        });
+      }
+    });
+    obs.observe(log, { childList: true });
+  } catch (e) {
+    console.warn('Tone polisher disabled:', e);
+  }
 })();
 </script>
+
 </body>
 </html>
 
