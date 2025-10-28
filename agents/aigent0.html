@@ -4426,191 +4426,152 @@ setTimeout(()=>{
   };
 })();
 </script>
+  <!-- 🔧 AiGentsy C-Suite Chat — CEO=User rule (v3.2) -->
 <script>
-/* ==== C-Suite Persona Prime: inject first-person expertise into the prompt ==== */
 (() => {
-  if (window.__CSUITE_PERSONA_PRIME__) return; window.__CSUITE_PERSONA_PRIME__ = true;
+  if (window.__AIGENTSY_CSUITE_PATCH_V32__) return;
+  window.__AIGENTSY_CSUITE_PATCH_V32__ = true;
 
-  // Short, action-oriented briefs per role (first person, expert voice)
-  const BRIEF = {
-    CTO: `You are the CTO. Speak in first person. Diagnose tech needs, suggest build/integration steps,
-          surface risks, and give a 3–5 step implementation plan with options. Offer one clarifying question at the end.`,
-    CMO: `You are the CMO. Speak in first person. Pick a growth play, define target, message, channels,
-          simple funnel metrics, and next 3 actions. Offer one clarifying question at the end.`,
-    CLO: `You are the CLO (counsel). Speak in first person. Identify legal risks, the right instrument (NDA, license, ToS),
-          key clauses to include, and a simple path to execution. Offer one clarifying question at the end.`,
-    CFO: `You are the CFO. Speak in first person. Frame pricing or ROI, unit economics, cash implications,
-          and a simple financial next step (e.g., quote template or off-ramp step). Ask one clarifying question.`,
-    COO: `You are the COO. Speak in first person. Turn the request into an SOP with owners, timing, and handoffs.
-          Flag dependencies/risks. Ask one clarifying question.`,
-    CPO: `You are the CPO. Speak in first person. Translate the ask into a crisp PRD slice: problem, users,
-          acceptance criteria, and a minimal prototype path. Ask one clarifying question.`,
-    CRO: `You are the CRO. Speak in first person. Choose a sales motion, define ICP, talk track/objection handling,
-          and the next 3 pipeline actions. Ask one clarifying question.`,
-    CAIO:`You are the CAIO. Speak in first person. Propose an AI capability map, data/guardrails, and orchestration plan
-          (tools, models, routes). End with the next 3 engineering or data steps and one clarifying question.`
-  };
+  const ta  = document.querySelector('#agentInput');
+  const log = document.querySelector('#chatLog');
+  const btn = document.querySelector('#sendBtn');
 
-  // Try to reuse your router’s role; otherwise re-infer quickly
-  function activeRole(text){
-    const r = (window.AIGENTS_ROUTER && (window.AIGENTS_ROUTER.__lastRole ||
-              (window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(text)))) || null;
-    if (r && BRIEF[r]) return r;
-    const t = (text||"").toLowerCase();
-    if (/\bcto\b|sdk|api|integrat|build|deploy|tech/.test(t)) return "CTO";
-    if (/\bcmo\b|marketing|growth|leads|campaign|brand/.test(t)) return "CMO";
-    if (/\bclo\b|legal|license|ip|contract|compliance|remix|fork/.test(t)) return "CLO";
-    if (/\bcfo\b|price|budget|revenue|profit|payout|cash|off-?ramp/.test(t)) return "CFO";
-    if (/\bcoo\b|ops|operations|timeline|handoff|sop/.test(t)) return "COO";
-    if (/\bcpo\b|product|feature|spec|ux|ui|roadmap/.test(t)) return "CPO";
-    if (/\bcro\b|sales|pipeline|demo|quote|close/.test(t)) return "CRO";
-    if (/\bcaio\b|chief ai officer|orchestr|multi-?agent|llm/.test(t)) return "CAIO";
-    return null;
-  }
+  // Route all chat to Growth runtime
+  const BASE = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT_ENDPOINT = `${BASE}/agent`;
 
-  // Wrap fetch-call sites used by runAgent() to inject the brief once per send
-  const _send = window.runAgent;
-  if (!_send) return;
+  // small rolling memory
+  const mem = (window.aigChatMemory = window.aigChatMemory || []);
+  const MAX_MEM = 12;
 
-  window.runAgent = async function(){
-    const ta = document.getElementById('agentInput');
-    const raw = (ta?.value || '').trim();
-    const role = activeRole(raw);
-    // Prime the message without changing your UI memory/logs
-    if (role && BRIEF[role]) {
-      // Expose for the code that builds the request body
-      window.__CSUITE_PERSONA_PREFIX__ = `[ROLE:${role}] ${BRIEF[role].replace(/\s+/g,' ').trim()}\n\nUser: `;
-    } else {
-      window.__CSUITE_PERSONA_PREFIX__ = null;
-    }
-
-    // Monkey-patch fetch to prepend the persona to the "input" field only for this turn
-    const _fetch = window.fetch;
-    window.fetch = async (url, init) => {
-      try {
-        if (init && typeof init.body === 'string' && init.headers && /json/i.test(init.headers['Content-Type']||'')) {
-          const body = JSON.parse(init.body);
-          if (body && body.input && !body.__primed && window.__CSUITE_PERSONA_PREFIX__) {
-            body.input = `${window.__CSUITE_PERSONA_PREFIX__}${body.input}`;
-            body.__primed = true;                // avoid double-priming
-            init.body = JSON.stringify(body);
-          }
-        }
-      } catch {}
-      return _fetch(url, init);
-    };
-
-    try { await _send(); }
-    finally {
-      window.fetch = _fetch;
-      window.__CSUITE_PERSONA_PREFIX__ = null;
-    }
-  };
-})();
-</script>
-
-  <script id="csuite-chat-route-patch">
-(function () {
-  // ---- CONFIG: role → runtime key (matches your backends) ----
-  const ROLE_MAP = {
-    CEO:  { type: "user" },                // user is CEO
-    COO:  { agent: "ops" },                // if you don’t have a separate route, point to venture or growth
-    CTO:  { agent: "sdk" },                // sdk_agent runtime
-    CPO:  { agent: "product" },            // or venture if product route not split yet
-    CMO:  { agent: "growth" },             // aigent_growth_agent runtime
-    CFO:  { agent: "venture" },            // AiGent0 / venture_builder runtime
-    CLO:  { agent: "remix" },              // remix_agent runtime (IP/licensing)
-    CAIO: { agent: "ai" }                  // planning/payloads runtime (map to venture/growth if not split)
-  };
-
-  // ---- HELPERS: safely find existing chat elements (no DOM changes) ----
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const input = $('[data-chat-input], #chatInput, textarea[name="chat"]');
-  const form  = $('[data-chat-form], #chatForm, form[data-role="chat"]');
-  let typingEls = document.querySelectorAll('[data-typing],[data-thinking], .typing, .thinking');
-
-  // De-dupe typing/thinking indicators (keep the first, remove the rest)
-  if (typingEls.length > 1) [...typingEls].slice(1).forEach(el => el.remove());
-  const typingEl = typingEls[0] || null;
-  const showTyping = (on, role) => {
-    if (!typingEl) return;
-    typingEl.style.display = on ? '' : 'none';
-    typingEl.textContent = on ? ((role ? `(${role}) ` : '') + 'typing…') : '';
-  };
-
-  // Utilities to append messages to your existing chat log without creating new UI
-  const chatLog = $('[data-chat-log], .chat-log, #chatLog') || document.body;
-  const appendMsg = (html) => {
-    const div = document.createElement('div');
-    div.className = 'msg';
-    div.innerHTML = html;
-    chatLog.appendChild(div);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  };
-  const userBubble  = (t) => `<div class="bubble you">${escapeHtml(t)}</div>`;
-  const agentBubble = (role, t) => `<div class="bubble agent"><strong>(${role})</strong> ${escapeHtml(t)}</div>`;
-  const escapeHtml  = (s)=>String(s).replace(/[&<>]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
-
-  // ---- Role detection: (ROLE) prefix or “my cmo/cto/…” in the text ----
-  function detectRole(text){
-    const m = text.match(/^\s*\(([^)]+)\)\s*(.*)$/i);
-    if (m) return { role: m[1].toUpperCase(), msg: m[2] };
-    for (const r of Object.keys(ROLE_MAP)){
-      const re = new RegExp(`\\bmy\\s+${r.toLowerCase()}\\b|^\\s*${r}\\b`, 'i');
-      if (re.test(text)) return { role: r, msg: text };
-    }
-    // Default to CFO (venture) if none specified—keeps current behavior
-    return { role: 'CFO', msg: text };
-  }
-
-  // ---- First-person voice normalizer (light touch) ----
-  function toFirstPerson(role, text){
-    // Strip “As the CRO/CMO...” style preambles if present, then prepend role tag
-    const stripped = String(text).replace(/^as\s+the\s+c[a-z]{1,3}o.*?:\s*/i, '').replace(/^i am\s+the\s+c[a-z]{1,3}o[:,]?\s*/i,'I ');
-    const ensured  = stripped.replace(/\b(we|our team)\b/gi,'I'); // gentle bias to singular
-    return ensured;
-  }
-
-  // ---- Routing ----
-  const BACKEND = window.BACKEND_BASE || '';
-  async function routeToAgent(role, message){
-    // CEO is the user; respond with guidance instead of hitting an agent
-    if (role === 'CEO' || ROLE_MAP[role]?.type === 'user') {
-      return "You’re the CEO. Ask an executive directly by prefixing your question, e.g. (CMO) run a client outreach plan, (CLO) draft a licensing term, (CTO) package the SDK.";
-    }
-    const agentKey = ROLE_MAP[role]?.agent || 'growth';
-    const url = `${BACKEND}/chat/${agentKey}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, role })
+  function purgeThinking() {
+    const killers = ['.typing-line', '.agent-typing', '.advisor-typing'];
+    killers.forEach(sel => [...(log?.querySelectorAll(sel) || [])].forEach(n => n.remove()));
+    [...(log?.children || [])].forEach(n => {
+      if (n.textContent && /typing|thinking…|thinking\.\.\./i.test(n.textContent)) n.remove();
     });
-    let data = {};
-    try { data = await res.json(); } catch(e){}
-    const text = data.text || data.reply || data.message || res.statusText || '…';
-    return toFirstPerson(role, text);
   }
 
-  // ---- Hook submit without altering your existing markup ----
-  if (form && input) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const raw = (input.value || '').trim();
-      if (!raw) return;
-      const { role, msg } = detectRole(raw);
-      appendMsg(userBubble(raw));
-      input.value = '';
-      showTyping(true, role);
-      try {
-        const reply = await routeToAgent(role, msg);
-        appendMsg(agentBubble(role, reply));
-      } catch (err) {
-        appendMsg(agentBubble(role, 'Error reaching runtime.')); 
-      } finally {
-        showTyping(false);
-      }
-    }, { capture: true });
+  let typingEl = null;
+  function showTyping(label) {
+    purgeThinking();
+    typingEl = document.createElement('div');
+    typingEl.className = 'chat-agent typing-line';
+    typingEl.textContent = `⌛ ${label} is typing…`;
+    log?.appendChild(typingEl);
+    log && (log.scrollTop = log.scrollHeight);
   }
+  function replaceTypingWith(text) {
+    if (!typingEl) {
+      typingEl = document.createElement('div');
+      typingEl.className = 'chat-agent';
+      log?.appendChild(typingEl);
+    }
+    typingEl.classList.remove('typing-line');
+    typingEl.textContent = text;
+    log && (log.scrollTop = log.scrollHeight);
+    typingEl = null;
+  }
+
+  // 9 canonical roles + CEO_ADVICE (advisor mode only)
+  // Slash override allowed for each role; /ceo triggers CEO_ADVICE.
+  function detectRole(text='') {
+    const t = text.toLowerCase();
+
+    const m = t.match(/(^|\s)\/(ceo|coo|cto|cpo|cmo|cro|clo|cfo|caio)\b/);
+    if (m) return m[2].toUpperCase() === 'CEO' ? 'CEO_ADVICE' : m[2].toUpperCase();
+
+    if (/\bcfo\b|pricing|payout|revenue|cash|wallet|off[- ]?ramp|margin|unit econ/.test(t)) return 'CFO';
+    if (/\bcro\b|sales|pipeline|quote|close|deal|upsell|renewal/.test(t)) return 'CRO';
+    if (/\bcmo\b|marketing|growth|campaign|ads|seo|leads|outreach|tiktok|ugc|partners?/.test(t)) return 'CMO';
+    if (/\bcto\b|sdk|developer|api|integration|build|deploy|platform|runtime/.test(t)) return 'CTO';
+    if (/\bclo\b|legal|license|licen[cs]ing|ip|contract|compliance|terms/.test(t)) return 'CLO';
+    if (/\bcoo\b|ops|delivery|runbook|handoff|process|sop|support|sla/.test(t)) return 'COO';
+    if (/\bcpo\b|product|roadmap|spec|ux|mvp|packaging|bundle|pricing test/.test(t)) return 'CPO';
+    if (/\bcaio\b|chief ai|orchestr|multi-?agent|meta?bridge|aam|dealgraph/.test(t)) return 'CAIO';
+    if (/\bceo\b|exec decision|board|fundraise|company vision/.test(t)) return 'CEO_ADVICE';
+
+    // default to growth-forward help (never CEO)
+    return 'CMO';
+  }
+
+  const headers = {
+    CEO_ADVICE: "👑 For you, the CEO — decision frame:",
+    COO:  "🛠 COO — Ops & delivery:",
+    CTO:  "🧬 CTO — SDK & platform:",
+    CPO:  "🧪 CPO — Product & UX:",
+    CMO:  "📣 CMO — Growth & partners:",
+    CRO:  "💼 CRO — Revenue & sales:",
+    CLO:  "📜 CLO — IP & licensing:",
+    CFO:  "💰 CFO — Pricing & payouts:",
+    CAIO: "🤖 CAIO — AI/agents & research:"
+  };
+  function roleHeader(role){ return headers[role] || "🤝 Advisor — Here's the move:"; }
+
+  const protocolTopics = [
+    "AAM (Autonomous App Monetizer)",
+    "MetaBridge DealGraph",
+    "Intent Exchange",
+    "R3 Router (Recursive Referral) with AutoStake",
+    "Co-op Sponsors",
+    "OutcomeOracle events & attribution",
+    "LTV Governor",
+    "Proposal Auto-Close",
+    "Franchise Packs",
+    "Shopify Inventory Proxy",
+    "Amazon cart nudger",
+    "TikTok UGC loops"
+  ];
+
+  async function callGrowthAgent({input, role}) {
+    const personaHint =
+      `${role === 'CEO_ADVICE'
+        ? "Advisor to the CEO. NEVER speak as CEO; the human user is the CEO."
+        : `${role} expert. Speak first-person AS ${role}.`
+      } Always tie actions to money-in-wallet and next steps. Reference AAM/MetaBridge/R3 when useful.`;
+    const body = { input, role, personaHint, topics: protocolTopics, memory: mem.slice(-MAX_MEM) };
+    try {
+      const r = await fetch(AGENT_ENDPOINT, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      const j = await r.json().catch(()=> ({}));
+      return (j.output || j.message || '').toString().trim() || 'No response.';
+    } catch (e) {
+      return 'Runtime error — ' + (e?.message || 'failed to reach growth runtime');
+    }
+  }
+
+  async function send() {
+    const text = (ta?.value || '').trim();
+    if (!text) return;
+    ta.value = '';
+
+    // user bubble
+    if (log) {
+      const u = document.createElement('div');
+      u.className = 'chat-user';
+      u.textContent = '🧠 You: ' + text;
+      log.appendChild(u);
+    }
+
+    const role = detectRole(text);
+    showTyping(role === 'CEO_ADVICE' ? 'Advisor' : role);
+
+    mem.push(text);
+    if (mem.length > MAX_MEM*2) mem.splice(0, mem.length - MAX_MEM*2);
+
+    const raw = await callGrowthAgent({input: text, role});
+    replaceTypingWith(`${roleHeader(role)}\n\n${raw}`);
+    mem.push(`AGENT(${role}): ` + raw.slice(0, 2000));
+  }
+
+  purgeThinking();
+  btn && (btn.onclick = send);
+  ta && ta.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+  });
 })();
 </script>
 
