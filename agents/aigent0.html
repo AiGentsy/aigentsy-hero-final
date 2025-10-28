@@ -4275,8 +4275,7 @@ setTimeout(()=>{
 
 })(); 
 </script>
-
-
+  
 <script>
 (function restoreChatControls(){
   if (window.__CHAT_WIRED__) return; window.__CHAT_WIRED__=true;
@@ -4661,73 +4660,6 @@ function showTyping(label) {
     } catch (_) {}
     return _fetch(url, init);
   };
-})();
-</script>
-<!-- AiGentsy Reply Conditioner v1.2 (grammar clean + one typing line) -->
-<script>
-(() => {
-  if (window.__AIG_REPLY_CONDITIONER__) return; window.__AIG_REPLY_CONDITIONER__ = true;
-
-  const log = document.getElementById('chatLog');
-
-  // normalize output text
-  function clean(text) {
-    let t = String(text || "");
-    // Remove weird spaced roles like "( CTO )" → "CTO"
-    t = t.replace(/\(\s*(C[TCMOAI]|CL?O|CAIO)\s*\)\s*/gi, (m)=>m.replace(/[()]/g,'').replace(/\s+/g,'').toUpperCase() + ' — ');
-    // Collapse multiple spaces/newlines
-    t = t.replace(/[ \t]{2,}/g,' ').replace(/\n{3,}/g,'\n\n');
-    // Smooth “Your AiGentsy” system prefaces
-    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
-    // Light first-person swap when the model slips into “we”
-    t = t.replace(/(^|\s)we can\b/gi, "$1I can")
-         .replace(/(^|\s)we will\b/gi, "$1I will")
-         .replace(/\bwe’ll\b/gi, "I’ll")
-         .replace(/\bour\b/gi, "my")
-         .replace(/\bwe\b/gi, "I");
-    return t.trim();
-  }
-
-  // ensure only one typing line exists at a time
-  function oneTyping(label){
-    if (!log) return;
-    [...log.querySelectorAll('.typing-line')].forEach(n => n.remove());
-    let line = document.createElement('div');
-    line.className = 'chat-agent typing-line';
-    line.textContent = `⌛ ${label || 'Team'} is typing…`;
-    log.appendChild(line);
-    log.scrollTop = log.scrollHeight;
-    return line;
-  }
-
-  // Hook your existing v3.2 router typing helpers if present
-  const _showTyping = window.showTyping;
-  if (typeof _showTyping === 'function') {
-    window.showTyping = (label) => oneTyping(label);
-  } else {
-    // Fallback: minimally attach to send button to avoid doubles
-    const btn = document.getElementById('sendBtn');
-    if (btn && !btn.__aigTypingHook){
-      btn.__aigTypingHook = true;
-      btn.addEventListener('click', ()=> oneTyping('Team'));
-    }
-  }
-
-  // Observe new agent lines and clean them in place
-  const obs = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      for (const node of m.addedNodes) {
-        if (!(node instanceof HTMLElement)) continue;
-        const isAgent = node.classList && node.classList.contains('chat-agent');
-        const isTyping = node.classList && node.classList.contains('typing-line');
-        if (isAgent && !isTyping) {
-          node.textContent = clean(node.textContent);
-        }
-      }
-    }
-  });
-  if (log) obs.observe(log, { childList: true });
-
 })();
 </script>
 
