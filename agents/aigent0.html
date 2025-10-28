@@ -4600,6 +4600,136 @@ function showTyping(label) {
   }
 })();
 </script>
+<!-- AiGentsy Chat Context Primer v1.0 (safe: only patches /agent calls) -->
+<script>
+(() => {
+  if (window.__AIG_CONTEXT_PRIMER__) return; window.__AIG_CONTEXT_PRIMER__ = true;
+
+  // Detect the Growth runtime endpoint your v3.2 router uses
+  const BASE = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT_ENDPOINT = `${BASE}/agent`;
+
+  // Canonical capabilities catalog (short, model-friendly)
+  const CAPABILITIES = {
+    stacks: [
+      "AAM (Autonomous App Monetizer)",
+      "MetaBridge DealGraph (multi-sided matching & rev-splits)",
+      "Intent Exchange (publish/claim/settle)",
+      "R3 Router (Recursive Referral) + AutoStake",
+      "Co-op Sponsor Credits (brand-subsidized sends)",
+      "OutcomeOracle (events & attribution)",
+      "LTV Governor (budget shift by predicted yield)",
+      "Proposal Auto-Close (quickpay nudges)",
+      "Franchise Packs (reusable bundle manifests, rev-share)",
+      "Shopify Inventory Proxy (stock-aware offers/discounts)",
+      "Amazon cart nudger (low-friction conversions)",
+      "TikTok UGC loops (creator seeding)",
+      "SDK Packaging & Licensing (toolkit → productization)",
+      "Vault & Off-Ramp (Stripe enabled)"
+    ],
+    rules: [
+      "User is the CEO. Never speak as CEO; advise when asked (/ceo).",
+      "Answer as the detected C-Suite role in first person (CTO/CMO/CFO/etc.).",
+      "Tie plans to money: expected ROI, next 2–3 actions, who/what/when.",
+      "Reference relevant modules (AAM, DealGraph, R3, etc.) when useful."
+    ]
+  };
+
+  const TONE_GUIDE =
+    "Tone: friendly, expert, concise. Use first person singular (I). " +
+    "Avoid corporate filler. Give numbered next steps and a short ROI frame.";
+
+  const _fetch = window.fetch;
+  window.fetch = async (url, init) => {
+    try {
+      const isAgentCall =
+        typeof url === "string" &&
+        (url === AGENT_ENDPOINT || (url.includes('/agent') && url.includes(BASE)));
+
+      if (isAgentCall && init && typeof init.body === "string" && init.headers && /json/i.test(init.headers['Content-Type']||'')) {
+        const body = JSON.parse(init.body);
+        // Non-invasive: only enrich if this looks like our Growth request
+        if (body && !body.__contextPrimed) {
+          body.capabilities = CAPABILITIES;
+          body.toneGuide = TONE_GUIDE;
+          body.ceoRule = "Human user is CEO. Do not roleplay as CEO.";
+          // keep any existing personaHint/topics/memory the router set
+          body.__contextPrimed = true;
+          init.body = JSON.stringify(body);
+        }
+      }
+    } catch (_) {}
+    return _fetch(url, init);
+  };
+})();
+</script>
+<!-- AiGentsy Reply Conditioner v1.2 (grammar clean + one typing line) -->
+<script>
+(() => {
+  if (window.__AIG_REPLY_CONDITIONER__) return; window.__AIG_REPLY_CONDITIONER__ = true;
+
+  const log = document.getElementById('chatLog');
+
+  // normalize output text
+  function clean(text) {
+    let t = String(text || "");
+    // Remove weird spaced roles like "( CTO )" → "CTO"
+    t = t.replace(/\(\s*(C[TCMOAI]|CL?O|CAIO)\s*\)\s*/gi, (m)=>m.replace(/[()]/g,'').replace(/\s+/g,'').toUpperCase() + ' — ');
+    // Collapse multiple spaces/newlines
+    t = t.replace(/[ \t]{2,}/g,' ').replace(/\n{3,}/g,'\n\n');
+    // Smooth “Your AiGentsy” system prefaces
+    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
+    // Light first-person swap when the model slips into “we”
+    t = t.replace(/(^|\s)we can\b/gi, "$1I can")
+         .replace(/(^|\s)we will\b/gi, "$1I will")
+         .replace(/\bwe’ll\b/gi, "I’ll")
+         .replace(/\bour\b/gi, "my")
+         .replace(/\bwe\b/gi, "I");
+    return t.trim();
+  }
+
+  // ensure only one typing line exists at a time
+  function oneTyping(label){
+    if (!log) return;
+    [...log.querySelectorAll('.typing-line')].forEach(n => n.remove());
+    let line = document.createElement('div');
+    line.className = 'chat-agent typing-line';
+    line.textContent = `⌛ ${label || 'Team'} is typing…`;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+    return line;
+  }
+
+  // Hook your existing v3.2 router typing helpers if present
+  const _showTyping = window.showTyping;
+  if (typeof _showTyping === 'function') {
+    window.showTyping = (label) => oneTyping(label);
+  } else {
+    // Fallback: minimally attach to send button to avoid doubles
+    const btn = document.getElementById('sendBtn');
+    if (btn && !btn.__aigTypingHook){
+      btn.__aigTypingHook = true;
+      btn.addEventListener('click', ()=> oneTyping('Team'));
+    }
+  }
+
+  // Observe new agent lines and clean them in place
+  const obs = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      for (const node of m.addedNodes) {
+        if (!(node instanceof HTMLElement)) continue;
+        const isAgent = node.classList && node.classList.contains('chat-agent');
+        const isTyping = node.classList && node.classList.contains('typing-line');
+        if (isAgent && !isTyping) {
+          node.textContent = clean(node.textContent);
+        }
+      }
+    }
+  });
+  if (log) obs.observe(log, { childList: true });
+
+})();
+</script>
 
 </body>
 </html>
