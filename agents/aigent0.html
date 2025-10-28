@@ -4574,7 +4574,139 @@ setTimeout(()=>{
   });
 })();
 </script>
+<!-- 🌟 AiGentsy C-Suite Tone Polisher (observer-based, safe with v3.2) -->
+<script>
+(() => {
+  if (window.__AIGENTSY_TONE_POLISH_V1__) return; window.__AIGENTSY_TONE_POLISH_V1__ = true;
 
+  const LOG_SEL = "#chatLog";
+  const ROLE_HEADERS = {
+    "CFO":  "💰 CFO — Pricing & payouts:",
+    "CRO":  "💼 CRO — Revenue & sales:",
+    "CMO":  "📣 CMO — Growth & partners:",
+    "CTO":  "🧬 CTO — SDK & platform:",
+    "CPO":  "🧪 CPO — Product & UX:",
+    "COO":  "🛠 COO — Ops & delivery:",
+    "CLO":  "📜 CLO — IP & licensing:",
+    "CAIO": "🤖 CAIO — AI/agents & research:",
+    "CEO_ADVICE": "👑 For you, the CEO — decision frame:"
+  };
+
+  // Soft heuristics: keep it human, decisive, and clear—without changing code blocks or lists.
+  function polishText(text, role) {
+    if (!text || typeof text !== "string") return text;
+
+    // Split around code blocks to avoid rewriting them
+    const parts = text.split(/(```[\s\S]*?```)/g);
+
+    function gentlePolish(chunk) {
+      let t = chunk;
+
+      // Remove robotic prefaces
+      t = t.replace(/\bAs an AI( language model)?[, ]*/gi, "")
+           .replace(/\bI cannot\b/gi, "I can’t")
+           .replace(/\bI will\b/gi, "I’ll")
+           .replace(/\bwe\b/gi, "I")
+           .replace(/\bour\b/gi, "my")
+           .replace(/\bwe’ll\b/gi, "I’ll")
+           .replace(/\bwe can\b/gi, "I can")
+           .replace(/\bautonomously\b/gi, "automatically")
+           .replace(/\bSDK\b/g, "developer toolkit");
+
+      // Soften hedging but keep honesty
+      t = t.replace(/\bI think\b/gi, "I recommend")
+           .replace(/\bperhaps\b/gi, "let’s")
+           .replace(/\bmaybe\b/gi, "let’s");
+
+      // Nudge to action-ability (light): if long paragraph with zero bullets, add a short action footer
+      const hasList = /(^|\n)\s*[-*•]\s/.test(t) || /\n\d+\.\s/.test(t);
+      if (t.length > 600 && !hasList) {
+        t += `\n\nNext steps:\n• I’ll outline options and pick one.\n• I’ll run a quick test and measure impact.\n• I’ll report results and double down.`;
+      }
+
+      // Ensure it opens with the role header if missing (v3.2 usually adds it; this is a safety net)
+      const header = ROLE_HEADERS[role] || null;
+      if (header && !t.startsWith(header)) t = `${header}\n\n${t}`;
+
+      // Compact double blanks
+      t = t.replace(/\n{3,}/g, "\n\n");
+      return t;
+    }
+
+    // Detect role from existing header in the text if not provided
+    if (!role) {
+      for (const [k, v] of Object.entries(ROLE_HEADERS)) {
+        if (text.startsWith(v)) { role = k; break; }
+      }
+    }
+
+    // Rebuild with polished non-code chunks
+    const polished = parts.map(p => (/^```/.test(p) ? p : gentlePolish(p)));
+    return polished.join("");
+  }
+
+  function extractRoleFromLine(elText) {
+    for (const [role, header] of Object.entries(ROLE_HEADERS)) {
+      if (elText.startsWith(header)) return role;
+    }
+    // Fallback mini-inference if header missing
+    const t = elText.toLowerCase();
+    if (/\bpricing|payout|margin|cash|off-?ramp/.test(t)) return "CFO";
+    if (/\bsales|pipeline|quote|close|renewal/.test(t))   return "CRO";
+    if (/\bgrowth|campaign|seo|ads|tiktok|ugc|partner/.test(t)) return "CMO";
+    if (/\bapi|sdk|integration|deploy|runtime|stack/.test(t))   return "CTO";
+    if (/\bprd|acceptance criteria|ux|prototype|bundle/.test(t)) return "CPO";
+    if (/\bops|runbook|sop|handoff|sla|fulfillment/.test(t))    return "COO";
+    if (/\blicense|ip|nda|terms|compliance|trademark/.test(t))  return "CLO";
+    if (/\borchestr|multi-?agent|metabridge|aam|dealgraph/.test(t)) return "CAIO";
+    if (/\bboard|vision|fundraise|executive decision/.test(t)) return "CEO_ADVICE";
+    return null;
+  }
+
+  function processNewAgentLine(node) {
+    if (!node || node.dataset.processed === "1") return;
+    const raw = node.textContent || "";
+    if (!raw.trim()) return;
+
+    const role = extractRoleFromLine(raw);
+    const polished = polishText(raw, role);
+    node.textContent = polished;
+    node.dataset.processed = "1";
+  }
+
+  // One typing line only: clean any duplicates the moment a real line lands
+  function cleanupTyping() {
+    document.querySelectorAll('#chatLog .typing-line').forEach(n => {
+      if (n.nextElementSibling && n.nextElementSibling.classList.contains('chat-agent')) n.remove();
+    });
+    // Remove lingering “advisor/team is typing…” if content replaced
+    [...document.querySelectorAll('#chatLog .chat-agent')].forEach(n => {
+      if (/typing|thinking…|thinking\.\.\./i.test(n.textContent||"")) n.remove();
+    });
+  }
+
+  const log = document.querySelector(LOG_SEL);
+  if (!log) return;
+
+  // Handle existing lines (in case we load late)
+  [...log.querySelectorAll(".chat-agent")].forEach(processNewAgentLine);
+
+  // Observe new assistant bubbles
+  const mo = new MutationObserver((muts) => {
+    for (const m of muts) {
+      m.addedNodes && [...m.addedNodes].forEach(node => {
+        if (!(node instanceof HTMLElement)) return;
+        if (node.classList.contains("chat-agent")) {
+          processNewAgentLine(node);
+          cleanupTyping();
+        }
+      });
+    }
+  });
+  mo.observe(log, { childList: true });
+
+})();
+</script>
 </body>
 </html>
 
