@@ -4352,6 +4352,21 @@ setTimeout(()=>{
     });
   }
 
+  // Inside your v3.2 script, right above showTyping():
+  function _oneTypingLine() {
+  const log = document.querySelector('#chatLog');
+  if (!log) return;
+  const lines = log.querySelectorAll('.typing-line, .advisor-typing, .agent-typing');
+  if (lines.length > 0) [...lines].forEach((n, i) => { if (i < lines.length - 1) n.remove(); });
+}
+
+// Then at the very top of showTyping(label):
+function showTyping(label) {
+  _oneTypingLine();           // <— add this line
+  purgeThinking();
+  // ...existing code...
+}
+
   let typingEl = null;
   function showTyping(label) {
     purgeThinking();
