@@ -4662,6 +4662,96 @@ function showTyping(label) {
   };
 })();
 </script>
+<script>
+(() => {
+  if (window.__AIG_SAFE_PRIMER__) return; window.__AIG_SAFE_PRIMER__ = true;
+
+  const BASE = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT_ENDPOINT = `${BASE}/agent`;
+
+  // Tight, model-friendly catalog (keep short)
+  const CAP = [
+    "AAM (Autonomous App Monetizer)",
+    "MetaBridge DealGraph (multi-sided matching & rev splits)",
+    "Intent Exchange (publish/claim/settle)",
+    "R3 Router (recursive referral) + AutoStake",
+    "Co-op Sponsors (brand-subsidized sends)",
+    "OutcomeOracle (event attribution)",
+    "LTV Governor (budget shifts by predicted yield)",
+    "Proposal Auto-Close (quickpay nudges)",
+    "Franchise Packs (bundle manifests, rev-share)",
+    "Shopify Inventory Proxy; Amazon cart nudger; TikTok UGC",
+    "SDK packaging/licensing; Vault & Stripe off-ramp"
+  ];
+
+  const RULES = "Human user is the CEO (never roleplay as CEO). Respond as the detected C-Suite role in first person. Tie plans to money-in-wallet with 2–3 next actions.";
+
+  // We patch only the one endpoint by wrapping Request construction
+  const _origFetch = window.fetch;
+  window.fetch = async function(url, init) {
+    const isAgent =
+      typeof url === 'string' &&
+      (url === AGENT_ENDPOINT || (url.includes('/agent') && url.includes(BASE)));
+
+    if (isAgent && init && typeof init.body === 'string' && /json/i.test((init.headers && (init.headers['Content-Type']||init.headers.get && init.headers.get('Content-Type')))||'')) {
+      try {
+        const body = JSON.parse(init.body);
+        if (body && body.input && !body.__primedV11) {
+          const primer = `Context: AiGentsy capabilities = ${CAP.join('; ')}. Rules: ${RULES}`;
+          // prepend context in a way models obey while preserving the user’s text
+          body.input = `${primer}\n\nUser: ${body.input}`;
+          // keep any existing personaHint/topics/memory your router added
+          body.__primedV11 = true;
+          init.body = JSON.stringify(body);
+        }
+      } catch(_) {}
+    }
+    return _origFetch.apply(this, arguments);
+  };
+})();
+</script>
+<script>
+(() => {
+  if (window.__AIG_SAFE_CLEANER__) return; window.__AIG_SAFE_CLEANER__ = true;
+
+  const log = document.getElementById('chatLog');
+  if (!log) return;
+
+  function clean(text){
+    let t = String(text||"");
+    // normalize role headers like "( CTO )" → "CTO — "
+    t = t.replace(/\(\s*(CEO|COO|CTO|CPO|CMO|CRO|CLO|CFO|CAIO)\s*\)\s*/gi, (_,r)=> `${r.toUpperCase()} — `);
+    // drop robotic prefaces
+    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
+    // light first-person smoothing
+    t = t.replace(/(^|\s)we can\b/gi,"$1I can")
+         .replace(/(^|\s)we will\b/gi,"$1I will")
+         .replace(/\bwe’ll\b/gi,"I’ll")
+         .replace(/\bour\b/gi,"my")
+         .replace(/\bwe\b/gi,"I");
+    // whitespace tidy
+    t = t.replace(/[ \t]{2,}/g," ").replace(/\n{3,}/g,"\n\n").trim();
+    return t;
+  }
+
+  // ensure only one typing line at a time (without touching your sender)
+  function enforceSingleTyping(){
+    const lines = [...log.querySelectorAll('.typing-line')];
+    while (lines.length > 1) { const n = lines.shift(); n && n.remove(); }
+  }
+
+  const obs = new MutationObserver((muts) => {
+    enforceSingleTyping();
+    for (const m of muts) for (const n of m.addedNodes) {
+      if (!(n instanceof HTMLElement)) continue;
+      const isAgent = n.classList && n.classList.contains('chat-agent');
+      const isTyping = n.classList && n.classList.contains('typing-line');
+      if (isAgent && !isTyping) n.textContent = clean(n.textContent);
+    }
+  });
+  obs.observe(log, { childList: true });
+})();
+</script>
 
 </body>
 </html>
