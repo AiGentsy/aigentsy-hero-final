@@ -4510,6 +4510,140 @@ setTimeout(()=>{
   ta.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
 })();
 </script>
+<!-- AiGentsy First-Person Enforcer v4.1.1 (works with v4.1 orchestrator) -->
+<script>
+(() => {
+  if (window.__AIGENTS_FIRST_PERSON_ENFORCER__) return;
+  window.__AIGENTS_FIRST_PERSON_ENFORCER__ = true;
+
+  const log = document.getElementById('chatLog');
+  if (!log) return;
+
+  const ROLE_HEADERS = {
+    CEO_ADVICE:"👑 For you, the CEO — decision frame:",
+    COO:"🛠 COO — Ops & delivery:",
+    CTO:"🧬 CTO — SDK & platform:",
+    CPO:"🧪 CPO — Product & UX:",
+    CMO:"📣 CMO — Growth & partners:",
+    CRO:"💼 CRO — Revenue & sales:",
+    CLO:"📜 CLO — IP & licensing:",
+    CFO:"💰 CFO — Pricing & payouts:",
+    CAIO:"🤖 CAIO — AI/agents & research:"
+  };
+
+  // Heuristics to infer the role header already used (or fallback to CMO)
+  function inferRole(line="") {
+    for (const [k,v] of Object.entries(ROLE_HEADERS)) {
+      if (line.startsWith(v)) return k;
+    }
+    const t = line.toLowerCase();
+    if (/\bcro\b|revenue|pipeline|close|quote/.test(t)) return "CRO";
+    if (/\bcfo\b|pricing|payout|cash|roi|ltv|off-?ramp/.test(t)) return "CFO";
+    if (/\bcmo\b|growth|campaign|ads|seo|ugc|tiktok|referral|partner/.test(t)) return "CMO";
+    if (/\bcto\b|sdk|api|integration|deploy|runtime|stack/.test(t)) return "CTO";
+    if (/\bcoo\b|ops|fulfillment|sop|handoff|sla|onboarding/.test(t)) return "COO";
+    if (/\bcpo\b|product|mvp|prototype|ux|spec|bundle/.test(t)) return "CPO";
+    if (/\bclo\b|legal|license|ip|contract|nda|tos|trademark|compliance/.test(t)) return "CLO";
+    if (/\bcaio\b|orchestr|multi-?agent|dealgraph|aam|router|intent exchange/.test(t)) return "CAIO";
+    if (/\bceo\b|board|fundraise|vision/.test(t)) return "CEO_ADVICE";
+    return "CMO";
+  }
+
+  // Rewrite third-person to first-person for a given role
+  function toFirstPerson(role, text="") {
+    let t = String(text || "");
+
+    // Strip generic prefaces
+    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
+
+    // Common third-person openers → "As your {role}, I …"
+    const roleWords = {
+      CRO: /(your\s+chief\s+revenue\s+officer|\bCRO\b)/i,
+      CFO: /(your\s+chief\s+financial\s+officer|\bCFO\b)/i,
+      CMO: /(your\s+chief\s+marketing\s+officer|\bCMO\b)/i,
+      CTO: /(your\s+chief\s+technology\s+officer|\bCTO\b)/i,
+      COO: /(your\s+chief\s+operating\s+officer|\bCOO\b)/i,
+      CPO: /(your\s+chief\s+product\s+officer|\bCPO\b)/i,
+      CLO: /(your\s+chief\s+legal\s+officer|\bCLO\b)/i,
+      CAIO: /(your\s+chief\s+ai\s+officer|\bCAIO\b)/i,
+      CEO_ADVICE: /(your\s+ceo|\bCEO\b)/i
+    };
+    const rw = roleWords[role] || null;
+    if (rw) {
+      // e.g., "Your Chief Revenue Officer (CRO) is responsible for …"
+      t = t.replace(
+        new RegExp(`^(\\s*)(?:the\\s+|your\\s+)?(?:chief\\s+[a-z ]+\\s+officer\\s*\\([^)]*\\)|${rw.source})(\\s+)(is|handles|focuses|leads|will|can)\\b`, 'i'),
+        (_m, p1, _p2, _verb) => `${p1}As your ${role === "CEO_ADVICE" ? "advisor" : role}, I `
+      );
+      t = t.replace(/^(?:\s*)your\s+[A-Za-z].*?\bis\b/mi, `As your ${role === "CEO_ADVICE" ? "advisor" : role}, I `);
+      t = t.replace(/^(?:\s*)the\s+[A-Za-z].*?\bis\b/mi, `As your ${role === "CEO_ADVICE" ? "advisor" : role}, I `);
+    }
+
+    // Pronouns: they/their/them → I/my/me (only outside code blocks)
+    const parts = t.split(/(```[\s\S]*?```)/g);
+    const fix = (s) => s
+      .replace(/\b[Tt]hey\b/g, "I")
+      .replace(/\b[Tt]heir\b/g, "my")
+      .replace(/\b[Tt]hem\b/g, "me")
+      .replace(/\bwe can\b/gi, "I can")
+      .replace(/\bwe will\b/gi, "I will")
+      .replace(/\bwe’ll\b/gi, "I’ll")
+      .replace(/\bour\b/gi, "my")
+      .replace(/\bwe\b/gi, "I")
+      .replace(/\bautonomously\b/gi, "automatically")
+      .replace(/\bSDK\b/g, "developer toolkit");
+    t = parts.map(p => p.startsWith("```") ? p : fix(p)).join("");
+
+    // Ensure header prefix once
+    const header = ROLE_HEADERS[role] || "🤝 Advisor — Here's the move:";
+    if (!t.startsWith(header)) t = `${header}\n\n${t}`.replace(/\n{3,}/g,"\n\n");
+
+    // If we *still* don’t have an “I” near top, force a friendly lead
+    if (!/^\s*(?:[^\n]*\bI\b)/.test(t)) {
+      t = t.replace(header, `${header}\n\nAs your ${role === "CEO_ADVICE" ? "advisor" : role}, I can`);
+    }
+
+    return t.trim();
+  }
+
+  // Observe new agent lines and enforce first-person voice
+  const obs = new MutationObserver(muts => {
+    for (const m of muts) {
+      m.addedNodes && [...m.addedNodes].forEach(node => {
+        if (!(node instanceof HTMLElement)) return;
+        if (!node.classList.contains('chat-agent')) return;
+        if (node.classList.contains('typing-line')) return;
+        if (node.dataset.fpFixed === "1") return;
+
+        const raw = node.textContent || "";
+        const role = inferRole(raw);
+        node.textContent = toFirstPerson(role, raw);
+        node.dataset.fpFixed = "1";
+      });
+    }
+  });
+  obs.observe(log, { childList: true });
+
+  // Also patch the outgoing request hint so the model stops writing in third-person
+  const _fetch = window.fetch;
+  const BASE = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT = `${BASE}/agent`;
+  window.fetch = async (url, init) => {
+    try {
+      const isAgent = typeof url === "string" && (url === AGENT || (url.includes('/agent') && url.includes(BASE)));
+      if (isAgent && init && typeof init.body === "string" && /json/i.test((init.headers && (init.headers['Content-Type']||''))||'')) {
+        const body = JSON.parse(init.body);
+        if (body && !body.__firstPersonPinned) {
+          body.personaHint = (body.personaHint || "") + " STRICT: Speak only in first person as the role (I/me/my). Never say 'Your {role} is' or refer to the role in third person.";
+          body.__firstPersonPinned = true;
+          init.body = JSON.stringify(body);
+        }
+      }
+    } catch(_) {}
+    return _fetch(url, init);
+  };
+})();
+</script>
 
 </body>
 </html>
