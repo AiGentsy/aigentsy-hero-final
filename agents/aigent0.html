@@ -4325,41 +4325,44 @@ setTimeout(()=>{
 })();
 </script>
 
- <!-- ✅ AiGentsy C-Suite Unifier v4: friendly expert voice + full-logic awareness -->
-<script>
+ <script>
 (() => {
-  if (window.__AIGENTSY_CSUITE_UNIFIER_V4__) return;
-  window.__AIGENTSY_CSUITE_UNIFIER_V4__ = true;
+  if (window.__AIGENTSY_CSUITE_V4__) return; window.__AIGENTSY_CSUITE_V4__ = true;
 
-  // ---------- Config ----------
-  const GROWTH_BASE = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
-  const AGENT_ENDPOINT = `${GROWTH_BASE}/agent`;
+  // ---- DOM hooks
+  const ta  = document.querySelector('#agentInput');
+  const log = document.querySelector('#chatLog');
+  const btn = document.querySelector('#sendBtn');
 
-  // ---------- DOM ----------
-  const ta  = document.getElementById('agentInput');
-  const log = document.getElementById('chatLog');
-  const btn = document.getElementById('sendBtn');
+  // ---- Backend route (Growth runtime)
+  const BASE  = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT = `${BASE}/agent`;
 
-  // ---------- Capabilities (teach the runtime what to reference) ----------
-  const PROTOCOL_CAPABILITIES = [
-    "AAM (Autonomous App Monetizer) send loops",
-    "MetaBridge DealGraph (multi-sided roles + rev-split)",
+  // ---- Small rolling chat memory (helps the model stay on topic)
+  const mem = (window.aigChatMemory = window.aigChatMemory || []);
+  const MAX_MEM = 12;
+
+  // ---- Capabilities & rules primer (short, model-friendly)
+  const CAP = [
+    "AAM (Autonomous App Monetizer)",
+    "MetaBridge DealGraph (multi-sided matching + rev-splits)",
     "Intent Exchange (publish/claim/settle)",
-    "R3 Router (Recursive Referral) + AutoStake caps",
-    "Co-op Sponsor Credits (brand-subsidized sends)",
-    "OutcomeOracle events & attribution (PAID/ATTRIBUTED/etc.)",
-    "LTV Governor (budget shift by predicted LTV)",
-    "Pricing ARM (bundle A/B allocator)",
-    "Proposal Auto-Close (nudge → quickpay)",
-    "Franchise Packs (reusable plays with revenue split)",
-    "Shopify Inventory Proxy (inventory-aware offers)",
-    "Amazon cart nudger / marketplace sync",
-    "TikTok UGC loops and retarget",
-    "Mesh session attribution across channels"
+    "R3 Router (recursive referral) + AutoStake",
+    "Co-op Sponsors (brand-subsidized sends)",
+    "OutcomeOracle (events/attribution)",
+    "LTV Governor (budget shift by predicted yield)",
+    "Proposal Auto-Close (quickpay nudges)",
+    "Franchise Packs (bundle manifests, rev-share)",
+    "Shopify inventory proxy; Amazon cart nudger; TikTok UGC",
+    "SDK packaging/licensing; Vault & Stripe off-ramp"
   ];
+  const RULES =
+    "Human user is the CEO. Never roleplay as CEO. Answer as the detected C-Suite role in first person. " +
+    "Be friendly, expert, concise. Tie plans to money-in-wallet. Give 2–4 numbered next steps.";
 
-  // ---------- Role detection (CEO is the user) ----------
-  const HEADERS = {
+  // ---- Role detection (no slash needed; but /cto etc. still works)
+  const ROLE_HEADERS = {
+    CEO_ADVICE: "👑 For you, the CEO — decision frame:",
     COO:  "🛠 COO — Ops & delivery:",
     CTO:  "🧬 CTO — SDK & platform:",
     CPO:  "🧪 CPO — Product & UX:",
@@ -4367,153 +4370,138 @@ setTimeout(()=>{
     CRO:  "💼 CRO — Revenue & sales:",
     CLO:  "📜 CLO — IP & licensing:",
     CFO:  "💰 CFO — Pricing & payouts:",
-    CAIO: "🤖 CAIO — AI/agents & research:",
-    CEO_ADVICE: "👑 Advisor to the CEO — decision frame:"
+    CAIO: "🤖 CAIO — AI/agents & research:"
   };
 
-  function detectRole(text=""){
+  function detectRole(text = "") {
     const t = text.toLowerCase();
-    // explicit slash override
+
+    // explicit override: /cto, /cmo, /ceo, etc.
     const m = t.match(/(^|\s)\/(ceo|coo|cto|cpo|cmo|cro|clo|cfo|caio)\b/);
-    if (m) return m[2].toUpperCase() === "CEO" ? "CEO_ADVICE" : m[2].toUpperCase();
+    if (m) return (m[2].toUpperCase() === 'CEO') ? 'CEO_ADVICE' : m[2].toUpperCase();
 
-    if (/\bcfo\b|price|payout|revenue|cash|wallet|off[- ]?ramp|margin|unit econ/.test(t)) return "CFO";
-    if (/\bcro\b|sales|pipeline|quote|close|deal|renewal|upsell/.test(t)) return "CRO";
-    if (/\bcmo\b|marketing|growth|campaign|ads|seo|leads|outreach|tiktok|ugc|partner/.test(t)) return "CMO";
-    if (/\bcto\b|sdk|developer|api|integration|build|deploy|platform|runtime/.test(t)) return "CTO";
-    if (/\bclo\b|legal|license|licen[cs]ing|ip|contract|compliance|terms/.test(t)) return "CLO";
-    if (/\bcoo\b|ops|delivery|runbook|handoff|process|sop|support|sla/.test(t)) return "COO";
-    if (/\bcpo\b|product|roadmap|spec|ux|mvp|packaging|bundle/.test(t)) return "CPO";
-    if (/\bcaio\b|chief ai|orchestr|multi-?agent|metabridge|aam|dealgraph/.test(t)) return "CAIO";
-    if (/\bceo\b/.test(t)) return "CEO_ADVICE"; // never speak AS CEO
-    // default to helpful growth voice
-    return "CMO";
+    if (/\bpricing|payout|margin|unit econ|cash|off-?ramp|roi|lifetime value|ltv\b/.test(t)) return 'CFO';
+    if (/\bsales|pipeline|quote|close|renewal|demo|crm|deal\b/.test(t))             return 'CRO';
+    if (/\bgrowth|campaign|seo|ads|lead|outreach|tiktok|ugc|partner\b/.test(t))     return 'CMO';
+    if (/\bsdk|developer|api|integration|deploy|runtime|stack|build\b/.test(t))     return 'CTO';
+    if (/\blegal|license|licen[cs]ing|ip|contract|terms|compliance|nda\b/.test(t))  return 'CLO';
+    if (/\bops|delivery|runbook|handoff|process|sop|sla|support\b/.test(t))         return 'COO';
+    if (/\bproduct|roadmap|feature|spec|ux|ui|bundle|pricing test\b/.test(t))       return 'CPO';
+    if (/\bchief ai|caio|orchestr|multi-?agent|metabridge|aam|dealgraph\b/.test(t)) return 'CAIO';
+    if (/\bceo|board|fundraise|company vision|exec decision\b/.test(t))             return 'CEO_ADVICE';
+
+    // default to growth-forward help
+    return 'CMO';
   }
+  function headerFor(role){ return ROLE_HEADERS[role] || "🤝 Advisor — Here's the move:"; }
 
-  // ---------- Single typing line ----------
+  // ---- Single typing line utilities
   let typingEl = null;
-  function showTyping(label){
-    removeTyping();
+  function killOldTyping() {
+    [...(log?.querySelectorAll('.typing-line, .agent-typing, .advisor-typing') || [])]
+      .forEach((n, i, arr) => { if (i < arr.length - 1) n.remove(); });
+  }
+  function showTyping(label) {
+    killOldTyping();
     typingEl = document.createElement('div');
-    typingEl.className = 'chat-agent';
-    typingEl.dataset.typing = "1";
+    typingEl.className = 'chat-agent typing-line';
     typingEl.textContent = `⌛ ${label} is typing…`;
     log?.appendChild(typingEl);
     log && (log.scrollTop = log.scrollHeight);
   }
-  function replaceTypingWith(text){
+  function swapTyping(text) {
     if (!typingEl) {
       typingEl = document.createElement('div');
       typingEl.className = 'chat-agent';
       log?.appendChild(typingEl);
     }
-    typingEl.dataset.typing = "0";
+    typingEl.classList.remove('typing-line');
     typingEl.textContent = text;
-    typingEl = null;
     log && (log.scrollTop = log.scrollHeight);
-  }
-  function removeTyping(){
-    [...(log?.querySelectorAll('[data-typing="1"]') || [])].forEach(n => n.remove());
-    // scrub stray duplicates
-    [...(log?.children||[])].forEach(n => {
-      if (/is typing…|thinking/i.test(n.textContent||"")) n.remove();
-    });
+    typingEl = null;
   }
 
-  // ---------- Tone polisher (friendly, concise, first-person) ----------
-  function humanize(role, text=""){
-    let t = String(text || "");
-    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
-    t = t.replace(/\bSDK\b/g, "developer toolkit")
-         .replace(/\bautonomously\b/gi, "automatically");
+  // ---- Friendly first-person polisher (keeps code blocks intact)
+  function polish(role, raw) {
+    if (!raw || typeof raw !== 'string') return raw;
+    const parts = raw.split(/(```[\s\S]*?```)/g);
+    const header = headerFor(role);
+    const tidy = (s) => s
+      .replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "")
+      .replace(/\bautonomously\b/gi, "automatically")
+      .replace(/\bSDK\b/g, "developer toolkit")
+      .replace(/(^|\s)we can\b/gi, "$1I can")
+      .replace(/(^|\s)we will\b/gi, "$1I will")
+      .replace(/\bwe’ll\b/gi, "I’ll")
+      .replace(/\bour\b/gi, "my")
+      .replace(/\bwe\b/gi, "I")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
 
-    // soften “we” → “I” but avoid inside code blocks
-    if (!/```/.test(t)) {
-      t = t.replace(/(^|[\s(])we can\b/gi, "$1I can")
-           .replace(/(^|[\s(])we will\b/gi, "$1I will")
-           .replace(/\bwe’ll\b/gi, "I’ll")
-           .replace(/\bour\b/gi, "my")
-           .replace(/\bwe\b/gi, "I");
-    }
-
-    const head = HEADERS[role] || "🤝 Advisor — Here’s the move:";
-    if (!t.startsWith(head)) t = `${head}\n\n${t}`;
-    return t;
+    let out = parts.map(p => p.startsWith("```") ? p : tidy(p)).join("");
+    if (!out.startsWith(header)) out = `${header}\n\n${out}`;
+    return out;
   }
 
-  // ---------- Memory (short rolling) ----------
-  const mem = (window.aigChatMemory = window.aigChatMemory || []);
-  const MAX_MEM = 12;
-
-  // ---------- Orchestrator trigger ----------
-  function wantsOrchestrate(t=""){
-    const s = t.toLowerCase();
-    return /use everything|all logics|end-to-end plan|tie.*together|combine.*(r3|dealgraph|oracle|co-?op|intent|pricing|ltv|franchise)|\/orchestrate/.test(s);
-  }
-
-  // ---------- Backend call ----------
-  async function callGrowthAgent({input, role, orchestrate}){
+  // ---- Backend call
+  async function callGrowthAgent({input, role}) {
     const personaHint =
-      role === "CEO_ADVICE"
-        ? "Advisor to the CEO. The human user IS the CEO. Provide crisp decision frames and tradeoffs."
-        : `${role} expert. Speak first-person AS ${role}. Friendly, practical, money-first.`;
-
-    const synthesisHint = orchestrate
-      ? "User requests an end-to-end plan. Combine ALL relevant logics (DealGraph, R3, AAM, Co-op, Oracle, LTV, Pricing ARM, Intent Exchange, Proposal Auto-Close, Franchise Packs, Shopify Inventory, Amazon, TikTok UGC). Produce one cohesive playbook with next steps, metrics, and who/what triggers."
-      : "By default, combine multiple logics when it increases ROI (don’t tunnel on one unless asked).";
+      (role === 'CEO_ADVICE')
+        ? "Advisor to the CEO. NEVER speak as CEO; the human user is the CEO."
+        : `${role} expert. Speak first-person as ${role}.`;
 
     const body = {
       input,
       role,
-      personaHint: `${personaHint} ${synthesisHint}`,
-      capabilities: PROTOCOL_CAPABILITIES,
-      orchestrate: !!orchestrate,
+      personaHint,
+      topics: ["AAM","DealGraph","Intent Exchange","R3","Co-op","OutcomeOracle","LTV Governor","Auto-Close","Franchise","Shopify/Amazon/TikTok"],
+      capabilities: { stacks: CAP, rules: [RULES] },
+      toneGuide: "Friendly, expert, practical. Tie to money. Give 2–4 next steps.",
       memory: mem.slice(-MAX_MEM)
     };
 
+    const r = await fetch(AGENT, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const j = await r.json().catch(()=> ({}));
+    return (j.output || j.message || '').toString().trim() || 'No response.';
+  }
+
+  // ---- Send pipeline
+  async function send() {
+    const text = (ta?.value || '').trim();
+    if (!text) return;
+    ta.value = '';
+
+    // user bubble
+    if (log) {
+      const u = document.createElement('div');
+      u.className = 'chat-user';
+      u.textContent = '🧠 You: ' + text;
+      log.appendChild(u);
+    }
+
+    const role = detectRole(text);
+    showTyping(role === 'CEO_ADVICE' ? 'Advisor' : role);
+
+    mem.push(text);
+    if (mem.length > MAX_MEM*2) mem.splice(0, mem.length - MAX_MEM*2);
+
     try {
-      const r = await fetch(AGENT_ENDPOINT, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(body)
-      });
-      const j = await r.json().catch(()=> ({}));
-      return (j.output || j.message || "").toString().trim() || "No response.";
+      const raw = await callGrowthAgent({input: text, role});
+      const pretty = polish(role, raw);
+      swapTyping(pretty);
+      mem.push(`AGENT(${role}): ${raw.slice(0, 1800)}`);
     } catch (e) {
-      return "Runtime error — " + (e?.message || "failed to reach growth runtime");
+      swapTyping(headerFor(role) + "\n\n" + "I hit a runtime error. Please try again.");
     }
   }
 
-  // ---------- Send flow ----------
-  async function send(){
-    const text = (ta?.value || "").trim();
-    if (!text) return;
-    ta.value = "";
-
-    // user bubble
-    const u = document.createElement('div');
-    u.className = 'chat-user';
-    u.textContent = '🧠 You: ' + text;
-    log?.appendChild(u);
-
-    const role = detectRole(text);
-    const orchestrate = wantsOrchestrate(text);
-    showTyping(role === "CEO_ADVICE" ? "Advisor" : role);
-
-    mem.push(text);
-    if (mem.length > MAX_MEM * 2) mem.splice(0, mem.length - MAX_MEM * 2);
-
-    const raw = await callGrowthAgent({input: text, role, orchestrate});
-    const pretty = humanize(role, raw);
-    replaceTypingWith(pretty);
-
-    mem.push(`AGENT(${role}) ${pretty.slice(0, 800)}`);
-  }
-
-  // ---------- Wire UI ----------
-  removeTyping();
+  // ---- Wire events
   btn && (btn.onclick = send);
-  ta && ta.addEventListener('keydown', (e)=>{
+  ta && ta.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   });
 })();
