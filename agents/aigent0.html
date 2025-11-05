@@ -4324,22 +4324,23 @@ setTimeout(()=>{
 })();
 </script>
 
-<!-- AiGentsy C-Suite LOCK v4.4 — first-person, correct role, single typing, concert-logic -->
+<!-- AiGentsy C-Suite Chat — Unified Orchestrator v4.4 -->
 <script>
 (() => {
-  if (window.__AIGENTSY_CSUITE_LOCK_44__) return;
-  window.__AIGENTSY_CSUITE_LOCK_44__ = true;
+  if (window.__AIGENTSY_CSUITE_V44__) return;
+  window.__AIGENTSY_CSUITE_V44__ = true;
 
+  // ---- DOM ----
   const ta  = document.getElementById('agentInput');
   const btn = document.getElementById('sendBtn');
   const log = document.getElementById('chatLog');
   if (!ta || !btn || !log) return;
 
-  // ---- Growth endpoint (single speaker)
+  // ---- Endpoint (Growth agent is single speaker) ----
   const BASE  = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
   const AGENT = `${BASE}/agent`;
 
-  // ---- Role headers
+  // ---- Role detection (direct + adjacent keywords). CEO is ALWAYS the user. ----
   const HEAD = {
     CEO_ADVICE:"👑 For you, the CEO — decision frame:",
     COO:"🛠 COO — Ops & delivery:",
@@ -4352,76 +4353,76 @@ setTimeout(()=>{
     CAIO:"🤖 CAIO — AI/agents & research:"
   };
 
-  // ---- Keyword map (direct + adjacent)
-  const MATCH = [
-    ["CFO",  /\b(cfo|price|pricing|budget|payout|margin|unit\s*econ|off-?ramp|ltv|roi|forecast)\b/i],
-    ["CRO",  /\b(cro|sales|pipeline|crm|quote|close|renewal|upsell|bookings|win rate)\b/i],
-    ["CMO",  /\b(cmo|marketing|growth|campaign|ads?|seo|ugc|tiktok|leads?|referral|partner|co-?op)\b/i],
-    ["CTO",  /\b(cto|developer|sdk|api|integration|deploy|runtime|stack|webhook|repo|shopify app)\b/i],
-    ["COO",  /\b(coo|ops|operations|onboarding|handoff|sop|sla|support|fulfillment|delivery)\b/i],
-    ["CPO",  /\b(cpo|product|roadmap|feature|spec|mvp|prototype|ux|bundle|pricing test)\b/i],
-    ["CLO",  /\b(clo|legal|license|licen[cs]ing|nda|contract|terms|ip|trademark|compliance|fork)\b/i],
-    ["CAIO", /\b(caio|ai officer|orchestr|multi-?agent|metabridge|dealgraph|aam|intent exchange|router)\b/i],
-    ["CEO_ADVICE", /\b(ceo|board|fundraise|vision|executive decision)\b/i],
-  ];
+  function detectRole(t='') {
+    const s = String(t).toLowerCase();
 
-  function detectRole(text='') {
-    const t = text.toLowerCase();
-    const slash = t.match(/(^|\s)\/(ceo|coo|cto|cpo|cmo|cro|clo|cfo|caio)\b/);
-    if (slash) return (slash[2].toUpperCase()==='CEO') ? 'CEO_ADVICE' : slash[2].toUpperCase();
-    for (const [role, rx] of MATCH) if (rx.test(t)) return role;
-    return 'CMO'; // polite default if nothing matches
+    // explicit override: /cfo etc.
+    const m = s.match(/(^|\s)\/(ceo|coo|cto|cpo|cmo|cro|clo|cfo|caio)\b/);
+    if (m) return (m[2].toUpperCase() === 'CEO') ? 'CEO_ADVICE' : m[2].toUpperCase();
+
+    if (/\bcfo\b|budget|pricing|unit econ|margin|payout|cash( |-)flow|off-?ramp|roi|ltv/.test(s)) return "CFO";
+    if (/\bcro\b|sales|pipeline|quote|close|renewal|upsell|bookings|win rate|cs\w*\b/.test(s)) return "CRO";
+    if (/\bcmo\b|marketing|growth|campaign|seo|ads|ugc|tiktok|lead|referral|partner|co-?op/.test(s)) return "CMO";
+    if (/\bcto\b|sdk|api|integration|deploy|runtime|stack|webhook|bug|github|shopify app/.test(s)) return "CTO";
+    if (/\bcoo\b|ops|operations|handoff|sop|sla|onboarding|fulfillment|support/.test(s)) return "COO";
+    if (/\bcpo\b|product|mvp|prototype|ux|ui|spec|bundle|roadmap|pricing test/.test(s)) return "CPO";
+    if (/\bclo\b|legal|license|licen[cs]ing|nda|contract|terms|compliance|trademark|ip\b/.test(s)) return "CLO";
+    if (/\bcaio\b|orchestr|multi-?agent|metabridge|dealgraph|aam|intent exchange|router/.test(s)) return "CAIO";
+    if (/\bceo\b|board|fundraise|vision|executive decision|company strategy/.test(s)) return "CEO_ADVICE";
+    return "CMO"; // fallback
   }
 
-  // ---- One typing line only
-  let typingEl=null;
-  function killTyping(){ [...log.querySelectorAll('.typing-line,.agent-typing,.advisor-typing')].forEach(n=>n.remove()); }
-  function showTyping(role){
-    killTyping();
-    typingEl = document.createElement('div');
-    typingEl.className='chat-agent typing-line';
-    typingEl.textContent = `⌛ ${role==='CEO_ADVICE'?'Advisor':role} is typing…`;
-    log.appendChild(typingEl);
+  function roleHeader(role){ return HEAD[role] || "🤝 Advisor — Here's the move:"; }
+
+  // ---- One typing line only ----
+  function clearTyping() {
+    [...log.querySelectorAll('.typing-line,.agent-typing,.advisor-typing')].forEach(n => n.remove());
+  }
+  function showTyping(role) {
+    clearTyping();
+    const el = document.createElement('div');
+    el.className = 'chat-agent typing-line';
+    el.textContent = `⌛ ${(role === 'CEO_ADVICE' ? 'Advisor' : role)} is typing…`;
+    log.appendChild(el);
     log.scrollTop = log.scrollHeight;
+    return el;
   }
-  function replaceTyping(text){
-    if(!typingEl){
-      typingEl=document.createElement('div');
-      typingEl.className='chat-agent';
-      log.appendChild(typingEl);
+  function replaceTyping(el, text) {
+    if (!el) {
+      el = document.createElement('div'); el.className = 'chat-agent'; log.appendChild(el);
     }
-    typingEl.classList.remove('typing-line');
-    typingEl.textContent=text;
-    typingEl.dataset.fpFixed="1";
+    el.classList.remove('typing-line'); el.textContent = text; el.dataset.fpFixed="1";
     log.scrollTop = log.scrollHeight;
-    typingEl=null;
   }
 
-  // ---- Concert logic primer (short + model-friendly)
-  const CAP = [
+  // ---- Capability primer (short & complete) ----
+  const CAPABILITIES = [
     "AAM (Autonomous App Monetizer)",
     "MetaBridge DealGraph (multi-sided matching & rev-splits)",
     "Intent Exchange (publish/claim/settle)",
     "R³ Router (recursive referrals) + AutoStake",
     "Co-op Sponsor Credits (brand-subsidized sends)",
-    "OutcomeOracle (event attribution; AIGx credit)",
-    "LTV Governor (daily budget shifts by predicted yield)",
+    "OutcomeOracle (events & attribution → AIGx credit)",
+    "LTV Governor (budget shifts by predicted yield)",
     "Proposal Auto-Close (quickpay nudges)",
-    "Franchise Packs (bundle manifests; rev-share)",
-    "Shopify Inventory Proxy; Amazon cart nudger; TikTok UGC",
+    "Franchise Packs (reusable bundle manifests; rev-share)",
+    "Shopify Inventory Proxy; Amazon cart nudger; TikTok UGC loops",
     "SDK packaging/licensing; Vault & Stripe off-ramp"
   ];
-  const RULES = "Human user is the CEO. Do not roleplay as CEO. Speak ONLY in first person as the detected role. Tie advice to money-in-wallet with 2–3 next actions (+ owners & timing).";
-  const CONCERT = "When useful, show how multiple modules combine (AAM, DealGraph, Intent Exchange, R3+AutoStake, Co-op, OutcomeOracle, LTV Governor, Auto-Close, Franchise, Inventory Proxy, Amazon nudger, TikTok UGC, SDK packaging, Vault/Stripe) for compound ROI.";
+  const RULES =
+    "Human user is the CEO — never roleplay as CEO. Speak ONLY in first person as the detected C-Suite role. " +
+    "Be friendly, expert, concise. Tie plans to money-in-wallet with 2–3 next actions (owner & timing). " +
+    "When useful, combine multiple modules so the plan works in concert.";
 
-  // ---- First-person rewriter (robust; fixes 'Your <role>...' phrasing)
-  function toFirstPerson(role, text=''){
-    const head = HEAD[role] || "🤝 Advisor — Here's the move:";
-    let t = String(text||"");
-    // remove robot preface
-    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i,'');
-    // hard openers → first person
-    const map = {
+  // ---- Grammar/voice polisher → first person, fluent ----
+  function toFirstPerson(role, text='') {
+    const head = roleHeader(role);
+    let t = String(text || "");
+
+    // strip robotic prefaces and convert third-person
+    t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
+    // normalize common third-person openings ("Your CRO ...") → "As your CRO, I ..."
+    const roleNames = {
       CRO: /(your\s+chief\s+revenue\s+officer|\bCRO\b)/i,
       CFO: /(your\s+chief\s+financial\s+officer|\bCFO\b)/i,
       CMO: /(your\s+chief\s+marketing\s+officer|\bCMO\b)/i,
@@ -4429,102 +4430,115 @@ setTimeout(()=>{
       COO: /(your\s+chief\s+operating\s+officer|\bCOO\b)/i,
       CPO: /(your\s+chief\s+product\s+officer|\bCPO\b)/i,
       CLO: /(your\s+chief\s+legal\s+officer|\bCLO\b)/i,
-      CAIO:/(your\s+chief\s+ai\s+officer|\bCAIO\b)/i
+      CAIO: /(your\s+chief\s+ai\s+officer|\bCAIO\b)/i,
+      CEO_ADVICE: /(your\s+ceo|\bCEO\b)/i
     };
-    if (map[role]) {
+    const rx = roleNames[role];
+    if (rx) {
       t = t.replace(
-        new RegExp(`^\\s*(?:the\\s+|your\\s+)?(?:chief\\s+[a-z ]+\\s+officer\\s*\\([^)]*\\)|${map[role].source}).*?\\b(is|handles|focuses|leads|ensures|will|can)\\b`, 'i'),
-        `As your ${role}, I `
+        new RegExp(`^(\\s*)(?:the\\s+|your\\s+)?(?:chief\\s+[a-z ]+\\s+officer\\s*\\([^)]*\\)|${rx.source}).*?\\b(is|handles|focuses|leads|ensures|oversees|can|will)\\b`, 'i'),
+        (_m,p1) => `${p1}As your ${role === 'CEO_ADVICE' ? 'advisor' : role}, I `
       );
     }
-    // gentle pronoun & jargon polish (outside code blocks)
+
+    // light pronoun smoothing, never touch code blocks
     const parts = t.split(/(```[\s\S]*?```)/g);
     const fix = s => s
       .replace(/\b[Tt]hey\b/g,"I").replace(/\b[Tt]heir\b/g,"my").replace(/\b[Tt]hem\b/g,"me")
       .replace(/\bwe can\b/gi,"I can").replace(/\bwe will\b/gi,"I will").replace(/\bwe’ll\b/gi,"I’ll")
       .replace(/\bour\b/gi,"my").replace(/\bwe\b/gi,"I")
-      .replace(/\bautonomously\b/gi,"automatically").replace(/\bSDK\b/g,"developer toolkit")
-      .replace(/\s{2,}/g,' ');
-    t = parts.map(p=>p.startsWith('```')?p:fix(p)).join('');
-    if (!t.startsWith(head)) t = `${head}\n\n${t}`;
-    return t.replace(/\n{3,}/g,"\n\n").trim();
+      .replace(/\bautonomously\b/gi,"automatically")
+      .replace(/\bSDK\b/g,"developer toolkit")
+      .replace(/\s{2,}/g," ");
+    t = parts.map(p => p.startsWith("```") ? p : fix(p)).join("");
+
+    // ensure header once and tidy
+    if (!t.startsWith(head)) t = head + "\n\n" + t;
+    t = t.replace(/\n{3,}/g,"\n\n").trim();
+    if (t.length > 900) t += `\n\n— ${role}`;
+    return t;
   }
 
-  // ---- Fetch patch: inject role + strict persona + concert logic on /agent
+  // ---- Intercept Growth /agent to pin persona & context; also ensure single call ----
   const _fetch = window.fetch;
   window.fetch = async (url, init) => {
-    const isAgent = typeof url==='string' && (url===AGENT || (url.includes('/agent') && url.includes(BASE)));
-    if (isAgent && init && typeof init.body==='string' &&
+    const isAgent = typeof url === "string" && (url === AGENT || (url.includes('/agent') && url.includes(BASE)));
+    if (isAgent && init && typeof init.body === "string" &&
         /json/i.test((init.headers && (init.headers['Content-Type']||''))||'')) {
-      try{
+      try {
         const body = JSON.parse(init.body);
-        if (body && !body.__csuiteLock44) {
-          // infer role from current input (what the user just typed)
-          const role = detectRole((ta.value||'') || body.input || '');
+        if (body && !body.__v44_primed) {
+          const inputNow = (ta.value || "").trim();
+          const role = detectRole(inputNow || body.input || "");
           body.role = body.role || role;
-          body.personaHint = `${body.personaHint||''} STRICT: Speak ONLY in first person as ${role}. The human user is the CEO.`.trim();
-          body.capabilities = body.capabilities || CAP;
+          body.personaHint = `${(body.personaHint||"").trim()} STRICT: speak in first person as ${role}. Human user is the CEO (never roleplay as CEO).`;
+          body.capabilities = body.capabilities || CAPABILITIES;
           body.rules = body.rules || RULES;
-          body.concertPlan = body.concertPlan || CONCERT;
-          body.__csuiteLock44 = true;
+          body.__v44_primed = true;
           init.body = JSON.stringify(body);
         }
-      }catch{}
+      } catch(_) {}
     }
     return _fetch(url, init);
   };
 
-  // ---- Wrap sender to (a) show typing for the right role and (b) rewrite to first person
-  const original = window.runAgent || window.sendAgent || (async ()=>{ btn.click(); });
-  window.runAgent = async function(){
-    const input = (ta.value||'').trim();
-    const role  = detectRole(input);
-    // append user bubble (keeps your current style)
-    const userLine = document.createElement('div');
-    userLine.className = 'chat-user';
-    userLine.textContent = '🧠 You: ' + input;
-    if (input) { log.appendChild(userLine); }
+  // ---- Wrap the existing sender so: (1) correct typing role, (2) no duplicates, (3) polish final line ----
+  const senders = [window.runAgent, window.sendAgent, window.__aigents_send__].filter(fn => typeof fn === 'function');
+  const original = senders[0];
+  if (!original) return;
 
-    // typing for correct role (no flicker)
-    showTyping(role);
-    try{
-      // call the existing pipeline
-      await (typeof original==='function' ? original.apply(this, arguments) : Promise.resolve());
-      // find newest agent line, otherwise replace typing line
-      const lines = [...log.querySelectorAll('.chat-agent')].filter(n=>!n.classList.contains('typing-line'));
-      const last  = lines[lines.length-1];
-      if (last) {
-        last.textContent = toFirstPerson(role, last.textContent||'');
-        last.dataset.fpFixed="1";
-        killTyping();
+  if (!window.__AIGENTSY_SEND_LOCK__) window.__AIGENTSY_SEND_LOCK__ = false;
+
+  window.runAgent = async function() {
+    if (window.__AIGENTSY_SEND_LOCK__) return; // prevent double fire
+    window.__AIGENTSY_SEND_LOCK__ = true;
+
+    const input = (ta.value || "").trim();
+    const role  = detectRole(input);
+    const typing = showTyping(role);
+
+    try {
+      // call original once
+      await original.apply(this, arguments);
+
+      // find newest agent line; if none, rewrite typing line
+      const lines = [...log.querySelectorAll('.chat-agent')];
+      const last  = lines[lines.length - 1];
+      if (last && !last.classList.contains('typing-line')) {
+        if (last.dataset.fpFixed !== "1") {
+          last.textContent = toFirstPerson(role, last.textContent || "");
+          last.dataset.fpFixed = "1";
+        }
+        clearTyping();
       } else {
-        replaceTyping(toFirstPerson(role, ''));
+        replaceTyping(typing, toFirstPerson(role, typing.textContent || ""));
       }
-    } catch(e){
-      replaceTyping(HEAD[role] + "\n\nI hit a runtime error. Please try again.");
+    } catch (e) {
+      replaceTyping(typing, roleHeader(role) + "\n\nI hit a runtime error. Please try again.");
+    } finally {
+      // clean stray typing lines
+      clearTyping();
+      window.__AIGENTSY_SEND_LOCK__ = false;
     }
   };
 
-  // ---- Enter-to-send
-  ta.addEventListener('keydown', (e)=>{ if (e.key==='Enter' && !e.shiftKey){ e.preventDefault(); window.runAgent(); }});
-  btn.onclick = ()=> window.runAgent();
-
-  // ---- Safety observer: normalize any agent lines appended by other code
-  const obs = new MutationObserver(muts=>{
+  // Safety net: normalize any later agent lines (from streaming, etc.)
+  const obs = new MutationObserver(muts => {
     for (const m of muts) {
-      m.addedNodes && [...m.addedNodes].forEach(n=>{
-        if (!(n instanceof HTMLElement)) return;
-        if (!n.classList.contains('chat-agent')) return;
-        if (n.classList.contains('typing-line')) return;
-        if (n.dataset.fpFixed==="1") return;
-        const guess = Object.entries(HEAD).find(([k,h]) => (n.textContent||'').startsWith(h))?.[0] || detectRole(ta.value||'');
-        n.textContent = toFirstPerson(guess, n.textContent||'');
-        n.dataset.fpFixed="1";
-        killTyping();
+      m.addedNodes && [...m.addedNodes].forEach(node => {
+        if (!(node instanceof HTMLElement)) return;
+        if (!node.classList.contains('chat-agent')) return;
+        if (node.classList.contains('typing-line')) return;
+        if (node.dataset.fpFixed === "1") return;
+        const guess = Object.entries(HEAD).find(([_,h]) => (node.textContent||"").startsWith(h))?.[0] || detectRole(ta.value||"");
+        node.textContent = toFirstPerson(guess, node.textContent || "");
+        node.dataset.fpFixed = "1";
+        clearTyping();
       });
     }
   });
   obs.observe(log, { childList: true });
+
 })();
 </script>
 
