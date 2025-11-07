@@ -272,13 +272,52 @@
   </div>
 </div>
 
-   <div class="metric-box">
+<div class="metric-box">
   <h3>💰 Wallet & Off-Ramp</h3>
-  <div class="wallet-flex"><ul style="padding-left:18px; font-size:0.9rem; color:#ccc;; margin:0;">
-    <li>AIGx Earned: 0</li>
-    <li>Staked: 0</li>
-    <li>Referrals: 0 active</li>
-  </ul><a class="btn-glow btn-sm" href="#" onclick="alert('🏦 Coming soon: connect your bank or wallet for fiat payouts.')">💸 Cash Out to Fiat</a></div>
+  
+  <!-- Earnings Breakdown (Expandable) -->
+  <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
+      <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+    </div>
+    <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+    <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💼 Service Payments</span>
+        <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🛍️ Shopify Sales</span>
+        <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>📱 Affiliate Commissions</span>
+        <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🎥 Content CPM</span>
+        <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💎 Staking Returns</span>
+        <span style="color:#00ff88;">$<span id="stakingEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;">
+        <span>🤝 JV Splits</span>
+        <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="wallet-flex">
+    <ul style="padding-left:18px; font-size:0.9rem; color:#ccc; margin:0;">
+      <li>AIGx Balance: <span id="aigxBalance">0</span></li>
+      <li>Staked: <span id="stakedAmount">0</span></li>
+      <li>Referrals: <span id="referralCount">0</span> active</li>
+    </ul>
+    <button class="btn-glow btn-sm" onclick="openWithdrawModal()">💸 Cash Out</button>
+  </div>
 
   
   <!-- 🧭 Compact Snapshot (replaces Snapshot/Growth/Earnings) -->
@@ -335,8 +374,9 @@
   <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
 </div>
 
+</div>
 
-    <!-- 🔓 Unlock Modal -->
+<!-- 🔓 Unlock Modal -->
 <div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
   <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
     <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
@@ -344,6 +384,23 @@
     <div style="margin-top:20px; text-align:right;">
       <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
       <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:20px; border-radius:12px; max-width:360px; width:90%; border:1px solid #00ff88;">
+    <h3 style="color:#00ff88; margin-top:0;">💸 Withdraw Funds</h3>
+    <p style="font-size:0.85rem; color:#ccc;">Available: $<span id="withdrawAvailable">0.00</span></p>
+    <input type="number" id="withdrawAmount" placeholder="Amount (USD)" style="width:100%; padding:8px; margin:8px 0; background:#000; color:#fff; border:1px solid #444; border-radius:6px; font-size:0.9rem;">
+    <div style="margin:8px 0; font-size:0.8rem;">
+      <label style="color:#ccc;"><input type="radio" name="withdrawMethod" value="stripe" checked> Stripe</label><br>
+      <label style="color:#ccc;"><input type="radio" name="withdrawMethod" value="crypto"> Crypto</label>
+    </div>
+    <div style="margin-top:16px; display:flex; gap:8px;">
+      <button class="btn-glow btn-sm" onclick="closeWithdrawModal()" style="flex:1; background:#444;">Cancel</button>
+      <button class="btn-glow btn-sm" onclick="submitWithdraw()" style="flex:1;">Confirm</button>
     </div>
   </div>
 </div>
@@ -4113,7 +4170,6 @@ setTimeout(()=>{
 })();
 </script>
 
-
 <script>
 (function enhanceUI(){
   if (window.__AIG_ENH__) return; window.__AIG_ENH__=true;
@@ -4275,8 +4331,7 @@ setTimeout(()=>{
 
 })(); 
 </script>
-
-
+  
 <script>
 (function restoreChatControls(){
   if (window.__CHAT_WIRED__) return; window.__CHAT_WIRED__=true;
@@ -4326,187 +4381,350 @@ setTimeout(()=>{
 })();
 </script>
 
+<!-- AiGentsy C-Suite Chat — Unified Orchestrator v4.5 (scored roles + neutral typing fallback) -->
 <script>
-/* === C-Suite Persona Polisher: one expert, first-person voice === */
 (() => {
-  if (window.__CSUITE_PERSONA_POLISH__) return; window.__CSUITE_PERSONA_POLISH__ = true;
+  if (window.__AIGENTSY_CSUITE_V45__) return;
+  window.__AIGENTSY_CSUITE_V45__ = true;
 
-  // If your router already sets the role, reuse it; else lightly infer.
-  function inferRole(txt=""){
-    const t = txt.toLowerCase();
-    if (/\bcaio\b|chief ai officer|orchestr/.test(t)) return "CAIO";
-    if (/\bcfo\b|pricing|budget|revenue|profit|cash|payout|off-?ramp|fiat/.test(t)) return "CFO";
-    if (/\bclo\b|legal|license|ip|contract|compliance|trademark|remix|fork/.test(t)) return "CLO";
-    if (/\bcto\b|sdk|developer|api|integration|build|deploy|stack|runtime|bug/.test(t)) return "CTO";
-    if (/\bcmo\b|marketing|growth|campaign|audience|leads|promote|brand/.test(t)) return "CMO";
-    if (/\bcoo\b|ops|operations|fulfillment|handoff|process|sop|timeline/.test(t)) return "COO";
-    if (/\bcpo\b|product|feature|roadmap|ux|ui|spec/.test(t)) return "CPO";
-    if (/\bcro\b|sales|pipeline|deal|crm|demo|quote/.test(t)) return "CRO";
-    return null;
+  // --- DOM
+  const ta  = document.getElementById('agentInput');
+  const btn = document.getElementById('sendBtn');
+  const log = document.getElementById('chatLog');
+  if (!ta || !btn || !log) return;
+
+  // --- Endpoint
+  const BASE  = (window.BACKEND_GROWTH_BASE || 'https://aigent-growth-runtime.onrender.com').replace(/\/+$/,'');
+  const AGENT = `${BASE}/agent`;
+
+  // --- Role headers
+  const HEAD = {
+    CEO_ADVICE:"👑 For you, the CEO — decision frame:",
+    COO:"🛠 COO — Ops & delivery:",
+    CTO:"🧬 CTO — SDK & platform:",
+    CPO:"🧪 CPO — Product & UX:",
+    CMO:"📣 CMO — Growth & partners:",
+    CRO:"💼 CRO — Revenue & sales:",
+    CLO:"📜 CLO — IP & licensing:",
+    CFO:"💰 CFO — Pricing & payouts:",
+    CAIO:"🤖 CAIO — AI/agents & research:"
+  };
+  const ROLES = Object.keys(HEAD);
+
+  // --- Scored role detector (direct + adjacent)
+  function scoreRole(text=''){
+    const s = String(text).toLowerCase();
+
+    // explicit slash override
+    const m = s.match(/(^|\s)\/(ceo|coo|cto|cpo|cmo|cro|clo|cfo|caio)\b/);
+    if (m) return { role: m[2].toUpperCase()==='CEO' ? 'CEO_ADVICE' : m[2].toUpperCase(), conf: 9 };
+
+    const rules = [
+      // CFO (money/roi/unit econ)
+      [/(\bpricing tests?\b|\bunit\s*econ|\bmargin(s)?\b|\broi\b|\bltv\b|\boff-?ramp\b|\bpayout(s)?\b|\bcash[- ]?flow\b)/, 'CFO', 3],
+      [/\b(price|budget|forecast|breakeven|profit|net|gross|arpu|cac)\b/, 'CFO', 2],
+      [/\b(make|earn|monetize|monetise)\s+money\b/, 'CFO', 2],
+      // CRO (sales/closing)
+      [/\b(pipeline|deal\s?desk|quote|renewal|upsell|close|win\s*rate|bookings)\b/, 'CRO', 3],
+      [/\b(sell|sales|prospect|demo|objection|contract\s+sign|client\s+acquisition)\b/, 'CRO', 2],
+      // CMO (growth/marketing)
+      [/\b(marketing|campaign|seo|ads?|creative|ugc|tiktok|influencer|referral|co-?op|lead(s)?|top\s*of\s*funnel)\b/, 'CMO', 2],
+      // CTO (tech/build)
+      [/\b(sdk|api|integration|deploy|runtime|webhook|stack|repo|github|bug|shopify app)\b/, 'CTO', 3],
+      // COO (ops)
+      [/\b(ops|operations|sop|sla|handoff|onboarding|fulfillment|support|ticket|process)\b/, 'COO', 2],
+      // CPO (product)
+      [/\b(product|mvp|prototype|ux|ui|spec|bundle|roadmap|acceptance\s+criteria)\b/, 'CPO', 2],
+      // CLO (legal)
+      [/\b(legal|license|licen[cs]ing|ip\b|nda|contract|terms|compliance|trademark|fork\b)\b/, 'CLO', 3],
+      // CAIO (agents/orchestration)
+      [/\b(orchestr|multi-?agent|metabridge|dealgraph|aam|intent\s+exchange|router)\b/, 'CAIO', 3],
+      // CEO advisory
+      [/\b(vision|board|fundraise|executive\s+decision|company\s+strategy)\b/, 'CEO_ADVICE', 2],
+    ];
+
+    const tally = {};
+    for (const [rx, role, w] of rules) if (rx.test(s)) tally[role] = (tally[role]||0) + w;
+
+    // pick max score
+    let best = null, bestScore = 0;
+    for (const r of Object.keys(tally)) if (tally[r] > bestScore) { best=r; bestScore=tally[r]; }
+    if (!best) return { role: 'CMO', conf: 0 };      // fallback
+    return { role: best, conf: bestScore };
   }
 
-  const OPEN = {
-    CFO:  "💰 (CFO) I manage the numbers. Here’s how I’d handle this:",
-    CLO:  "📜 (CLO) I’m your counsel. Here’s what I recommend:",
-    CTO:  "🧬 (CTO) I’ll handle the technical side. Here’s my plan:",
-    CMO:  "📣 (CMO) I lead growth. Here’s how I’d approach it:",
-    COO:  "🧭 (COO) I’ll run ops. Here’s the execution plan:",
-    CPO:  "🧪 (CPO) Product hat on. Here’s the build path:",
-    CRO:  "💼 (CRO) I’ll drive revenue. Here’s the move:",
-    CAIO: "🧠 (CAIO) I lead AI capabilities. Here’s what I can unlock:"
-  };
+  function roleHeader(role){ return HEAD[role] || "🤝 Advisor — Here's the move:"; }
 
-  // Convert neutral/collective tone → first-person expert voice
-  function personalize(role, text){
-    let t = String(text || "");
-    // Strip system-y prefaces
+  // --- Typing management
+  function clearTyping(){ [...log.querySelectorAll('.typing-line,.agent-typing,.advisor-typing')].forEach(n=>n.remove()); }
+  function showTyping(role, conf){
+    clearTyping();
+    const el = document.createElement('div');
+    el.className = 'chat-agent typing-line';
+    const label = (conf >= 2) ? (role==='CEO_ADVICE' ? 'Advisor' : role) : 'Your AiGentsy';
+    el.textContent = `⌛ ${label} is typing…`;
+    el.dataset.typingRole = role;
+    el.dataset.typingConf = String(conf||0);
+    log.appendChild(el); log.scrollTop = log.scrollHeight;
+    return el;
+  }
+  function replaceTyping(el, text){
+    if (!el){ el=document.createElement('div'); el.className='chat-agent'; log.appendChild(el); }
+    el.classList.remove('typing-line'); el.textContent = text; el.dataset.fpFixed="1";
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // --- Capabilities primer (kept concise)
+  const CAPABILITIES = [
+    "AAM (Autonomous App Monetizer)",
+    "MetaBridge DealGraph (multi-sided matching & rev-splits)",
+    "Intent Exchange (publish/claim/settle)",
+    "R³ Router (recursive referrals) + AutoStake",
+    "Co-op Sponsor Credits (brand-subsidized sends)",
+    "OutcomeOracle (events & attribution → AIGx credit)",
+    "LTV Governor (budget shifts by predicted yield)",
+    "Proposal Auto-Close (quickpay nudges)",
+    "Franchise Packs (bundle manifests; rev-share)",
+    "Shopify Inventory Proxy; Amazon cart nudger; TikTok UGC loops",
+    "SDK packaging/licensing; Vault & Stripe off-ramp"
+  ];
+  const RULES =
+    "Human user is the CEO — never roleplay as CEO. Speak ONLY in first person as the detected role. " +
+    "Be friendly, expert, concise. Tie plans to money-in-wallet with 2–3 next actions (owner & timing). " +
+    "Combine modules when useful so the plan works in concert.";
+
+  // --- First-person fluent rewriter
+  function toFirstPerson(role, text=''){
+    const head = roleHeader(role);
+    let t = String(text||"");
     t = t.replace(/^🤖\s*Your\s*AiGentsy:\s*/i, "");
-    // Light humanization
-    t = t.replace(/\bSDK\b/g, "developer toolkit")
-         .replace(/\bautonomously\b/gi, "automatically");
-    // First-person pass (soft; avoids inside code blocks/backticks)
-    t = t.replace(/(^|[\s(])we can\b/gi, "$1I can")
-         .replace(/(^|[\s(])we will\b/gi, "$1I will")
-         .replace(/\bwe’ll\b/gi, "I’ll")
-         .replace(/\bour\b/gi, "my")
-         .replace(/\bwe\b/gi, "I");
 
-    // Ensure it opens with the role’s voice once
-    const opener = OPEN[role] || null;
-    if (opener && !t.startsWith(opener)) t = `${opener}\n\n${t}`;
-    // Optional: concise sign-off on long replies
-    if (t.length > 600 && role) t += `\n\n— ${role}`;
+    const roleNames = {
+      CRO: /(your\s+chief\s+revenue\s+officer|\bCRO\b)/i,
+      CFO: /(your\s+chief\s+financial\s+officer|\bCFO\b)/i,
+      CMO: /(your\s+chief\s+marketing\s+officer|\bCMO\b)/i,
+      CTO: /(your\s+chief\s+technology\s+officer|\bCTO\b)/i,
+      COO: /(your\s+chief\s+operating\s+officer|\bCOO\b)/i,
+      CPO: /(your\s+chief\s+product\s+officer|\bCPO\b)/i,
+      CLO: /(your\s+chief\s+legal\s+officer|\bCLO\b)/i,
+      CAIO: /(your\s+chief\s+ai\s+officer|\bCAIO\b)/i,
+      CEO_ADVICE: /(your\s+ceo|\bCEO\b)/i
+    };
+    const rx = roleNames[role];
+    if (rx){
+      t = t.replace(
+        new RegExp(`^(\\s*)(?:the\\s+|your\\s+)?(?:chief\\s+[a-z ]+\\s+officer\\s*\\([^)]*\\)|${rx.source}).*?\\b(is|handles|focuses|leads|ensures|oversees|can|will)\\b`, 'i'),
+        (_m,p1)=> `${p1}As your ${role==='CEO_ADVICE'?'advisor':role}, I `
+      );
+    }
+
+    const parts = t.split(/(```[\s\S]*?```)/g);
+    const fix = s => s
+      .replace(/\b[Tt]hey\b/g,"I").replace(/\b[Tt]heir\b/g,"my").replace(/\b[Tt]hem\b/g,"me")
+      .replace(/\bwe can\b/gi,"I can").replace(/\bwe will\b/gi,"I will").replace(/\bwe’ll\b/gi,"I’ll")
+      .replace(/\bour\b/gi,"my").replace(/\bwe\b/gi,"I")
+      .replace(/\bautonomously\b/gi,"automatically")
+      .replace(/\bSDK\b/g,"developer toolkit")
+      .replace(/\s{2,}/g," ");
+    t = parts.map(p => p.startsWith("```") ? p : fix(p)).join("");
+
+    if (!t.startsWith(head)) t = head + "\n\n" + t;
+    t = t.replace(/\n{3,}/g,"\n\n").trim();
+    if (t.length > 900) t += `\n\n— ${role}`;
     return t;
   }
 
-  // Single typing indicator helper
-  function setTyping(role){
-    const log = document.getElementById("chatLog"); if (!log) return null;
-    let line = log.querySelector('[data-typing="1"]');
-    if (!line){
-      line = document.createElement("div");
-      line.className = "chat-agent"; line.dataset.typing = "1";
-      log.appendChild(line);
-    }
-    line.textContent = `⌛ ${role || "Team"} is typing…`;
-    log.scrollTop = log.scrollHeight;
-    return line;
-  }
+  // --- Intercept /agent to pin persona & context; allow retrofit if model chooses a different role
+  const _fetch = window.fetch;
+  window.fetch = async (url, init) => {
+    const isAgent = typeof url === "string" && (url === AGENT || (url.includes('/agent') && url.includes(BASE)));
+    if (isAgent && init && typeof init.body === "string" &&
+        /json/i.test((init.headers && (init.headers['Content-Type']||''))||'')) {
+      try {
+        const body = JSON.parse(init.body);
+        if (body && !body.__v45_primed) {
+          const { role, conf } = scoreRole((ta.value||"") || body.input || "");
+          body.role = body.role || role;
+          body.personaHint = `${(body.personaHint||"").trim()} STRICT: speak in first person as ${role}. The human user is the CEO (do not roleplay as CEO).`;
+          body.capabilities = body.capabilities || CAPABILITIES;
+          body.rules = body.rules || RULES;
+          body.__v45_primed = true;
+          init.body = JSON.stringify(body);
 
-  // Patch runAgent to polish replies in-place (non-destructive)
-  const original = window.runAgent;
-  if (!original) return;
+          // remember confidence for the current turn (used by typing banner)
+          window.__AIG_TURN_ROLE__ = role;
+          window.__AIG_TURN_CONF__ = conf;
+        }
+      } catch(_) {}
+    }
+    return _fetch(url, init);
+  };
+
+  // --- Wrap sender: one call, correct typing from the start, retrofit banner if role differs
+  const senders = [window.runAgent, window.sendAgent, window.__aigents_send__].filter(fn => typeof fn === 'function');
+  const original = senders[0]; if (!original) return;
+  if (!window.__AIGENTSY_SEND_LOCK__) window.__AIGENTSY_SEND_LOCK__ = false;
 
   window.runAgent = async function(){
-    const ta = document.getElementById("agentInput");
-    const input = (ta?.value || "").trim();
-    const role = (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.__lastRole)
-                 || (window.AIGENTS_ROUTER && window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(input))
-                 || inferRole(input);
+    if (window.__AIGENTSY_SEND_LOCK__) return;
+    window.__AIGENTSY_SEND_LOCK__ = true;
 
-    // show one typing line (and update, not duplicate)
-    const typing = setTyping(role);
+    const input = (ta.value || "").trim();
+    const { role, conf } = scoreRole(input);
+    const typing = showTyping(role, conf);
 
-    // run your existing pipeline
-    const before = document.querySelectorAll("#chatLog .chat-agent").length;
-    await original();
+    try {
+      await original.apply(this, arguments);
 
-    // find latest agent line; if new line was appended, use it; else reuse typing
-    const lines = Array.from(document.querySelectorAll("#chatLog .chat-agent"));
-    const after = lines.length;
-    const latest = (after > before) ? lines[after - 1] : typing;
+      // newest agent line
+      const lines = [...log.querySelectorAll('.chat-agent')];
+      const last  = lines[lines.length-1];
 
-    if (latest){
-      // personalize content
-      latest.dataset.typing = "0";
-      latest.textContent = personalize(role, latest.textContent);
+      // detect if the model chose a different header (e.g., "💰 CFO — ..." etc.)
+      let finalRole = role;
+      if (last && !last.classList.contains('typing-line')) {
+        const txt = last.textContent || "";
+        for (const r of ROLES){
+          if (txt.startsWith(HEAD[r])) { finalRole = r; break; }
+        }
+        // retrofit banner if role changed & confidence was low (neutral banner shown)
+        if (finalRole !== role && typing && typing.classList.contains('typing-line')) {
+          const label = (finalRole==='CEO_ADVICE'?'Advisor':finalRole);
+          typing.textContent = `⌛ ${label} is typing…`;
+        }
+        if (last.dataset.fpFixed !== "1") {
+          last.textContent = toFirstPerson(finalRole, txt);
+          last.dataset.fpFixed = "1";
+        }
+        clearTyping();
+      } else {
+        replaceTyping(typing, toFirstPerson(role, typing.textContent || ""));
+      }
+    } catch(e){
+      replaceTyping(typing, roleHeader(role) + "\n\nI hit a runtime error. Please try again.");
+    } finally {
+      clearTyping();
+      window.__AIGENTSY_SEND_LOCK__ = false;
     }
-    // remove any extra “typing…” lines left behind
-    document.querySelectorAll('#chatLog .chat-agent[data-typing="1"]').forEach(n => n.remove());
   };
+
+  // Safety net for any later appended lines (streaming, etc.)
+  const obs = new MutationObserver(muts=>{
+    for (const m of muts) {
+      m.addedNodes && [...m.addedNodes].forEach(node=>{
+        if (!(node instanceof HTMLElement)) return;
+        if (!node.classList.contains('chat-agent')) return;
+        if (node.classList.contains('typing-line')) return;
+        if (node.dataset.fpFixed === "1") return;
+        const txt = node.textContent || "";
+        let r = ROLES.find(R => txt.startsWith(HEAD[R])) || (window.__AIG_TURN_ROLE__ || 'CMO');
+        node.textContent = toFirstPerson(r, txt);
+        node.dataset.fpFixed = "1";
+        clearTyping();
+      });
+    }
+  });
+  obs.observe(log, { childList: true });
+
 })();
 </script>
+
 <script>
-/* ==== C-Suite Persona Prime: inject first-person expertise into the prompt ==== */
-(() => {
-  if (window.__CSUITE_PERSONA_PRIME__) return; window.__CSUITE_PERSONA_PRIME__ = true;
+// ============ EARNINGS DASHBOARD (MINIMAL) ============
 
-  // Short, action-oriented briefs per role (first person, expert voice)
-  const BRIEF = {
-    CTO: `You are the CTO. Speak in first person. Diagnose tech needs, suggest build/integration steps,
-          surface risks, and give a 3–5 step implementation plan with options. Offer one clarifying question at the end.`,
-    CMO: `You are the CMO. Speak in first person. Pick a growth play, define target, message, channels,
-          simple funnel metrics, and next 3 actions. Offer one clarifying question at the end.`,
-    CLO: `You are the CLO (counsel). Speak in first person. Identify legal risks, the right instrument (NDA, license, ToS),
-          key clauses to include, and a simple path to execution. Offer one clarifying question at the end.`,
-    CFO: `You are the CFO. Speak in first person. Frame pricing or ROI, unit economics, cash implications,
-          and a simple financial next step (e.g., quote template or off-ramp step). Ask one clarifying question.`,
-    COO: `You are the COO. Speak in first person. Turn the request into an SOP with owners, timing, and handoffs.
-          Flag dependencies/risks. Ask one clarifying question.`,
-    CPO: `You are the CPO. Speak in first person. Translate the ask into a crisp PRD slice: problem, users,
-          acceptance criteria, and a minimal prototype path. Ask one clarifying question.`,
-    CRO: `You are the CRO. Speak in first person. Choose a sales motion, define ICP, talk track/objection handling,
-          and the next 3 pipeline actions. Ask one clarifying question.`,
-    CAIO:`You are the CAIO. Speak in first person. Propose an AI capability map, data/guardrails, and orchestration plan
-          (tools, models, routes). End with the next 3 engineering or data steps and one clarifying question.`
-  };
-
-  // Try to reuse your router’s role; otherwise re-infer quickly
-  function activeRole(text){
-    const r = (window.AIGENTS_ROUTER && (window.AIGENTS_ROUTER.__lastRole ||
-              (window.AIGENTS_ROUTER.decideRole && window.AIGENTS_ROUTER.decideRole(text)))) || null;
-    if (r && BRIEF[r]) return r;
-    const t = (text||"").toLowerCase();
-    if (/\bcto\b|sdk|api|integrat|build|deploy|tech/.test(t)) return "CTO";
-    if (/\bcmo\b|marketing|growth|leads|campaign|brand/.test(t)) return "CMO";
-    if (/\bclo\b|legal|license|ip|contract|compliance|remix|fork/.test(t)) return "CLO";
-    if (/\bcfo\b|price|budget|revenue|profit|payout|cash|off-?ramp/.test(t)) return "CFO";
-    if (/\bcoo\b|ops|operations|timeline|handoff|sop/.test(t)) return "COO";
-    if (/\bcpo\b|product|feature|spec|ux|ui|roadmap/.test(t)) return "CPO";
-    if (/\bcro\b|sales|pipeline|demo|quote|close/.test(t)) return "CRO";
-    if (/\bcaio\b|chief ai officer|orchestr|multi-?agent|llm/.test(t)) return "CAIO";
-    return null;
+function toggleEarningsBreakdown() {
+  const el = document.getElementById("earningsBreakdown");
+  const btn = event.target;
+  if (el.style.display === "none") {
+    el.style.display = "block";
+    btn.textContent = "Hide Breakdown";
+  } else {
+    el.style.display = "none";
+    btn.textContent = "Show Breakdown";
   }
+}
 
-  // Wrap fetch-call sites used by runAgent() to inject the brief once per send
-  const _send = window.runAgent;
-  if (!_send) return;
+async function refreshEarnings() {
+  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
+  
+  try {
+    const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/revenue/summary?username=${username}`);
+    const data = await res.json();
+    
+    if (!data.ok) {
+      console.error("Failed to load earnings:", data.error);
+      return;
+    }
+    
+    const sources = data.sources || {};
+    
+    // Update earnings breakdown
+    document.getElementById("shopifyEarnings").textContent = (sources.shopify || 0).toFixed(2);
+    document.getElementById("affiliateEarnings").textContent = ((sources.tiktok_affiliate || 0) + (sources.amazon_affiliate || 0)).toFixed(2);
+    document.getElementById("contentEarnings").textContent = ((sources.youtube_cpm || 0) + (sources.tiktok_cpm || 0)).toFixed(2);
+    document.getElementById("serviceEarnings").textContent = (sources.service || 0).toFixed(2);
+    document.getElementById("stakingEarnings").textContent = (sources.staking || 0).toFixed(2);
+    document.getElementById("jvEarnings").textContent = (sources.jv || 0).toFixed(2);
+    
+    // Update total
+    document.getElementById("totalEarnings").textContent = (data.total_earned || 0).toFixed(2);
+    
+    // Update wallet balance
+    document.getElementById("aigxBalance").textContent = (data.aigx_balance || 0).toFixed(2);
+    document.getElementById("withdrawAvailable").textContent = (data.aigx_balance || 0).toFixed(2);
+    
+  } catch (err) {
+    console.error("Error refreshing earnings:", err);
+  }
+}
 
-  window.runAgent = async function(){
-    const ta = document.getElementById('agentInput');
-    const raw = (ta?.value || '').trim();
-    const role = activeRole(raw);
-    // Prime the message without changing your UI memory/logs
-    if (role && BRIEF[role]) {
-      // Expose for the code that builds the request body
-      window.__CSUITE_PERSONA_PREFIX__ = `[ROLE:${role}] ${BRIEF[role].replace(/\s+/g,' ').trim()}\n\nUser: `;
+// ============ WITHDRAW MODAL ============
+
+function openWithdrawModal() {
+  document.getElementById("withdrawModal").style.display = "flex";
+}
+
+function closeWithdrawModal() {
+  document.getElementById("withdrawModal").style.display = "none";
+}
+
+async function submitWithdraw() {
+  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
+  const amount = parseFloat(document.getElementById("withdrawAmount").value);
+  
+  if (!amount || amount <= 0) {
+    alert("Please enter a valid amount");
+    return;
+  }
+  
+  try {
+    const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/payout/request`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({username, amount})
+    });
+    
+    const data = await res.json();
+    
+    if (data.ok || data.payment) {
+      alert(`✅ Withdrawal requested: $${amount}\n\nYou'll receive payment within 2-3 business days.`);
+      closeWithdrawModal();
+      refreshEarnings();
     } else {
-      window.__CSUITE_PERSONA_PREFIX__ = null;
+      alert(`❌ Withdrawal failed: ${data.error || "Unknown error"}`);
     }
+  } catch (err) {
+    console.error("Withdrawal error:", err);
+    alert("❌ Error processing withdrawal");
+  }
+}
 
-    // Monkey-patch fetch to prepend the persona to the "input" field only for this turn
-    const _fetch = window.fetch;
-    window.fetch = async (url, init) => {
-      try {
-        if (init && typeof init.body === 'string' && init.headers && /json/i.test(init.headers['Content-Type']||'')) {
-          const body = JSON.parse(init.body);
-          if (body && body.input && !body.__primed && window.__CSUITE_PERSONA_PREFIX__) {
-            body.input = `${window.__CSUITE_PERSONA_PREFIX__}${body.input}`;
-            body.__primed = true;                // avoid double-priming
-            init.body = JSON.stringify(body);
-          }
-        }
-      } catch {}
-      return _fetch(url, init);
-    };
+// ============ AUTO-LOAD ============
 
-    try { await _send(); }
-    finally {
-      window.fetch = _fetch;
-      window.__CSUITE_PERSONA_PREFIX__ = null;
-    }
-  };
-})();
+window.addEventListener("DOMContentLoaded", () => {
+  refreshEarnings();
+  setInterval(refreshEarnings, 30000); // Refresh every 30 seconds
+});
 </script>
 
 </body>
