@@ -4692,13 +4692,14 @@ setTimeout(()=>{
 
 function toggleEarningsBreakdown() {
   const el = document.getElementById("earningsBreakdown");
-  const btn = event.target;
+  const btn = document.getElementById("breakdownToggleText");
+  
   if (el.style.display === "none") {
     el.style.display = "block";
-    btn.textContent = "Hide Breakdown";
+    btn.textContent = "▲ Hide Earnings Breakdown";
   } else {
     el.style.display = "none";
-    btn.textContent = "Show Breakdown";
+    btn.textContent = "▼ Show Earnings Breakdown";
   }
 }
 
@@ -4715,26 +4716,14 @@ async function refreshEarnings() {
     }
     
     const sources = data.sources || {};
-    
-    // Update earnings breakdown
-    document.getElementById("shopifyEarnings").textContent = (sources.shopify || 0).toFixed(2);
-    document.getElementById("affiliateEarnings").textContent = ((sources.tiktok_affiliate || 0) + (sources.amazon_affiliate || 0)).toFixed(2);
-    document.getElementById("contentEarnings").textContent = ((sources.youtube_cpm || 0) + (sources.tiktok_cpm || 0)).toFixed(2);
-    document.getElementById("serviceEarnings").textContent = (sources.service || 0).toFixed(2);
-    document.getElementById("stakingEarnings").textContent = (sources.staking || 0).toFixed(2);
-    document.getElementById("jvEarnings").textContent = (sources.jv || 0).toFixed(2);
-    
-    // Update total
-    document.getElementById("totalEarnings").textContent = (data.total_earned || 0).toFixed(2);
-    
-    // Update wallet balance
-    document.getElementById("aigxBalance").textContent = (data.aigx_balance || 0).toFixed(2);
-    document.getElementById("withdrawAvailable").textContent = (data.aigx_balance || 0).toFixed(2);
-    
-  } catch (err) {
-    console.error("Error refreshing earnings:", err);
-  }
-}
+    // Calculate platform fee and reinvestment
+const total = data.total_earned || 0;
+const platformFee = total * 0.05 / 0.75; // Reverse calc: if user got 75%, platform got 5%
+const reinvested = total * 0.20 / 0.75;  // 20% was reinvested
+
+document.getElementById("platformFee").textContent = platformFee.toFixed(2);
+document.getElementById("reinvested").textContent = reinvested.toFixed(2);
+document.getElementById("cloneEarnings").textContent = (sources.clone_royalty || 0).toFixed(2);
 
 // ============ WITHDRAW MODAL ============
 
