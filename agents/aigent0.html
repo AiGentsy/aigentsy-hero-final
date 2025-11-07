@@ -272,119 +272,101 @@
   </div>
 </div>
 
-  <!-- ============ EARNINGS DASHBOARD ============ -->
-<div class="metric-box full-width">
-  <h3>💰 Earnings Dashboard</h3>
+<div class="metric-box">
+  <h3>💰 Wallet & Off-Ramp</h3>
   
-  <div class="earnings-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px;">
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Shopify Sales</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="shopifyEarnings">0.00</span></div>
+  <!-- Earnings Breakdown (Expandable) -->
+  <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
+      <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
     </div>
-    
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Affiliate Commissions</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="affiliateEarnings">0.00</span></div>
-    </div>
-    
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Content CPM</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="contentEarnings">0.00</span></div>
-    </div>
-    
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Service Payments</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="serviceEarnings">0.00</span></div>
-    </div>
-    
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">Staking Returns</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="stakingEarnings">0.00</span></div>
-    </div>
-    
-    <div class="earnings-source" style="background:#0a0a0a; padding:12px; border-radius:8px; border:1px solid #222;">
-      <div style="font-size:0.75rem; color:#888; margin-bottom:4px;">JV Splits</div>
-      <div style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="jvEarnings">0.00</span></div>
-    </div>
-  </div>
-  
-  <div style="background:#001a0d; border:2px solid #00ff88; padding:16px; border-radius:10px; margin-bottom:20px;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <div style="font-size:0.85rem; color:#888;">Total Earnings (All Time)</div>
-        <div style="font-size:2rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></div>
+    <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+    <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💼 Service Payments</span>
+        <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
       </div>
-      <div>
-        <div style="font-size:0.85rem; color:#888;">Available Balance</div>
-        <div style="font-size:1.6rem; font-weight:700; color:#fff;">$<span id="availableBalance">0.00</span></div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🛍️ Shopify Sales</span>
+        <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>📱 Affiliate Commissions</span>
+        <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🎥 Content CPM</span>
+        <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💎 Staking Returns</span>
+        <span style="color:#00ff88;">$<span id="stakingEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;">
+        <span>🤝 JV Splits</span>
+        <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
       </div>
     </div>
   </div>
   
-  <div class="button-row">
-    <button class="btn-glow" onclick="refreshEarnings()">🔄 Refresh</button>
-    <button class="btn-glow" onclick="openWithdrawModal()">💸 Withdraw</button>
-    <button class="btn-glow" onclick="viewTransactionHistory()">📜 Transaction History</button>
+  <div class="wallet-flex">
+    <ul style="padding-left:18px; font-size:0.9rem; color:#ccc; margin:0;">
+      <li>AIGx Balance: <span id="aigxBalance">0</span></li>
+      <li>Staked: <span id="stakedAmount">0</span></li>
+      <li>Referrals: <span id="referralCount">0</span> active</li>
+    </ul>
+    <button class="btn-glow btn-sm" onclick="openWithdrawModal()">💸 Cash Out</button>
   </div>
-</div>
 
-<!-- ============ AGENT INVESTMENTS ============ -->
-<div class="metric-box">
-  <h3>📊 Agent Investments</h3>
-  <ul id="agentPortfolio" style="list-style:none; padding:0;">
-    <li style="color:#888;">Loading portfolio...</li>
-  </ul>
-  <div style="margin-top:10px;">
-    <button class="btn-glow btn-sm" onclick="openInvestModal()">➕ Invest in Agent</button>
-  </div>
-</div>
-
-<!-- ============ JV PARTNERSHIPS ============ -->
-<div class="metric-box">
-  <h3>🤝 JV Partnerships</h3>
-  <ul id="jvList" style="list-style:none; padding:0;">
-    <li style="color:#888;">Loading partnerships...</li>
-  </ul>
-  <div style="margin-top:10px;">
-    <button class="btn-glow btn-sm" onclick="openJVModal()">➕ Create JV</button>
-  </div>
-</div>
-
-<!-- ============ CLONE ROYALTIES ============ -->
-<div class="metric-box">
-  <h3>🧬 Clone Royalties</h3>
-  <ul id="royaltyFeed" style="list-style:none; padding:0;">
-    <li style="color:#888;">Loading royalty feed...</li>
-  </ul>
-  <div style="margin-top:10px; font-size:0.75rem; color:#888;">
-    You earn 30% royalties when your clones generate revenue
-  </div>
-</div>
-
-<!-- ============ WITHDRAW MODAL ============ -->
-<div id="withdrawModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
-  <div style="background:#111; padding:24px; border-radius:12px; max-width:400px; width:90%; border:1px solid #00ff88;">
-    <h3 style="color:#00ff88; margin-top:0;">💸 Withdraw Funds</h3>
-    <p style="font-size:0.9rem; color:#ccc;">Available: $<span id="withdrawAvailable">0.00</span></p>
-    
-    <input type="number" id="withdrawAmount" placeholder="Amount (USD)" style="width:100%; padding:10px; margin:10px 0; background:#000; color:#fff; border:1px solid #444; border-radius:6px;">
-    
-    <div style="margin:10px 0;">
-      <label style="font-size:0.85rem; color:#ccc;">
-        <input type="radio" name="withdrawMethod" value="stripe" checked> Stripe (Bank Transfer)
-      </label>
-      <br>
-      <label style="font-size:0.85rem; color:#ccc;">
-        <input type="radio" name="withdrawMethod" value="crypto"> Crypto Wallet
-      </label>
+  
+  <!-- 🧭 Compact Snapshot (replaces Snapshot/Growth/Earnings) -->
+  <div id="compactSnapshot" class="metric-box">
+    <h3>🧭 Compact Snapshot</h3>
+    <div class="csn-grid">
+      <div class="csn-tile"><div class="csn-label">Proposals</div><div id="csnProposals" class="csn-value">0</div></div>
+      <div class="csn-tile"><div class="csn-label">Intents</div><div id="csnIntents" class="csn-value">0</div></div>
+      <div class="csn-tile"><div class="csn-label">Quotes</div><div id="csnQuotes" class="csn-value">0</div></div>
+      <div class="csn-tile"><div class="csn-label">Escrow</div><div id="csnEscrow" class="csn-value">0</div></div>
+      <div class="csn-tile"><div class="csn-label">AIGx</div><div id="csnAIGx" class="csn-value">0</div></div>
+      <div class="csn-tile"><div class="csn-label">OutcomeScore</div><div id="csnOS" class="csn-value">—</div></div>
     </div>
-    
-    <div style="margin-top:20px; display:flex; gap:10px;">
-      <button class="btn-glow" onclick="closeWithdrawModal()" style="background:#444;">Cancel</button>
-      <button class="btn-glow" onclick="submitWithdraw()">Confirm Withdrawal</button>
+    <button id="toggleSnapshotDetails" class="btn-glow" style="margin-top:10px;">Show details</button>
+    <div id="snapshotDetails" style="display:none; margin-top:12px;">
+      <div class="csn-details">
+        <div class="csn-detail">
+          <h4 style="color:#00bfff;margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+          <ul style="padding-left:18px;margin:0;">
+            <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
+            <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
+            <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+            <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+            <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+            <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+          </ul>
+        </div>
+        <div class="csn-detail">
+          <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth & Deployment</h4>
+          <ul style="padding-left:18px;margin:0;">
+            <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
+            <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
+            <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
+            <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
+            <li>📊 Live Status: <span id="growthStatus">—</span></li>
+          </ul>
+        </div>
+        <div class="csn-detail">
+          <h4 style="color:#00bfff;margin-bottom:6px;">💼 Real-World Earnings</h4>
+          <ul style="padding-left:18px;margin:0;">
+            <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
+            <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
+            <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
+            <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
-</div>
   
 <!-- 📩 Proposal Viewer (Click to View Inbox) -->
 <div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
@@ -392,8 +374,9 @@
   <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
 </div>
 
+</div>
 
-    <!-- 🔓 Unlock Modal -->
+<!-- 🔓 Unlock Modal -->
 <div id="unlockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
   <div style="background:#111; padding:24px; border-radius:12px; max-width:480px; width:90%; box-shadow:0 0 20px rgba(0,255,255,0.2);">
     <h2 id="modalTitle" style="color:#00bfff; margin-top:0;"></h2>
@@ -401,6 +384,23 @@
     <div style="margin-top:20px; text-align:right;">
       <button class="btn-glow" onclick="closeUnlockModal()" style="background:#444; color:#fff; margin-right:10px;">Cancel</button>
       <button class="btn-glow" id="confirmUnlockBtn">Continue to Purchase</button>
+    </div>
+  </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; padding:20px; border-radius:12px; max-width:360px; width:90%; border:1px solid #00ff88;">
+    <h3 style="color:#00ff88; margin-top:0;">💸 Withdraw Funds</h3>
+    <p style="font-size:0.85rem; color:#ccc;">Available: $<span id="withdrawAvailable">0.00</span></p>
+    <input type="number" id="withdrawAmount" placeholder="Amount (USD)" style="width:100%; padding:8px; margin:8px 0; background:#000; color:#fff; border:1px solid #444; border-radius:6px; font-size:0.9rem;">
+    <div style="margin:8px 0; font-size:0.8rem;">
+      <label style="color:#ccc;"><input type="radio" name="withdrawMethod" value="stripe" checked> Stripe</label><br>
+      <label style="color:#ccc;"><input type="radio" name="withdrawMethod" value="crypto"> Crypto</label>
+    </div>
+    <div style="margin-top:16px; display:flex; gap:8px;">
+      <button class="btn-glow btn-sm" onclick="closeWithdrawModal()" style="flex:1; background:#444;">Cancel</button>
+      <button class="btn-glow btn-sm" onclick="submitWithdraw()" style="flex:1;">Confirm</button>
     </div>
   </div>
 </div>
@@ -4628,14 +4628,26 @@ setTimeout(()=>{
 
 })();
 </script>
+
 <script>
-// ============ EARNINGS DASHBOARD LOGIC ============
+// ============ EARNINGS DASHBOARD (MINIMAL) ============
+
+function toggleEarningsBreakdown() {
+  const el = document.getElementById("earningsBreakdown");
+  const btn = event.target;
+  if (el.style.display === "none") {
+    el.style.display = "block";
+    btn.textContent = "Hide Breakdown";
+  } else {
+    el.style.display = "none";
+    btn.textContent = "Show Breakdown";
+  }
+}
 
 async function refreshEarnings() {
   const username = localStorage.getItem("aigentsyUsername") || "demo_user";
   
   try {
-    // Fetch earnings summary
     const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/revenue/summary?username=${username}`);
     const data = await res.json();
     
@@ -4644,8 +4656,9 @@ async function refreshEarnings() {
       return;
     }
     
-    // Update earnings display
     const sources = data.sources || {};
+    
+    // Update earnings breakdown
     document.getElementById("shopifyEarnings").textContent = (sources.shopify || 0).toFixed(2);
     document.getElementById("affiliateEarnings").textContent = ((sources.tiktok_affiliate || 0) + (sources.amazon_affiliate || 0)).toFixed(2);
     document.getElementById("contentEarnings").textContent = ((sources.youtube_cpm || 0) + (sources.tiktok_cpm || 0)).toFixed(2);
@@ -4653,125 +4666,15 @@ async function refreshEarnings() {
     document.getElementById("stakingEarnings").textContent = (sources.staking || 0).toFixed(2);
     document.getElementById("jvEarnings").textContent = (sources.jv || 0).toFixed(2);
     
-    // Update totals
+    // Update total
     document.getElementById("totalEarnings").textContent = (data.total_earned || 0).toFixed(2);
-    document.getElementById("availableBalance").textContent = (data.aigx_balance || 0).toFixed(2);
+    
+    // Update wallet balance
+    document.getElementById("aigxBalance").textContent = (data.aigx_balance || 0).toFixed(2);
     document.getElementById("withdrawAvailable").textContent = (data.aigx_balance || 0).toFixed(2);
     
   } catch (err) {
     console.error("Error refreshing earnings:", err);
-  }
-}
-
-// ============ AGENT PORTFOLIO ============
-
-async function loadAgentPortfolio() {
-  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
-  const list = document.getElementById("agentPortfolio");
-  
-  try {
-    const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/user`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username})
-    });
-    const data = await res.json();
-    const user = data.record || data.user || {};
-    
-    const staked = user.wallet?.staked || 0;
-    const staking_target = user.staking_target || null;
-    
-    if (staked > 0 && staking_target) {
-      list.innerHTML = `
-        <li style="padding:8px 0; border-bottom:1px solid #222;">
-          <div style="display:flex; justify-content:space-between;">
-            <span style="color:#00bfff;">${staking_target}</span>
-            <span style="color:#00ff88;">$${staked} staked</span>
-          </div>
-          <div style="font-size:0.75rem; color:#888; margin-top:4px;">Earning 10% returns on agent's revenue</div>
-        </li>
-      `;
-    } else {
-      list.innerHTML = `<li style="color:#888;">No active investments. Stake on agents to earn passive returns.</li>`;
-    }
-  } catch (err) {
-    console.error("Error loading portfolio:", err);
-    list.innerHTML = `<li style="color:#f88;">Error loading portfolio</li>`;
-  }
-}
-
-// ============ JV PARTNERSHIPS ============
-
-async function loadJVPartnerships() {
-  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
-  const list = document.getElementById("jvList");
-  
-  try {
-    const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/user`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username})
-    });
-    const data = await res.json();
-    const user = data.record || data.user || {};
-    const jvMesh = user.jvMesh || [];
-    
-    if (jvMesh.length > 0) {
-      list.innerHTML = jvMesh.map(jv => `
-        <li style="padding:8px 0; border-bottom:1px solid #222;">
-          <div style="display:flex; justify-content:space-between;">
-            <span style="color:#00bfff;">${jv.title || "JV Partnership"}</span>
-            <span style="color:#888; font-size:0.75rem;">${jv.id}</span>
-          </div>
-          <div style="font-size:0.75rem; color:#888; margin-top:4px;">
-            Split: ${(jv.split?.a || 0.5) * 100}% / ${(jv.split?.b || 0.5) * 100}%
-          </div>
-        </li>
-      `).join("");
-    } else {
-      list.innerHTML = `<li style="color:#888;">No JV partnerships yet. Create one to split revenue with partners.</li>`;
-    }
-  } catch (err) {
-    console.error("Error loading JVs:", err);
-    list.innerHTML = `<li style="color:#f88;">Error loading partnerships</li>`;
-  }
-}
-
-// ============ CLONE ROYALTIES ============
-
-async function loadCloneRoyalties() {
-  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
-  const list = document.getElementById("royaltyFeed");
-  
-  try {
-    const res = await fetch(`https://aigentsy-ame-runtime.onrender.com/user`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({username})
-    });
-    const data = await res.json();
-    const user = data.record || data.user || {};
-    const ledger = user.ownership?.ledger || [];
-    const royalties = ledger.filter(e => e.event === "clone_royalty_received");
-    
-    if (royalties.length > 0) {
-      list.innerHTML = royalties.slice(0, 5).map(r => `
-        <li style="padding:8px 0; border-bottom:1px solid #222;">
-          <div style="display:flex; justify-content:space-between;">
-            <span style="color:#00bfff;">Clone: ${r.clone_id || "Unknown"}</span>
-            <span style="color:#00ff88;">+$${(r.amount || 0).toFixed(2)}</span>
-          </div>
-          <div style="font-size:0.75rem; color:#888; margin-top:4px;">
-            ${new Date(r.ts).toLocaleDateString()}
-          </div>
-        </li>
-      `).join("");
-    } else {
-      list.innerHTML = `<li style="color:#888;">No royalties yet. Your clones will earn you 30% of their revenue.</li>`;
-    }
-  } catch (err) {
-    console.error("Error loading royalties:", err);
-    list.innerHTML = `<li style="color:#f88;">Error loading royalty feed</li>`;
   }
 }
 
@@ -4788,7 +4691,6 @@ function closeWithdrawModal() {
 async function submitWithdraw() {
   const username = localStorage.getItem("aigentsyUsername") || "demo_user";
   const amount = parseFloat(document.getElementById("withdrawAmount").value);
-  const method = document.querySelector('input[name="withdrawMethod"]:checked').value;
   
   if (!amount || amount <= 0) {
     alert("Please enter a valid amount");
@@ -4817,33 +4719,11 @@ async function submitWithdraw() {
   }
 }
 
-// ============ TRANSACTION HISTORY ============
-
-function viewTransactionHistory() {
-  const username = localStorage.getItem("aigentsyUsername") || "demo_user";
-  window.open(`/transactions.html?user=${username}`, "_blank");
-}
-
-// ============ PLACEHOLDER MODALS ============
-
-function openInvestModal() {
-  alert("🚧 Agent investment coming soon!\n\nYou'll be able to stake on other agents and earn 10% of their revenue.");
-}
-
-function openJVModal() {
-  alert("🚧 JV creation coming soon!\n\nYou'll be able to create revenue-sharing partnerships with other agents.");
-}
-
-// ============ AUTO-LOAD ON PAGE LOAD ============
+// ============ AUTO-LOAD ============
 
 window.addEventListener("DOMContentLoaded", () => {
   refreshEarnings();
-  loadAgentPortfolio();
-  loadJVPartnerships();
-  loadCloneRoyalties();
-  
-  // Auto-refresh every 30 seconds
-  setInterval(refreshEarnings, 30000);
+  setInterval(refreshEarnings, 30000); // Refresh every 30 seconds
 });
 </script>
 
