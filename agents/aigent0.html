@@ -290,13 +290,14 @@
 </div>
 
   <!-- ✅ Team Achievements -->
-  <div class="metric-box">
-    <h3>🏆 Team Achievements</h3>
-    <ul id="achievementList">
-      <li>Loading your business wins...</li>
-    </ul>
-  </div>
-
+  <ul style="padding-left:18px; line-height:1.8;">
+  <li>✅ Business minted — your AiGentsy is live</li>
+  <li>✅ Earnings tracking on — AIGx & fiat ready</li>
+  <li>✅ First proposal drafted — outreach cycle starts</li>
+  <li>✅ SDK + Legal packs ready — productize & license</li>
+  <li>🎯 <span id="achievementDynamic">Revenue streams active: 0/6</span></li>
+  <li>💰 <span id="achievementEarnings">Total earned: $0.00</span></li>
+</ul>
   <!-- ✅ Expand Business Circle (Already correct) -->
   <div class="metric-box">
     <h3>🌐 Expand Your Business Circle</h3>
@@ -328,7 +329,7 @@
   
   <!-- Earnings Breakdown (Expandable) -->
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-bottom:10px;">
-    <span id="breakdownToggleText">▼ Show Earnings Breakdown</span>
+    ▼ Show Earnings Breakdown
   </button>
   
   <div id="earningsBreakdown" style="display:none; margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222; font-size:0.8rem;">
@@ -377,8 +378,8 @@
     <button class="btn-glow btn-sm" onclick="openWithdrawModal()" style="flex:1;">💸 Cash Out</button>
     <button class="btn-glow btn-sm" onclick="refreshEarnings()" style="flex:1;">🔄 Refresh</button>
   </div>
-  
-  <!-- 🧭 Compact Snapshot (replaces Snapshot/Growth/Earnings) -->
+
+  <!-- 🧭 Compact Snapshot -->
   <div id="compactSnapshot" class="metric-box">
     <h3>🧭 Compact Snapshot</h3>
     <div class="csn-grid">
@@ -393,45 +394,42 @@
     <div id="snapshotDetails" style="display:none; margin-top:12px;">
       <div class="csn-details">
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
-          <ul style="padding-left:18px;margin:0;">
+          <h4 style="color:#00bfff;margin-bottom:6px;">📊 Business Metrics</h4>
+          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
             <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
             <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
-            <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
-            <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
-            <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
-            <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+            <li>🧑‍💼 Active Clients: <span id="snapshotClients">0</span></li>
+            <li>💰 Total Revenue: <span id="snapshotAigx">$0</span></li>
+            <li>📦 Services Rendered: <span id="snapshotServices">0</span></li>
           </ul>
         </div>
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth & Deployment</h4>
-          <ul style="padding-left:18px;margin:0;">
-            <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
+          <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth Metrics</h4>
+          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
             <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-            <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
-            <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
-            <li>📊 Live Status: <span id="growthStatus">—</span></li>
+            <li>🤝 JV Partnerships: <span id="growthJVs">0</span></li>
+            <li>📡 App Integrations: <span id="growthIntegrations">0</span></li>
+            <li>🧬 Clones Created: <span id="growthClones">0</span></li>
           </ul>
         </div>
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">💼 Real-World Earnings</h4>
-          <ul style="padding-left:18px;margin:0;">
-            <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
-            <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
-            <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
-            <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
+          <h4 style="color:#00bfff;margin-bottom:6px;">💼 Revenue Sources</h4>
+          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
+            <li>Active: <span id="revenueSourcesActive">0/6</span></li>
+            <li>This Month: <span id="revenueThisMonth">$0</span></li>
+            <li>Platform Fee Paid: <span id="revenuePlatformFee">$0</span></li>
+            <li>Reinvested (R³): <span id="revenueReinvested">$0</span></li>
           </ul>
         </div>
       </div>
     </div>
   </div>
   
-<!-- 📩 Proposal Viewer (Click to View Inbox) -->
-<div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
-  <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
-  <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
-</div>
-
+  <!-- 📩 Proposal Viewer -->
+  <div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
+    <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
+    <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
+  </div>
 </div>
 
 <!-- 🔓 Unlock Modal -->
@@ -4692,9 +4690,14 @@ setTimeout(()=>{
 
 function toggleEarningsBreakdown() {
   const el = document.getElementById("earningsBreakdown");
-  const btn = document.getElementById("breakdownToggleText");
+  const btn = event.target; // Get the button that was clicked
   
-  if (el.style.display === "none") {
+  if (!el) {
+    console.error("earningsBreakdown element not found");
+    return;
+  }
+  
+  if (el.style.display === "none" || el.style.display === "") {
     el.style.display = "block";
     btn.textContent = "▲ Hide Earnings Breakdown";
   } else {
@@ -4702,7 +4705,7 @@ function toggleEarningsBreakdown() {
     btn.textContent = "▼ Show Earnings Breakdown";
   }
 }
-
+  
 async function refreshEarnings() {
   const username = localStorage.getItem("aigentsyUsername") || "demo_user";
   
