@@ -136,44 +136,7 @@
     font-weight: 500;
     white-space: pre-line;
   }
-  /* Actions Drawer Dark Theme */
-#aigxDrawer, #gxDrawer {
-  background: #0a0a0a !important;
-  border-left: 1px solid #1a2332 !important;
-  color: #e8f0ff !important;
-}
 
-#aigxDrawer header, #gxDrawer header {
-  background: #0f0f0f !important;
-  border-bottom: 1px solid #1a2332 !important;
-}
-
-#aigxDrawer h3, #gxDrawer h3 {
-  color: #00bfff !important;
-}
-
-.aigx-drawer .group h4, .gx-drawer .grp h4,
-#aigxDrawer .group h4, #gxDrawer .grp h4 {
-  color: #00bfff !important;
-  opacity: 1 !important;
-}
-
-.aigx-drawer .group button, .gx-drawer .grp button,
-#aigxDrawer .group button, #gxDrawer .grp button {
-  background: #111 !important;
-  border: 1px solid #222 !important;
-  color: #cfe7ff !important;
-}
-
-.aigx-drawer .group button:hover, .gx-drawer .grp button:hover,
-#aigxDrawer .group button:hover, #gxDrawer .grp button:hover {
-  background: #1a1a1a !important;
-  border-color: #00bfff !important;
-}
-
-.aigx-chip, .gx-chip {
-  background: #0b5 !important;
-}
 /* === Compact Snapshot styles === */
 .csn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media (max-width: 1024px){.csn-grid{grid-template-columns:repeat(2,1fr)}}
@@ -290,14 +253,13 @@
 </div>
 
   <!-- ✅ Team Achievements -->
-  <ul style="padding-left:18px; line-height:1.8;">
-  <li>✅ Business minted — your AiGentsy is live</li>
-  <li>✅ Earnings tracking on — AIGx & fiat ready</li>
-  <li>✅ First proposal drafted — outreach cycle starts</li>
-  <li>✅ SDK + Legal packs ready — productize & license</li>
-  <li>🎯 <span id="achievementDynamic">Revenue streams active: 0/6</span></li>
-  <li>💰 <span id="achievementEarnings">Total earned: $0.00</span></li>
-</ul>
+  <div class="metric-box">
+    <h3>🏆 Team Achievements</h3>
+    <ul id="achievementList">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
+
   <!-- ✅ Expand Business Circle (Already correct) -->
   <div class="metric-box">
     <h3>🌐 Expand Your Business Circle</h3>
@@ -313,73 +275,52 @@
 <div class="metric-box">
   <h3>💰 Wallet & Off-Ramp</h3>
   
-  <!-- Total Earnings (Big Number) -->
-  <div style="margin-bottom:12px; background:#001a0d; padding:12px; border-radius:8px; border:2px solid #00ff88;">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <div style="font-size:0.75rem; color:#888;">Total Earnings</div>
-        <div style="font-size:2rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></div>
-      </div>
-      <div>
-        <div style="font-size:0.75rem; color:#888;">Available Balance</div>
-        <div style="font-size:1.4rem; font-weight:700; color:#fff;">$<span id="aigxBalance">0.00</span></div>
-      </div>
-    </div>
-  </div>
-  
   <!-- Earnings Breakdown (Expandable) -->
-  <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-bottom:10px;">
-    ▼ Show Earnings Breakdown
-  </button>
-  
-  <div id="earningsBreakdown" style="display:none; margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222; font-size:0.8rem;">
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>💼 Service Payments</span>
-      <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
+  <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
+      <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
     </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🛍️ Shopify Sales</span>
-      <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>📱 Affiliate</span>
-      <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🎥 Content CPM</span>
-      <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>💎 Staking</span>
-      <span style="color:#00ff88;">$<span id="stakingEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🤝 JV Splits</span>
-      <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🧬 Clone Royalties</span>
-      <span style="color:#00ff88;">$<span id="cloneEarnings">0.00</span></span>
-    </div>
-    <div style="margin-top:8px; padding-top:8px; border-top:2px solid #00bfff;">
-      <div style="display:flex; justify-content:space-between; padding:2px 0; font-size:0.7rem; color:#888;">
-        <span>Platform Fee (5%)</span>
-        <span>-$<span id="platformFee">0.00</span></span>
+    <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+    <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💼 Service Payments</span>
+        <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
       </div>
-      <div style="display:flex; justify-content:space-between; padding:2px 0; font-size:0.7rem; color:#888;">
-        <span>Reinvested (20%)</span>
-        <span>-$<span id="reinvested">0.00</span></span>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🛍️ Shopify Sales</span>
+        <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>📱 Affiliate Commissions</span>
+        <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>🎥 Content CPM</span>
+        <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+        <span>💎 Staking Returns</span>
+        <span style="color:#00ff88;">$<span id="stakingEarnings">0.00</span></span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:4px 0;">
+        <span>🤝 JV Splits</span>
+        <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
       </div>
     </div>
   </div>
   
-  <!-- Quick Actions -->
-  <div style="display:flex; gap:8px;">
-    <button class="btn-glow btn-sm" onclick="openWithdrawModal()" style="flex:1;">💸 Cash Out</button>
-    <button class="btn-glow btn-sm" onclick="refreshEarnings()" style="flex:1;">🔄 Refresh</button>
+  <div class="wallet-flex">
+    <ul style="padding-left:18px; font-size:0.9rem; color:#ccc; margin:0;">
+      <li>AIGx Balance: <span id="aigxBalance">0</span></li>
+      <li>Staked: <span id="stakedAmount">0</span></li>
+      <li>Referrals: <span id="referralCount">0</span> active</li>
+    </ul>
+    <button class="btn-glow btn-sm" onclick="openWithdrawModal()">💸 Cash Out</button>
   </div>
 
-  <!-- 🧭 Compact Snapshot -->
+  
+  <!-- 🧭 Compact Snapshot (replaces Snapshot/Growth/Earnings) -->
   <div id="compactSnapshot" class="metric-box">
     <h3>🧭 Compact Snapshot</h3>
     <div class="csn-grid">
@@ -394,42 +335,45 @@
     <div id="snapshotDetails" style="display:none; margin-top:12px;">
       <div class="csn-details">
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">📊 Business Metrics</h4>
-          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
+          <h4 style="color:#00bfff;margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+          <ul style="padding-left:18px;margin:0;">
             <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
             <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
-            <li>🧑‍💼 Active Clients: <span id="snapshotClients">0</span></li>
-            <li>💰 Total Revenue: <span id="snapshotAigx">$0</span></li>
-            <li>📦 Services Rendered: <span id="snapshotServices">0</span></li>
+            <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
+            <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
+            <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
+            <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
           </ul>
         </div>
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth Metrics</h4>
-          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
+          <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth & Deployment</h4>
+          <ul style="padding-left:18px;margin:0;">
+            <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
             <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-            <li>🤝 JV Partnerships: <span id="growthJVs">0</span></li>
-            <li>📡 App Integrations: <span id="growthIntegrations">0</span></li>
-            <li>🧬 Clones Created: <span id="growthClones">0</span></li>
+            <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
+            <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
+            <li>📊 Live Status: <span id="growthStatus">—</span></li>
           </ul>
         </div>
         <div class="csn-detail">
-          <h4 style="color:#00bfff;margin-bottom:6px;">💼 Revenue Sources</h4>
-          <ul style="padding-left:18px;margin:0; font-size:0.85rem;">
-            <li>Active: <span id="revenueSourcesActive">0/6</span></li>
-            <li>This Month: <span id="revenueThisMonth">$0</span></li>
-            <li>Platform Fee Paid: <span id="revenuePlatformFee">$0</span></li>
-            <li>Reinvested (R³): <span id="revenueReinvested">$0</span></li>
+          <h4 style="color:#00bfff;margin-bottom:6px;">💼 Real-World Earnings</h4>
+          <ul style="padding-left:18px;margin:0;">
+            <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
+            <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
+            <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
+            <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
           </ul>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- 📩 Proposal Viewer -->
-  <div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
-    <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
-    <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
-  </div>
+<!-- 📩 Proposal Viewer (Click to View Inbox) -->
+<div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
+  <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
+</div>
+
 </div>
 
 <!-- 🔓 Unlock Modal -->
@@ -4690,22 +4634,16 @@ setTimeout(()=>{
 
 function toggleEarningsBreakdown() {
   const el = document.getElementById("earningsBreakdown");
-  const btn = event.target; // Get the button that was clicked
-  
-  if (!el) {
-    console.error("earningsBreakdown element not found");
-    return;
-  }
-  
-  if (el.style.display === "none" || el.style.display === "") {
+  const btn = event.target;
+  if (el.style.display === "none") {
     el.style.display = "block";
-    btn.textContent = "▲ Hide Earnings Breakdown";
+    btn.textContent = "Hide Breakdown";
   } else {
     el.style.display = "none";
-    btn.textContent = "▼ Show Earnings Breakdown";
+    btn.textContent = "Show Breakdown";
   }
 }
-  
+
 async function refreshEarnings() {
   const username = localStorage.getItem("aigentsyUsername") || "demo_user";
   
@@ -4719,14 +4657,26 @@ async function refreshEarnings() {
     }
     
     const sources = data.sources || {};
-    // Calculate platform fee and reinvestment
-const total = data.total_earned || 0;
-const platformFee = total * 0.05 / 0.75; // Reverse calc: if user got 75%, platform got 5%
-const reinvested = total * 0.20 / 0.75;  // 20% was reinvested
-
-document.getElementById("platformFee").textContent = platformFee.toFixed(2);
-document.getElementById("reinvested").textContent = reinvested.toFixed(2);
-document.getElementById("cloneEarnings").textContent = (sources.clone_royalty || 0).toFixed(2);
+    
+    // Update earnings breakdown
+    document.getElementById("shopifyEarnings").textContent = (sources.shopify || 0).toFixed(2);
+    document.getElementById("affiliateEarnings").textContent = ((sources.tiktok_affiliate || 0) + (sources.amazon_affiliate || 0)).toFixed(2);
+    document.getElementById("contentEarnings").textContent = ((sources.youtube_cpm || 0) + (sources.tiktok_cpm || 0)).toFixed(2);
+    document.getElementById("serviceEarnings").textContent = (sources.service || 0).toFixed(2);
+    document.getElementById("stakingEarnings").textContent = (sources.staking || 0).toFixed(2);
+    document.getElementById("jvEarnings").textContent = (sources.jv || 0).toFixed(2);
+    
+    // Update total
+    document.getElementById("totalEarnings").textContent = (data.total_earned || 0).toFixed(2);
+    
+    // Update wallet balance
+    document.getElementById("aigxBalance").textContent = (data.aigx_balance || 0).toFixed(2);
+    document.getElementById("withdrawAvailable").textContent = (data.aigx_balance || 0).toFixed(2);
+    
+  } catch (err) {
+    console.error("Error refreshing earnings:", err);
+  }
+}
 
 // ============ WITHDRAW MODAL ============
 
