@@ -132,11 +132,13 @@
   .chat-user {
     color: #00B3FF;
     font-weight: 500;
+    margin: 8px 0;
   }
   .chat-agent {
     color: #FFFFFF;
     font-weight: 500;
     white-space: pre-line;
+    margin: 8px 0;
   }
   
   /* Compact Snapshot styles */
@@ -666,6 +668,88 @@ function formatResponseEnhanced(text) {
   return explainTerms(cleaned);
 }
 
+// ✅ FIX #3: C-SUITE FIRST-PERSON RESPONSES
+const agentPersonas = {
+  CMO: {
+    name: "CMO (AiGent Growth)",
+    intro: ["Hey", "Hi", "What's up", "Let's talk"],
+    style: "casual",
+    replacements: [
+      { from: /\bI would\b/g, to: "I'll" },
+      { from: /\bI can\b/g, to: "I'll" },
+      { from: /\bwill help\b/g, to: "'ll help" },
+      { from: /\bto assist\b/g, to: "to help" }
+    ]
+  },
+  CLO: {
+    name: "CLO (AiGent Legal)",
+    intro: ["Here's what I see", "From a legal standpoint", "Let me break this down"],
+    style: "professional",
+    replacements: [
+      { from: /\bcompliance\b/g, to: "staying compliant" },
+      { from: /\bframework\b/g, to: "structure" }
+    ]
+  },
+  CTO: {
+    name: "CTO (AiGent Tech)",
+    intro: ["Let me help with that", "Here's the tech side", "Quick tech note"],
+    style: "technical",
+    replacements: [
+      { from: /\bframework\b/g, to: "system" },
+      { from: /\barchitecture\b/g, to: "setup" }
+    ]
+  },
+  CFO: {
+    name: "CFO (AiGent Finance)",
+    intro: ["Let's talk numbers", "Here's the financial view", "Money-wise"],
+    style: "analytical",
+    replacements: [
+      { from: /\boptimize\b/g, to: "improve" },
+      { from: /\bmetrics\b/g, to: "numbers" }
+    ]
+  },
+  COO: {
+    name: "COO (AiGent Operations)",
+    intro: ["I'll handle that", "On the ops side", "Let's get this done"],
+    style: "action",
+    replacements: [
+      { from: /\bexecute\b/g, to: "do" },
+      { from: /\bimplement\b/g, to: "set up" }
+    ]
+  }
+};
+
+function makeFirstPerson(text, role) {
+  if (!role || !agentPersonas[role]) return text;
+  
+  const persona = agentPersonas[role];
+  let result = text;
+  
+  // Apply persona-specific replacements
+  persona.replacements.forEach(({ from, to }) => {
+    result = result.replace(from, to);
+  });
+  
+  // Generic first-person conversions
+  result = result
+    .replace(/\byour (AiGent (Finance|Growth|Tech|IP & Legal|Legal|Operations))\b/gi, "I")
+    .replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "I")
+    .replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO|COO)\b/g, "I")
+    .replace(/\bAiGent (Marketing|Tech|Remix|Finance|Operations|Growth|Legal)\b/g, "I")
+    .replace(/\bThis agent\b/gi, "I")
+    .replace(/\bthe agent\b/gi, "I")
+    .replace(/\bI am an agent in the AiGentsy ecosystem\b/gi, "I'm part of your team")
+    .replace(/\bI is\b/g, "I'm")
+    .replace(/\bMy role is to\b/gi, "I")
+    .replace(/\bI will\b/g, "I'll")
+    .replace(/\bI can help\b/g, "I'll help")
+    .replace(/\bprotocol\b/gi, "platform")
+    .replace(/\bautonomously\b/g, "automatically")
+    .replace(/\s{2,}/g, " ");
+  
+  return result.trim();
+}
+
 async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
@@ -685,27 +769,33 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
 
   let conditionedInput = input;
-  const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let's do it"];
+  const shortConfirm = ["yes", "ok", "okay", "sure", "go ahead", "yes please", "let's do it", "do it"];
   const lastAgentTurn = memory.slice().reverse().find(m => m.startsWith("🤖"));
   if (shortConfirm.includes(input.toLowerCase()) && lastAgentTurn) {
     conditionedInput = `${lastAgentTurn.replace("🤖", "").trim()}\n\nPlease continue based on this.`;
   }
 
   try {
-    // Route to correct C-Suite agent
+    // Detect which C-Suite member to route to
     let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
+    let detectedRole = null;
     const lower = conditionedInput.toLowerCase();
     
-    if (/\b(sdk|developer|api|tech|tools|integration|product|feature)\b/.test(lower)) {
-      endpoint = "https://aigent-sdk-runtime.onrender.com/agent"; // CTO
-    } else if (/\b(growth|scale|marketing|market|outreach|campaign|promotion|audience)\b/.test(lower)) {
-      endpoint = "https://aigent-growth-runtime.onrender.com/agent"; // CMO
-    } else if (/\b(remix|clone|license|legal|ip|compliance|contract|branding)\b/.test(lower)) {
-      endpoint = "https://aigent-remix-runtime.onrender.com/agent"; // CLO
-    } else if (/\b(finance|wallet|cashout|budget|yield|payment|profit|revenue|token|earn)\b/.test(lower)) {
-      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // CFO
-    } else if (/\b(operations|ops|delivery|fulfillment|execute)\b/.test(lower)) {
-      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent"; // COO
+    if (/\b(growth|scale|marketing|market|outreach|campaign|promotion|audience|sell|client|customer|lead)\b/.test(lower)) {
+      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+      detectedRole = "CMO";
+    } else if (/\b(remix|clone|license|legal|ip|compliance|contract|branding|law|rights)\b/.test(lower)) {
+      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
+      detectedRole = "CLO";
+    } else if (/\b(sdk|developer|api|tech|tools|integration|product|feature|code|build)\b/.test(lower)) {
+      endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
+      detectedRole = "CTO";
+    } else if (/\b(finance|wallet|cashout|budget|yield|payment|profit|revenue|token|earn|money|price)\b/.test(lower)) {
+      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
+      detectedRole = "CFO";
+    } else if (/\b(operations|ops|delivery|fulfillment|execute|workflow|process)\b/.test(lower)) {
+      endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
+      detectedRole = "COO";
     }
 
     const res = await fetch(endpoint, {
@@ -723,45 +813,23 @@ async function runAgent() {
     }
 
     let reply = formatResponseEnhanced(data.output || "No response.");
-
-    // Detect role
-    function getAgentRole(input) {
-      const lower = input.toLowerCase();
-      if (/\b(marketing|promote|audience|growth|sell|reach|customers|ads|leads)\b/.test(lower)) return "CMO";
-      if (/\b(legal|license|licensing|compliance|ip|rights|remix|contract|law)\b/.test(lower)) return "CLO";
-      if (/\b(sdk|technology|build|api|tools|deploy|platform|integration|tech)\b/.test(lower)) return "CTO";
-      if (/\b(finance|money|cash|earnings|valuation|cost|pricing|revenue|payment)\b/.test(lower)) return "CFO";
-      if (/\b(operations|ops|delivery|fulfillment|execute)\b/.test(lower)) return "COO";
-      return null;
+    
+    // Convert to first person with persona
+    reply = makeFirstPerson(reply, detectedRole);
+    
+    // Add casual intro if role detected
+    if (detectedRole && agentPersonas[detectedRole]) {
+      const persona = agentPersonas[detectedRole];
+      const intro = persona.intro[Math.floor(Math.random() * persona.intro.length)];
+      reply = `${intro}! ${reply}`;
     }
 
-    const agentRole = getAgentRole(conditionedInput);
-
-    // Make replies first-person and conversational
-    reply = reply.replace(/\byour (AiGent (Finance|Marketing|Tech|IP & Legal|Operations))\b/gi, "I");
-    reply = reply.replace(/\bAs (AiGent [^,:\n]+), I\b/gi, "Here's what I'd do");
-    reply = reply.replace(/\b(Your|your|As your)\s+(CFO|CMO|CTO|CLO|COO)\b/g, "I");
-    reply = reply.replace(/\bAiGent (Marketing|Tech|Remix|Finance|Operations)\b/g, "I");
-    reply = reply.replace(/\bThis agent\b/g, "I");
-    reply = reply.replace(/\bI am an agent in the AiGentsy ecosystem\b/g, "I'm part of your business");
-    reply = reply.replace(/\bI is\b/g, "I'm");
-    reply = reply.replace(/\bMy role is to\b/g, "I");
-    reply = reply.replace(/\bprotocol\b/gi, "platform");
-    reply = reply.replace(/\bautonomously\b/g, "automatically");
-    reply = reply.replace(/\bframework\b/g, "plan");
-    reply = reply.replace(/\bstrategy\b/g, "approach");
-    reply = reply.replace(/\s{2,}/g, " ");
-    reply = reply.trim();
-
-    // Add role prefix if detected
-    if (agentRole) {
-      reply = `${agentRole}: ${reply}`;
-    }
-
-    loader.textContent = reply;
+    // Format with role prefix
+    const rolePrefix = detectedRole ? `**${detectedRole}**: ` : "";
+    loader.innerHTML = `${rolePrefix}${reply}`;
     memory.push(`🤖 ${reply}`);
     
-    // ✅ FIX #3: ADD CHAT ACTION BUTTONS AFTER RESPONSE
+    // Add action buttons after response
     const buttons = document.createElement("div");
     buttons.className = "chat-response-buttons";
     buttons.innerHTML = `
@@ -999,13 +1067,18 @@ async function injectUserDashboard() {
     const user = data.record || data.user || null;
     window.aigentsyUser = user;
     
-    if (!user) return;
+    if (!user) {
+      console.warn("No user data returned");
+      return;
+    }
 
     // Ensure user structure exists
     user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
     user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
     user.cloneLineage = user.cloneLineage || [];
     user.traits = user.traits || [];
+
+    console.log("✅ User data loaded:", user);
 
     // Business Summary List
     const summaryBox = document.getElementById("businessSummaryList");
@@ -1126,66 +1199,87 @@ async function injectUserDashboard() {
       kitDocBox.innerHTML = doc || "No kit detected.";
     }
 
-    // ✅ FIX #1: WALLET CHART RENDERING
+    // ✅ FIX #1: WALLET CHART RENDERING - WITH RETRY LOGIC
     const walletChart = document.getElementById('walletChart');
-    if (Chart && walletChart) {
-      if (walletChart.chartInstance) walletChart.chartInstance.destroy();
-
-      const remixCount = user.remixUnlocked.remixCount || 0;
-      const remixCredits = user.remixUnlocked.remixCredits || 0;
-      const vaultYield = user.yield.vaultYield || 0;
-      const remixYield = user.yield.remixYield || 0;
-      const aigxEarned = user.yield.aigxEarned || 0;
-      const staked = user.staked || 0;
-      const referrals = user.cloneLineage.length;
-
-      walletChart.chartInstance = new Chart(walletChart, {
-        type: 'bar',
-        data: {
-          labels: [
-            'Remix Count',
-            'Remix Credits',
-            'Vault Yield',
-            'Remix Yield',
-            'AIGx Earned',
-            'Staked',
-            'Referrals'
-          ],
-          datasets: [{
-            data: [
-              remixCount,
-              remixCredits,
-              vaultYield,
-              remixYield,
-              aigxEarned,
-              staked,
-              referrals
-            ],
-            backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { color: '#888' },
-              grid: { color: '#222' }
-            },
-            x: {
-              ticks: { color: '#aaa' },
-              grid: { display: false }
-            }
-          }
+    if (walletChart) {
+      const renderChart = () => {
+        if (!window.Chart) {
+          console.warn("Chart.js not loaded yet, retrying...");
+          setTimeout(renderChart, 100);
+          return;
         }
-      });
+
+        if (walletChart.chartInstance) {
+          walletChart.chartInstance.destroy();
+        }
+
+        const remixCount = user.remixUnlocked.remixCount || 0;
+        const remixCredits = user.remixUnlocked.remixCredits || 0;
+        const vaultYield = user.yield.vaultYield || 0;
+        const remixYield = user.yield.remixYield || 0;
+        const aigxEarned = user.yield.aigxEarned || 0;
+        const staked = user.staked || 0;
+        const referrals = user.cloneLineage.length;
+
+        console.log("📊 Rendering chart with data:", {
+          remixCount, remixCredits, vaultYield, remixYield, aigxEarned, staked, referrals
+        });
+
+        try {
+          walletChart.chartInstance = new Chart(walletChart, {
+            type: 'bar',
+            data: {
+              labels: [
+                'Remix Count',
+                'Remix Credits',
+                'Vault Yield',
+                'Remix Yield',
+                'AIGx Earned',
+                'Staked',
+                'Referrals'
+              ],
+              datasets: [{
+                data: [
+                  remixCount,
+                  remixCredits,
+                  vaultYield,
+                  remixYield,
+                  aigxEarned,
+                  staked,
+                  referrals
+                ],
+                backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
+                borderRadius: 6
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: '#888' },
+                  grid: { color: '#222' }
+                },
+                x: {
+                  ticks: { color: '#aaa' },
+                  grid: { display: false }
+                }
+              }
+            }
+          });
+          console.log("✅ Chart rendered successfully");
+        } catch (chartError) {
+          console.error("❌ Chart rendering error:", chartError);
+        }
+      };
+
+      renderChart();
     }
 
   } catch (e) {
-    console.error("injectUserDashboard error:", e);
+    console.error("❌ injectUserDashboard error:", e);
   }
 }
 
@@ -1538,7 +1632,6 @@ const gxClose = document.getElementById("gxClose");
 if (gxFab) {
   gxFab.onclick = () => {
     gxDrawer.classList.toggle("open");
-    // Refresh OutcomeScore when opening drawer
     if (gxDrawer.classList.contains("open")) {
       const username = localStorage.getItem("aigentsyUsername");
       if (username) {
@@ -1561,7 +1654,6 @@ if (gxClose) {
   gxClose.onclick = () => gxDrawer.classList.remove("open");
 }
 
-// Close drawer and modals on ESC
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     gxDrawer.classList.remove("open");
@@ -1596,11 +1688,12 @@ document.addEventListener("keydown", (e) => {
   }
 })();
 
-// ✅ FIX #2: INITIALIZATION WITH MULTIPLE FALLBACKS
-// This ensures the dashboard always hydrates, even if timing is off
+// ✅ FIX #2: COMPREHENSIVE INITIALIZATION WITH MULTIPLE FALLBACKS
 
-// Primary initialization
-window.addEventListener("DOMContentLoaded", () => {
+// Initialize immediately when DOM ready
+function initializeDashboard() {
+  console.log("🚀 Initializing dashboard...");
+  
   // Set default username if not exists
   if (!localStorage.getItem("aigentsyUsername")) {
     localStorage.setItem("aigentsyUsername", "admin4");
@@ -1608,8 +1701,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const username = localStorage.getItem("aigentsyUsername") || "You";
 
-  // Initialize dashboard
+  // Initialize user data and chart
   if (username) {
+    console.log("👤 Loading user:", username);
     injectUserDashboard();
     autoMatchEngine(username);
   }
@@ -1635,42 +1729,49 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
   // Preload chat message
-  if (chatLog) {
+  if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = `Ready to launch your business? Just ask.`;
+    preload.innerHTML = `Hey! Ready to grow your business? Just ask me anything.`;
     chatLog.appendChild(preload);
   }
-});
+}
 
-// Fallback #1: After all scripts load
+// Primary initialization - DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDashboard);
+} else {
+  initializeDashboard();
+}
+
+// Fallback #1: After all resources load
 window.addEventListener("load", () => {
   setTimeout(() => {
-    const username = localStorage.getItem("aigentsyUsername");
-    if (username && typeof injectUserDashboard === "function") {
-      // Only re-run if chart isn't rendered yet
-      const chart = document.getElementById("walletChart");
-      if (chart && !chart.chartInstance) {
-        console.log("🔄 Fallback #1: Running initialization");
-        injectUserDashboard();
-        autoMatchEngine(username);
-      }
+    const chart = document.getElementById("walletChart");
+    if (chart && !chart.chartInstance) {
+      console.log("🔄 Fallback #1: Running initialization");
+      initializeDashboard();
     }
   }, 500);
 });
 
 // Fallback #2: Delayed safety net
 setTimeout(() => {
-  const username = localStorage.getItem("aigentsyUsername");
-  if (username && typeof injectUserDashboard === "function") {
-    const chart = document.getElementById("walletChart");
-    if (chart && !chart.chartInstance) {
-      console.log("🔄 Fallback #2: Running initialization");
-      injectUserDashboard();
-      autoMatchEngine(username);
-    }
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Fallback #2: Running initialization");
+    initializeDashboard();
   }
 }, 2000);
+
+// Fallback #3: Final retry
+setTimeout(() => {
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Fallback #3: Final initialization attempt");
+    initializeDashboard();
+  }
+}, 5000);
 </script>
 
 </body>
