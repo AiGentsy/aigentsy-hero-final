@@ -760,6 +760,17 @@ async function runAgent() {
 
     loader.textContent = reply;
     memory.push(`🤖 ${reply}`);
+    
+    // ✅ FIX #3: ADD CHAT ACTION BUTTONS AFTER RESPONSE
+    const buttons = document.createElement("div");
+    buttons.className = "chat-response-buttons";
+    buttons.innerHTML = `
+      <button class="btn-glow" onclick="triggerSDK()">🧬 Trigger SDK</button>
+      <button class="btn-glow" onclick="openPackagingModal()">📦 Set Up Packaging</button>
+      <button class="btn-glow" onclick="matchClients()">🤝 Match Clients</button>
+    `;
+    chatLog.appendChild(buttons);
+    
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
   } catch (err) {
@@ -768,6 +779,169 @@ async function runAgent() {
 }
 
 if (sendBtn) sendBtn.onclick = runAgent;
+
+// ===== HELPER FUNCTIONS =====
+function triggerSDK() {
+  const user = window.aigentsyUser || {};
+  const content = `
+    <h2>🧬 Your SDK Toolkit</h2>
+    <p>This is your development kit. It includes:</p>
+    <ul>
+      <li>✅ Agent Runtime Code</li>
+      <li>✅ JSONBin + Runtime API Access</li>
+      <li>✅ Clone/Remix Logic</li>
+      <li>✅ Monetization Hooks</li>
+      <li>✅ Trait Injection + Memory Layer</li>
+    </ul>
+    <p><strong>Status:</strong> ${user.sdkAccess_eligible || user.sdkUnlocked ? "🟢 SDK Access Granted" : "🔒 SDK Locked — Unlock via Dashboard"}</p>
+  `;
+  document.getElementById("gxModalBody").innerHTML = content;
+  document.getElementById("gxModal").classList.add("open");
+}
+
+function openPackagingModal() {
+  const content = `
+    <h2>📦 Set Up Packaging</h2>
+    <p>This module lets you bundle your AiGentsy into ready-to-sell packages.</p>
+    <ul>
+      <li>Set price, licensing terms, and category</li>
+      <li>Distribute on the marketplace</li>
+      <li>Auto-track buyers, remixes, and revenue</li>
+    </ul>
+    <p><strong>Status:</strong> Coming soon</p>
+  `;
+  document.getElementById("gxModalBody").innerHTML = content;
+  document.getElementById("gxModal").classList.add("open");
+}
+
+async function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing");
+
+  const loader = document.createElement("div");
+  loader.textContent = "Scanning for client matches...";
+  chatLog.appendChild(loader);
+
+  try {
+    const res = await fetch("https://aigentsy-growth-agent.onrender.com/match_clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    loader.remove();
+
+    const message = data.message || "No match message returned.";
+    const matchLink = data.link || null;
+    const partner = data.partner || null;
+    const nextStep = data.action || "Send a proposal or view their profile.";
+
+    let matchHTML = `
+      <div class="chat-response" style="background:#111; border:1px solid #333; padding:12px; margin-top:10px; border-radius:8px;">
+        <strong>CMO:</strong>
+        <div style="margin-top:6px;">${message}</div>`;
+
+    if (matchLink && partner) {
+      matchHTML += `
+        <div style="margin-top:8px;">
+          <a href="${matchLink}" class="btn-glow" target="_blank">🔗 View Profile</a>
+          <button class="btn-glow" onclick="openProposalModal('${partner}')">📤 Propose Deal</button>
+        </div>`;
+    }
+
+    matchHTML += `<div style="margin-top:12px; font-size:0.85rem; color:#ccc;">${nextStep}</div></div>`;
+    chatLog.insertAdjacentHTML("beforeend", matchHTML);
+    chatLog.scrollTop = chatLog.scrollHeight;
+
+  } catch (err) {
+    loader.textContent = "Error matching clients: " + err.message;
+  }
+}
+
+function openProposalModal(partnerUsername) {
+  window.currentProposalTarget = partnerUsername;
+  document.getElementById("proposalModal").classList.add("open");
+}
+
+function closeProposalModal() {
+  document.getElementById("proposalModal").classList.remove("open");
+}
+
+async function submitProposal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const target = window.currentProposalTarget;
+  const title = document.getElementById("proposalTitle").value.trim();
+  const body = document.getElementById("proposalBody").value.trim();
+  const link = document.getElementById("proposalLink").value.trim();
+
+  if (!title || !body) return alert("Proposal title and body are required.");
+
+  try {
+    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/propose_deal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: username,
+        to: target,
+        title,
+        body,
+        link,
+        timestamp: new Date().toISOString()
+      })
+    });
+
+    if (res.ok) {
+      alert("✅ Proposal sent!");
+      closeProposalModal();
+    } else {
+      alert("❌ Failed to send proposal.");
+    }
+  } catch (err) {
+    console.error("Proposal error:", err);
+    alert("⚠️ Error sending proposal.");
+  }
+}
+
+function openProposalInboxModal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing.");
+
+  document.getElementById("proposalInboxModal").classList.add("open");
+  const inboxBox = document.getElementById("proposalInboxContent");
+  inboxBox.innerHTML = "Loading...";
+
+  fetch("https://aigentsy-ame-runtime.onrender.com/get_proposals", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const proposals = data.proposals || [];
+      if (proposals.length === 0) {
+        inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
+      } else {
+        inboxBox.innerHTML = proposals.map(p => `
+          <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
+            <strong>From:</strong> ${p.sender}<br>
+            <strong>Title:</strong> ${p.title}<br>
+            <p>${p.details}</p>
+            <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
+            ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
+          </div>
+        `).join("");
+      }
+    })
+    .catch(err => {
+      console.error("Inbox error:", err);
+      inboxBox.innerHTML = "<p>Error loading proposals.</p>";
+    });
+}
+
+function closeProposalInboxModal() {
+  document.getElementById("proposalInboxModal").classList.remove("open");
+}
 
 // ===== FILE HANDLING =====
 let attachedFiles = [];
@@ -952,7 +1126,7 @@ async function injectUserDashboard() {
       kitDocBox.innerHTML = doc || "No kit detected.";
     }
 
-    // Wallet Chart
+    // ✅ FIX #1: WALLET CHART RENDERING
     const walletChart = document.getElementById('walletChart');
     if (Chart && walletChart) {
       if (walletChart.chartInstance) walletChart.chartInstance.destroy();
@@ -1145,96 +1319,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
       alert("Error unlocking offering.");
     }
   }, 1500);
-}
-
-// ===== PROPOSALS =====
-let currentProposalPartner = null;
-
-function openProposalModal(partner) {
-  currentProposalPartner = partner;
-  document.getElementById("proposalModal").classList.add("open");
-}
-
-function closeProposalModal() {
-  document.getElementById("proposalModal").classList.remove("open");
-}
-
-async function submitProposal() {
-  const username = localStorage.getItem("aigentsyUsername");
-  const title = document.getElementById("proposalTitle").value.trim();
-  const details = document.getElementById("proposalBody").value.trim();
-  const link = document.getElementById("proposalLink").value.trim();
-
-  if (!title || !details || !currentProposalPartner) {
-    return alert("Please fill in all fields and confirm recipient.");
-  }
-
-  const payload = {
-    sender: username,
-    recipient: currentProposalPartner,
-    title,
-    details,
-    link,
-    timestamp: new Date().toISOString()
-  };
-
-  try {
-    const res = await fetch("https://aigentsy-ame-runtime.onrender.com/submit_proposal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      showToast("✅ Proposal sent!", "success");
-      closeProposalModal();
-    } else {
-      alert("❌ Failed to send proposal.");
-    }
-  } catch (err) {
-    console.error("Proposal send error:", err);
-    alert("⚠️ Proposal failed to send.");
-  }
-}
-
-function openProposalInboxModal() {
-  const username = localStorage.getItem("aigentsyUsername");
-  if (!username) return alert("Username missing.");
-
-  document.getElementById("proposalInboxModal").classList.add("open");
-  const inboxBox = document.getElementById("proposalInboxContent");
-  inboxBox.innerHTML = "Loading...";
-
-  fetch("https://aigentsy-ame-runtime.onrender.com/get_proposals", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
-  })
-    .then(res => res.json())
-    .then(data => {
-      const proposals = data.proposals || [];
-      if (proposals.length === 0) {
-        inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
-      } else {
-        inboxBox.innerHTML = proposals.map(p => `
-          <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <strong>From:</strong> ${p.sender}<br>
-            <strong>Title:</strong> ${p.title}<br>
-            <p>${p.details}</p>
-            <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
-            ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
-          </div>
-        `).join("");
-      }
-    })
-    .catch(err => {
-      console.error("Inbox error:", err);
-      inboxBox.innerHTML = "<p>Error loading proposals.</p>";
-    });
-}
-
-function closeProposalInboxModal() {
-  document.getElementById("proposalInboxModal").classList.remove("open");
 }
 
 // ===== EARNINGS BREAKDOWN =====
@@ -1512,7 +1596,10 @@ document.addEventListener("keydown", (e) => {
   }
 })();
 
-// ===== INITIALIZATION =====
+// ✅ FIX #2: INITIALIZATION WITH MULTIPLE FALLBACKS
+// This ensures the dashboard always hydrates, even if timing is off
+
+// Primary initialization
 window.addEventListener("DOMContentLoaded", () => {
   // Set default username if not exists
   if (!localStorage.getItem("aigentsyUsername")) {
@@ -1556,25 +1643,34 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ===== CLEANUP: HIDE STRAY UI ELEMENTS =====
-setTimeout(() => {
-  try {
-    // Hide any "Set API Key" buttons
-    document.querySelectorAll('button, [role="button"]').forEach(btn => {
-      if ((btn.textContent || '').toLowerCase().includes('set api key')) {
-        let parent = btn;
-        for (let i = 0; i < 5 && parent; i++) {
-          const style = getComputedStyle(parent);
-          if (style.position === 'fixed') {
-            parent.style.display = 'none';
-            break;
-          }
-          parent = parent.parentElement;
-        }
+// Fallback #1: After all scripts load
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const username = localStorage.getItem("aigentsyUsername");
+    if (username && typeof injectUserDashboard === "function") {
+      // Only re-run if chart isn't rendered yet
+      const chart = document.getElementById("walletChart");
+      if (chart && !chart.chartInstance) {
+        console.log("🔄 Fallback #1: Running initialization");
+        injectUserDashboard();
+        autoMatchEngine(username);
       }
-    });
-  } catch(e) {}
-}, 800);
+    }
+  }, 500);
+});
+
+// Fallback #2: Delayed safety net
+setTimeout(() => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username && typeof injectUserDashboard === "function") {
+    const chart = document.getElementById("walletChart");
+    if (chart && !chart.chartInstance) {
+      console.log("🔄 Fallback #2: Running initialization");
+      injectUserDashboard();
+      autoMatchEngine(username);
+    }
+  }
+}, 2000);
 </script>
 
 </body>
