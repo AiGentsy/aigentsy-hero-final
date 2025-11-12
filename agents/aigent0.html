@@ -782,6 +782,48 @@ function openPackagingModal() {
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
+async function matchClients() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing");
+
+  const chatLog = document.getElementById("chatLog");
+  const loader = document.createElement("div");
+  loader.textContent = "🤖 Scanning for client matches...";
+  chatLog.appendChild(loader);
+
+  try {
+    const res = await fetch("https://aigentsy-growth-agent.onrender.com/match_clients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+    loader.remove();
+
+    const message = data.message || "No match message returned.";
+    const matchLink = data.link || null;
+    const partner = data.partner || null;
+    const nextStep = data.action || "Send a proposal or view their profile.";
+
+    let matchHTML = `
+      <div class="chat-response" style="background:#111; border:1px solid #333; padding:12px; margin-top:10px; border-radius:8px;">
+        <strong>🤖 AiGent Growth:</strong>
+        <div style="margin-top:6px;">${message}</div>`;
+
+    if (matchLink && partner) {
+  matchHTML += `
+    <div style="margin-top:8px;">
+      <a href="${matchLink}" class="btn-glow" target="_blank">🔗 View Matched Profile</a>
+      <button class="btn-glow" onclick="openProposalModal('${partner}')">📤 Propose Deal</button>
+    </div>`;
+}
+
+matchHTML += `<div style="margin-top:12px; font-size:0.85rem; color:#ccc;">${nextStep}</div>`;
+matchHTML += `</div>`;
+
+chatLog.insertAdjacentHTML("beforeend", matchHTML);
+
     const buttons = document.createElement("div");
     buttons.className = "chat-response-buttons";
     buttons.innerHTML = `
@@ -1628,6 +1670,12 @@ function showUnlockModal(type) {
   document.getElementById("unlockModal").style.display = "flex";
 }
 
+  function openPackagingModal() {
+  const modal = document.getElementById("packagingModal");
+  const notesBox = document.getElementById("packagingNotes");
+  if (notesBox) notesBox.value = localStorage.getItem("packagingNotes") || "";
+  modal.style.display = "flex";
+}
 
 function closePackagingModal() {
   document.getElementById("packagingModal").style.display = "none";
@@ -1807,6 +1855,9 @@ function handleSubmit(event) {
       icon: "🧠"
     }
   };
+  function openPackagingModal() {
+  document.getElementById("packagingModal").style.display = "flex";
+}
 
 function closePackagingModal() {
   document.getElementById("packagingModal").style.display = "none";
@@ -2146,6 +2197,17 @@ function closeProposalInboxModal() {
       <button class="btn-glow" onclick="submitPackaging()">Save</button>
       <button class="btn-glow" onclick="closePackagingModal()">Close</button>
     </div>
+  </div>
+</div>
+<!-- 📦 Packaging Modal -->
+<div id="packagingModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#111; border:1px solid #444; padding:20px; max-width:540px; width:100%; color:#eee; border-radius:10px; box-shadow:0 0 12px #0ff;">
+    <h3>📦 Create Client Offer</h3>
+    <input id="pkgTitle" type="text" placeholder="Offering Title" style="width:100%; margin-bottom:8px; padding:6px;">
+    <textarea id="pkgDetails" placeholder="What does your offer include?" style="width:100%; height:100px; margin-bottom:8px; padding:6px;"></textarea>
+    <input id="pkgLink" type="url" placeholder="Optional Link (e.g. Google Doc, PDF, Agent Page)" style="width:100%; margin-bottom:12px; padding:6px;">
+    <button class="btn-glow" onclick="submitPackage()">📤 Submit Offer</button>
+    <button style="margin-left:10px;" onclick="closePackagingModal()">Cancel</button>
   </div>
 </div>
 <!-- ✅ Proposal Modal -->
@@ -2787,6 +2849,20 @@ function closeProposalInboxModal() {
   const chatLogEl = document.querySelector(".chat-log");
   if (chatLogEl && !chatLogEl.id) chatLogEl.id = "chatLog";
 
+  ["modalOverlay","packagingModal"].forEach((id) => {
+    const nodes = Array.from(document.querySelectorAll(`#${id}`));
+    nodes.slice(1).forEach(n => n.remove()); // keep first, remove extras
+  });
+
+  // ---- 2) Single, global packaging modal handlers ----
+  window.openPackagingModal = function () {
+    const m = document.getElementById("packagingModal");
+    if (m) m.style.display = "flex";
+  };
+  window.closePackagingModal = function () {
+    const m = document.getElementById("packagingModal");
+    if (m) m.style.display = "none";
+  };
 
   // ---- 3) Proposal Inbox: add O2C & follow-up actions ----
   function attachProposalActions(container) {
@@ -2884,6 +2960,171 @@ function closeProposalInboxModal() {
       document.body.appendChild(holder);
     }
   });
+})();
+</script>
+
+
+
+<style id="aig-overlay-style">
+#aig-set-key-btn{position:fixed;top:12px;right:12px;z-index:9999;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.15);background:#222;color:#fff;opacity:.9}
+#aig-set-key-btn:hover{opacity:1}
+#platformFee{font-weight:600}
+.aig-inline-controls{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.aig-inline-controls input{padding:6px 8px;border:1px solid #ddd;border-radius:8px}
+.aig-inline-controls button{padding:8px 12px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.1);background:#3a7afe;color:#fff}
+</style>
+
+<button id="aig-set-key-btn" onclick="setApiKey()">🔑 Set API Key</button>
+<div>
+    <input id="payoutAmt" type="number" placeholder="Payout amount">
+    <button onclick="requestPayout()">💸 Request Payout</button>
+  </div>
+  <div>
+    <input id="distUrl" placeholder="https://hooks.slack.com/...">
+    <input id="distToken" placeholder="Token (optional)">
+    <button onclick="registerHook()">📡 Register Hook</button>
+  </div>
+  <div>
+    <input id="listingId" placeholder="Listing ID">
+    <button onclick="pushDistribution()">🚀 Push Distribution</button>
+  </div>
+  <div>
+    <input id="jvTitle" placeholder="JV title">
+    <input id="jvA" placeholder="Member A (default: you)">
+    <input id="jvAS" type="number" step="0.01" value="0.5">
+    <input id="jvB" placeholder="Member B (optional)">
+    <input id="jvBS" type="number" step="0.01" value="0.5">
+    <button onclick="createJV()">🤝 Create JV</button>
+  </div>
+  <div>
+    <input id="splitJvId" placeholder="JV id">
+    <input id="splitAmt" type="number" step="0.01" placeholder="Amount">
+    <button onclick="doSplit()">💠 Split</button>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  const AiG = {
+    get apiKey(){ try{return localStorage.getItem("AIG_API_KEY")||""}catch{return ""} },
+    set apiKey(v){ try{localStorage.setItem("AIG_API_KEY", v||"")}catch{} },
+    uname(){ try{
+      const u = (window.aigentsyUser?.username || window.aigentsyUser?.consent?.username || localStorage.getItem("aigentsyUsername") || "");
+      return (u||"").trim();
+    }catch(e){ return "" } },
+    uuid(){ return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); },
+    async post(path, body={}, {idempotent}={}){
+      const headers = {"Content-Type":"application/json"};
+      if (AiG.apiKey) headers["X-API-Key"] = AiG.apiKey;
+      if (idempotent) headers["Idempotency-Key"] = idempotent;
+      const res = await fetch(path, {method:"POST", headers, body: JSON.stringify(body)});
+      let j = {}; try{ j = await res.json(); }catch{}
+      if (!res.ok) throw new Error(j.detail || j.error || (res.status+" "+res.statusText));
+      return j;
+    }
+  };
+  window.AiG = AiG;
+
+  const _origFetch = window.fetch;
+  window.fetch = async function(resource, init={}){
+    try{
+      const url = (typeof resource === "string") ? resource : resource?.url || "";
+      const isSameOrigin = /^\/[^/]/.test(url);
+      const method = (init?.method || "GET").toUpperCase();
+      if (isSameOrigin && method === "POST"){
+        init.headers = init.headers || {};
+        if (!("Content-Type" in init.headers)) init.headers["Content-Type"] = "application/json";
+        if (AiG.apiKey) init.headers["X-API-Key"] = AiG.apiKey;
+      }
+    }catch{}
+    return _origFetch(resource, init);
+  };
+
+  function normalizeRecord(u){
+    if (!u || typeof u !== "object") return u;
+    if (Array.isArray(u.contacts)){
+      u.crm = (u.crm||[]).concat(u.contacts);
+      u.contacts = { sources: [], counts: {}, lastSync: null };
+    }
+    if (!Array.isArray(u.crm)) u.crm = [];
+    if (!u.contacts || typeof u.contacts !== "object") u.contacts = { sources: [], counts: {}, lastSync: null };
+    if (!u.contacts.counts) u.contacts.counts = {};
+    return u;
+  }
+  try{
+    let __u = window.aigentsyUser ? normalizeRecord(window.aigentsyUser) : null;
+    Object.defineProperty(window, "aigentsyUser", {
+      get(){ return __u; },
+      set(v){ __u = normalizeRecord(v); },
+      configurable: true
+    });
+  }catch{}
+
+  window.setApiKey = function(){
+    const k = prompt("Enter your AiGentsy API Key (X-API-Key). Generate from your account or /apikey/issue.");
+    if (k){ AiG.apiKey = k.trim(); alert("Saved."); }
+  };
+
+  window.requestPayout = async function(){
+    const el = document.getElementById("payoutAmt");
+    if (!el) return alert("Payout amount field not found.");
+    const amt = Number(el.value||0);
+    if (!amt) return alert("Enter an amount");
+    const idemp = AiG.uuid();
+    const res = await AiG.post("/payout/request", { username: AiG.uname(), amount: amt }, { idempotent: idemp });
+    alert(`Requested payout: net ${res?.payment?.net} after fee`);
+  };
+
+  function looksUrl(u){
+    try{ const p = new URL(u); return /^https?:$/.test(p.protocol); }catch{ return false }
+  }
+  window.registerHook = async function(){
+    const url = (document.getElementById("distUrl")?.value||"").trim();
+    const token = (document.getElementById("distToken")?.value||"").trim();
+    if (!looksUrl(url)) return alert("Enter a valid https:// URL");
+    await AiG.post("/distribution/register", { username: AiG.uname(), channel: "webhook", endpoint_url: url, token });
+    alert("Webhook registered.");
+  };
+  window.pushDistribution = async function(){
+    const lid = (document.getElementById("listingId")?.value||"").trim();
+    if (!lid) return alert("Enter a listingId");
+    const res = await AiG.post("/distribution/push", { username: AiG.uname(), listingId: lid });
+    alert(res.ok ? "Push sent." : "Push failed.");
+  };
+
+  window.createJV = async function(){
+    const title = (document.getElementById("jvTitle")?.value||"JV").trim();
+    const a = (document.getElementById("jvA")?.value||AiG.uname()).trim();
+    const b = (document.getElementById("jvB")?.value||"").trim() || null;
+    const aS = Number(document.getElementById("jvAS")?.value||0.5);
+    const bS = Number(document.getElementById("jvBS")?.value||0.5);
+    const res = await AiG.post("/jv/create", { username: AiG.uname(), title, a, b, split: {a:aS, b:bS} });
+    if (res?.jv?.id) document.getElementById("splitJvId").value = res.jv.id;
+    alert("JV created.");
+  };
+  window.doSplit = async function(){
+    const jvId = (document.getElementById("splitJvId")?.value||"").trim();
+    const amount = Number(document.getElementById("splitAmt")?.value||0);
+    if (!jvId || !amount) return alert("Enter JV id and amount");
+    const res = await AiG.post("/revenue/split", { username: AiG.uname(), jvId, amount });
+    alert("Split posted: " + JSON.stringify(res.split||[]));
+  };
+
+  async function loadHealth(){
+    try{
+      const r = await fetch("/healthz");
+      if (!r.ok) return;
+      const h = await r.json();
+      const el = document.getElementById("platformFee");
+      if (el) el.textContent = ((h?.fee||0)*100).toFixed(0) + "%";
+    }catch{}
+  }
+  loadHealth();
+
+  setTimeout(()=>{ try{
+    if (window.aigentsyUser) window.aigentsyUser = normalizeRecord(window.aigentsyUser);
+  }catch{} }, 0);
 })();
 </script>
 
@@ -3358,6 +3599,45 @@ const AIGUI = (function(){
 </style>
 
 <div id="gxFab" class="gx-fab">Actions</div>
+
+<aside id="gxDrawer" class="gx-drawer" aria-hidden="true">
+  <header>
+    <h3>Actions</h3>
+    <div>
+      <span id="gxOutcomeChip" class="gx-chip">OS: —</span>
+      <button id="gxClose" class="gx-chip" style="background:#333;">✕</button>
+    </div>
+  </header>
+  <div class="grp">
+    <h4>Launch</h4>
+    <button onclick="GXA.publishStorefront()">🚀 Publish Storefront</button>
+    <button onclick="GXA.copyWidget()">🔗 Copy Widget</button>
+  </div>
+  <div class="grp">
+    <h4>Sell</h4>
+    <button onclick="GXA.quickIntent()">⚡ Quick Intent (90s)</button>
+    <button onclick="GXA.productizeUrl()">🧪 Productize URL</button>
+    <button onclick="GXA.instantQuote()">💳 Instant Quote / Escrow</button>
+  </div>
+  <div class="grp">
+    <h4>Deliver</h4>
+    <button onclick="GXA.issuePoO()">🏅 Proof‑of‑Outcome</button>
+    <button onclick="GXA.bindMedia()">🎞️ Bind Media ↔ Offer</button>
+    <button onclick="GXA.localizeOffer()">🌐 Localize Offer</button>
+  </div>
+  <div class="grp">
+    <h4>Earnings & Payouts</h4>
+    <button onclick="GXA.registerBusiness()">🏢 Register Business</button>
+    <button onclick="GXA.createJV()">🤝 Create JV</button>
+    <button onclick="GXA.payout()">💸 Payout</button>
+  </div>
+  <div class="grp">
+    <h4>Grow</h4>
+    <button onclick="GXA.createTeam()">🧩 Create Team Bundle</button>
+    <button onclick="GXA.scheduleRetarget()">📣 Schedule Retargeter</button>
+    <button onclick="GXA.openMarket()">🏬 Marketplace Top 20</button>
+  </div>
+</aside>
 
 <div id="gxModal" class="gx-modal" role="dialog" aria-modal="true">
   <div class="panel">
@@ -4051,6 +4331,55 @@ setTimeout(()=>{
 
 })(); 
 </script>
+  
+<script>
+(function restoreChatControls(){
+  if (window.__CHAT_WIRED__) return; window.__CHAT_WIRED__=true;
+  const ta = document.getElementById('agentInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const qa = document.getElementById('chatQuickActions');
+  // If original handler exists, keep it. Else wire a default POST /agent.
+  const origSend = sendBtn ? sendBtn.onclick : null;
+  async function defaultSend(){
+    if (!ta) return;
+    const text = (ta.value||'').trim(); if(!text) return;
+    try{
+      const r = await fetch('/agent', {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ input: text, username: (window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername') || 'guest') })
+      });
+      const j = await r.json();
+      const log = document.querySelector('.chat-log');
+      const pre = document.createElement('pre'); pre.className='aigx-code';
+      pre.textContent = JSON.stringify(j, null, 2);
+      (log||document.body).appendChild(pre);
+      ta.value='';
+    }catch(e){ console.error(e); }
+  }
+  if (sendBtn){
+    sendBtn.addEventListener('click', (e)=>{
+      if (typeof origSend === 'function'){ origSend.call(sendBtn, e); }
+      else { defaultSend(); }
+    });
+  }
+  if (ta && sendBtn){
+    ta.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+  }
+  if (qa && ta){
+    qa.querySelectorAll('button.mini').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const cmd = b.getAttribute('data-fill') || '';
+        ta.value = cmd;
+        ta.focus();
+      });
+    });
+  }
+})();
+</script>
 
 <!-- AiGentsy C-Suite Chat — Unified Orchestrator v4.5 (scored roles + neutral typing fallback) -->
 <script>
@@ -4073,10 +4402,12 @@ setTimeout(()=>{
     CEO_ADVICE:"👑 For you, the CEO — decision frame:",
     COO:"🛠 COO — Ops & delivery:",
     CTO:"🧬 CTO — SDK & platform:",
+    CPO:"🧪 CPO — Product & UX:",
     CMO:"📣 CMO — Growth & partners:",
     CRO:"💼 CRO — Revenue & sales:",
     CLO:"📜 CLO — IP & licensing:",
     CFO:"💰 CFO — Pricing & payouts:",
+    CAIO:"🤖 CAIO — AI/agents & research:"
   };
   const ROLES = Object.keys(HEAD);
 
