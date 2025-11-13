@@ -1199,18 +1199,14 @@ async function injectUserDashboard() {
       kitDocBox.innerHTML = doc || "No kit detected.";
     }
 
-    // ✅ FIX #1: WALLET CHART RENDERING - WITH RETRY LOGIC
+    // ✅ WALLET CHART RENDERING (simplified with guaranteed Chart.js)
     const walletChart = document.getElementById('walletChart');
-    if (walletChart) {
-      const renderChart = () => {
-        if (!window.Chart) {
-          console.warn("Chart.js not loaded yet, retrying...");
-          setTimeout(renderChart, 100);
-          return;
-        }
-
+    if (walletChart && window.Chart) {
+      try {
+        // Destroy existing chart instance if it exists
         if (walletChart.chartInstance) {
           walletChart.chartInstance.destroy();
+          console.log("♻️ Destroyed existing chart instance");
         }
 
         const remixCount = user.remixUnlocked.remixCount || 0;
@@ -1225,57 +1221,55 @@ async function injectUserDashboard() {
           remixCount, remixCredits, vaultYield, remixYield, aigxEarned, staked, referrals
         });
 
-        try {
-          walletChart.chartInstance = new Chart(walletChart, {
-            type: 'bar',
-            data: {
-              labels: [
-                'Remix Count',
-                'Remix Credits',
-                'Vault Yield',
-                'Remix Yield',
-                'AIGx Earned',
-                'Staked',
-                'Referrals'
+        walletChart.chartInstance = new Chart(walletChart, {
+          type: 'bar',
+          data: {
+            labels: [
+              'Remix Count',
+              'Remix Credits',
+              'Vault Yield',
+              'Remix Yield',
+              'AIGx Earned',
+              'Staked',
+              'Referrals'
+            ],
+            datasets: [{
+              data: [
+                remixCount,
+                remixCredits,
+                vaultYield,
+                remixYield,
+                aigxEarned,
+                staked,
+                referrals
               ],
-              datasets: [{
-                data: [
-                  remixCount,
-                  remixCredits,
-                  vaultYield,
-                  remixYield,
-                  aigxEarned,
-                  staked,
-                  referrals
-                ],
-                backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
-                borderRadius: 6
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: { color: '#888' },
-                  grid: { color: '#222' }
-                },
-                x: {
-                  ticks: { color: '#aaa' },
-                  grid: { display: false }
-                }
+              backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#888' },
+                grid: { color: '#222' }
+              },
+              x: {
+                ticks: { color: '#aaa' },
+                grid: { display: false }
               }
             }
-          });
-          console.log("✅ Chart rendered successfully");
-        } catch (chartError) {
-          console.error("❌ Chart rendering error:", chartError);
-        }
-      };
-
-      renderChart();
+          }
+        });
+        console.log("✅ Chart rendered successfully");
+      } catch (chartError) {
+        console.error("❌ Chart rendering error:", chartError);
+      }
+    } else if (walletChart && !window.Chart) {
+      console.warn("⚠️ Chart.js not available, skipping chart render");
     }
 
   } catch (e) {
@@ -1688,27 +1682,46 @@ document.addEventListener("keydown", (e) => {
   }
 })();
 
-// ✅ FIX #2: COMPREHENSIVE INITIALIZATION WITH MULTIPLE FALLBACKS
+// ✅ HYDRATION FIX: COORDINATED INITIALIZATION
 
-// Initialize immediately when DOM ready
-function initializeDashboard() {
-  console.log("🚀 Initializing dashboard...");
-  
+// Global flag to prevent multiple initializations
+let dashboardInitialized = false;
+let chartJsReady = false;
+
+// Check if Chart.js is loaded
+function waitForChartJs(callback, retries = 20) {
+  if (window.Chart) {
+    console.log("✅ Chart.js loaded successfully");
+    chartJsReady = true;
+    callback();
+  } else if (retries > 0) {
+    console.log(`⏳ Waiting for Chart.js... (${retries} retries left)`);
+    setTimeout(() => waitForChartJs(callback, retries - 1), 200);
+  } else {
+    console.error("❌ Chart.js failed to load after all retries");
+    chartJsReady = false;
+    callback(); // Continue without chart
+  }
+}
+
+// Initialize dashboard once all dependencies are ready
+async function initializeDashboard() {
+  if (dashboardInitialized) {
+    console.log("⚠️ Dashboard already initialized, skipping...");
+    return;
+  }
+
+  console.log("🚀 Starting dashboard initialization...");
+
   // Set default username if not exists
   if (!localStorage.getItem("aigentsyUsername")) {
     localStorage.setItem("aigentsyUsername", "admin4");
   }
 
   const username = localStorage.getItem("aigentsyUsername") || "You";
+  console.log("👤 User:", username);
 
-  // Initialize user data and chart
-  if (username) {
-    console.log("👤 Loading user:", username);
-    injectUserDashboard();
-    autoMatchEngine(username);
-  }
-
-  // Update C-Suite box
+  // Update C-Suite box (non-blocking)
   const csuiteBox = document.getElementById("csuiteBox");
   if (csuiteBox) {
     const cSuiteRoles = [
@@ -1728,50 +1741,56 @@ function initializeDashboard() {
     `;
   }
 
-  // Preload chat message
+  // Preload chat message (non-blocking)
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
     preload.innerHTML = `Hey! Ready to grow your business? Just ask me anything.`;
     chatLog.appendChild(preload);
   }
-}
 
-// Primary initialization - DOM ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeDashboard);
-} else {
-  initializeDashboard();
-}
+  // Mark as initialized early to prevent race conditions
+  dashboardInitialized = true;
 
-// Fallback #1: After all resources load
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const chart = document.getElementById("walletChart");
-    if (chart && !chart.chartInstance) {
-      console.log("🔄 Fallback #1: Running initialization");
-      initializeDashboard();
+  // Load user data and render (async)
+  try {
+    if (username) {
+      console.log("📊 Loading user data and initializing components...");
+      // These are async but we don't block on them
+      injectUserDashboard().catch(err => {
+        console.error("❌ Error in injectUserDashboard:", err);
+      });
+      autoMatchEngine(username).catch(err => {
+        console.error("❌ Error in autoMatchEngine:", err);
+      });
     }
-  }, 500);
-});
-
-// Fallback #2: Delayed safety net
-setTimeout(() => {
-  const chart = document.getElementById("walletChart");
-  if (chart && !chart.chartInstance) {
-    console.log("🔄 Fallback #2: Running initialization");
-    initializeDashboard();
+    console.log("✅ Dashboard initialization complete");
+  } catch (err) {
+    console.error("❌ Dashboard initialization error:", err);
   }
-}, 2000);
+}
 
-// Fallback #3: Final retry
-setTimeout(() => {
-  const chart = document.getElementById("walletChart");
-  if (chart && !chart.chartInstance) {
-    console.log("🔄 Fallback #3: Final initialization attempt");
-    initializeDashboard();
+// Coordinated startup sequence
+function startupSequence() {
+  console.log("🔧 Starting coordinated initialization sequence...");
+
+  // Wait for DOM to be fully ready
+  if (document.readyState === 'loading') {
+    console.log("⏳ Waiting for DOM...");
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("✅ DOM ready");
+      // Wait for Chart.js, then initialize
+      waitForChartJs(initializeDashboard);
+    });
+  } else {
+    console.log("✅ DOM already ready");
+    // Wait for Chart.js, then initialize
+    waitForChartJs(initializeDashboard);
   }
-}, 5000);
+}
+
+// Start the sequence
+startupSequence();
 </script>
 
 </body>
