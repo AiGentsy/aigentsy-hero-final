@@ -1050,11 +1050,24 @@ if (dropZone) {
 // ===== USER DASHBOARD INJECTION =====
 async function injectUserDashboard() {
   const username = localStorage.getItem("aigentsyUsername");
-  
+
   if (!username) {
     console.warn("No username found. Skipping user injection.");
     return;
   }
+
+  // Default/fallback user data
+  let user = {
+    username: username,
+    remixUnlocked: { remixCount: 0, remixCredits: 0 },
+    yield: { vaultYield: 0, remixYield: 0, aigxEarned: 0 },
+    cloneLineage: [],
+    staked: 0,
+    traits: [],
+    sdkAccess_eligible: false,
+    vaultAccess: false,
+    cloneLicenseUnlocked: false
+  };
 
   try {
     const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
@@ -1064,21 +1077,27 @@ async function injectUserDashboard() {
     });
 
     const data = await res.json();
-    const user = data.record || data.user || null;
-    window.aigentsyUser = user;
-    
-    if (!user) {
-      console.warn("No user data returned");
-      return;
+    const fetchedUser = data.record || data.user || null;
+
+    if (fetchedUser) {
+      user = fetchedUser;
+      console.log("✅ User data loaded from API:", user);
+    } else {
+      console.warn("⚠️ No user data returned from API, using fallback");
     }
+  } catch (fetchError) {
+    console.warn("⚠️ API fetch failed, using fallback data:", fetchError.message);
+    console.log("📊 Rendering with demo/mock data");
+  }
 
-    // Ensure user structure exists
-    user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
-    user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
-    user.cloneLineage = user.cloneLineage || [];
-    user.traits = user.traits || [];
+  // Ensure user structure exists (defensive programming)
+  user.remixUnlocked = user.remixUnlocked || { remixCount: 0, remixCredits: 0 };
+  user.yield = user.yield || { vaultYield: 0, remixYield: 0, aigxEarned: 0 };
+  user.cloneLineage = user.cloneLineage || [];
+  user.traits = user.traits || [];
 
-    console.log("✅ User data loaded:", user);
+  window.aigentsyUser = user;
+  console.log("✅ User data loaded:", user);
 
     // Business Summary List
     const summaryBox = document.getElementById("businessSummaryList");
@@ -1279,6 +1298,15 @@ async function injectUserDashboard() {
 
 // ===== AUTO MATCH ENGINE =====
 async function autoMatchEngine(username) {
+  let user = {
+    sdkAccess_eligible: false,
+    vaultAccess: false,
+    remixUnlocked: false,
+    cloneLicenseUnlocked: false,
+    yield: { aigxEarnedEnabled: false },
+    traits: []
+  };
+
   try {
     const res = await fetch("https://aigentsy-ame-runtime.onrender.com/user", {
       method: "POST",
@@ -1287,8 +1315,15 @@ async function autoMatchEngine(username) {
     });
 
     const data = await res.json();
-    const user = data.record || data;
-    if (!user) return;
+    const fetchedUser = data.record || data;
+    if (fetchedUser) {
+      user = fetchedUser;
+    } else {
+      console.warn("⚠️ autoMatchEngine: No user data, using defaults");
+    }
+  } catch (fetchError) {
+    console.warn("⚠️ autoMatchEngine: API failed, using default offerings:", fetchError.message);
+  }
 
     const list = document.getElementById("autoMatchOfferings");
     if (!list) return;
@@ -1358,10 +1393,6 @@ async function autoMatchEngine(username) {
       }
       list.appendChild(li);
     });
-
-  } catch (err) {
-    console.error("autoMatchEngine() error:", err);
-  }
 }
 
 async function unlockOffering(username, offeringId, stripeLink) {
