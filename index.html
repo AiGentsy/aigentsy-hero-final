@@ -260,60 +260,214 @@
       return null;
     }
 
-    async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-      if (!JSONBIN_URL || !JSONBIN_SECRET) return; // skip if not configured
-      const now = new Date().toISOString();
-      const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
-      const entry = {
-        id: `User #${Date.now()}`,
-        consent: { agreed: true, username, timestamp: now },
-        trait: selectedAgent || "founder",
-        traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-        prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
-        offeringType: "kit",
-        offeringKeywords:
-          selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
-        : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
-        : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
-        : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
-        : ["custom", "idea", "autonomous", "builder"],
-        referral: referralCode || "origin/hero",
-        runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-        mintTime: now,
-        role: roleMap[selectedAgent || "general"],
-        protocol: "MetaUpgrade25+26",
-        realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
-        metaVenture: {
-          ventureHive: "Autonomous Launch",
-          ventureRole: roleMap[selectedAgent || "general"],
-          ventureStatus: "Pending",
-          ventureID: `MV-${Date.now()}`
-        },
-        remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
-        mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Pending", sentinelAlert: false },
-        yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
-        earningsEnabled: true, listingStatus: "Active", protocolStatus: "Bound", tethered: true,
-        name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
-        sdkAccess_eligible: selectedAgent === "saas",
-        sdkAccess: false, vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false,
-        licensingApproved: false, stripeUnlocked: true,
-        productsPurchased: [], teachStage: 1, teachInComplete: false,
-        complianceReviewed: false, complianceLog: [], teachInLog: [],
-        runtimeFlags: { flagged: false, eligibleForAudit: true, needsReview: false, vaultAccess: true }
-      };
-      try {
-        const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-        const currentData = await getRes.json().catch(() => ({ record: [] }));
-        const updatedArray = Array.isArray(currentData.record) ? [...currentData.record, entry] : [entry];
-        await fetch(JSONBIN_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-          body: JSON.stringify({ record: updatedArray })
-        });
-      } catch (err) {
-        console.warn("JSONBin skipped:", err);
-      }
-    }
+async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
+  if (!JSONBIN_URL || !JSONBIN_SECRET) return;
+  const now = new Date().toISOString();
+  const roleMap = { 
+    legal: "CLO", 
+    social: "CMO", 
+    saas: "CTO", 
+    marketing: "CMO", 
+    custom: "CEO", 
+    general: "CEO" 
+  };
+  
+  // ✅ COMPLETE USER ENTRY matching dashboard expectations
+  const entry = {
+    schemaVersion: 3,
+    id: `user_${Date.now()}`,
+    username: username,  // ✅ Add username at root level
+    consent: { 
+      agreed: true, 
+      username: username, 
+      timestamp: now 
+    },
+    companyType: companyTypeMap(selectedAgent),
+    created: now,
+    mintTime: now,
+    customInput: customDescription || "",
+    meta_role: roleMap[selectedAgent || "general"],
+    role: roleMap[selectedAgent || "general"],
+    
+    // ✅ Traits
+    trait: selectedAgent || "founder",
+    traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
+    
+    // ✅ Runtime flags
+    runtimeFlags: {
+      vaultAccess: true,
+      remixUnlocked: false,
+      cloneLicenseUnlocked: false,
+      sdkAccess_eligible: selectedAgent === "saas",
+      flagged: false,
+      eligibleForAudit: true,
+      needsReview: false
+    },
+    
+    // ✅ Wallet structure
+    wallet: {
+      address: "0x0",
+      staked: 0
+    },
+    staked: 0,
+    
+    // ✅ Yield structure
+    yield: {
+      autoStake: false,
+      aigxEarned: 0,
+      vaultYield: 0,
+      remixYield: 0,
+      aigxAttributedTo: [],
+      aigxEarnedEnabled: false
+    },
+    
+    // ✅ Remix structure (as object, not just properties)
+    remixUnlocked: false,
+    remixUnlockedForks: 0,
+    remix: {
+      remixCount: 0,
+      remixCredits: 1000,
+      lineageDepth: 0,
+      royaltyTerms: "Standard 30%"
+    },
+    
+    // ✅ Clone lineage
+    cloneLineage: [],
+    cloneLicenseUnlocked: false,
+    
+    // ✅ Additional expected fields
+    proposals: [],
+    orders: [],
+    invoices: [],
+    payments: [],
+    contacts: [],
+    meetings: [],
+    kpi_snapshots: [],
+    docs: [],
+    ownership: { ledger: [] },
+    
+    // ✅ Kits
+    kits: {
+      universal: { unlocked: true },
+      growth: { unlocked: false },
+      legal: { unlocked: selectedAgent === "legal" },
+      sdk: { unlocked: false },
+      branding: { unlocked: false },
+      marketing: { unlocked: selectedAgent === "marketing" },
+      social: { unlocked: selectedAgent === "social" }
+    },
+    
+    // ✅ Other structures
+    metaloop: {
+      enabled: true,
+      lastMatchCheck: null,
+      proposalHistory: []
+    },
+    metabridge: {
+      active: true,
+      lastBridge: null,
+      bridgeCount: 0
+    },
+    automatch: {
+      status: "pending",
+      lastMatchResult: null,
+      matchReady: true
+    },
+    
+    // Legacy compatibility
+    referral: referralCode || "origin/hero",
+    runtimeURL: "https://aigentsy.com/agents/aigent0.html",
+    protocol: "MetaUpgrade25+26",
+    realm: { 
+      name: "Realm 101 — Strategic Expansion", 
+      joinedAt: now 
+    },
+    metaVenture: {
+      ventureHive: "Autonomous Launch",
+      ventureRole: roleMap[selectedAgent || "general"],
+      ventureStatus: "Pending",
+      ventureID: `MV-${Date.now()}`
+    },
+    mirror: {
+      mirroredInRealms: ["Realm 101 — Strategic Expansion"],
+      mirrorIntegrity: "Verified",
+      sentinelAlert: false
+    },
+    
+    earningsEnabled: true,
+    listingStatus: "active",
+    protocolStatus: "Bound",
+    tethered: true,
+    name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
+    
+    sdkAccess_eligible: selectedAgent === "saas",
+    sdkAccess: false,
+    vaultAccess: true,
+    
+    licenses: {
+      sdk: false,
+      vault: false,
+      remix: false,
+      clone: false,
+      aigx: false
+    },
+    
+    transactions: {
+      unlocks: [],
+      yieldEvents: [],
+      referralEvents: []
+    },
+    
+    aigxUnlockReady: true,
+    offRampRequested: false,
+    
+    packaging: {
+      kits_sent: [],
+      proposals: [],
+      custom_files: [],
+      active: false
+    },
+    
+    offerings: {
+      products: [],
+      services: [],
+      pricing: [],
+      description: ""
+    },
+    
+    licensingApproved: false,
+    stripeUnlocked: true,
+    productsPurchased: [],
+    teachStage: 1,
+    teachInComplete: false,
+    complianceReviewed: false,
+    complianceLog: [],
+    teachInLog: []
+  };
+  
+  try {
+    const getRes = await fetch(JSONBIN_URL, { 
+      headers: { "X-Master-Key": JSONBIN_SECRET } 
+    });
+    const currentData = await getRes.json().catch(() => ({ record: [] }));
+    const updatedArray = Array.isArray(currentData.record) 
+      ? [...currentData.record, entry] 
+      : [entry];
+    
+    await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-Master-Key": JSONBIN_SECRET 
+      },
+      body: JSON.stringify(updatedArray)  // ✅ Send raw array, JSONBin wraps it
+    });
+    
+    console.log("✅ User registered to JSONBin:", username);
+  } catch (err) {
+    console.error("❌ JSONBin registration failed:", err);
+  }
+}
 
     async function mintOnce({ username, companyType, referral, customInput, template }) {
       const res = await fetch(API.mint, {
