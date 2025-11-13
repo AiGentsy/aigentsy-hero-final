@@ -261,7 +261,11 @@
     }
 
 async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-  if (!JSONBIN_URL || !JSONBIN_SECRET) return;
+  if (!JSONBIN_URL || !JSONBIN_SECRET) {
+    console.warn("⚠️ JSONBin not configured");
+    return;
+  }
+  
   const now = new Date().toISOString();
   const roleMap = { 
     legal: "CLO", 
@@ -272,11 +276,11 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     general: "CEO" 
   };
   
-  // ✅ COMPLETE USER ENTRY matching dashboard expectations
+  // ✅ COMPLETE user entry with ALL required fields
   const entry = {
     schemaVersion: 3,
     id: `user_${Date.now()}`,
-    username: username,  // ✅ Add username at root level
+    username: username,  // ✅ Critical: username at root level
     consent: { 
       agreed: true, 
       username: username, 
@@ -289,11 +293,11 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     meta_role: roleMap[selectedAgent || "general"],
     role: roleMap[selectedAgent || "general"],
     
-    // ✅ Traits
+    // Traits
     trait: selectedAgent || "founder",
     traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
     
-    // ✅ Runtime flags
+    // Runtime flags as OBJECT
     runtimeFlags: {
       vaultAccess: true,
       remixUnlocked: false,
@@ -304,14 +308,14 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       needsReview: false
     },
     
-    // ✅ Wallet structure
+    // Wallet as OBJECT
     wallet: {
       address: "0x0",
       staked: 0
     },
     staked: 0,
     
-    // ✅ Yield structure
+    // Yield as OBJECT
     yield: {
       autoStake: false,
       aigxEarned: 0,
@@ -321,7 +325,7 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       aigxEarnedEnabled: false
     },
     
-    // ✅ Remix structure (as object, not just properties)
+    // Remix as OBJECT (not just boolean)
     remixUnlocked: false,
     remixUnlockedForks: 0,
     remix: {
@@ -331,11 +335,9 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       royaltyTerms: "Standard 30%"
     },
     
-    // ✅ Clone lineage
+    // Collections
     cloneLineage: [],
     cloneLicenseUnlocked: false,
-    
-    // ✅ Additional expected fields
     proposals: [],
     orders: [],
     invoices: [],
@@ -346,7 +348,7 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     docs: [],
     ownership: { ledger: [] },
     
-    // ✅ Kits
+    // Kits
     kits: {
       universal: { unlocked: true },
       growth: { unlocked: false },
@@ -357,7 +359,7 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       social: { unlocked: selectedAgent === "social" }
     },
     
-    // ✅ Other structures
+    // Meta structures
     metaloop: {
       enabled: true,
       lastMatchCheck: null,
@@ -374,10 +376,11 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       matchReady: true
     },
     
-    // Legacy compatibility
+    // Other required fields
     referral: referralCode || "origin/hero",
     runtimeURL: "https://aigentsy.com/agents/aigent0.html",
     protocol: "MetaUpgrade25+26",
+    
     realm: { 
       name: "Realm 101 — Strategic Expansion", 
       joinedAt: now 
@@ -444,6 +447,135 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     complianceLog: [],
     teachInLog: []
   };
+  
+  try {
+    console.log("📡 Fetching current JSONBin data...");
+    const getRes = await fetch(JSONBIN_URL, { 
+      headers: { "X-Master-Key": JSONBIN_SECRET } 
+    });
+    
+    if (!getRes.ok) {
+      throw new Error(`JSONBin GET failed: ${getRes.status}`);
+    }
+    
+    const currentData = await getRes.json();
+    console.log("📦 Current data structure:", typeof currentData, Array.isArray(currentData));
+    
+    // Extract array from JSONBin response
+    let currentArray = [];
+    if (currentData && typeof currentData === 'object') {
+      if (Array.isArray(currentData.record)) {
+        currentArray = currentData.record;
+      } else if (Array.isArray(currentData)) {
+        currentArray = currentData;
+      }
+    }
+    
+    console.log(`📝 Current users: ${currentArray.length}`);
+    
+    // Check if user already exists
+    const existingIndex = currentArray.findIndex(u => 
+      u.username === username || u.consent?.username === username
+    );
+    
+    if (existingIndex >= 0) {
+      console.log("⚠️ User exists, updating...");
+      currentArray[existingIndex] = entry;
+    } else {
+      console.log("✅ Adding new user");
+      currentArray.push(entry);
+    }
+    
+    console.log(`💾 Saving ${currentArray.length} users...`);
+    
+    // ✅ Send raw array - JSONBin wraps it
+    const putRes = await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-Master-Key": JSONBIN_SECRET 
+      },
+      body: JSON.stringify(currentArray)
+    });
+    
+    if (!putRes.ok) {
+      const errorText = await putRes.text();
+      throw new Error(`JSONBin PUT failed: ${putRes.status} - ${errorText}`);
+    }
+    
+    const result = await putRes.json();
+    console.log("✅ JSONBin save result:", result);
+    console.log("✅ User registered successfully!");
+    
+  } catch (err) {
+    console.error("❌ JSONBin error:", err);
+    throw err;
+  }
+}
+  
+  try {
+    console.log("📡 Fetching current JSONBin data...");
+    const getRes = await fetch(JSONBIN_URL, { 
+      headers: { "X-Master-Key": JSONBIN_SECRET } 
+    });
+    
+    if (!getRes.ok) {
+      throw new Error(`JSONBin GET failed: ${getRes.status}`);
+    }
+    
+    const currentData = await getRes.json();
+    console.log("📦 Current data:", currentData);
+    
+    // Get the current array
+    let currentArray = [];
+    if (currentData && typeof currentData === 'object') {
+      if (Array.isArray(currentData.record)) {
+        currentArray = currentData.record;
+      } else if (Array.isArray(currentData)) {
+        currentArray = currentData;
+      }
+    }
+    
+    console.log(`📝 Current users in JSONBin: ${currentArray.length}`);
+    
+    // Check if user already exists
+    const existingIndex = currentArray.findIndex(u => 
+      u.username === username || u.consent?.username === username
+    );
+    
+    if (existingIndex >= 0) {
+      console.log("⚠️ User already exists, updating...");
+      currentArray[existingIndex] = entry;
+    } else {
+      console.log("✅ Adding new user...");
+      currentArray.push(entry);
+    }
+    
+    console.log(`📡 Saving ${currentArray.length} users to JSONBin...`);
+    
+    // ✅ Send as raw array - JSONBin will wrap it
+    const putRes = await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: { 
+        "Content-Type": "application/json", 
+        "X-Master-Key": JSONBIN_SECRET 
+      },
+      body: JSON.stringify(currentArray)  // Send raw array
+    });
+    
+    if (!putRes.ok) {
+      const errorText = await putRes.text();
+      throw new Error(`JSONBin PUT failed: ${putRes.status} - ${errorText}`);
+    }
+    
+    console.log("✅ User registered to JSONBin successfully!");
+    
+  } catch (err) {
+    console.error("❌ JSONBin registration failed:", err);
+    throw err;  // Re-throw so we can catch it in the button handler
+  }
+}
+
   
   try {
     const getRes = await fetch(JSONBIN_URL, { 
@@ -677,57 +809,6 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     return null;
   }
 
-  async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-    if (!JSONBIN_URL || !JSONBIN_SECRET) return;
-    const now = new Date().toISOString();
-    const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
-    const entry = {
-      id: `User #${Date.now()}`,
-      consent: { agreed: true, username, timestamp: now },
-      trait: selectedAgent || "founder",
-      traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-      prebuiltKit: ["legal", "social", "saas", "marketing"].includes(selectedAgent) ? selectedAgent : "universal",
-      offeringType: "kit",
-      offeringKeywords:
-        selectedAgent === "social" ? ["tiktok", "instagram", "reels", "launch", "content"]
-      : selectedAgent === "saas" ? ["software", "tool", "platform", "tech"]
-      : selectedAgent === "legal" ? ["contracts", "ip", "nda", "compliance"]
-      : selectedAgent === "marketing" ? ["seo", "ads", "growth", "funnels"]
-      : ["custom", "idea", "autonomous", "builder"],
-      referral: referralCode || "origin/hero",
-      runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-      mintTime: now,
-      role: roleMap[selectedAgent || "general"],
-      protocol: "MetaUpgrade25+26",
-      realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
-      metaVenture: { ventureHive: "Autonomous Launch", ventureRole: roleMap[selectedAgent || "general"],
-                     ventureStatus: "Pending", ventureID: `MV-${Date.now()}` },
-      remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
-      mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Pending", sentinelAlert: false },
-      yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
-      earningsEnabled: true, listingStatus: "Active", protocolStatus: "Bound", tethered: true,
-      name: `AiGent ${roleMap[selectedAgent || "general"] || "Founder"}`,
-      sdkAccess_eligible: selectedAgent === "saas",
-      sdkAccess: false, vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false,
-      licensingApproved: false, stripeUnlocked: true,
-      productsPurchased: [], teachStage: 1, teachInComplete: false,
-      complianceReviewed: false, complianceLog: [], teachInLog: [],
-      runtimeFlags: { flagged: false, eligibleForAudit: true, needsReview: false, vaultAccess: true }
-    };
-    try {
-      const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-      const currentData = await getRes.json().catch(() => ({ record: [] }));
-      const updatedArray = Array.isArray(currentData.record) ? [...currentData.record, entry] : [entry];
-      await fetch(JSONBIN_URL, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-        body: JSON.stringify({ record: updatedArray })
-      });
-    } catch (err) {
-      console.warn("JSONBin skipped:", err);
-    }
-  }
-
   async function mintOnce({ username, companyType, referral, customInput, template }) {
     const res = await fetch(API.mint, {
       method: "POST",
@@ -794,42 +875,41 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
     };
 
     enterBtn.addEventListener('click', async () => {
-      if (enterBtn.disabled) return;
-      const username = (usernameInput.value || "").trim();
-      if (!username) { alert("Enter a username"); return; }
-      const companyType = companyTypeMap(selectedAgent);
-      const idea        = (searchInput && searchInput.value || "").trim();
-      const template    = guessTemplateFromSearch(idea);
+  if (enterBtn.disabled) return;
+  const username = (usernameInput.value || "").trim();
+  if (!username) { alert("Enter a username"); return; }
+  const companyType = companyTypeMap(selectedAgent);
+  const idea = (searchInput && searchInput.value || "").trim();
+  const template = guessTemplateFromSearch(idea);
 
-      try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
-      try { localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false"); } catch(e){}
-      try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
-      try { localStorage.setItem("aigentsyAuthMode", authMode); } catch(e){}
-      if (template) { try { localStorage.setItem("aigentsyTemplate", JSON.stringify(template)); } catch(e){} }
+  // Save to localStorage
+  try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
+  try { localStorage.setItem("aigentsyUserConsent", agreeCheckbox.checked ? "true" : "false"); } catch(e){}
+  try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+  try { localStorage.setItem("aigentsyAuthMode", authMode); } catch(e){}
+  if (template) { try { localStorage.setItem("aigentsyTemplate", JSON.stringify(template)); } catch(e){} }
 
-      registerUserToJSONBin(username, selectedAgent, idea, referral);
-
-      enterBtn.disabled = true;
-      const oldText = enterBtn.textContent;
-      enterBtn.textContent = "Minting…";
-      try {
-        await mintOnce({ username, companyType, referral, customInput: idea, template });
-        await publishStarterOffer(username, idea, companyType);
-        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
-      } catch (e) {
-        console.error(e);
-        alert("❌ Could not mint your AiGentsy. Please try again.");
-      } finally {
-        enterBtn.disabled = false;
-        enterBtn.textContent = oldText;
-      }
-    });
-
-    updateButtonState();
+  enterBtn.disabled = true;
+  const oldText = enterBtn.textContent;
+  enterBtn.textContent = "Creating your AiGentsy...";
+  
+  try {
+    // ✅ ONLY register to JSONBin - skip backend for now
+    console.log("📝 Registering user to JSONBin:", username);
+    await registerUserToJSONBin(username, selectedAgent, idea, referral);
+    console.log("✅ User registered successfully");
+    
+    // ✅ Go straight to dashboard
+    console.log("🚀 Redirecting to dashboard...");
+    window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+    
+  } catch (e) {
+    console.error("❌ Registration failed:", e);
+    alert("❌ Could not create your AiGentsy. Please try again.");
+    enterBtn.disabled = false;
+    enterBtn.textContent = oldText;
   }
-
-  bindEvents();
-})();
+});
 </script>
 
 </body>
