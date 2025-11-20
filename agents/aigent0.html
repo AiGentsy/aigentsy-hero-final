@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="/theme.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-  /* [KEEPING ALL YOUR EXISTING STYLES - NOT REPEATING FOR BREVITY] */
   .col-left { display: flex; flex-direction: column; gap: 20px; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: radial-gradient(circle at center, #0e101a, #000); color: #fff; display: flex; }
   .sidebar { width: 320px; background: #0a0a0a; padding: 30px 20px; }
@@ -62,18 +61,15 @@
 </style>
 </head>
 <body>
-<!-- Live Feed -->
 <div id="gxLive" class="gx-live">
   <h4>Live Activity</h4>
   <div id="gxLiveList" class="gx-live-list"></div>
 </div>
-<!-- Sidebar -->
 <div class="sidebar">
   <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
   <div class="chart-section">
     <canvas id="walletChart" width="300" height="300"></canvas>
   </div>
-  <!-- ✅ DYNAMIC C-SUITE BOX -->
   <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
     <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
     <ul style="padding-left: 18px; font-size: 0.9rem;" id="csuiteList">
@@ -81,7 +77,6 @@
     </ul>
     <p id="csuiteNote" style="font-size: 0.85rem; color: #888;"></p>
   </div>
-  <!-- ✅ DYNAMIC KIT BOX -->
   <div class="chart-sidebar-box" id="businessSummarySidebarBox">
     <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
     <div style="margin-bottom:10px;">
@@ -94,9 +89,7 @@
     <ul id="businessSummaryList" style="padding-left:18px;"></ul>
   </div>
 </div>
-<!-- Main Content -->
 <div class="main">
-  <!-- ✅ DYNAMIC WELCOME BOX -->
   <div class="metric-box full-width">
     <h2 id="welcomeTitle">Loading your AiGentsy...</h2>
     <p id="welcomeDescription">Setting up your autonomous business unit...</p>
@@ -128,7 +121,6 @@
   <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
 </div>
 
-<!-- ✅ DYNAMIC ACHIEVEMENTS -->
 <div class="metric-box">
   <h3>🏆 Team Achievements</h3>
   <ul id="achievementList">
@@ -182,7 +174,6 @@
   </div>
 </div>
 
-<!-- Compact Snapshot -->
 <div id="compactSnapshot" class="metric-box">
   <h3>🧭 Compact Snapshot</h3>
   <div class="csn-grid">
@@ -236,7 +227,6 @@
 </div>
   </div>
 </div>
-<!-- [KEEPING ALL YOUR EXISTING MODALS AND UI ELEMENTS] -->
 <div id="gxFab" class="gx-fab">Actions</div>
 <aside id="gxDrawer" class="gx-drawer" aria-hidden="true">
   <header>
@@ -308,6 +298,8 @@
   </div>
 </div>
 <script>
+console.log("🚀 Script loading...");
+
 // ===== GLOBAL CONFIG =====
 window.BACKEND_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
 window.aigentsyUser = null;
@@ -520,6 +512,7 @@ function getBusinessConfig(companyType) {
 }
 
 function renderDynamicWelcome(user) {
+  console.log("📝 Rendering welcome");
   const config = getBusinessConfig(user.companyType);
   
   document.getElementById("welcomeTitle").textContent = config.title;
@@ -530,6 +523,7 @@ function renderDynamicWelcome(user) {
 }
 
 function renderDynamicCSuite(user) {
+  console.log("👔 Rendering C-Suite");
   const config = getBusinessConfig(user.companyType);
   const csuiteList = document.getElementById("csuiteList");
   
@@ -546,6 +540,7 @@ function renderDynamicCSuite(user) {
 }
 
 function renderDynamicKit(user) {
+  console.log("📦 Rendering kit");
   const config = getBusinessConfig(user.companyType);
   const kitDocBox = document.getElementById("dynamicKitDoc");
   
@@ -570,6 +565,7 @@ function renderDynamicKit(user) {
 }
 
 function renderDynamicAchievements(user) {
+  console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
   
@@ -608,6 +604,7 @@ function renderDynamicAchievements(user) {
 }
 
 function renderWalletChart(user) {
+  console.log("📊 Rendering chart");
   const walletChart = document.getElementById('walletChart');
   if (!walletChart) return;
 
@@ -630,31 +627,15 @@ function renderWalletChart(user) {
     const staked = user.wallet?.staked || user.staked || 0;
     const referrals = (user.cloneLineage || []).length;
 
-    console.log("📊 Rendering chart for", user.companyType, "business");
+    console.log("📊 Chart data for", user.companyType);
 
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
         data: {
-          labels: [
-            'Projects',
-            'Credits',
-            'Vault Yield',
-            'Project Yield',
-            'AIGx Earned',
-            'Staked',
-            'Partners'
-          ],
+          labels: ['Projects', 'Credits', 'Vault Yield', 'Project Yield', 'AIGx Earned', 'Staked', 'Partners'],
           datasets: [{
-            data: [
-              remixCount,
-              remixCredits,
-              vaultYield,
-              remixYield,
-              aigxEarned,
-              staked,
-              referrals
-            ],
+            data: [remixCount, remixCredits, vaultYield, remixYield, aigxEarned, staked, referrals],
             backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
             borderRadius: 6
           }]
@@ -664,21 +645,14 @@ function renderWalletChart(user) {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: {
-              beginAtZero: true,
-              ticks: { color: '#888' },
-              grid: { color: '#222' }
-            },
-            x: {
-              ticks: { color: '#aaa' },
-              grid: { display: false }
-            }
+            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+            x: { ticks: { color: '#aaa' }, grid: { display: false } }
           }
         }
       });
-      console.log("✅ Chart rendered successfully");
+      console.log("✅ Chart rendered");
     } catch (chartError) {
-      console.error("❌ Chart rendering error:", chartError);
+      console.error("❌ Chart error:", chartError);
     }
   };
 
@@ -690,12 +664,12 @@ async function injectUserDashboard() {
   const username = localStorage.getItem("aigentsyUsername");
   
   if (!username) {
-    console.warn("No username found. Redirecting to hero page...");
+    console.warn("No username found");
     window.location.href = "/";
     return;
   }
 
-  console.log("📡 Loading user data for:", username);
+  console.log("📡 Loading user:", username);
 
   try {
     const res = await fetchWithRetry(`${window.BACKEND_BASE}/user`, {
@@ -716,17 +690,12 @@ async function injectUserDashboard() {
     window.aigentsyUser = user;
     console.log("✅ User loaded:", user.username, "Business:", user.companyType);
     
-    // Render all dynamic sections
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
     renderDynamicAchievements(user);
     renderWalletChart(user);
-    
-    // Render offerings
     renderOfferingsWithData(user);
-    
-    // Update snapshot data
     updateSnapshotData(user);
 
   } catch (e) {
@@ -736,13 +705,11 @@ async function injectUserDashboard() {
 }
 
 function updateSnapshotData(user) {
-  // Update compact snapshot
   document.getElementById("csnProposals").textContent = (user.proposals || []).length;
   document.getElementById("csnIntents").textContent = (user.orders || []).length;
   document.getElementById("csnQuotes").textContent = (user.invoices || []).length;
   document.getElementById("csnAIGx").textContent = user.yield?.aigxEarned || 0;
   
-  // Update detailed snapshot
   document.getElementById("snapshotRemix").textContent = user.remix?.remixCount || 0;
   document.getElementById("snapshotLineage").textContent = (user.cloneLineage || []).length;
   document.getElementById("snapshotClients").textContent = (user.contacts || []).length;
@@ -758,6 +725,7 @@ function updateSnapshotData(user) {
 }
 
 function renderOfferingsWithData(user) {
+  console.log("🔓 Rendering offerings");
   const list = document.getElementById("autoMatchOfferings");
   if (!list) return;
   list.innerHTML = "";
@@ -800,10 +768,7 @@ function renderOfferingsWithData(user) {
     if (!condition) {
       li.innerHTML = `✅ ${label} Unlocked`;
     } else {
-      li.innerHTML = `
-        <button class="btn-glow" onclick="unlockOffering('${user.username}', '${id}', '${stripe}')">
-          🔓 Unlock ${label}
-        </button>`;
+      li.innerHTML = `<button class="btn-glow" onclick="unlockOffering('${user.username}', '${id}', '${stripe}')">🔓 Unlock ${label}</button>`;
     }
     list.appendChild(li);
   });
@@ -838,7 +803,7 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 1500);
 }
 
-// ===== CHAT WITH BUSINESS-SPECIFIC ROUTING =====
+// ===== CHAT =====
 const memory = [];
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
@@ -866,7 +831,6 @@ async function runAgent() {
     let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
     let roleName = "AiGent";
     
-    // Route based on business type first
     if (user.companyType === "legal") {
       endpoint = "https://aigent-remix-runtime.onrender.com/agent";
       roleName = "CLO (Legal)";
@@ -939,7 +903,7 @@ if (dropZone) {
   });
 }
 
-// ===== OTHER HELPER FUNCTIONS =====
+// ===== OTHER HELPERS =====
 function toggleEarningsBreakdown() {
   const breakdown = document.getElementById("earningsBreakdown");
   if (breakdown.style.display === "none") {
@@ -1062,7 +1026,7 @@ function sendInvite() {
   }, 3000);
 }
 
-// ===== GLOBAL ACTION NAMESPACE (GXA) =====
+// ===== GLOBAL ACTIONS =====
 window.GXA = (() => {
   const BASE = window.BACKEND_BASE;
   const U = { name: localStorage.getItem("aigentsyUsername") || "" };
@@ -1085,10 +1049,10 @@ window.GXA = (() => {
       openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
 },
 async publishStorefront() {
-  showToast("Publishing your storefront...", "info");
+  showToast("Publishing...", "info");
   const j = await jpost(BASE + "/storefront/publish", { username: U.name });
   if (j.ok && j.url) {
-    showToast("Storefront published", "success");
+    showToast("Published", "success");
     window.open(j.url, "_blank");
   } else {
     showToast(j.error || "Failed", "error");
@@ -1100,17 +1064,14 @@ async quickIntent() {
   const budget = Number(prompt("Budget (USD)", "200") || "200");
   showToast("Creating intent...", "info");
   const j = await jpost(BASE + "/intent/create", { buyer: U.name, brief, budget });
-  if (j.ok) {
-    showToast("Intent created and auto-bidding...", "success");
-  } else {
-    showToast(j.error, "error");
-  }
+  if (j.ok) showToast("Intent created", "success");
+  else showToast(j.error, "error");
 },
 async productizeUrl() {
   const url = prompt("Paste a post/reel/article URL to productize");
   if (!url) return;
   const j = await jpost(BASE + "/productize", { username: U.name, url });
-  showToast(j.ok ? ("Offer created: " + j.offer.id) : ("Error: " + j.error), j.ok ? "success" : "error");
+  showToast(j.ok ? `Offer created: ${j.offer.id}` : `Error: ${j.error}`, j.ok ? "success" : "error");
 },
 async instantQuote() {
   const seller = prompt("Quote from which seller?", "demo_seller");
@@ -1119,11 +1080,8 @@ async instantQuote() {
   if (!scope) return;
   showToast("Generating quote...", "info");
   const q = await jpost(BASE + "/quote", { buyer: U.name, seller, scope, ttr: "24h" });
-  if (q.ok) {
-    showToast(`Quote ready: $${q.quote.price}`, "success");
-  } else {
-    showToast(q.error, "error");
-  }
+  if (q.ok) showToast(`Quote ready: $${q.quote.price}`, "success");
+  else showToast(q.error, "error");
 },
 async issuePoO() {
   const title = prompt("What did you complete? (PoO title)");
@@ -1146,7 +1104,7 @@ async localizeOffer() {
   if (!locales) return;
   const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
   const j = await jpost(BASE + "/offer/localize", { username: U.name, offer_id: offer, locales: arr });
-  showToast(j.ok ? (`Created ${j.variants.length} variants`) : "Error", j.ok ? "success" : "error");
+  showToast(j.ok ? `Created ${j.variants.length} variants` : "Error", j.ok ? "success" : "error");
 },
 async registerBusiness() {
   const biz = prompt("Legal business name");
@@ -1168,7 +1126,7 @@ async payout() {
   openModal("Payout", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
 },
 async createTeam() {
-  showToast("Creating team bundle...", "info");
+  showToast("Creating team...", "info");
   const members = prompt("Members (comma usernames)", "demo_seller,demo_integrator");
   if (!members) return;
   const mem = members.split(",").map(s => s.trim()).filter(Boolean);
@@ -1189,7 +1147,7 @@ async openMarket() {
 }
 };
 })();
-// ===== ACTION DRAWER CONTROLS =====
+// ===== ACTION DRAWER =====
 const gxFab = document.getElementById("gxFab");
 const gxDrawer = document.getElementById("gxDrawer");
 const gxClose = document.getElementById("gxClose");
@@ -1218,6 +1176,7 @@ const item = document.createElement("div");
 item.className = "gx-live-item";
 const label = ev.type || "event";
 const txt = ev.title || ev.brief || ev.event?.type || ev.intent_id || "";
+// ✅ FIXED: Added backticks
 item.textContent = [${label}] ${txt}.trim();
 const list = document.getElementById("gxLiveList");
 if (list) list.prepend(item);
@@ -1233,24 +1192,23 @@ console.warn("SSE not available", e);
 })();
 // ===== INITIALIZATION =====
 function initializeDashboard() {
-console.log("🚀 Initializing dynamic dashboard...");
+console.log("🚀 Initializing dashboard...");
 const username = localStorage.getItem("aigentsyUsername");
 if (!username) {
-console.warn("No username - redirecting to hero");
+console.warn("No username - redirecting");
 window.location.href = "/";
 return;
 }
-console.log("👤 Loading dashboard for:", username);
+console.log("👤 Loading for:", username);
 injectUserDashboard();
-// Preload chat with welcome message
 if (chatLog && chatLog.children.length === 0) {
 const preload = document.createElement("div");
 preload.className = "chat-agent";
+// ✅ FIXED: Added backticks
 preload.innerHTML = Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?;
 chatLog.appendChild(preload);
 }
 }
-// Multiple initialization triggers
 if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', initializeDashboard);
 } else {
@@ -1260,7 +1218,7 @@ window.addEventListener("load", () => {
 setTimeout(() => {
 const chart = document.getElementById("walletChart");
 if (chart && !chart.chartInstance) {
-console.log("🔄 Fallback initialization");
+console.log("🔄 Fallback init");
 initializeDashboard();
 }
 }, 500);
@@ -1268,10 +1226,11 @@ initializeDashboard();
 setTimeout(() => {
 const chart = document.getElementById("walletChart");
 if (chart && !chart.chartInstance) {
-console.log("🔄 Final fallback initialization");
+console.log("🔄 Final fallback");
 initializeDashboard();
 }
 }, 3000);
+console.log("✅ Script loaded");
 </script>
 </body>
 </html>
