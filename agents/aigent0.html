@@ -1177,7 +1177,7 @@ item.className = "gx-live-item";
 const label = ev.type || "event";
 const txt = ev.title || ev.brief || ev.event?.type || ev.intent_id || "";
 // ✅ FIXED: Added backticks
-item.textContent = [${label}] ${txt}.trim();
+item.textContent = `[${label}] ${txt}`.trim();
 const list = document.getElementById("gxLiveList");
 if (list) list.prepend(item);
 } catch(_) {}
@@ -1205,7 +1205,7 @@ if (chatLog && chatLog.children.length === 0) {
 const preload = document.createElement("div");
 preload.className = "chat-agent";
 // ✅ FIXED: Added backticks
-preload.innerHTML = Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?;
+preload.innerHTML = `Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?`;
 chatLog.appendChild(preload);
 }
 }
