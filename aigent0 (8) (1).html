@@ -300,11 +300,9 @@
 <script>
 console.log("🚀 Script loading...");
 
-// ===== GLOBAL CONFIG =====
 window.BACKEND_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
 window.aigentsyUser = null;
 
-// ===== BUSINESS TYPE CONFIGURATIONS =====
 const BUSINESS_CONFIGS = {
   legal: {
     title: "Your Legal AiGentsy's Autonomous Launchpad",
@@ -319,19 +317,8 @@ const BUSINESS_CONFIGS = {
       { role: "CFO", name: "AiGent Finance" },
       { role: "COO", name: "AiGent Operations" }
     ],
-    kitDoc: `
-      <div style="margin-bottom: 12px;">
-        <strong>📜 Legal Service Kit:</strong>
-        <ul style="padding-left:16px;">
-          <li>NDA & Contract Templates</li>
-          <li>IP Assignment Frameworks</li>
-          <li>Licensing Agreement Builder</li>
-          <li>Compliance Checklists</li>
-          <li>Legal Agent Companion</li>
-        </ul>
-      </div>`
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>📜 Legal Service Kit:</strong><ul style="padding-left:16px;"><li>NDA & Contract Templates</li><li>IP Assignment Frameworks</li><li>Licensing Agreement Builder</li><li>Compliance Checklists</li><li>Legal Agent Companion</li></ul></div>`
   },
-  
   social: {
     title: "Your Social Media AiGentsy's Autonomous Launchpad",
     description: "You've launched an AI-powered social media business creating Reels, TikToks, content launches, and creator kits.",
@@ -345,19 +332,8 @@ const BUSINESS_CONFIGS = {
       { role: "CFO", name: "AiGent Finance" },
       { role: "COO", name: "AiGent Operations" }
     ],
-    kitDoc: `
-      <div style="margin-bottom: 12px;">
-        <strong>📱 Social Media Kit:</strong>
-        <ul style="padding-left:16px;">
-          <li>Reel & TikTok Templates</li>
-          <li>Content Calendar System</li>
-          <li>Brand Voice Guidelines</li>
-          <li>Hashtag Strategy Tools</li>
-          <li>Creator Collaboration Kits</li>
-        </ul>
-      </div>`
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>📱 Social Media Kit:</strong><ul style="padding-left:16px;"><li>Reel & TikTok Templates</li><li>Content Calendar System</li><li>Brand Voice Guidelines</li><li>Hashtag Strategy Tools</li><li>Creator Collaboration Kits</li></ul></div>`
   },
-  
   saas: {
     title: "Your SaaS AiGentsy's Autonomous Launchpad",
     description: "You've launched an AI-powered SaaS business building software tools, web apps, and technical solutions.",
@@ -371,19 +347,8 @@ const BUSINESS_CONFIGS = {
       { role: "CMO", name: "AiGent Growth" },
       { role: "CFO", name: "AiGent Finance" }
     ],
-    kitDoc: `
-      <div style="margin-bottom: 12px;">
-        <strong>💻 SaaS Development Kit:</strong>
-        <ul style="padding-left:16px;">
-          <li>Auth & Subscription System</li>
-          <li>API Framework & Docs</li>
-          <li>Stripe Integration Ready</li>
-          <li>Database Schema Templates</li>
-          <li>Deployment Automation</li>
-        </ul>
-      </div>`
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>💻 SaaS Development Kit:</strong><ul style="padding-left:16px;"><li>Auth & Subscription System</li><li>API Framework & Docs</li><li>Stripe Integration Ready</li><li>Database Schema Templates</li><li>Deployment Automation</li></ul></div>`
   },
-  
   marketing: {
     title: "Your Marketing AiGentsy's Autonomous Launchpad",
     description: "You've launched an AI-powered marketing business specializing in SEO, ads, outreach, and growth campaigns.",
@@ -397,19 +362,8 @@ const BUSINESS_CONFIGS = {
       { role: "CFO", name: "AiGent Finance" },
       { role: "COO", name: "AiGent Operations" }
     ],
-    kitDoc: `
-      <div style="margin-bottom: 12px;">
-        <strong>🎯 Marketing Growth Kit:</strong>
-        <ul style="padding-left:16px;">
-          <li>SEO Optimization Tools</li>
-          <li>Ad Campaign Templates</li>
-          <li>Email Sequence Builder</li>
-          <li>Analytics Dashboard</li>
-          <li>Outreach Automation Scripts</li>
-        </ul>
-      </div>`
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>🎯 Marketing Growth Kit:</strong><ul style="padding-left:16px;"><li>SEO Optimization Tools</li><li>Ad Campaign Templates</li><li>Email Sequence Builder</li><li>Analytics Dashboard</li><li>Outreach Automation Scripts</li></ul></div>`
   },
-  
   general: {
     title: "Your AiGentsy's Autonomous Launchpad",
     description: "You've launched your own AI-powered business that can generate income autonomously across real-world industries.",
@@ -424,21 +378,44 @@ const BUSINESS_CONFIGS = {
       { role: "CTO", name: "AiGent Tech" },
       { role: "COO", name: "AiGent Operations" }
     ],
-    kitDoc: `
-      <div style="margin-bottom: 12px;">
-        <strong>🧠 Universal Business Kit:</strong>
-        <ul style="padding-left:16px;">
-          <li>Core Business Templates</li>
-          <li>Basic Legal Frameworks</li>
-          <li>Marketing Starter Pack</li>
-          <li>Financial Planning Tools</li>
-          <li>Operations Playbook</li>
-        </ul>
-      </div>`
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>🧠 Universal Business Kit:</strong><ul style="padding-left:16px;"><li>Core Business Templates</li><li>Basic Legal Frameworks</li><li>Marketing Starter Pack</li><li>Financial Planning Tools</li><li>Operations Playbook</li></ul></div>`
   }
 };
 
-// ===== UTILITY FUNCTIONS =====
+function getStarterData(username, companyType) {
+  return {
+    username: username,
+    companyType: companyType || "general",
+    remix: {
+      remixCount: 1,
+      remixCredits: 500,
+      remixUnlockedForks: 1
+    },
+    yield: {
+      vaultYield: 50,
+      remixYield: 25,
+      aigxEarned: 100
+    },
+    wallet: {
+      staked: 250
+    },
+    traits: [companyType || "general"],
+    vaultAccess: true,
+    cloneLineage: [],
+    contacts: [],
+    proposals: [],
+    orders: [],
+    invoices: [],
+    offerings: { products: [] },
+    runtimeFlags: {
+      vaultAccess: true,
+      sdkAccess_eligible: false,
+      remixUnlocked: false,
+      cloneLicenseUnlocked: false
+    }
+  };
+}
+
 function showToast(message, kind) {
   try {
     console.log(kind ? `[${kind}]` : "", message);
@@ -457,26 +434,13 @@ async function fetchWithRetry(url, options = {}, maxRetries = 3, timeout = 10000
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeout);
-      
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      
+      const response = await fetch(url, { ...options, signal: controller.signal });
       clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       return response;
     } catch (error) {
       console.warn(`Fetch attempt ${i + 1}/${maxRetries} failed:`, error.message);
-      
-      if (i === maxRetries - 1) {
-        throw error;
-      }
-      
+      if (i === maxRetries - 1) throw error;
       await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
     }
   }
@@ -506,7 +470,6 @@ async function jget(url) {
   }
 }
 
-// ===== DYNAMIC DASHBOARD RENDERING =====
 function getBusinessConfig(companyType) {
   return BUSINESS_CONFIGS[companyType] || BUSINESS_CONFIGS.general;
 }
@@ -514,7 +477,6 @@ function getBusinessConfig(companyType) {
 function renderDynamicWelcome(user) {
   console.log("📝 Rendering welcome");
   const config = getBusinessConfig(user.companyType);
-  
   document.getElementById("welcomeTitle").textContent = config.title;
   document.getElementById("welcomeDescription").textContent = config.description;
   document.getElementById("traitsDisplay").textContent = config.traits;
@@ -526,13 +488,9 @@ function renderDynamicCSuite(user) {
   console.log("👔 Rendering C-Suite");
   const config = getBusinessConfig(user.companyType);
   const csuiteList = document.getElementById("csuiteList");
-  
   if (csuiteList) {
-    csuiteList.innerHTML = config.cSuite
-      .map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`)
-      .join("");
+    csuiteList.innerHTML = config.cSuite.map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`).join("");
   }
-  
   const note = document.getElementById("csuiteNote");
   if (note) {
     note.textContent = `Each agent handles specialized ${user.companyType} functions for your business.`;
@@ -543,11 +501,7 @@ function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
   const config = getBusinessConfig(user.companyType);
   const kitDocBox = document.getElementById("dynamicKitDoc");
-  
-  if (kitDocBox) {
-    kitDocBox.innerHTML = config.kitDoc;
-  }
-  
+  if (kitDocBox) kitDocBox.innerHTML = config.kitDoc;
   const summaryBox = document.getElementById("businessSummaryList");
   if (summaryBox) {
     const summaryItems = [
@@ -557,10 +511,7 @@ function renderDynamicKit(user) {
       { label: "Clone License", check: user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked },
       { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, check: (user.traits || []).includes(user.companyType) }
     ];
-    
-    summaryBox.innerHTML = summaryItems
-      .map(({ label, check }) => `<li>${check ? "✅" : "🔒"} ${label}</li>`)
-      .join("");
+    summaryBox.innerHTML = summaryItems.map(({ label, check }) => `<li>${check ? "✅" : "🔒"} ${label}</li>`).join("");
   }
 }
 
@@ -568,34 +519,16 @@ function renderDynamicAchievements(user) {
   console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
-  
   const achievements = [];
   const config = getBusinessConfig(user.companyType);
-  
   if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
     achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
   }
-  
-  if ((user.cloneLineage || []).length > 0) {
-    achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
-  }
-  
-  if ((user.yield?.aigxEarned || 0) > 0) {
-    achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
-  }
-  
-  if ((user.traits || []).includes(user.companyType)) {
-    achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
-  }
-  
-  if ((user.contacts || []).length > 0) {
-    achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
-  }
-  
-  if ((user.proposals || []).length > 0) {
-    achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
-  }
-  
+  if ((user.cloneLineage || []).length > 0) achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
+  if ((user.yield?.aigxEarned || 0) > 0) achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
+  if ((user.traits || []).includes(user.companyType)) achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+  if ((user.contacts || []).length > 0) achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
+  if ((user.proposals || []).length > 0) achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
@@ -607,18 +540,13 @@ function renderWalletChart(user) {
   console.log("📊 Rendering chart");
   const walletChart = document.getElementById('walletChart');
   if (!walletChart) return;
-
   const renderChart = () => {
     if (!window.Chart) {
       console.warn("Chart.js not loaded yet, retrying...");
       setTimeout(renderChart, 100);
       return;
     }
-
-    if (walletChart.chartInstance) {
-      walletChart.chartInstance.destroy();
-    }
-
+    if (walletChart.chartInstance) walletChart.chartInstance.destroy();
     const remixCount = user.remix?.remixCount || user.remixUnlockedForks || 0;
     const remixCredits = user.remix?.remixCredits || 0;
     const vaultYield = user.yield?.vaultYield || 0;
@@ -626,9 +554,7 @@ function renderWalletChart(user) {
     const aigxEarned = user.yield?.aigxEarned || 0;
     const staked = user.wallet?.staked || user.staked || 0;
     const referrals = (user.cloneLineage || []).length;
-
     console.log("📊 Chart data for", user.companyType);
-
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
@@ -655,41 +581,31 @@ function renderWalletChart(user) {
       console.error("❌ Chart error:", chartError);
     }
   };
-
   renderChart();
 }
 
-// ===== USER DASHBOARD INJECTION =====
 async function injectUserDashboard() {
   const username = localStorage.getItem("aigentsyUsername");
-  
   if (!username) {
     console.warn("No username found");
     window.location.href = "/";
     return;
   }
-
   console.log("📡 Loading user:", username);
-
   try {
     const res = await fetchWithRetry(`${window.BACKEND_BASE}/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username })
     }, 2, 10000);
-
     const data = await res.json();
-    const user = data.record || data.user || null;
-    
-    if (!user || data.error) {
-      console.error("❌ Failed to load user:", data.error);
-      showToast("Failed to load user data", "error");
-      return;
+    let user = data.record || data.user || null;
+    if (!user || !user.remix || !user.yield) {
+      console.log("📦 User has no data, using starter data");
+      user = getStarterData(username, user?.companyType || "general");
     }
-
     window.aigentsyUser = user;
     console.log("✅ User loaded:", user.username, "Business:", user.companyType);
-    
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
@@ -697,10 +613,19 @@ async function injectUserDashboard() {
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
-
   } catch (e) {
     console.error("⚠️ Backend unreachable:", e);
-    showToast("Cannot connect to server", "error");
+    console.log("📦 Backend error, using starter data");
+    const user = getStarterData(username, "general");
+    window.aigentsyUser = user;
+    renderDynamicWelcome(user);
+    renderDynamicCSuite(user);
+    renderDynamicKit(user);
+    renderDynamicAchievements(user);
+    renderWalletChart(user);
+    renderOfferingsWithData(user);
+    updateSnapshotData(user);
+    showToast("Using demo data - backend unavailable", "info");
   }
 }
 
@@ -709,16 +634,13 @@ function updateSnapshotData(user) {
   document.getElementById("csnIntents").textContent = (user.orders || []).length;
   document.getElementById("csnQuotes").textContent = (user.invoices || []).length;
   document.getElementById("csnAIGx").textContent = user.yield?.aigxEarned || 0;
-  
   document.getElementById("snapshotRemix").textContent = user.remix?.remixCount || 0;
   document.getElementById("snapshotLineage").textContent = (user.cloneLineage || []).length;
   document.getElementById("snapshotClients").textContent = (user.contacts || []).length;
   document.getElementById("snapshotAigx").textContent = "+" + (user.yield?.aigxEarned || 0);
   document.getElementById("snapshotServices").textContent = (user.offerings?.products || []).length;
-  
   document.getElementById("growthClients").textContent = (user.contacts || []).length;
   document.getElementById("growthReferrals").textContent = (user.cloneLineage || []).length;
-  
   document.getElementById("earningsServices").textContent = (user.offerings?.products || []).length;
   document.getElementById("earningsClients").textContent = (user.contacts || []).length;
   document.getElementById("earningsAigx").textContent = "+" + (user.yield?.aigxEarned || 0);
@@ -729,40 +651,13 @@ function renderOfferingsWithData(user) {
   const list = document.getElementById("autoMatchOfferings");
   if (!list) return;
   list.innerHTML = "";
-
   const offerings = [
-    {
-      id: "sdk",
-      label: "SDK Toolkit",
-      condition: !(user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible),
-      stripe: "https://buy.stripe.com/3cs14m3Nhaor5Xfg1k6AM0a"
-    },
-    {
-      id: "vault",
-      label: "Vault Access",
-      condition: !(user.vaultAccess || user.runtimeFlags?.vaultAccess),
-      stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
-    },
-    {
-      id: "remix",
-      label: "Remix License",
-      condition: !(user.remixUnlocked || user.runtimeFlags?.remixUnlocked),
-      stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07"
-    },
-    {
-      id: "clone",
-      label: "Clone License",
-      condition: !(user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked),
-      stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09"
-    },
-    {
-      id: user.companyType,
-      label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`,
-      condition: !(user.traits || []).includes(user.companyType),
-      stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08"
-    }
+    { id: "sdk", label: "SDK Toolkit", condition: !(user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible), stripe: "https://buy.stripe.com/3cs14m3Nhaor5Xfg1k6AM0a" },
+    { id: "vault", label: "Vault Access", condition: !(user.vaultAccess || user.runtimeFlags?.vaultAccess), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" },
+    { id: "remix", label: "Remix License", condition: !(user.remixUnlocked || user.runtimeFlags?.remixUnlocked), stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07" },
+    { id: "clone", label: "Clone License", condition: !(user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked), stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09" },
+    { id: user.companyType, label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, condition: !(user.traits || []).includes(user.companyType), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" }
   ];
-
   offerings.forEach(({ id, label, condition, stripe }) => {
     const li = document.createElement("li");
     if (!condition) {
@@ -776,26 +671,17 @@ function renderOfferingsWithData(user) {
 
 async function unlockOffering(username, offeringId, stripeLink) {
   window.open(stripeLink, "_blank");
-  
   setTimeout(async () => {
     if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
-
     try {
-      const res = await fetchWithRetry(`${window.BACKEND_BASE}/unlock`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, offeringId })
-      }, 2, 10000);
-
+      const res = await fetchWithRetry(`${window.BACKEND_BASE}/unlock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, offeringId }) }, 2, 10000);
       const result = await res.json();
-
       if (result.success) {
         showToast(`✅ ${offeringId} unlocked!`, "success");
         setTimeout(() => window.location.reload(), 1500);
       } else {
         alert(`❌ Failed to unlock ${offeringId}.`);
       }
-
     } catch (err) {
       console.error("unlockOffering() error:", err);
       alert("⚠️ Error unlocking offering.");
@@ -803,7 +689,6 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 1500);
 }
 
-// ===== CHAT =====
 const memory = [];
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
@@ -811,7 +696,6 @@ const textarea = document.getElementById("agentInput");
 async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
-
   const userMsg = document.createElement("div");
   userMsg.className = "chat-user";
   userMsg.textContent = `You: ${input}`;
@@ -819,18 +703,15 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
   textarea.value = "";
-
   const loader = document.createElement("div");
   loader.className = "chat-agent";
   loader.textContent = "Thinking...";
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
-
   try {
     const user = window.aigentsyUser || {};
     let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
     let roleName = "AiGent";
-    
     if (user.companyType === "legal") {
       endpoint = "https://aigent-remix-runtime.onrender.com/agent";
       roleName = "CLO (Legal)";
@@ -841,24 +722,11 @@ async function runAgent() {
       endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
       roleName = "CTO (Tech)";
     }
-
-    const res = await fetchWithRetry(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        input: input, 
-        memory,
-        businessType: user.companyType,
-        username: user.username
-      })
-    }, 2, 15000);
-
+    const res = await fetchWithRetry(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ input: input, memory, businessType: user.companyType, username: user.username }) }, 2, 15000);
     const data = await res.json();
     let reply = data.output || "No response.";
-    
     loader.innerHTML = `**${roleName}**: ${reply}`;
     memory.push(`🤖 ${reply}`);
-    
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
   } catch (err) {
@@ -867,13 +735,9 @@ async function runAgent() {
   }
 }
 
-// ===== FILE HANDLING =====
 let attachedFiles = [];
-
 function handleFiles(files) {
-  for (let file of files) {
-    attachedFiles.push(file);
-  }
+  for (let file of files) attachedFiles.push(file);
   renderFilePreview();
 }
 
@@ -889,28 +753,14 @@ function renderFilePreview() {
 
 const dropZone = document.getElementById("fileDropZone");
 if (dropZone) {
-  dropZone.addEventListener("dragover", e => {
-    e.preventDefault();
-    dropZone.style.borderColor = "#00bfff";
-  });
-  dropZone.addEventListener("dragleave", () => {
-    dropZone.style.borderColor = "#444";
-  });
-  dropZone.addEventListener("drop", e => {
-    e.preventDefault();
-    dropZone.style.borderColor = "#444";
-    handleFiles(e.dataTransfer.files);
-  });
+  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.style.borderColor = "#00bfff"; });
+  dropZone.addEventListener("dragleave", () => { dropZone.style.borderColor = "#444"; });
+  dropZone.addEventListener("drop", e => { e.preventDefault(); dropZone.style.borderColor = "#444"; handleFiles(e.dataTransfer.files); });
 }
 
-// ===== OTHER HELPERS =====
 function toggleEarningsBreakdown() {
   const breakdown = document.getElementById("earningsBreakdown");
-  if (breakdown.style.display === "none") {
-    breakdown.style.display = "block";
-  } else {
-    breakdown.style.display = "none";
-  }
+  breakdown.style.display = breakdown.style.display === "none" ? "block" : "none";
 }
 
 document.getElementById("toggleSnapshotDetails")?.addEventListener("click", function() {
@@ -943,23 +793,9 @@ async function submitProposal() {
   const title = document.getElementById("proposalTitle").value.trim();
   const body = document.getElementById("proposalBody").value.trim();
   const link = document.getElementById("proposalLink").value.trim();
-
   if (!title || !body) return alert("Proposal title and body are required.");
-
   try {
-    const res = await fetchWithRetry(`${window.BACKEND_BASE}/propose_deal`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: username,
-        to: target,
-        title,
-        body,
-        link,
-        timestamp: new Date().toISOString()
-      })
-    }, 2, 15000);
-
+    const res = await fetchWithRetry(`${window.BACKEND_BASE}/propose_deal`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ from: username, to: target, title, body, link, timestamp: new Date().toISOString() }) }, 2, 15000);
     if (res.ok) {
       alert("✅ Proposal sent!");
       closeProposalModal();
@@ -975,31 +811,17 @@ async function submitProposal() {
 function openProposalInboxModal() {
   const username = localStorage.getItem("aigentsyUsername");
   if (!username) return alert("Username missing.");
-
   document.getElementById("proposalInboxModal").classList.add("open");
   const inboxBox = document.getElementById("proposalInboxContent");
   inboxBox.innerHTML = "Loading...";
-
-  fetchWithRetry(`${window.BACKEND_BASE}/get_proposals`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username })
-  }, 2, 15000)
+  fetchWithRetry(`${window.BACKEND_BASE}/get_proposals`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) }, 2, 15000)
     .then(res => res.json())
     .then(data => {
       const proposals = data.proposals || [];
       if (proposals.length === 0) {
         inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
       } else {
-        inboxBox.innerHTML = proposals.map(p => `
-          <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <strong>From:</strong> ${p.sender}<br>
-            <strong>Title:</strong> ${p.title}<br>
-            <p>${p.details}</p>
-            <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
-            ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
-          </div>
-        `).join("");
+        inboxBox.innerHTML = proposals.map(p => `<div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;"><strong>From:</strong> ${p.sender}<br><strong>Title:</strong> ${p.title}<br><p>${p.details}</p><div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}</div>`).join("");
       }
     })
     .catch(err => {
@@ -1011,225 +833,207 @@ function openProposalInboxModal() {
 function sendInvite() {
   const inviteInput = document.getElementById("inviteInput");
   const feedback = document.getElementById("inviteFeedback");
-  
   const email = inviteInput.value.trim();
   if (!email) {
     feedback.textContent = "Please enter an email or handle.";
     return;
   }
-  
   feedback.textContent = `✅ Invite sent to ${email}!`;
   inviteInput.value = "";
-  
-  setTimeout(() => {
-    feedback.textContent = "";
-  }, 3000);
+  setTimeout(() => { feedback.textContent = ""; }, 3000);
 }
 
-// ===== GLOBAL ACTIONS =====
 window.GXA = (() => {
   const BASE = window.BACKEND_BASE;
   const U = { name: localStorage.getItem("aigentsyUsername") || "" };
-  
   function openModal(title, html) {
     document.getElementById("gxModalTitle").textContent = title || "Modal";
     document.getElementById("gxModalBody").innerHTML = html || "";
     document.getElementById("gxModal").classList.add("open");
   }
-
   function closeModal() {
     document.getElementById("gxModal").classList.remove("open");
   }
-
   return {
     closeModal,
     copyWidget() {
       const tag = `<script src="https://cdn.aigentsy.com/widget.min.js" data-user="${U.name}" data-backend="${BASE}"></` + `script>`;
       navigator.clipboard.writeText(tag);
       openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
-},
-async publishStorefront() {
-  showToast("Publishing...", "info");
-  const j = await jpost(BASE + "/storefront/publish", { username: U.name });
-  if (j.ok && j.url) {
-    showToast("Published", "success");
-    window.open(j.url, "_blank");
-  } else {
-    showToast(j.error || "Failed", "error");
-  }
-},
-async quickIntent() {
-  const brief = prompt("What do you need?", "Landing hero");
-  if (!brief) return;
-  const budget = Number(prompt("Budget (USD)", "200") || "200");
-  showToast("Creating intent...", "info");
-  const j = await jpost(BASE + "/intent/create", { buyer: U.name, brief, budget });
-  if (j.ok) showToast("Intent created", "success");
-  else showToast(j.error, "error");
-},
-async productizeUrl() {
-  const url = prompt("Paste a post/reel/article URL to productize");
-  if (!url) return;
-  const j = await jpost(BASE + "/productize", { username: U.name, url });
-  showToast(j.ok ? `Offer created: ${j.offer.id}` : `Error: ${j.error}`, j.ok ? "success" : "error");
-},
-async instantQuote() {
-  const seller = prompt("Quote from which seller?", "demo_seller");
-  if (!seller) return;
-  const scope = prompt("Scope summary", "Hero section + copy");
-  if (!scope) return;
-  showToast("Generating quote...", "info");
-  const q = await jpost(BASE + "/quote", { buyer: U.name, seller, scope, ttr: "24h" });
-  if (q.ok) showToast(`Quote ready: $${q.quote.price}`, "success");
-  else showToast(q.error, "error");
-},
-async issuePoO() {
-  const title = prompt("What did you complete? (PoO title)");
-  if (!title) return;
-  const j = await jpost(BASE + "/poo", { username: U.name, title, metrics: {}, evidence_urls: [] });
-  showToast(j.ok ? "PoO issued" : "Error", j.ok ? "success" : "error");
-},
-async bindMedia() {
-  const media = prompt("Media ID (e.g., hero-video-001)");
-  if (!media) return;
-  const offer = prompt("Offer ID to bind to");
-  if (!offer) return;
-  const j = await jpost(BASE + "/media/bind_offer", { username: U.name, media_id: media, offer_id: offer });
-  showToast(j.ok ? "Media bound" : "Error", j.ok ? "success" : "error");
-},
-async localizeOffer() {
-  const offer = prompt("Offer ID to localize");
-  if (!offer) return;
-  const locales = prompt("Locales (comma separated)", "es-ES,fr-FR");
-  if (!locales) return;
-  const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
-  const j = await jpost(BASE + "/offer/localize", { username: U.name, offer_id: offer, locales: arr });
-  showToast(j.ok ? `Created ${j.variants.length} variants` : "Error", j.ok ? "success" : "error");
-},
-async registerBusiness() {
-  const biz = prompt("Legal business name");
-  if (!biz) return;
-  const j = await jpost(BASE + "/distribution/register", { username: U.name, business_name: biz });
-  openModal("Register Business", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
-},
-async createJV() {
-  const partner = prompt("Partner username/email");
-  if (!partner) return;
-  const split = prompt("Split (you,partner) e.g. 60,40", "60,40");
-  const [a, b] = (split || "60,40").split(",").map(x => parseFloat(x.trim()) / 100);
-  const j = await jpost(BASE + "/jv/create", { username: U.name, partner, split: [a, b] });
-  openModal("JV Created", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
-},
-async payout() {
-  const method = prompt("Method: stripe | crypto", "stripe");
-  const j = await jpost(BASE + "/payout", { username: U.name, method });
-  openModal("Payout", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
-},
-async createTeam() {
-  showToast("Creating team...", "info");
-  const members = prompt("Members (comma usernames)", "demo_seller,demo_integrator");
-  if (!members) return;
-  const mem = members.split(",").map(s => s.trim()).filter(Boolean);
-  const t = await jpost(BASE + "/team/create", { lead_owner: U.name, members: mem, split: [0.5,0.3,0.2] });
-  showToast(t.ok ? "Team created" : "Error", t.ok ? "success" : "error");
-},
-async scheduleRetarget() {
-  const lead = prompt("Lead ID to retarget", "lead-123");
-  if (!lead) return;
-  const j = await jpost(BASE + "/retarget/schedule", { username: U.name, lead_id: lead, cadence: "3d", incentive: "AIGx10" });
-  showToast(j.ok ? "Retarget scheduled" : "Error", j.ok ? "success" : "error");
-},
-async openMarket() {
-  showToast("Loading marketplace...", "info");
-  const j = await jget(BASE + "/market/rank");
-  const html = `<ol>` + (j.results || []).slice(0, 20).map(r => `<li>${r.username} — rank ${r.rank}</li>`).join("") + `</ol>`;
-  openModal("Marketplace Top 20", html);
-}
-};
+    },
+    async publishStorefront() {
+      showToast("Publishing...", "info");
+      const j = await jpost(BASE + "/storefront/publish", { username: U.name });
+      if (j.ok && j.url) { showToast("Published", "success"); window.open(j.url, "_blank"); }
+      else { showToast(j.error || "Failed", "error"); }
+    },
+    async quickIntent() {
+      const brief = prompt("What do you need?", "Landing hero");
+      if (!brief) return;
+      const budget = Number(prompt("Budget (USD)", "200") || "200");
+      showToast("Creating intent...", "info");
+      const j = await jpost(BASE + "/intent/create", { buyer: U.name, brief, budget });
+      if (j.ok) showToast("Intent created", "success");
+      else showToast(j.error, "error");
+    },
+    async productizeUrl() {
+      const url = prompt("Paste a post/reel/article URL to productize");
+      if (!url) return;
+      const j = await jpost(BASE + "/productize", { username: U.name, url });
+      showToast(j.ok ? `Offer created: ${j.offer.id}` : `Error: ${j.error}`, j.ok ? "success" : "error");
+    },
+    async instantQuote() {
+      const seller = prompt("Quote from which seller?", "demo_seller");
+      if (!seller) return;
+      const scope = prompt("Scope summary", "Hero section + copy");
+      if (!scope) return;
+      showToast("Generating quote...", "info");
+      const q = await jpost(BASE + "/quote", { buyer: U.name, seller, scope, ttr: "24h" });
+      if (q.ok) showToast(`Quote ready: $${q.quote.price}`, "success");
+      else showToast(q.error, "error");
+    },
+    async issuePoO() {
+      const title = prompt("What did you complete? (PoO title)");
+      if (!title) return;
+      const j = await jpost(BASE + "/poo", { username: U.name, title, metrics: {}, evidence_urls: [] });
+      showToast(j.ok ? "PoO issued" : "Error", j.ok ? "success" : "error");
+    },
+    async bindMedia() {
+      const media = prompt("Media ID (e.g., hero-video-001)");
+      if (!media) return;
+      const offer = prompt("Offer ID to bind to");
+      if (!offer) return;
+      const j = await jpost(BASE + "/media/bind_offer", { username: U.name, media_id: media, offer_id: offer });
+      showToast(j.ok ? "Media bound" : "Error", j.ok ? "success" : "error");
+    },
+    async localizeOffer() {
+      const offer = prompt("Offer ID to localize");
+      if (!offer) return;
+      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR");
+      if (!locales) return;
+      const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
+      const j = await jpost(BASE + "/offer/localize", { username: U.name, offer_id: offer, locales: arr });
+      showToast(j.ok ? `Created ${j.variants.length} variants` : "Error", j.ok ? "success" : "error");
+    },
+    async registerBusiness() {
+      const biz = prompt("Legal business name");
+      if (!biz) return;
+      const j = await jpost(BASE + "/distribution/register", { username: U.name, business_name: biz });
+      openModal("Register Business", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+    },
+    async createJV() {
+      const partner = prompt("Partner username/email");
+      if (!partner) return;
+      const split = prompt("Split (you,partner) e.g. 60,40", "60,40");
+      const [a, b] = (split || "60,40").split(",").map(x => parseFloat(x.trim()) / 100);
+      const j = await jpost(BASE + "/jv/create", { username: U.name, partner, split: [a, b] });
+      openModal("JV Created", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+    },
+    async payout() {
+      const method = prompt("Method: stripe | crypto", "stripe");
+      const j = await jpost(BASE + "/payout", { username: U.name, method });
+      openModal("Payout", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+    },
+    async createTeam() {
+      showToast("Creating team...", "info");
+      const members = prompt("Members (comma usernames)", "demo_seller,demo_integrator");
+      if (!members) return;
+      const mem = members.split(",").map(s => s.trim()).filter(Boolean);
+      const t = await jpost(BASE + "/team/create", { lead_owner: U.name, members: mem, split: [0.5,0.3,0.2] });
+      showToast(t.ok ? "Team created" : "Error", t.ok ? "success" : "error");
+    },
+    async scheduleRetarget() {
+      const lead = prompt("Lead ID to retarget", "lead-123");
+      if (!lead) return;
+      const j = await jpost(BASE + "/retarget/schedule", { username: U.name, lead_id: lead, cadence: "3d", incentive: "AIGx10" });
+      showToast(j.ok ? "Retarget scheduled" : "Error", j.ok ? "success" : "error");
+    },
+    async openMarket() {
+      showToast("Loading marketplace...", "info");
+      const j = await jget(BASE + "/market/rank");
+      const html = `<ol>` + (j.results || []).slice(0, 20).map(r => `<li>${r.username} — rank ${r.rank}</li>`).join("") + `</ol>`;
+      openModal("Marketplace Top 20", html);
+    }
+  };
 })();
-// ===== ACTION DRAWER =====
+
 const gxFab = document.getElementById("gxFab");
 const gxDrawer = document.getElementById("gxDrawer");
 const gxClose = document.getElementById("gxClose");
-if (gxFab) {
-gxFab.onclick = () => gxDrawer.classList.toggle("open");
-}
-if (gxClose) {
-gxClose.onclick = () => gxDrawer.classList.remove("open");
-}
+
+if (gxFab) { gxFab.onclick = () => gxDrawer.classList.toggle("open"); }
+if (gxClose) { gxClose.onclick = () => gxDrawer.classList.remove("open"); }
+
 document.addEventListener("keydown", (e) => {
-if (e.key === "Escape") {
-gxDrawer.classList.remove("open");
-GXA.closeModal();
-closeProposalModal();
-closeProposalInboxModal();
-}
+  if (e.key === "Escape") {
+    gxDrawer.classList.remove("open");
+    GXA.closeModal();
+    closeProposalModal();
+    closeProposalInboxModal();
+  }
 });
-// ===== SSE LIVE FEED =====
+
 (function startSSE() {
-try {
-const es = new EventSource(window.BACKEND_BASE + "/stream/activity");
-es.onmessage = (e) => {
-try {
-const ev = JSON.parse(e.data);
-const item = document.createElement("div");
-item.className = "gx-live-item";
-const label = ev.type || "event";
-const txt = ev.title || ev.brief || ev.event?.type || ev.intent_id || "";
-// ✅ FIXED: Added backticks
-item.textContent = `[${label}] ${txt}`.trim();
-const list = document.getElementById("gxLiveList");
-if (list) list.prepend(item);
-} catch(_) {}
-};
-es.onerror = () => {
-console.warn("SSE connection error");
-es.close();
-};
-} catch(e) {
-console.warn("SSE not available", e);
-}
+  try {
+    const es = new EventSource(window.BACKEND_BASE + "/stream/activity");
+    es.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        const item = document.createElement("div");
+        item.className = "gx-live-item";
+        const label = ev.type || "event";
+        const txt = ev.title || ev.brief || ev.event?.type || ev.intent_id || "";
+        item.textContent = `[${label}] ${txt}`.trim();
+        const list = document.getElementById("gxLiveList");
+        if (list) list.prepend(item);
+      } catch(_) {}
+    };
+    es.onerror = () => { console.warn("SSE connection error"); es.close(); };
+  } catch(e) { console.warn("SSE not available", e); }
 })();
-// ===== INITIALIZATION =====
+
 function initializeDashboard() {
-console.log("🚀 Initializing dashboard...");
-const username = localStorage.getItem("aigentsyUsername");
-if (!username) {
-console.warn("No username - redirecting");
-window.location.href = "/";
-return;
+  console.log("🚀 Initializing dashboard...");
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) {
+    console.warn("No username - redirecting");
+    window.location.href = "/";
+    return;
+  }
+  console.log("👤 Loading for:", username);
+  injectUserDashboard();
+  if (chatLog && chatLog.children.length === 0) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?`;
+    chatLog.appendChild(preload);
+  }
 }
-console.log("👤 Loading for:", username);
-injectUserDashboard();
-if (chatLog && chatLog.children.length === 0) {
-const preload = document.createElement("div");
-preload.className = "chat-agent";
-// ✅ FIXED: Added backticks
-preload.innerHTML = `Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?`;
-chatLog.appendChild(preload);
-}
-}
+
 if (document.readyState === 'loading') {
-document.addEventListener('DOMContentLoaded', initializeDashboard);
+  document.addEventListener('DOMContentLoaded', initializeDashboard);
 } else {
-initializeDashboard();
+  initializeDashboard();
 }
+
 window.addEventListener("load", () => {
-setTimeout(() => {
-const chart = document.getElementById("walletChart");
-if (chart && !chart.chartInstance) {
-console.log("🔄 Fallback init");
-initializeDashboard();
-}
-}, 500);
+  setTimeout(() => {
+    const chart = document.getElementById("walletChart");
+    if (chart && !chart.chartInstance) {
+      console.log("🔄 Fallback init");
+      initializeDashboard();
+    }
+  }, 500);
 });
+
 setTimeout(() => {
-const chart = document.getElementById("walletChart");
-if (chart && !chart.chartInstance) {
-console.log("🔄 Final fallback");
-initializeDashboard();
-}
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Final fallback");
+    initializeDashboard();
+  }
 }, 3000);
+
 console.log("✅ Script loaded");
 </script>
 </body>
