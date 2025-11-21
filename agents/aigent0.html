@@ -1011,9 +1011,9 @@ function initializeDashboard() {
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?`;
+    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
-  }
+}
 }
 
 if (document.readyState === 'loading') {
