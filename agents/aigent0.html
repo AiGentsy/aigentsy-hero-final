@@ -710,8 +710,8 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
-    // ALL questions now go to Growth agent (which handles C-Suite routing internally)
-    let endpoint = "https://aigentsy-growth-runtime.onrender.com/agent";
+    // ALL questions go to Growth agent (handles C-Suite routing internally)
+    const endpoint = "https://aigentsy-growth-runtime.onrender.com/agent";
     
     const res = await fetchWithRetry(endpoint, { 
       method: "POST", 
@@ -727,7 +727,7 @@ async function runAgent() {
     const data = await res.json();
     let reply = data.output || "No response.";
     
-    // Parse markdown-style bold for C-Suite labels (**CFO:** becomes blue bold)
+    // Parse markdown-style bold for C-Suite labels
     const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
     loader.innerHTML = formattedReply;
     
