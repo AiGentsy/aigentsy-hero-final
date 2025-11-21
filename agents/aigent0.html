@@ -710,8 +710,9 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
-    // ALL questions go to Growth agent (handles C-Suite routing internally)
-    const endpoint = "https://aigentsy-growth-runtime.onrender.com/agent";
+    
+    // ALL chat goes to Growth agent (the communicator)
+    const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
     
     const res = await fetchWithRetry(endpoint, { 
       method: "POST", 
