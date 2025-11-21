@@ -1050,117 +1050,424 @@ async function sendInvite() {
 window.GXA = (() => {
   const BASE = window.BACKEND_BASE;
   const U = { name: localStorage.getItem("aigentsyUsername") || "" };
+  
   function openModal(title, html) {
     document.getElementById("gxModalTitle").textContent = title || "Modal";
     document.getElementById("gxModalBody").innerHTML = html || "";
     document.getElementById("gxModal").classList.add("open");
   }
+  
   function closeModal() {
     document.getElementById("gxModal").classList.remove("open");
   }
+  
   return {
     closeModal,
+    
+    // ✅ ALREADY WORKS
     copyWidget() {
       const tag = `<script src="https://cdn.aigentsy.com/widget.min.js" data-user="${U.name}" data-backend="${BASE}"></` + `script>`;
       navigator.clipboard.writeText(tag);
       openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
     },
+    
+    // 🚀 Publish Storefront - CORRECTED
     async publishStorefront() {
-      showToast("Publishing...", "info");
-      const j = await jpost(BASE + "/storefront/publish", { username: U.name });
-      if (j.ok && j.url) { showToast("Published", "success"); window.open(j.url, "_blank"); }
-      else { showToast(j.error || "Failed", "error"); }
+      showToast("Publishing storefront...", "info");
+      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+      
+      try {
+        const res = await fetch(`${BASE}/storefront/publish`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(apiKey && { "X-API-Key": apiKey })
+          },
+          body: JSON.stringify({ username: U.name })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Storefront published!", "success");
+          openModal("Storefront Published", `<p>Your storefront is live at:</p><p><a href="${result.link}" target="_blank" style="color:#00bfff;">${result.link}</a></p>`);
+        } else {
+          showToast(result.error || "Failed to publish", "error");
+        }
+      } catch (err) {
+        console.error("Publish error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // ⚡ Quick Intent - CORRECTED
     async quickIntent() {
-      const brief = prompt("What do you need?", "Landing hero");
+      const brief = prompt("What do you need? (e.g., 'Landing page hero section')", "");
       if (!brief) return;
+      
       const budget = Number(prompt("Budget (USD)", "200") || "200");
+      
       showToast("Creating intent...", "info");
-      const j = await jpost(BASE + "/intent/create", { buyer: U.name, brief, budget });
-      if (j.ok) showToast("Intent created", "success");
-      else showToast(j.error, "error");
+      
+      try {
+        const res = await fetch(`${BASE}/intent/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            buyer: U.name, 
+            brief, 
+            budget 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Intent created! ID: ${result.intent.id}`, "success");
+          openModal("Intent Created", `<p><strong>ID:</strong> ${result.intent.id}</p><p><strong>Brief:</strong> ${brief}</p><p><strong>Budget:</strong> $${budget}</p><p>Matching with sellers...</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Intent error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🧪 Productize URL - CORRECTED
     async productizeUrl() {
-      const url = prompt("Paste a post/reel/article URL to productize");
+      const url = prompt("Paste a URL to productize (e.g., blog post, reel, article)");
       if (!url) return;
-      const j = await jpost(BASE + "/productize", { username: U.name, url });
-      showToast(j.ok ? `Offer created: ${j.offer.id}` : `Error: ${j.error}`, j.ok ? "success" : "error");
+      
+      showToast("Analyzing URL...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/productize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, url })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Offer created! ID: ${result.offer.id}`, "success");
+          openModal("Productized", `<p><strong>Offer ID:</strong> ${result.offer.id}</p><p><strong>URL:</strong> ${url}</p><p>Status: ${result.offer.status}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Productize error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 💳 Instant Quote/Escrow - CORRECTED
     async instantQuote() {
-      const seller = prompt("Quote from which seller?", "demo_seller");
+      const seller = prompt("Quote from which seller? (username)", "");
       if (!seller) return;
+      
       const scope = prompt("Scope summary", "Hero section + copy");
       if (!scope) return;
+      
       showToast("Generating quote...", "info");
-      const q = await jpost(BASE + "/quote", { buyer: U.name, seller, scope, ttr: "24h" });
-      if (q.ok) showToast(`Quote ready: $${q.quote.price}`, "success");
-      else showToast(q.error, "error");
+      
+      try {
+        const res = await fetch(`${BASE}/quote/instant`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            buyer: U.name, 
+            seller, 
+            scope, 
+            ttr: "24h" 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          const q = result.quote;
+          showToast(`✅ Quote ready: $${q.price}`, "success");
+          openModal("Quote Generated", `<p><strong>Price:</strong> $${q.price}</p><p><strong>Seller:</strong> ${q.seller}</p><p><strong>Scope:</strong> ${q.scope}</p><p><strong>TTR:</strong> ${q.ttr}</p><p>Escrow ready: ${q.escrow ? 'Yes' : 'No'}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Quote error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏅 Proof-of-Outcome - CORRECTED
     async issuePoO() {
       const title = prompt("What did you complete? (PoO title)");
       if (!title) return;
-      const j = await jpost(BASE + "/poo", { username: U.name, title, metrics: {}, evidence_urls: [] });
-      showToast(j.ok ? "PoO issued" : "Error", j.ok ? "success" : "error");
+      
+      showToast("Issuing PoO...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/poo/issue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            title, 
+            metrics: {}, 
+            evidence_urls: [] 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ PoO issued!", "success");
+          openModal("Proof-of-Outcome Issued", `<p><strong>ID:</strong> ${result.poo.id}</p><p><strong>Title:</strong> ${title}</p><p>Issued at: ${result.poo.ts}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("PoO error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🎞️ Bind Media - CORRECTED
     async bindMedia() {
       const media = prompt("Media ID (e.g., hero-video-001)");
       if (!media) return;
+      
       const offer = prompt("Offer ID to bind to");
       if (!offer) return;
-      const j = await jpost(BASE + "/media/bind_offer", { username: U.name, media_id: media, offer_id: offer });
-      showToast(j.ok ? "Media bound" : "Error", j.ok ? "success" : "error");
+      
+      showToast("Binding media...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/media/bind`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            media_id: media, 
+            offer_id: offer 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Media bound!", "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Bind error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🌐 Localize Offer - CORRECTED
     async localizeOffer() {
       const offer = prompt("Offer ID to localize");
       if (!offer) return;
-      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR");
+      
+      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR,de-DE");
       if (!locales) return;
+      
       const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
-      const j = await jpost(BASE + "/offer/localize", { username: U.name, offer_id: offer, locales: arr });
-      showToast(j.ok ? `Created ${j.variants.length} variants` : "Error", j.ok ? "success" : "error");
+      
+      showToast("Localizing offer...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/offer/localize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            offer_id: offer, 
+            locales: arr 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Created ${result.localized.length} variants`, "success");
+          openModal("Localized", `<p>Created ${result.localized.length} localized variants</p><ul>${result.localized.map(l => `<li>${l.locale}: ${l.id}</li>`).join('')}</ul>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Localize error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏢 Register Business - CORRECTED
     async registerBusiness() {
-      const biz = prompt("Legal business name");
-      if (!biz) return;
-      const j = await jpost(BASE + "/distribution/register", { username: U.name, business_name: biz });
-      openModal("Register Business", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      const bizName = prompt("Legal business name");
+      if (!bizName) return;
+      
+      const channel = prompt("Distribution channel", "partner");
+      const endpoint = prompt("Webhook endpoint URL", "https://example.com/webhook");
+      const token = prompt("API token", "");
+      
+      showToast("Registering business...", "info");
+      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+      
+      try {
+        const res = await fetch(`${BASE}/distribution/register`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(apiKey && { "X-API-Key": apiKey })
+          },
+          body: JSON.stringify({ 
+            username: U.name, 
+            channel,
+            endpoint_url: endpoint,
+            token
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Business registered!", "success");
+          openModal("Business Registered", `<p>Business: ${bizName}</p><p>Channel: ${channel}</p><p>Status: Active</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Register error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🤝 Create JV - CORRECTED
     async createJV() {
       const partner = prompt("Partner username/email");
       if (!partner) return;
-      const split = prompt("Split (you,partner) e.g. 60,40", "60,40");
-      const [a, b] = (split || "60,40").split(",").map(x => parseFloat(x.trim()) / 100);
-      const j = await jpost(BASE + "/jv/create", { username: U.name, partner, split: [a, b] });
-      openModal("JV Created", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      
+      const split = prompt("Split (you,partner) e.g. 60,40", "50,50");
+      const [a, b] = (split || "50,50").split(",").map(x => parseFloat(x.trim()) / 100);
+      
+      showToast("Creating JV...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/jv/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            partner_username: partner, 
+            split: [a, b] 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ JV created!", "success");
+          openModal("JV Created", `<p><strong>ID:</strong> ${result.jv.id}</p><p><strong>Partners:</strong> ${U.name} & ${partner}</p><p><strong>Split:</strong> ${Math.round(a*100)}% / ${Math.round(b*100)}%</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("JV error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 💸 Payout - USE EXISTING requestCashout()
     async payout() {
-      const method = prompt("Method: stripe | crypto", "stripe");
-      const j = await jpost(BASE + "/payout", { username: U.name, method });
-      openModal("Payout", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      // Just call the existing requestCashout function
+      requestCashout();
     },
+    
+    // 🧩 Create Team - CORRECTED
     async createTeam() {
-      showToast("Creating team...", "info");
-      const members = prompt("Members (comma usernames)", "demo_seller,demo_integrator");
+      const members = prompt("Team members (comma-separated usernames)", "");
       if (!members) return;
+      
       const mem = members.split(",").map(s => s.trim()).filter(Boolean);
-      const t = await jpost(BASE + "/team/create", { lead_owner: U.name, members: mem, split: [0.5,0.3,0.2] });
-      showToast(t.ok ? "Team created" : "Error", t.ok ? "success" : "error");
+      
+      showToast("Creating team...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/team/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            lead_owner: U.name, 
+            members: mem 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Team created!", "success");
+          openModal("Team Created", `<p><strong>ID:</strong> ${result.team.id}</p><p><strong>Members:</strong> ${mem.length + 1}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Team error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 📣 Schedule Retargeter - CORRECTED
     async scheduleRetarget() {
-      const lead = prompt("Lead ID to retarget", "lead-123");
+      const lead = prompt("Lead ID to retarget", "");
       if (!lead) return;
-      const j = await jpost(BASE + "/retarget/schedule", { username: U.name, lead_id: lead, cadence: "3d", incentive: "AIGx10" });
-      showToast(j.ok ? "Retarget scheduled" : "Error", j.ok ? "success" : "error");
+      
+      const cadence = prompt("Cadence (e.g., 3d, 1w)", "3d");
+      const incentive = prompt("Incentive (e.g., AIGx10, 10% off)", "");
+      
+      showToast("Scheduling retargeter...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/retarget/schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            lead_id: lead, 
+            cadence, 
+            incentive 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Retargeter scheduled!", "success");
+          openModal("Retargeter Scheduled", `<p><strong>Lead:</strong> ${lead}</p><p><strong>Cadence:</strong> ${cadence}</p><p><strong>Incentive:</strong> ${incentive}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Retarget error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏬 Marketplace Top 20 - CORRECTED
     async openMarket() {
       showToast("Loading marketplace...", "info");
-      const j = await jget(BASE + "/market/rank");
-      const html = `<ol>` + (j.results || []).slice(0, 20).map(r => `<li>${r.username} — rank ${r.rank}</li>`).join("") + `</ol>`;
-      openModal("Marketplace Top 20", html);
+      
+      try {
+        const res = await fetch(`${BASE}/market/rank`);
+        const result = await res.json();
+        
+        if (result.ok || result.results) {
+          const results = result.results || [];
+          const html = `<ol style="padding-left:20px;">` + results.slice(0, 20).map(r => 
+            `<li>${r.username} — Score: ${r.score || r.rank}</li>`
+          ).join("") + `</ol>`;
+          openModal("Marketplace Top 20", html);
+        } else {
+          showToast("Failed to load marketplace", "error");
+        }
+      } catch (err) {
+        console.error("Market error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     }
   };
 })();
-
+  
 const gxFab = document.getElementById("gxFab");
 const gxDrawer = document.getElementById("gxDrawer");
 const gxClose = document.getElementById("gxClose");
