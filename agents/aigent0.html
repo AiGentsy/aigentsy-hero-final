@@ -46,8 +46,25 @@
   .gx-drawer header { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
   .gx-drawer .grp { padding: 12px 16px; }
   .gx-drawer .grp h4 { margin: 10px 0 6px; font-size: 12px; opacity: 0.75; letter-spacing: 0.04em; text-transform: uppercase; }
-  .gx-drawer .grp button { width: 100%; margin: 6px 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #131722; color: #fff; cursor: pointer; text-align: left; }
-  .gx-drawer .grp button:hover { background: #1a2030; }
+  .gx-drawer .grp button { 
+  width: 100%; 
+  margin: 6px 0; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  border: 1px solid #00bfff; 
+  background: linear-gradient(135deg, #131722 0%, #1a2030 100%); 
+  color: #00bfff; 
+  cursor: pointer; 
+  text-align: left;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.gx-drawer .grp button:hover { 
+  background: linear-gradient(135deg, #00bfff 0%, #009cd8 100%); 
+  color: #000;
+  border-color: #00ffcc;
+  transform: translateX(-2px);
+}
   .gx-chip { display: inline-block; padding: 4px 8px; background: #0b5; color: #fff; border-radius: 999px; font-size: 12px; margin-left: 8px; }
   .gx-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 9999; }
   .gx-modal.open { display: flex; }
