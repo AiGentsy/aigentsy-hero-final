@@ -379,9 +379,19 @@ function getStarterData(username, companyType) {
 return {
 username: username,
 companyType: companyType || "general",
-remix: { remixCount: 1, remixCredits: 500, remixUnlockedForks: 1 },
-yield: { vaultYield: 50, remixYield: 25, aigxEarned: 100 },
-wallet: { staked: 250 },
+remix: {
+remixCount: 1,
+remixCredits: 500,
+remixUnlockedForks: 1
+},
+yield: {
+vaultYield: 50,
+remixYield: 25,
+aigxEarned: 100
+},
+wallet: {
+staked: 250
+},
 traits: [companyType || "general"],
 vaultAccess: true,
 cloneLineage: [],
@@ -390,7 +400,12 @@ proposals: [],
 orders: [],
 invoices: [],
 offerings: { products: [] },
-runtimeFlags: { vaultAccess: true, sdkAccess_eligible: false, remixUnlocked: false, cloneLicenseUnlocked: false }
+runtimeFlags: {
+vaultAccess: true,
+sdkAccess_eligible: false,
+remixUnlocked: false,
+cloneLicenseUnlocked: false
+}
 };
 }
 function showToast(message, kind) {
@@ -423,7 +438,11 @@ await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
 }
 async function jpost(url, body) {
 try {
-const response = await fetchWithRetry(url, { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) });
+const response = await fetchWithRetry(url, {
+method: "POST",
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify(body || {})
+});
 return await response.json();
 } catch (error) {
 console.error(POST ${url} failed:, error);
