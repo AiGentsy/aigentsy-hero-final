@@ -827,7 +827,19 @@ function openProposalInboxModal() {
       if (proposals.length === 0) {
         inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
       } else {
-        inboxBox.innerHTML = proposals.map(p => `<div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;"><strong>From:</strong> ${p.sender}<br><strong>Title:</strong> ${p.title}<br><p>${p.details}</p><div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}</div>`).join("");
+        inboxBox.innerHTML = proposals.map((p, idx) => `
+  <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
+    <strong>From:</strong> ${p.sender}<br>
+    <strong>Title:</strong> ${p.title}<br>
+    <p>${p.details}</p>
+    <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
+    ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
+    <div style="margin-top:8px; display:flex; gap:8px;">
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'accept', ${idx})" style="background:#00cc88;">✅ Accept</button>
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'decline', ${idx})" style="background:#666;">❌ Decline</button>
+    </div>
+  </div>
+`).join("");
       }
     })
     .catch(err => {
@@ -836,17 +848,91 @@ function openProposalInboxModal() {
     });
 }
 
-function sendInvite() {
+  async function respondToProposal(sender, action, index) {
+  const username = localStorage.getItem("aigentsyUsername");
+  
+  try {
+    // For now, just show feedback (can wire to backend later)
+    if (action === 'accept') {
+      showToast(`✅ Accepted proposal from ${sender}!`, "success");
+      // TODO: Send acceptance notification to sender
+      // Could create a reverse proposal or update JSONBin status
+    } else {
+      showToast(`Declined proposal from ${sender}`, "info");
+    }
+    
+    // Optionally refresh the proposal list
+    setTimeout(() => {
+      openProposalInboxModal();
+    }, 1000);
+    
+  } catch (err) {
+    console.error("Proposal response error:", err);
+    showToast("Error responding to proposal", "error");
+  }
+}
+  
+async function sendInvite() {
   const inviteInput = document.getElementById("inviteInput");
   const feedback = document.getElementById("inviteFeedback");
+  const sendBtn = document.querySelector('#inviteFeedback').previousElementSibling;
   const email = inviteInput.value.trim();
+  
   if (!email) {
-    feedback.textContent = "Please enter an email or handle.";
+    feedback.textContent = "⚠️ Please enter an email or handle.";
+    feedback.style.color = "#ff6b6b";
     return;
   }
-  feedback.textContent = `✅ Invite sent to ${email}!`;
-  inviteInput.value = "";
-  setTimeout(() => { feedback.textContent = ""; }, 3000);
+  
+  // Show loading state
+  const originalBtnText = sendBtn.textContent;
+  sendBtn.textContent = "Sending...";
+  sendBtn.disabled = true;
+  feedback.textContent = "📤 Sending invitation...";
+  feedback.style.color = "#00bfff";
+  
+  try {
+    const username = localStorage.getItem("aigentsyUsername");
+    const res = await fetch(`${window.BACKEND_BASE}/send_invite`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inviter: username,
+        target_email: email
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      feedback.textContent = result.message;
+      feedback.style.color = "#00ffcc";
+      inviteInput.value = "";
+      
+      // Extra feedback for existing users
+      if (result.existing_user) {
+        showToast("Invitation sent via Proposal System!", "success");
+      } else if (result.pending_email) {
+        showToast("Invite logged - email delivery coming soon!", "info");
+      }
+    } else {
+      feedback.textContent = `❌ ${result.message}`;
+      feedback.style.color = "#ff6b6b";
+    }
+  } catch (err) {
+    console.error("Invite error:", err);
+    feedback.textContent = "⚠️ Connection error. Please try again.";
+    feedback.style.color = "#ff6b6b";
+  } finally {
+    // Restore button
+    sendBtn.textContent = originalBtnText;
+    sendBtn.disabled = false;
+    
+    // Clear feedback after 5 seconds
+    setTimeout(() => {
+      feedback.textContent = "";
+    }, 5000);
+  }
 }
 
 window.GXA = (() => {
