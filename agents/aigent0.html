@@ -146,6 +146,7 @@
     <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
   </div>
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+  <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
   <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
     <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
       <span>💼 Service Payments</span>
@@ -869,6 +870,100 @@ function openProposalInboxModal() {
   } catch (err) {
     console.error("Proposal response error:", err);
     showToast("Error responding to proposal", "error");
+  }
+}
+
+async function requestCashout() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const totalEarnings = parseFloat(document.getElementById("totalEarnings").textContent) || 0;
+  
+  if (totalEarnings <= 0) {
+    showToast("⚠️ No earnings available to cash out", "error");
+    return;
+  }
+  
+  // Ask user for payout method
+  const method = prompt("Choose payout method:\n\n1. Stripe (type 'stripe')\n2. Crypto (type 'crypto')", "stripe");
+  
+  if (!method) return; // User cancelled
+  
+  // Ask for amount
+  const amountStr = prompt(`How much would you like to cash out?\n\nAvailable: $${totalEarnings.toFixed(2)}`, totalEarnings.toFixed(2));
+  if (!amountStr) return;
+  
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    showToast("⚠️ Invalid amount", "error");
+    return;
+  }
+  
+  if (amount > totalEarnings) {
+    showToast("⚠️ Amount exceeds available balance", "error");
+    return;
+  }
+  
+  const confirmMsg = `Cash out $${amount.toFixed(2)} via ${method}?`;
+  if (!confirm(confirmMsg)) return;
+  
+  try {
+    showToast("Processing cashout request...", "info");
+    
+    // Get API key if stored (optional - depends on your auth setup)
+    const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+    
+    const res = await fetch(`${window.BACKEND_BASE}/payout/request`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...(apiKey && { "X-API-Key": apiKey })
+      },
+      body: JSON.stringify({
+        username: username,
+        amount: amount,
+        method: method.toLowerCase()
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.ok) {
+      showToast(`✅ Payout requested: $${amount.toFixed(2)}`, "success");
+      
+      // Show detailed info
+      const payout = result.payout;
+      alert(
+        `💸 Payout Request Submitted!\n\n` +
+        `ID: ${payout.id}\n` +
+        `Amount: $${payout.amount}\n` +
+        `Method: ${payout.method}\n` +
+        `Status: ${payout.status}\n\n` +
+        `You'll be notified when processed.`
+      );
+      
+      // Refresh user data to update balance
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+    } else if (result.error) {
+      // Handle specific errors
+      if (result.error.includes("minimum payout")) {
+        showToast(`⚠️ ${result.error}`, "error");
+      } else if (result.error.includes("no payout destination")) {
+        showToast("⚠️ Please connect your payout method first", "error");
+        alert("To receive payouts, please:\n\n1. Go to Actions drawer\n2. Click 'Register Business'\n3. Connect Stripe or add crypto address");
+      } else if (result.error.includes("insufficient")) {
+        showToast("⚠️ Insufficient available funds", "error");
+      } else {
+        showToast(`❌ ${result.error}`, "error");
+      }
+    } else {
+      showToast("⚠️ Unexpected response from server", "error");
+    }
+    
+  } catch (err) {
+    console.error("Cashout error:", err);
+    showToast("⚠️ Connection error. Please try again.", "error");
   }
 }
   
