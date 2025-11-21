@@ -710,22 +710,27 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
-    let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
-    let roleName = "AiGent";
-    if (user.companyType === "legal") {
-      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
-      roleName = "CLO (Legal)";
-    } else if (user.companyType === "social" || user.companyType === "marketing") {
-      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
-      roleName = "CMO (Growth)";
-    } else if (user.companyType === "saas") {
-      endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
-      roleName = "CTO (Tech)";
-    }
-    const res = await fetchWithRetry(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ input: input, memory, businessType: user.companyType, username: user.username }) }, 2, 15000);
+    // ALL questions now go to Growth agent (which handles C-Suite routing internally)
+    let endpoint = "https://aigentsy-growth-runtime.onrender.com/agent";
+    
+    const res = await fetchWithRetry(endpoint, { 
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ 
+        input: input, 
+        memory, 
+        businessType: user.companyType, 
+        username: user.username 
+      }) 
+    }, 2, 15000);
+    
     const data = await res.json();
     let reply = data.output || "No response.";
-    loader.innerHTML = `**${roleName}**: ${reply}`;
+    
+    // Parse markdown-style bold for C-Suite labels (**CFO:** becomes blue bold)
+    const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
+    loader.innerHTML = formattedReply;
+    
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
