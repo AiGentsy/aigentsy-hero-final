@@ -5,415 +5,132 @@
   <title>AiGentsy — Launch Your AI Business Empire Now</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
     body {
+      margin: 0;
       font-family: 'Inter', sans-serif;
       background: radial-gradient(circle at center, #101c2c, #000000);
       color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
-      position: relative;
+      text-align: center;
+      overflow: hidden;
     }
-    
-    .bg-animation {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 0;
-      background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
-      animation: bgPulse 6s ease-in-out infinite;
-      pointer-events: none;
-    }
-    
     .hero {
-      position: relative;
-      z-index: 2;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 60px 20px 80px;
+      max-width: 900px;
+      padding: 40px 20px;
       animation: fadeIn 1.5s ease-out;
+      z-index: 2;
     }
-    
     .logo {
       display: block;
-      margin: 0 auto 30px;
-      max-width: 240px;
+      margin: 0 auto 20px;
+      max-width: 280px;
+      background: transparent;
+      filter: none;
     }
-    
     .hero h1 {
-      font-size: 3.2rem;
+      font-size: 2.6rem;
       color: #fff;
       margin-bottom: 20px;
-      font-weight: 700;
-      line-height: 1.2;
-      text-shadow: 0 0 20px rgba(0,191,255,0.3);
-      text-align: center;
     }
-    
-    .hero .subheadline {
-      font-size: 1.3rem;
-      color: #00bfff;
-      margin-bottom: 15px;
-      font-weight: 600;
-      text-align: center;
-    }
-    
     .hero p {
-      font-size: 1.15rem;
+      font-size: 1.2rem;
       color: #ccc;
       margin-bottom: 30px;
       line-height: 1.6;
-      text-align: center;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
     }
-    
-    /* CUSTOM BUSINESS SEARCH BAR */
-    .search-section {
-      max-width: 750px;
-      margin: 40px auto;
-      position: relative;
-    }
-    
-    .search-label {
-      font-size: 1.2rem;
-      color: #fff;
-      margin-bottom: 12px;
-      font-weight: 600;
-      display: block;
-      text-align: center;
-    }
-    
-    .search-sublabel {
-      font-size: 0.95rem;
-      color: #aaa;
-      margin-bottom: 20px;
-      text-align: center;
-      line-height: 1.5;
-    }
-    
-    .search-wrapper {
-      position: relative;
-      width: 100%;
-    }
-    
-    .search-input {
-      width: 100%;
-      padding: 18px 50px 18px 20px;
-      font-size: 1.1rem;
-      border: 2px solid #00bfff;
-      border-radius: 50px;
-      background: rgba(0,0,0,0.6);
-      color: #fff;
-      outline: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 20px rgba(0,191,255,0.2);
-    }
-    
-    .search-input:focus {
-      border-color: #00ffcc;
-      box-shadow: 0 0 30px rgba(0,255,204,0.4);
-      background: rgba(0,0,0,0.8);
-    }
-    
-    .search-input::placeholder {
-      color: #666;
-    }
-    
-    .search-icon {
-      position: absolute;
-      right: 22px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.4rem;
-      color: #00bfff;
-      pointer-events: none;
-    }
-    
-    .search-results {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #0d0d0d;
-      border: 2px solid #00bfff;
-      border-radius: 16px;
-      margin-top: 8px;
-      max-height: 400px;
-      overflow-y: auto;
-      display: none;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      z-index: 1000;
-    }
-    
-    .search-results.active {
-      display: block;
-    }
-    
-    .search-result-item {
-      padding: 16px 20px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border-bottom: 1px solid #222;
-      text-align: left;
-    }
-    
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-    
-    .search-result-item:hover {
-      background: #1a1a1a;
-      padding-left: 24px;
-    }
-    
-    .search-result-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #00bfff;
-      margin-bottom: 6px;
-    }
-    
-    .search-result-desc {
-      font-size: 0.9rem;
-      color: #aaa;
-      line-height: 1.4;
-    }
-    
-    .search-suggestion {
-      margin-top: 12px;
-      font-size: 0.95rem;
-      color: #00ffcc;
-      font-style: italic;
-      min-height: 24px;
-      text-align: center;
-    }
-    
-    .examples {
-      margin-top: 16px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    
-    .example-chip {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      color: #00bfff;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .example-chip:hover {
-      border-color: #00bfff;
-      background: #222;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,191,255,0.3);
-    }
-    
-    .social-proof {
-      font-size: 0.95rem;
-      color: #888;
-      margin: 30px auto 40px;
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    .social-proof span {
-      background: #111;
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid #333;
-    }
-    
     .consent-box {
-      background: rgba(13,13,13,0.95);
-      border: 1px solid rgba(255,255,255,0.3);
-      padding: 32px;
-      border-radius: 16px;
-      max-width: 750px;
+      background: #0d0d0d;
+      border: 1px solid #fff;
+      padding: 24px;
+      border-radius: 12px;
+      max-width: 600px;
       margin: 0 auto;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      box-shadow: 0 0 12px #ffffff33;
     }
-    
     .consent-box input[type="text"],
     .consent-box input[type="password"] {
-      width: 100%;
-      padding: 14px 16px;
+      width: 90%;
+      padding: 10px;
       margin: 10px 0;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #ffffff;
       background: #111;
       color: #fff;
-      font-size: 1rem;
     }
-    
     .consent-box label {
       display: block;
-      margin: 16px 0;
+      margin: 10px 0;
       font-size: 0.95rem;
       color: #ccc;
-      text-align: center;
     }
-    
     .toggle-auth {
-      margin: 12px 0;
+      margin: 10px 0;
       color: #00bfff;
       cursor: pointer;
-      font-size: 0.95rem;
-      text-decoration: underline;
-      text-align: center;
+      font-size: 0.9rem;
     }
-    
     .consent-box button {
-      margin-top: 24px;
-      padding: 16px 32px;
-      background: linear-gradient(135deg, #00bfff, #0080ff);
-      color: #fff;
+      margin-top: 16px;
+      padding: 10px 20px;
+      background: #fff;
+      color: #000;
       font-weight: bold;
-      font-size: 1.15rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      width: 100%;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
     }
-    
     .consent-box button:hover:not(:disabled) {
-      transform: scale(1.02);
-      box-shadow: 0 0 20px #00bfff;
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #ffffff;
     }
-    
     .consent-box button:disabled {
       background: #444;
       cursor: not-allowed;
-      opacity: 0.6;
     }
-    
-    .section-title {
-      color: #00bfff;
-      margin: 30px 0 16px;
-      font-size: 1.15rem;
-      font-weight: 600;
-      text-align: center;
-    }
-    
     .aigent-options {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 16px;
     }
-    
-    @media (max-width: 700px) {
-      .aigent-options { 
-        grid-template-columns: 1fr; 
-      }
-      .hero h1 { 
-        font-size: 2.2rem; 
-      }
-      .hero {
-        padding: 40px 16px 60px;
-      }
-      .consent-box {
-        padding: 24px;
-      }
-    }
-    
     .aigent-card {
-      background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
-      border: 2px solid #333;
+      background: #111;
+      border: 1px solid #fff;
       color: #fff;
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 14px 16px;
+      width: 250px;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-align: left;
-      position: relative;
-      overflow: hidden;
+      font-size: 0.95rem;
     }
-    
-    .aigent-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(135deg, transparent, rgba(0,191,255,0.1));
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .aigent-card.selected::before,
-    .aigent-card:hover::before {
-      opacity: 1;
-    }
-    
     .aigent-card.selected,
     .aigent-card:hover {
-      border-color: #00bfff;
-      box-shadow: 0 0 20px rgba(0,191,255,0.4);
-      transform: translateY(-2px);
+      box-shadow: 0 0 10px #ffffff;
+      background: #1a1a1a;
     }
-    
-    .aigent-card-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #00bfff;
-    }
-    
-    .aigent-card-desc {
-      font-size: 0.9rem;
-      color: #aaa;
-      line-height: 1.5;
-    }
-    
-    .aigent-card-badge {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #00bfff;
-      color: #000;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .aigent-card.selected .aigent-card-badge {
-      opacity: 1;
-    }
-    
     .footer-note {
-      margin-top: 60px;
-      padding-bottom: 40px;
-      font-size: 0.95rem;
+      margin-top: 50px;
+      font-size: 0.9rem;
       color: #666;
-      letter-spacing: 0.5px;
-      text-align: center;
     }
-    
+    .bg-animation {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1;
+      background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
+      animation: bgPulse 6s ease-in-out infinite;
+    }
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    
     @keyframes bgPulse {
       0%, 100% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.08); opacity: 0.7; }
@@ -422,98 +139,36 @@
 </head>
 <body>
   <div class="bg-animation"></div>
-  
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
-    
     <h1>Launch Your AI Business Empire Now</h1>
-    
-    <p class="subheadline">Your Business, Powered by Autonomous AI — Revenue Starts Today</p>
-    
     <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
-    
-    <!-- SEARCH BAR FOR TEMPLATES + CUSTOM BUSINESSES -->
-    <div class="search-section">
-      <label class="search-label">🔍 Search or Describe Your AI Business:</label>
-      <p class="search-sublabel">Type a business type (e.g., "real estate") or describe your custom idea in detail</p>
-      
-      <div class="search-wrapper">
-        <input 
-          type="text" 
-          id="businessSearch" 
-          class="search-input" 
-          placeholder="Try: podcast production, consulting firm, or 'I want to automate my coaching business'..."
-          autocomplete="off"
-        />
-        <span class="search-icon">🔍</span>
-      </div>
-      
-      <div id="searchResults" class="search-results"></div>
-      <div id="searchSuggestion" class="search-suggestion"></div>
-      
-      <div class="examples">
-        <span class="example-chip" data-example="real estate">🏠 Real Estate</span>
-        <span class="example-chip" data-example="consulting">💼 Consulting</span>
-        <span class="example-chip" data-example="podcast">🎙️ Podcast</span>
-        <span class="example-chip" data-example="recruiting">👔 Recruiting</span>
-        <span class="example-chip" data-example="health coaching">💪 Health</span>
-        <span class="example-chip" data-example="online education">📚 Education</span>
-      </div>
-    </div>
-    
-    <div class="social-proof">
-      <span>✅ No coding required</span>
-      <span>🚀 Deploy in minutes</span>
-      <span>💰 Start earning autonomously</span>
-    </div>
-    
     <div class="consent-box">
-      <input type="text" id="usernameInput" placeholder="Choose your username" />
-      <input type="password" id="passwordInput" placeholder="Create a password" style="display:none;" />
-      
-      <label>
-        <input type="checkbox" id="agreeCheckbox"/> 
-        I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#00bfff;text-decoration:underline;" target="_blank">protocol terms</a>
-      </label>
-      
-      <div class="toggle-auth">Already have an account? Log in</div>
+      <input type="text" id="usernameInput" placeholder="Username" />
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
+      <div class="toggle-auth">Don't have an account? Sign up</div>
 
-      <h3 class="section-title">Or Pick a Pre-Built Template:</h3>
-      
       <div class="aigent-options">
-        <div class="aigent-card" data-agent="legal">
-          <div class="aigent-card-badge">SELECTED</div>
-          <div class="aigent-card-title">⚖️ Legal AI</div>
-          <div class="aigent-card-desc">Contracts, IP, licensing, compliance — automated legal services</div>
-        </div>
-        
-        <div class="aigent-card" data-agent="social">
-          <div class="aigent-card-badge">SELECTED</div>
-          <div class="aigent-card-title">📱 Social Media AI</div>
-          <div class="aigent-card-desc">Content creation, Reels, TikToks, creator monetization</div>
-        </div>
-        
-        <div class="aigent-card" data-agent="saas">
-          <div class="aigent-card-badge">SELECTED</div>
-          <div class="aigent-card-title">💻 SaaS AI</div>
-          <div class="aigent-card-desc">Build & deploy AI-powered software tools and APIs</div>
-        </div>
-        
-        <div class="aigent-card" data-agent="marketing">
-          <div class="aigent-card-badge">SELECTED</div>
-          <div class="aigent-card-title">📈 Marketing AI</div>
-          <div class="aigent-card-desc">SEO, ads, campaigns, growth automation — fully autonomous</div>
-        </div>
+        <div class="aigent-card" data-agent="legal">Legal AI<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
+        <div class="aigent-card" data-agent="social">Social Media AI<br><span style="font-size: 0.85rem;">Reels, TikToks, content, creator kits</span></div>
+        <div class="aigent-card" data-agent="saas">SaaS AI<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+        <div class="aigent-card" data-agent="marketing">Marketing AI<br><span style="font-size: 0.85rem;">SEO, ads, outreach — autonomous</span></div>
       </div>
 
-      <button id="enterBtn" disabled>🚀 Launch My AI Business Now</button>
+      <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
+        <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Or describe your custom AI business idea:</label><br>
+        <input type="text" id="aigentsySearch" placeholder="e.g. podcast production, real estate agency, health coaching" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
+        <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
+      </div>
+
+      <button id="enterBtn" disabled>🚀 Launch Your AI Business Now</button>
     </div>
 
     <div class="footer-note">
       Autonomous income. Real-world monetization. No gatekeepers.
     </div>
   </div>
-  
   <script>
   (() => {
     if (window.__AIG_HERO_INIT__) return;
@@ -529,12 +184,11 @@
     const passwordInput = document.getElementById('passwordInput');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const enterBtn = document.getElementById('enterBtn');
-    const businessSearch = document.getElementById('businessSearch');
-    const searchResults = document.getElementById('searchResults');
-    const searchSuggestion = document.getElementById('searchSuggestion');
+    const searchInput = document.getElementById('aigentsySearch');
+    const suggestionBox = document.getElementById('aigentsySuggestion');
 
     // State
-    let authMode = "signup";
+    let authMode = "login";
     let selectedAgent = null;
     let customBusinessIdea = "";
 
@@ -543,134 +197,88 @@
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
-    // Business Templates Database
-    const businessTemplates = [
-      { id: "legal", name: "Legal Services AI", keywords: ["legal", "lawyer", "attorney", "contract", "ip", "compliance", "law firm"], desc: "Automate contracts, IP protection, licensing, and legal compliance", icon: "⚖️" },
-      { id: "social", name: "Social Media AI", keywords: ["social", "content", "creator", "influencer", "tiktok", "instagram", "reels", "video", "youtube"], desc: "Automated content creation, posting, and creator monetization", icon: "📱" },
-      { id: "saas", name: "SaaS Development AI", keywords: ["saas", "software", "app", "tool", "development", "api", "platform", "web app"], desc: "Build and deploy AI-powered software tools and APIs", icon: "💻" },
-      { id: "marketing", name: "Marketing Agency AI", keywords: ["marketing", "seo", "ads", "growth", "agency", "advertising", "campaign", "digital marketing"], desc: "Automated SEO, ads, lead generation, and growth campaigns", icon: "📈" },
-      { id: "consulting", name: "Consulting Business AI", keywords: ["consulting", "consultant", "advisor", "coaching", "mentor", "strategy", "business consulting"], desc: "Client matching, scheduling, deliverable automation, and program delivery", icon: "💼" },
-      { id: "podcast", name: "Podcast Production AI", keywords: ["podcast", "audio", "radio", "show", "broadcasting", "media", "podcasting"], desc: "Automated podcast production, editing, distribution, and monetization", icon: "🎙️" },
-      { id: "ecommerce", name: "E-Commerce AI", keywords: ["ecommerce", "shop", "store", "retail", "selling", "products", "dropship", "online store"], desc: "Automated inventory, fulfillment, customer service, and sales", icon: "🛒" },
-      { id: "recruiting", name: "Recruiting Agency AI", keywords: ["recruiting", "hiring", "talent", "hr", "headhunting", "staffing", "recruitment"], desc: "Candidate sourcing, screening, placement automation, and client matching", icon: "👔" },
-      { id: "real-estate", name: "Real Estate AI", keywords: ["real estate", "property", "realtor", "housing", "listings", "homes"], desc: "Lead generation, showing scheduling, deal closing, and property management", icon: "🏠" },
-      { id: "finance", name: "Financial Planning AI", keywords: ["finance", "financial", "planning", "investment", "wealth", "accounting", "bookkeeping"], desc: "Automated financial analysis, planning, and wealth management", icon: "💰" },
-      { id: "health", name: "Health & Wellness AI", keywords: ["health", "wellness", "fitness", "nutrition", "coaching", "training", "personal training"], desc: "Client programs, progress tracking, engagement automation, and coaching delivery", icon: "💪" },
-      { id: "education", name: "Online Education AI", keywords: ["education", "course", "training", "teaching", "learning", "tutoring", "online courses"], desc: "Course delivery, student engagement, assessment, and certification", icon: "📚" }
-    ];
-
-    // Helpers
+    // Business Type Mapping (for dashboard tailoring)
     const companyTypeMap = (agent) => {
       const map = { 
-        legal: "legal", social: "social", saas: "saas", marketing: "marketing", 
-        consulting: "general", podcast: "general", ecommerce: "general",
-        recruiting: "general", "real-estate": "general", finance: "general",
-        health: "general", education: "general", custom: "custom" 
+        legal: "legal", 
+        social: "social", 
+        saas: "saas", 
+        marketing: "marketing", 
+        custom: "custom" 
       };
       return map[agent] || "general";
     };
 
-    // Search functionality - HYBRID: Templates OR Custom
-    function searchBusinesses(query) {
-      if (!query || query.length < 2) {
-        searchResults.classList.remove('active');
-        searchSuggestion.textContent = "";
-        customBusinessIdea = "";
-        return;
-      }
-
-      const q = query.toLowerCase();
+    // Enhanced suggestion system with business type detection
+    function showSuggestion(value) {
+      if (!suggestionBox) return;
+      const v = (value || "").toLowerCase();
+      let msg = "We'll build you a custom AI business based on your input.";
+      let detectedType = "custom";
       
-      // First, search templates
-      const matches = businessTemplates.filter(biz => 
-        biz.name.toLowerCase().includes(q) || 
-        biz.keywords.some(kw => kw.includes(q) || q.includes(kw))
-      );
-
-      if (matches.length > 0) {
-        // Show template matches
-        searchResults.innerHTML = matches.map(biz => `
-          <div class="search-result-item" data-agent="${biz.id}" data-type="template">
-            <div class="search-result-title">${biz.icon} ${biz.name}</div>
-            <div class="search-result-desc">${biz.desc}</div>
-          </div>
-        `).join('');
-        
-        // Add custom option at bottom
-        searchResults.innerHTML += `
-          <div class="search-result-item" data-agent="custom" data-type="custom" style="border-top:2px solid #00bfff;margin-top:8px;padding-top:16px;">
-            <div class="search-result-title">✨ Custom Business: "${query}"</div>
-            <div class="search-result-desc">Build a completely custom AI business based on your specific description</div>
-          </div>
-        `;
-        
-        searchResults.classList.add('active');
-        searchSuggestion.textContent = `💡 Found ${matches.length} template${matches.length > 1 ? 's' : ''} matching "${query}" — or create custom below`;
-        
-      } else {
-        // No template match - show custom only
-        searchResults.innerHTML = `
-          <div class="search-result-item" data-agent="custom" data-type="custom">
-            <div class="search-result-title">✨ Custom AI Business: "${query}"</div>
-            <div class="search-result-desc">We'll build you a completely custom AI-powered business based on your description. Your C-Suite team will handle everything autonomously.</div>
-          </div>
-        `;
-        searchResults.classList.add('active');
-        searchSuggestion.textContent = "💡 No template match — we'll build you a custom AI business!";
+      // Detect business type and provide tailored suggestions
+      if (v.includes("legal") || v.includes("law") || v.includes("attorney") || v.includes("contract")) {
+        msg = "💼 Legal AI detected — Your C-Suite will handle contracts, IP protection, and compliance automation.";
+        detectedType = "legal";
+      } else if (v.includes("podcast") || v.includes("audio") || v.includes("broadcasting")) {
+        msg = "🎙️ Podcast AI detected — Auto-production, distribution, guest booking, and monetization.";
+        detectedType = "podcast";
+      } else if (v.includes("saas") || v.includes("software") || v.includes("app") || v.includes("tool")) {
+        msg = "💻 SaaS AI detected — Your C-Suite will build, deploy, and scale AI-powered tools.";
+        detectedType = "saas";
+      } else if (v.includes("marketing") || v.includes("seo") || v.includes("ads") || v.includes("growth")) {
+        msg = "📈 Marketing AI detected — SEO, ad campaigns, content strategy, and growth automation.";
+        detectedType = "marketing";
+      } else if (v.includes("social") || v.includes("content") || v.includes("creator") || v.includes("influencer")) {
+        msg = "📱 Social Media AI detected — Content creation, posting schedules, and creator monetization.";
+        detectedType = "social";
+      } else if (v.includes("real estate") || v.includes("property") || v.includes("realtor")) {
+        msg = "🏠 Real Estate AI detected — Lead gen, showing schedules, deal closing, and property management.";
+        detectedType = "real-estate";
+      } else if (v.includes("consult") || v.includes("coach") || v.includes("advisor") || v.includes("mentor")) {
+        msg = "💼 Consulting AI detected — Client matching, scheduling, deliverable automation, and billing.";
+        detectedType = "consulting";
+      } else if (v.includes("ecommerce") || v.includes("shop") || v.includes("store") || v.includes("retail")) {
+        msg = "🛒 E-Commerce AI detected — Inventory, fulfillment, customer service, and sales automation.";
+        detectedType = "ecommerce";
+      } else if (v.includes("recruit") || v.includes("hiring") || v.includes("talent") || v.includes("hr")) {
+        msg = "👔 Recruiting AI detected — Candidate sourcing, screening, interviews, and placement.";
+        detectedType = "recruiting";
+      } else if (v.includes("health") || v.includes("wellness") || v.includes("fitness") || v.includes("nutrition")) {
+        msg = "💪 Health & Wellness AI detected — Client programs, progress tracking, and engagement.";
+        detectedType = "health";
+      } else if (v.includes("education") || v.includes("course") || v.includes("training") || v.includes("teach")) {
+        msg = "📚 Education AI detected — Course delivery, student engagement, and assessment automation.";
+        detectedType = "education";
+      } else if (v.includes("finance") || v.includes("accounting") || v.includes("bookkeep") || v.includes("tax")) {
+        msg = "💰 Finance AI detected — Financial planning, analysis, reporting, and compliance.";
+        detectedType = "finance";
       }
-
-      // Add click handlers
-      document.querySelectorAll('.search-result-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const agent = item.getAttribute('data-agent');
-          const type = item.getAttribute('data-type');
-          const title = item.querySelector('.search-result-title').textContent;
-          selectBusiness(agent, type, title, query);
-          searchResults.classList.remove('active');
-          businessSearch.value = "";
-        });
-      });
-    }
-
-    function selectBusiness(agent, type, displayName, originalQuery) {
-      // Deselect all cards
-      document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
       
-      if (type === "template") {
-        // Template selected - select matching card
-        const matchingCard = document.querySelector(`.aigent-card[data-agent="${agent}"]`);
+      suggestionBox.textContent = msg;
+      
+      // Auto-select matching card if available and no card is selected
+      if (detectedType !== "custom" && !selectedAgent) {
+        const matchingCard = document.querySelector(`.aigent-card[data-agent="${detectedType}"]`);
         if (matchingCard) {
-          matchingCard.classList.add('selected');
+          setTimeout(() => {
+            document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
+            matchingCard.classList.add('selected');
+            selectedAgent = detectedType;
+            updateButtonState();
+          }, 300);
         }
-        selectedAgent = agent;
-        customBusinessIdea = "";
-        searchSuggestion.textContent = `✅ Selected template: ${displayName}`;
-      } else {
-        // Custom business selected
-        selectedAgent = "custom";
-        customBusinessIdea = originalQuery;
-        searchSuggestion.textContent = `✅ Custom business selected: "${originalQuery}"`;
       }
       
-      updateButtonState();
-    }
-
-    // Example chips
-    document.querySelectorAll('.example-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const example = chip.getAttribute('data-example');
-        businessSearch.value = example;
-        businessSearch.focus();
-        searchBusinesses(example);
-      });
-    });
-
-    // Close search results when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!searchResults.contains(e.target) && e.target !== businessSearch) {
-        searchResults.classList.remove('active');
+      // If custom description, set it
+      if (value && value.length > 10) {
+        customBusinessIdea = value;
+        if (!selectedAgent) {
+          selectedAgent = "custom";
+          updateButtonState();
+        }
       }
-    });
+    }
 
     async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
       if (!JSONBIN_URL || !JSONBIN_SECRET) {
@@ -679,11 +287,23 @@
       }
       
       const now = new Date().toISOString();
+      
+      // Role mapping based on business type (for C-Suite personalization)
       const roleMap = { 
-        legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", 
-        consulting: "CEO", podcast: "CEO", ecommerce: "COO", recruiting: "COO",
-        "real-estate": "CEO", finance: "CFO", health: "COO", education: "CEO",
-        custom: "CEO", general: "CEO" 
+        legal: "CLO",           // Chief Legal Officer
+        social: "CMO",          // Chief Marketing Officer
+        saas: "CTO",            // Chief Technology Officer
+        marketing: "CMO",       // Chief Marketing Officer
+        consulting: "CEO",      // Chief Executive Officer
+        podcast: "CEO",         // Chief Executive Officer
+        ecommerce: "COO",       // Chief Operations Officer
+        recruiting: "COO",      // Chief Operations Officer
+        "real-estate": "CEO",   // Chief Executive Officer
+        finance: "CFO",         // Chief Financial Officer
+        health: "COO",          // Chief Operations Officer
+        education: "CEO",       // Chief Executive Officer
+        custom: "CEO",          // Chief Executive Officer
+        general: "CEO"          // Chief Executive Officer
       };
       
       const entry = {
@@ -692,6 +312,7 @@
         username: username,
         consent: { agreed: true, username: username, timestamp: now },
         companyType: companyTypeMap(selectedAgent),
+        businessType: selectedAgent, // NEW: Specific business type for dashboard tailoring
         created: now,
         mintTime: now,
         customInput: customDescription || "",
@@ -699,16 +320,40 @@
         role: roleMap[selectedAgent || "general"],
         trait: selectedAgent || "founder",
         traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-        runtimeFlags: { vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false, sdkAccess_eligible: selectedAgent === "saas" },
+        runtimeFlags: { 
+          vaultAccess: true, 
+          remixUnlocked: false, 
+          cloneLicenseUnlocked: false, 
+          sdkAccess_eligible: selectedAgent === "saas" 
+        },
         wallet: { address: "0x0", staked: 0 },
         staked: 0,
-        yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0, aigxAttributedTo: [], aigxEarnedEnabled: false },
+        yield: { 
+          autoStake: false, 
+          aigxEarned: 0, 
+          vaultYield: 0, 
+          remixYield: 0, 
+          aigxAttributedTo: [], 
+          aigxEarnedEnabled: false 
+        },
         remixUnlocked: false,
         remixUnlockedForks: 0,
-        remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
+        remix: { 
+          remixCount: 0, 
+          remixCredits: 1000, 
+          lineageDepth: 0, 
+          royaltyTerms: "Standard 30%" 
+        },
         cloneLineage: [],
         cloneLicenseUnlocked: false,
-        proposals: [], orders: [], invoices: [], payments: [], contacts: [], meetings: [], kpi_snapshots: [], docs: [],
+        proposals: [], 
+        orders: [], 
+        invoices: [], 
+        payments: [], 
+        contacts: [], 
+        meetings: [], 
+        kpi_snapshots: [], 
+        docs: [],
         ownership: { ledger: [] },
         kits: {
           universal: { unlocked: true },
@@ -719,15 +364,39 @@
           marketing: { unlocked: selectedAgent === "marketing" },
           social: { unlocked: selectedAgent === "social" }
         },
-        metaloop: { enabled: true, lastMatchCheck: null, proposalHistory: [] },
-        metabridge: { active: true, lastBridge: null, bridgeCount: 0 },
-        automatch: { status: "pending", lastMatchResult: null, matchReady: true },
+        metaloop: { 
+          enabled: true, 
+          lastMatchCheck: null, 
+          proposalHistory: [] 
+        },
+        metabridge: { 
+          active: true, 
+          lastBridge: null, 
+          bridgeCount: 0 
+        },
+        automatch: { 
+          status: "pending", 
+          lastMatchResult: null, 
+          matchReady: true 
+        },
         referral: referralCode || "origin/hero",
         runtimeURL: "https://aigentsy.com/agents/aigent0.html",
         protocol: "MetaUpgrade25+26",
-        realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
-        metaVenture: { ventureHive: "Autonomous Launch", ventureRole: roleMap[selectedAgent || "general"], ventureStatus: "Pending", ventureID: `MV-${Date.now()}` },
-        mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Verified", sentinelAlert: false },
+        realm: { 
+          name: "Realm 101 — Strategic Expansion", 
+          joinedAt: now 
+        },
+        metaVenture: { 
+          ventureHive: "Autonomous Launch", 
+          ventureRole: roleMap[selectedAgent || "general"], 
+          ventureStatus: "Pending", 
+          ventureID: `MV-${Date.now()}` 
+        },
+        mirror: { 
+          mirroredInRealms: ["Realm 101 — Strategic Expansion"], 
+          mirrorIntegrity: "Verified", 
+          sentinelAlert: false 
+        },
         earningsEnabled: true,
         listingStatus: "active",
         protocolStatus: "Bound",
@@ -735,10 +404,30 @@
         sdkAccess_eligible: selectedAgent === "saas",
         sdkAccess: false,
         vaultAccess: true,
-        licenses: { sdk: false, vault: false, remix: false, clone: false, aigx: false },
-        transactions: { unlocks: [], yieldEvents: [], referralEvents: [] },
-        packaging: { kits_sent: [], proposals: [], custom_files: [], active: false },
-        offerings: { products: [], services: [], pricing: [], description: "" }
+        licenses: { 
+          sdk: false, 
+          vault: false, 
+          remix: false, 
+          clone: false, 
+          aigx: false 
+        },
+        transactions: { 
+          unlocks: [], 
+          yieldEvents: [], 
+          referralEvents: [] 
+        },
+        packaging: { 
+          kits_sent: [], 
+          proposals: [], 
+          custom_files: [], 
+          active: false 
+        },
+        offerings: { 
+          products: [], 
+          services: [], 
+          pricing: [], 
+          description: "" 
+        }
       };
       
       try {
@@ -785,32 +474,17 @@
     window.toggleAuthMode = function() {
       authMode = (authMode === "login") ? "signup" : "login";
       const el = document.querySelector('.toggle-auth');
-      const pwdField = document.getElementById('passwordInput');
-      
-      if (authMode === "login") {
-        el.textContent = "Don't have an account? Sign up";
-        pwdField.style.display = "block";
-        enterBtn.textContent = "🔐 Log In";
-      } else {
-        el.textContent = "Already have an account? Log in";
-        pwdField.style.display = "none";
-        enterBtn.textContent = "🚀 Launch My AI Business Now";
-      }
+      if (el) el.textContent = (authMode === "login") ? "Don't have an account? Sign up" : "Already have an account? Log in";
     };
 
     // Events
-    businessSearch.addEventListener('input', (e) => searchBusinesses(e.target.value));
-    businessSearch.addEventListener('focus', (e) => {
-      if (e.target.value.length >= 2) searchBusinesses(e.target.value);
-    });
-
     document.querySelectorAll('.aigent-card').forEach(card => {
       card.addEventListener('click', () => {
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
-        customBusinessIdea = "";
-        searchSuggestion.textContent = `✅ Selected template: ${card.querySelector('.aigent-card-title').textContent}`;
+        customBusinessIdea = ""; // Clear custom idea when selecting template
+        showSuggestion(selectedAgent);
         updateButtonState();
       });
     });
@@ -818,29 +492,34 @@
     document.querySelector('.toggle-auth').addEventListener('click', window.toggleAuthMode);
     usernameInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+    }
 
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
       const username = usernameInput.value.trim();
-      if (!username) { alert("Please enter a username"); return; }
+      if (!username) { alert("Enter a username"); return; }
+      
+      const idea = searchInput ? searchInput.value.trim() : "";
       
       try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
       try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+      try { localStorage.setItem("aigentsyBusinessIdea", customBusinessIdea); } catch(e){}
 
       enterBtn.disabled = true;
-      enterBtn.innerHTML = "🚀 Building your AI business...";
+      enterBtn.textContent = "🚀 Building your AI business...";
       
       try {
-        const description = selectedAgent === "custom" ? customBusinessIdea : "";
-        console.log("📝 Registering:", username, "as", selectedAgent, description ? `(custom: ${description})` : "(template)");
-        await registerUserToJSONBin(username, selectedAgent, description, referral);
-        console.log("🚀 Redirecting...");
+        console.log("📝 Registering:", username, "Type:", selectedAgent, customBusinessIdea ? `Custom: ${customBusinessIdea}` : "Template");
+        await registerUserToJSONBin(username, selectedAgent, customBusinessIdea || idea, referral);
+        console.log("🚀 Redirecting to tailored dashboard...");
         window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
       } catch (e) {
         console.error("❌ Error:", e);
         alert("Could not create your AiGentsy. Please try again.");
         enterBtn.disabled = false;
-        enterBtn.innerHTML = "🚀 Launch My AI Business Now";
+        enterBtn.textContent = "🚀 Launch Your AI Business Now";
       }
     });
 
