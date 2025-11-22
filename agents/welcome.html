@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AiGentsy — Building Your AI Business</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #101c2c, #000000);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    .logo {
+      width: 200px;
+      margin-bottom: 40px;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #00bfff, #00ffcc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .status {
+      font-size: 1.2rem;
+      color: #00bfff;
+      margin-bottom: 40px;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00bfff, #00ffcc);
+      border-radius: 10px;
+      animation: progress 4s ease-out forwards;
+    }
+    
+    .steps {
+      text-align: left;
+      margin: 30px auto;
+      max-width: 400px;
+    }
+    
+    .step {
+      padding: 12px 0;
+      font-size: 1rem;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s ease;
+    }
+    
+    .step.active {
+      color: #00bfff;
+    }
+    
+    .step.complete {
+      color: #00ffcc;
+    }
+    
+    .step-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+    
+    .step.active .step-icon {
+      border-color: #00bfff;
+      background: #00bfff;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .step.complete .step-icon {
+      border-color: #00ffcc;
+      background: #00ffcc;
+      color: #000;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes progress {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="../aigentsy-logo-ultraclean.png" alt="AiGentsy" class="logo" />
+    
+    <h1>Building Your AI Business</h1>
+    <p class="status" id="statusText">Initializing your C-Suite team...</p>
+    
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    
+    <div class="steps">
+      <div class="step" id="step1">
+        <div class="step-icon">1</div>
+        <div>Setting up business infrastructure</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-icon">2</div>
+        <div>Deploying AI C-Suite team</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-icon">3</div>
+        <div>Configuring autonomous operations</div>
+      </div>
+      <div class="step" id="step4">
+        <div class="step-icon">4</div>
+        <div>Activating revenue systems</div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const steps = [
+      { id: 'step1', text: 'Setting up your business infrastructure...', duration: 1000 },
+      { id: 'step2', text: 'Deploying AI C-Suite team...', duration: 1000 },
+      { id: 'step3', text: 'Configuring autonomous operations...', duration: 1000 },
+      { id: 'step4', text: 'Activating revenue systems...', duration: 1000 }
+    ];
+    
+    const statusText = document.getElementById('statusText');
+    const username = new URLSearchParams(window.location.search).get('user');
+    
+    // Check if returning user
+    const hasSeenTutorial = localStorage.getItem(`aigentsy_tutorial_viewed_${username}`);
+    
+    let currentStep = 0;
+    
+    function activateStep(index) {
+      if (index >= steps.length) {
+        statusText.textContent = "✅ Your AI business is ready!";
+        setTimeout(() => {
+          if (hasSeenTutorial) {
+            // Returning user - skip tutorial
+            window.location.href = `aigent0.html?user=${encodeURIComponent(username)}`;
+          } else {
+            // New user - show tutorial
+            window.location.href = `tutorial.html?user=${encodeURIComponent(username)}`;
+          }
+        }, 500);
+        return;
+      }
+      
+      const step = steps[index];
+      const stepEl = document.getElementById(step.id);
+      
+      // Mark previous steps as complete
+      if (index > 0) {
+        const prevStepEl = document.getElementById(steps[index - 1].id);
+        prevStepEl.classList.remove('active');
+        prevStepEl.classList.add('complete');
+        prevStepEl.querySelector('.step-icon').textContent = '✓';
+      }
+      
+      // Activate current step
+      stepEl.classList.add('active');
+      statusText.textContent = step.text;
+      
+      setTimeout(() => {
+        activateStep(index + 1);
+      }, step.duration);
+    }
+    
+    // Start sequence after brief delay
+    setTimeout(() => {
+      activateStep(0);
+    }, 500);
+  </script>
+</body>
+</html>
