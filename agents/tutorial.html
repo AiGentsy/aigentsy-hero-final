@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>AiGentsy — How to Use Your AI Business</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #101c2c, #000000);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .tutorial-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn 0.3s ease-out;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    
+    .tutorial-container {
+      background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+      border: 2px solid #00bfff;
+      border-radius: 20px;
+      max-width: 900px;
+      width: 100%;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0,191,255,0.3);
+      animation: slideUp 0.5s ease-out;
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .logo {
+      width: 180px;
+      display: block;
+      margin: 0 auto 30px;
+    }
+    
+    .tutorial-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .tutorial-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #00bfff, #00ffcc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .tutorial-header p {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+    
+    .section {
+      margin-bottom: 35px;
+      padding: 25px;
+      background: rgba(0,191,255,0.05);
+      border-radius: 12px;
+      border-left: 4px solid #00bfff;
+      transition: all 0.3s ease;
+    }
+    
+    .section:hover {
+      background: rgba(0,191,255,0.08);
+      transform: translateX(5px);
+    }
+    
+    .section h2 {
+      color: #00bfff;
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .section-icon {
+      font-size: 1.8rem;
+    }
+    
+    .section p {
+      font-size: 1.05rem;
+      color: #ccc;
+      line-height: 1.7;
+      margin: 0;
+    }
+    
+    .lifecycle-img {
+      margin: 30px auto;
+      max-width: 100%;
+      border: 2px solid #00bfff;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,191,255,0.2);
+      display: block;
+    }
+    
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid #333;
+    }
+    
+    .skip-btn {
+      background: transparent;
+      border: 2px solid #666;
+      color: #666;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .skip-btn:hover {
+      border-color: #00bfff;
+      color: #00bfff;
+    }
+    
+    .dashboard-btn {
+      background: linear-gradient(135deg, #00bfff, #0080ff);
+      border: none;
+      color: #fff;
+      padding: 14px 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0,191,255,0.6);
+    }
+    
+    .highlight {
+      color: #00ffcc;
+      font-weight: 600;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @media (max-width: 768px) {
+      .tutorial-container {
+        padding: 30px 20px;
+      }
+      
+      .tutorial-header h1 {
+        font-size: 2rem;
+      }
+      
+      .section h2 {
+        font-size: 1.3rem;
+      }
+      
+      .footer-buttons {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .skip-btn, .dashboard-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="tutorial-overlay">
+    <div class="tutorial-container">
+      <img src="../aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
+      
+      <div class="tutorial-header">
+        <h1>📘 How to Use Your AI Business</h1>
+        <p>Your complete guide to building, monetizing, and scaling autonomously</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">🚀</span> 1. Your AI Business is Live</h2>
+        <p>Your fully-staffed AI company is now operational. Your <span class="highlight">C-Suite team</span> (CEO, CMO, CTO, CFO) is already working 24/7 to find clients, close deals, and generate revenue.</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">💼</span> 2. Review AI-Generated Proposals</h2>
+        <p>Your C-Suite creates client proposals automatically based on your business type. Review them in your dashboard and approve with one click. The AI handles <span class="highlight">outreach, negotiation, and delivery</span>.</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">🔗</span> 3. Auto-Match with Partners</h2>
+        <p>The MetaLoop system connects you with complementary businesses for <span class="highlight">joint ventures, collaborations, and revenue sharing</span>. Your AI evaluates partnerships and recommends the best matches.</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">💰</span> 4. Earn Revenue Autonomously</h2>
+        <p>Your AiGentsy earns through services, licensing, partnerships, and referrals. Track your <span class="highlight">AIGx tokens</span> in the dashboard. Stake for yield or withdraw via Stripe/crypto wallet.</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">📊</span> 5. Monitor Your Dashboard</h2>
+        <p>View live KPIs: revenue, active clients, proposals sent, partnerships formed. Your <span class="highlight">C-Suite provides daily recommendations</span> to optimize growth and profitability.</p>
+      </div>
+      
+      <div class="section">
+        <h2><span class="section-icon">🎯</span> 6. Scale with Remix & Clone</h2>
+        <p>Expand your empire by remixing your business model or cloning into new markets. Each clone operates independently and generates its own revenue stream. <span class="highlight">Compound your earnings exponentially</span>.</p>
+      </div>
+      
+      <!-- Optional: Add lifecycle diagram if you have it -->
+      <!-- <img src="/lifecycle-diagram.png" alt="AiGentsy Lifecycle" class="lifecycle-img" /> -->
+      
+      <div class="footer-buttons">
+        <button class="skip-btn" onclick="skipToUniverse()">🌌 Explore Universe</button>
+        <button class="dashboard-btn" onclick="goToDashboard()">🚀 Go to Dashboard</button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const username = new URLSearchParams(window.location.search).get('user');
+    
+    function goToDashboard() {
+      window.location.href = `aigent0.html?user=${encodeURIComponent(username)}`;
+    }
+    
+    function skipToUniverse() {
+      window.location.href = `../universe.html?user=${encodeURIComponent(username)}`;
+    }
+    
+    // Optional: Mark tutorial as viewed
+    try {
+      localStorage.setItem(`aigentsy_tutorial_viewed_${username}`, 'true');
+    } catch(e) {}
+  </script>
+</body>
+</html>
+```
+
+---
+
+## ✅ **WHAT CHANGED FROM OLD VERSION:**
+
+### **1. MODERNIZED CONTENT** 🔄
+**OLD:**
+- "Mint Your AiGent"
+- "Remix Traits or Clone Downstream"
+- Generic vault/SDK talk
+
+**NEW:**
+- "Your AI Business is Live"
+- "Review AI-Generated Proposals"
+- "Earn Revenue Autonomously"
+- Tailored to actual user business
+
+### **2. UPDATED STRUCTURE** 📐
+**OLD:** Sidebar + Main layout
+**NEW:** Centered modal overlay (better for tutorial)
+
+### **3. BETTER FLOW** 🎯
+**OLD:** Static explanations
+**NEW:** Step-by-step journey with hover effects
+
+### **4. MODERN ACTIONS** 🚀
+**OLD:** "View the AiGentsy Universe" button
+**NEW:** Two options:
+- "Go to Dashboard" (primary CTA)
+- "Explore Universe" (secondary)
+
+### **5. MOBILE RESPONSIVE** 📱
+Added mobile breakpoints (old version wasn't responsive)
+
+---
+
+## 🎯 **UPDATED FLOW:**
+```
+index.html (registration)
+    ↓
+welcome.html (loading animation, 4 seconds)
+    ↓
+tutorial.html (this updated modal, skippable)
+    ↓
+aigent0.html (dashboard - tailored to business type)
