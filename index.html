@@ -33,7 +33,7 @@
     .hero {
       position: relative;
       z-index: 2;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 60px 20px 80px;
       animation: fadeIn 1.5s ease-out;
@@ -74,20 +74,28 @@
       margin-right: auto;
     }
     
-    /* SEARCH BAR STYLES */
+    /* CUSTOM BUSINESS SEARCH BAR */
     .search-section {
-      max-width: 700px;
+      max-width: 750px;
       margin: 40px auto;
       position: relative;
     }
     
     .search-label {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: #fff;
       margin-bottom: 12px;
       font-weight: 600;
       display: block;
       text-align: center;
+    }
+    
+    .search-sublabel {
+      font-size: 0.95rem;
+      color: #aaa;
+      margin-bottom: 20px;
+      text-align: center;
+      line-height: 1.5;
     }
     
     .search-wrapper {
@@ -97,7 +105,7 @@
     
     .search-input {
       width: 100%;
-      padding: 16px 50px 16px 20px;
+      padding: 18px 50px 18px 20px;
       font-size: 1.1rem;
       border: 2px solid #00bfff;
       border-radius: 50px;
@@ -115,12 +123,12 @@
     }
     
     .search-input::placeholder {
-      color: #888;
+      color: #666;
     }
     
     .search-icon {
       position: absolute;
-      right: 20px;
+      right: 22px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 1.4rem;
@@ -133,11 +141,11 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: #111;
+      background: #0d0d0d;
       border: 2px solid #00bfff;
       border-radius: 16px;
       margin-top: 8px;
-      max-height: 300px;
+      max-height: 400px;
       overflow-y: auto;
       display: none;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
@@ -149,7 +157,7 @@
     }
     
     .search-result-item {
-      padding: 14px 20px;
+      padding: 16px 20px;
       cursor: pointer;
       transition: all 0.2s ease;
       border-bottom: 1px solid #222;
@@ -166,24 +174,51 @@
     }
     
     .search-result-title {
-      font-size: 1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       color: #00bfff;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     
     .search-result-desc {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #aaa;
+      line-height: 1.4;
     }
     
     .search-suggestion {
-      margin-top: 10px;
+      margin-top: 12px;
       font-size: 0.95rem;
-      color: #00bfff;
+      color: #00ffcc;
       font-style: italic;
-      min-height: 20px;
+      min-height: 24px;
       text-align: center;
+    }
+    
+    .examples {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .example-chip {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #00bfff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .example-chip:hover {
+      border-color: #00bfff;
+      background: #222;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,191,255,0.3);
     }
     
     .social-proof {
@@ -208,7 +243,7 @@
       border: 1px solid rgba(255,255,255,0.3);
       padding: 32px;
       border-radius: 16px;
-      max-width: 700px;
+      max-width: 750px;
       margin: 0 auto;
       box-shadow: 0 0 30px rgba(0,0,0,0.5);
     }
@@ -277,7 +312,7 @@
     
     .aigent-options {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       margin-top: 20px;
     }
@@ -397,21 +432,33 @@
     
     <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
     
-    <!-- SEARCH BAR FOR WHITELABEL BUSINESSES -->
+    <!-- SEARCH BAR FOR TEMPLATES + CUSTOM BUSINESSES -->
     <div class="search-section">
-      <label class="search-label">🔍 Search for Your Perfect AI Business:</label>
+      <label class="search-label">🔍 Search or Describe Your AI Business:</label>
+      <p class="search-sublabel">Type a business type (e.g., "real estate") or describe your custom idea in detail</p>
+      
       <div class="search-wrapper">
         <input 
           type="text" 
           id="businessSearch" 
           class="search-input" 
-          placeholder="Try: legal services, podcast production, marketing agency, consulting..."
+          placeholder="Try: podcast production, consulting firm, or 'I want to automate my coaching business'..."
           autocomplete="off"
         />
         <span class="search-icon">🔍</span>
       </div>
+      
       <div id="searchResults" class="search-results"></div>
       <div id="searchSuggestion" class="search-suggestion"></div>
+      
+      <div class="examples">
+        <span class="example-chip" data-example="real estate">🏠 Real Estate</span>
+        <span class="example-chip" data-example="consulting">💼 Consulting</span>
+        <span class="example-chip" data-example="podcast">🎙️ Podcast</span>
+        <span class="example-chip" data-example="recruiting">👔 Recruiting</span>
+        <span class="example-chip" data-example="health coaching">💪 Health</span>
+        <span class="example-chip" data-example="online education">📚 Education</span>
+      </div>
     </div>
     
     <div class="social-proof">
@@ -431,7 +478,7 @@
       
       <div class="toggle-auth">Already have an account? Log in</div>
 
-      <h3 class="section-title">Or Pick a Pre-Built AI Business:</h3>
+      <h3 class="section-title">Or Pick a Pre-Built Template:</h3>
       
       <div class="aigent-options">
         <div class="aigent-card" data-agent="legal">
@@ -489,27 +536,27 @@
     // State
     let authMode = "signup";
     let selectedAgent = null;
-    let customBusinessType = "";
+    let customBusinessIdea = "";
 
     // Referral
     const params = new URLSearchParams(location.search);
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
-    // Whitelabel Business Database
-    const whitelabelBusinesses = [
-      { id: "legal", name: "Legal Services AI", keywords: ["legal", "lawyer", "attorney", "contract", "ip", "compliance", "law"], desc: "Automate contracts, IP protection, and legal compliance" },
-      { id: "social", name: "Social Media AI", keywords: ["social", "content", "creator", "influencer", "tiktok", "instagram", "reels", "video"], desc: "Automated content creation and creator monetization" },
-      { id: "saas", name: "SaaS Development AI", keywords: ["saas", "software", "app", "tool", "development", "api", "platform"], desc: "Build and deploy AI-powered software tools" },
-      { id: "marketing", name: "Marketing Agency AI", keywords: ["marketing", "seo", "ads", "growth", "agency", "advertising", "campaign"], desc: "Automated SEO, ads, and growth campaigns" },
-      { id: "consulting", name: "Consulting Business AI", keywords: ["consulting", "consultant", "advisor", "coaching", "mentor", "strategy"], desc: "Client matching, scheduling, and deliverable automation" },
-      { id: "podcast", name: "Podcast Production AI", keywords: ["podcast", "audio", "radio", "show", "broadcasting", "media"], desc: "Automated podcast production and distribution" },
-      { id: "ecommerce", name: "E-Commerce AI", keywords: ["ecommerce", "shop", "store", "retail", "selling", "products", "dropship"], desc: "Automated inventory, fulfillment, and customer service" },
-      { id: "recruiting", name: "Recruiting Agency AI", keywords: ["recruiting", "hiring", "talent", "hr", "headhunting", "staffing"], desc: "Candidate sourcing, screening, and placement automation" },
-      { id: "real-estate", name: "Real Estate AI", keywords: ["real estate", "property", "realtor", "housing", "listings"], desc: "Lead generation, showing scheduling, and deal closing" },
-      { id: "finance", name: "Financial Planning AI", keywords: ["finance", "financial", "planning", "investment", "wealth", "accounting"], desc: "Automated financial analysis and planning" },
-      { id: "health", name: "Health & Wellness AI", keywords: ["health", "wellness", "fitness", "nutrition", "coaching", "training"], desc: "Client programs, tracking, and engagement automation" },
-      { id: "education", name: "Online Education AI", keywords: ["education", "course", "training", "teaching", "learning", "tutoring"], desc: "Course delivery, student engagement, and assessment" }
+    // Business Templates Database
+    const businessTemplates = [
+      { id: "legal", name: "Legal Services AI", keywords: ["legal", "lawyer", "attorney", "contract", "ip", "compliance", "law firm"], desc: "Automate contracts, IP protection, licensing, and legal compliance", icon: "⚖️" },
+      { id: "social", name: "Social Media AI", keywords: ["social", "content", "creator", "influencer", "tiktok", "instagram", "reels", "video", "youtube"], desc: "Automated content creation, posting, and creator monetization", icon: "📱" },
+      { id: "saas", name: "SaaS Development AI", keywords: ["saas", "software", "app", "tool", "development", "api", "platform", "web app"], desc: "Build and deploy AI-powered software tools and APIs", icon: "💻" },
+      { id: "marketing", name: "Marketing Agency AI", keywords: ["marketing", "seo", "ads", "growth", "agency", "advertising", "campaign", "digital marketing"], desc: "Automated SEO, ads, lead generation, and growth campaigns", icon: "📈" },
+      { id: "consulting", name: "Consulting Business AI", keywords: ["consulting", "consultant", "advisor", "coaching", "mentor", "strategy", "business consulting"], desc: "Client matching, scheduling, deliverable automation, and program delivery", icon: "💼" },
+      { id: "podcast", name: "Podcast Production AI", keywords: ["podcast", "audio", "radio", "show", "broadcasting", "media", "podcasting"], desc: "Automated podcast production, editing, distribution, and monetization", icon: "🎙️" },
+      { id: "ecommerce", name: "E-Commerce AI", keywords: ["ecommerce", "shop", "store", "retail", "selling", "products", "dropship", "online store"], desc: "Automated inventory, fulfillment, customer service, and sales", icon: "🛒" },
+      { id: "recruiting", name: "Recruiting Agency AI", keywords: ["recruiting", "hiring", "talent", "hr", "headhunting", "staffing", "recruitment"], desc: "Candidate sourcing, screening, placement automation, and client matching", icon: "👔" },
+      { id: "real-estate", name: "Real Estate AI", keywords: ["real estate", "property", "realtor", "housing", "listings", "homes"], desc: "Lead generation, showing scheduling, deal closing, and property management", icon: "🏠" },
+      { id: "finance", name: "Financial Planning AI", keywords: ["finance", "financial", "planning", "investment", "wealth", "accounting", "bookkeeping"], desc: "Automated financial analysis, planning, and wealth management", icon: "💰" },
+      { id: "health", name: "Health & Wellness AI", keywords: ["health", "wellness", "fitness", "nutrition", "coaching", "training", "personal training"], desc: "Client programs, progress tracking, engagement automation, and coaching delivery", icon: "💪" },
+      { id: "education", name: "Online Education AI", keywords: ["education", "course", "training", "teaching", "learning", "tutoring", "online courses"], desc: "Course delivery, student engagement, assessment, and certification", icon: "📚" }
     ];
 
     // Helpers
@@ -523,68 +570,100 @@
       return map[agent] || "general";
     };
 
-    // Search functionality
+    // Search functionality - HYBRID: Templates OR Custom
     function searchBusinesses(query) {
       if (!query || query.length < 2) {
         searchResults.classList.remove('active');
         searchSuggestion.textContent = "";
+        customBusinessIdea = "";
         return;
       }
 
       const q = query.toLowerCase();
-      const matches = whitelabelBusinesses.filter(biz => 
+      
+      // First, search templates
+      const matches = businessTemplates.filter(biz => 
         biz.name.toLowerCase().includes(q) || 
-        biz.keywords.some(kw => kw.includes(q))
+        biz.keywords.some(kw => kw.includes(q) || q.includes(kw))
       );
 
-      if (matches.length === 0) {
-        searchResults.innerHTML = `
-          <div class="search-result-item" data-agent="custom">
-            <div class="search-result-title">✨ Custom Business: "${query}"</div>
-            <div class="search-result-desc">We'll build you a custom AI business based on your description</div>
-          </div>
-        `;
-        searchResults.classList.add('active');
-        searchSuggestion.textContent = "💡 We'll create a custom AI business for you!";
-      } else {
+      if (matches.length > 0) {
+        // Show template matches
         searchResults.innerHTML = matches.map(biz => `
-          <div class="search-result-item" data-agent="${biz.id}">
-            <div class="search-result-title">${biz.name}</div>
+          <div class="search-result-item" data-agent="${biz.id}" data-type="template">
+            <div class="search-result-title">${biz.icon} ${biz.name}</div>
             <div class="search-result-desc">${biz.desc}</div>
           </div>
         `).join('');
+        
+        // Add custom option at bottom
+        searchResults.innerHTML += `
+          <div class="search-result-item" data-agent="custom" data-type="custom" style="border-top:2px solid #00bfff;margin-top:8px;padding-top:16px;">
+            <div class="search-result-title">✨ Custom Business: "${query}"</div>
+            <div class="search-result-desc">Build a completely custom AI business based on your specific description</div>
+          </div>
+        `;
+        
         searchResults.classList.add('active');
-        searchSuggestion.textContent = `💡 Found ${matches.length} perfect match${matches.length > 1 ? 'es' : ''} for you!`;
+        searchSuggestion.textContent = `💡 Found ${matches.length} template${matches.length > 1 ? 's' : ''} matching "${query}" — or create custom below`;
+        
+      } else {
+        // No template match - show custom only
+        searchResults.innerHTML = `
+          <div class="search-result-item" data-agent="custom" data-type="custom">
+            <div class="search-result-title">✨ Custom AI Business: "${query}"</div>
+            <div class="search-result-desc">We'll build you a completely custom AI-powered business based on your description. Your C-Suite team will handle everything autonomously.</div>
+          </div>
+        `;
+        searchResults.classList.add('active');
+        searchSuggestion.textContent = "💡 No template match — we'll build you a custom AI business!";
       }
 
       // Add click handlers
       document.querySelectorAll('.search-result-item').forEach(item => {
         item.addEventListener('click', () => {
           const agent = item.getAttribute('data-agent');
-          selectBusiness(agent, item.querySelector('.search-result-title').textContent);
+          const type = item.getAttribute('data-type');
+          const title = item.querySelector('.search-result-title').textContent;
+          selectBusiness(agent, type, title, query);
           searchResults.classList.remove('active');
+          businessSearch.value = "";
         });
       });
     }
 
-    function selectBusiness(agent, displayName) {
+    function selectBusiness(agent, type, displayName, originalQuery) {
       // Deselect all cards
       document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
       
-      // If it's a predefined card, select it
-      const matchingCard = document.querySelector(`.aigent-card[data-agent="${agent}"]`);
-      if (matchingCard) {
-        matchingCard.classList.add('selected');
+      if (type === "template") {
+        // Template selected - select matching card
+        const matchingCard = document.querySelector(`.aigent-card[data-agent="${agent}"]`);
+        if (matchingCard) {
+          matchingCard.classList.add('selected');
+        }
+        selectedAgent = agent;
+        customBusinessIdea = "";
+        searchSuggestion.textContent = `✅ Selected template: ${displayName}`;
+      } else {
+        // Custom business selected
+        selectedAgent = "custom";
+        customBusinessIdea = originalQuery;
+        searchSuggestion.textContent = `✅ Custom business selected: "${originalQuery}"`;
       }
-      
-      selectedAgent = agent;
-      customBusinessType = agent === "custom" ? businessSearch.value : "";
-      
-      searchSuggestion.textContent = `✅ Selected: ${displayName}`;
-      businessSearch.value = "";
       
       updateButtonState();
     }
+
+    // Example chips
+    document.querySelectorAll('.example-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const example = chip.getAttribute('data-example');
+        businessSearch.value = example;
+        businessSearch.focus();
+        searchBusinesses(example);
+      });
+    });
 
     // Close search results when clicking outside
     document.addEventListener('click', (e) => {
@@ -615,7 +694,7 @@
         companyType: companyTypeMap(selectedAgent),
         created: now,
         mintTime: now,
-        customInput: customDescription || customBusinessType || "",
+        customInput: customDescription || "",
         meta_role: roleMap[selectedAgent || "general"],
         role: roleMap[selectedAgent || "general"],
         trait: selectedAgent || "founder",
@@ -730,8 +809,8 @@
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
-        customBusinessType = "";
-        searchSuggestion.textContent = `✅ Selected: ${card.querySelector('.aigent-card-title').textContent}`;
+        customBusinessIdea = "";
+        searchSuggestion.textContent = `✅ Selected template: ${card.querySelector('.aigent-card-title').textContent}`;
         updateButtonState();
       });
     });
@@ -752,8 +831,9 @@
       enterBtn.innerHTML = "🚀 Building your AI business...";
       
       try {
-        console.log("📝 Registering:", username, "as", selectedAgent);
-        await registerUserToJSONBin(username, selectedAgent, customBusinessType, referral);
+        const description = selectedAgent === "custom" ? customBusinessIdea : "";
+        console.log("📝 Registering:", username, "as", selectedAgent, description ? `(custom: ${description})` : "(template)");
+        await registerUserToJSONBin(username, selectedAgent, description, referral);
         console.log("🚀 Redirecting...");
         window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
       } catch (e) {
