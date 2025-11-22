@@ -514,7 +514,44 @@
         console.log("📝 Registering:", username, "Type:", selectedAgent, customBusinessIdea ? `Custom: ${customBusinessIdea}` : "Template");
         await registerUserToJSONBin(username, selectedAgent, customBusinessIdea || idea, referral);
         console.log("🚀 Redirecting to tailored dashboard...");
-        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        window.location.assign(`/agents/welcome.html?user=${encodeURIComponent(username)}`);
+```
+
+---
+
+## ✅ **COMPLETE FLOW NOW:**
+
+### **NEW USER:**
+```
+index.html (registration)
+    ↓ (clicks "Launch Your AI Business Now")
+welcome.html (4-second loading animation)
+    ↓ (auto-redirect)
+tutorial.html (teach-in modal, can skip)
+    ↓ (clicks "Go to Dashboard")
+aigent0.html (main dashboard)
+```
+
+### **RETURNING USER:**
+```
+index.html (login)
+    ↓
+welcome.html (quick 2-second "Welcome back")
+    ↓ (auto-redirect, skips tutorial)
+aigent0.html (main dashboard)
+```
+
+---
+
+## 📂 **FILE STRUCTURE:**
+```
+/
+├── index.html                    (updated redirect)
+├── agents/
+│   ├── welcome.html             (NEW - loading screen)
+│   ├── tutorial.html            (NEW - teach-in modal)
+│   └── aigent0.html             (existing dashboard)
+        
       } catch (e) {
         console.error("❌ Error:", e);
         alert("Could not create your AiGentsy. Please try again.");
