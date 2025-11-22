@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>AiGentsy — Launch Your AI Business Empire in 60 Seconds</title>
+  <title>AiGentsy — Launch Your AI Business Empire Now</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
@@ -32,11 +32,12 @@
       filter: none;
     }
     .hero h1 {
-      font-size: 3rem;
+      font-size: 3.2rem;
       color: #fff;
       margin-bottom: 20px;
       font-weight: 700;
       line-height: 1.2;
+      text-shadow: 0 0 20px rgba(0,191,255,0.3);
     }
     .hero .subheadline {
       font-size: 1.3rem;
@@ -50,6 +51,103 @@
       margin-bottom: 30px;
       line-height: 1.6;
     }
+    
+    /* SEARCH BAR STYLES */
+    .search-section {
+      max-width: 700px;
+      margin: 30px auto 40px;
+      position: relative;
+    }
+    .search-label {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 12px;
+      font-weight: 600;
+      display: block;
+    }
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    .search-input {
+      width: 100%;
+      padding: 16px 50px 16px 20px;
+      font-size: 1.1rem;
+      border: 2px solid #00bfff;
+      border-radius: 50px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(0,191,255,0.2);
+    }
+    .search-input:focus {
+      border-color: #00ffcc;
+      box-shadow: 0 0 30px rgba(0,255,204,0.4);
+      background: rgba(0,0,0,0.8);
+    }
+    .search-input::placeholder {
+      color: #888;
+    }
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.4rem;
+      color: #00bfff;
+      pointer-events: none;
+    }
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #111;
+      border: 2px solid #00bfff;
+      border-radius: 16px;
+      margin-top: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      z-index: 1000;
+    }
+    .search-results.active {
+      display: block;
+    }
+    .search-result-item {
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid #222;
+      text-align: left;
+    }
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    .search-result-item:hover {
+      background: #1a1a1a;
+      padding-left: 24px;
+    }
+    .search-result-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #00bfff;
+      margin-bottom: 4px;
+    }
+    .search-result-desc {
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+    .search-suggestion {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #00bfff;
+      font-style: italic;
+      min-height: 20px;
+    }
+    
     .social-proof {
       font-size: 0.95rem;
       color: #888;
@@ -109,9 +207,10 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
+      width: 100%;
     }
     .consent-box button:hover:not(:disabled) {
-      transform: scale(1.05);
+      transform: scale(1.02);
       box-shadow: 0 0 20px #00bfff;
     }
     .consent-box button:disabled {
@@ -127,6 +226,7 @@
     }
     @media (max-width: 600px) {
       .aigent-options { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2.2rem; }
     }
     .aigent-card {
       background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
@@ -216,11 +316,28 @@
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
     
-    <h1>Launch Your AI Business Empire in 60 Seconds</h1>
+    <h1>Launch Your AI Business Empire Now</h1>
     
     <p class="subheadline">Your Business, Powered by Autonomous AI — Revenue Starts Today</p>
     
-    <p>Choose your business type, and we'll build you a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
+    <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
+    
+    <!-- SEARCH BAR FOR WHITELABEL BUSINESSES -->
+    <div class="search-section">
+      <label class="search-label">🔍 Search for Your Perfect AI Business:</label>
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          id="businessSearch" 
+          class="search-input" 
+          placeholder="Try: legal services, podcast production, marketing agency, consulting..."
+          autocomplete="off"
+        />
+        <span class="search-icon">🔍</span>
+      </div>
+      <div id="searchResults" class="search-results"></div>
+      <div id="searchSuggestion" class="search-suggestion"></div>
+    </div>
     
     <div class="social-proof">
       <span>✅ No coding required</span>
@@ -237,7 +354,7 @@
       <div class="toggle-auth">Already have an account? Log in</div>
 
       <div style="margin: 20px 0;">
-        <h3 style="color:#00bfff;margin-bottom:12px;font-size:1.1rem;">Pick Your AI Business Type:</h3>
+        <h3 style="color:#00bfff;margin-bottom:12px;font-size:1.1rem;">Or Pick a Pre-Built AI Business:</h3>
         
         <div class="aigent-options">
           <div class="aigent-card" data-agent="legal">
@@ -266,12 +383,6 @@
         </div>
       </div>
 
-      <div id="aigentsySearchWrapper" style="margin-top: 25px; display:block;">
-        <label for="aigentsySearch" style="font-size: 1rem; color: #ccc;font-weight:500;">Or describe your custom business idea:</label><br>
-        <input type="text" id="aigentsySearch" placeholder="e.g., podcast business, coaching brand, consulting firm" style="width: 90%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #fff; background: #111; color: #fff;font-size:1rem;" />
-        <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.95rem; color: #00bfff;font-style:italic;"></div>
-      </div>
-
       <button id="enterBtn" disabled>🚀 Launch My AI Business Now</button>
     </div>
 
@@ -295,43 +406,116 @@
     const passwordInput = document.getElementById('passwordInput');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const enterBtn = document.getElementById('enterBtn');
-    const searchInput = document.getElementById('aigentsySearch');
-    const suggestionBox = document.getElementById('aigentsySuggestion');
+    const businessSearch = document.getElementById('businessSearch');
+    const searchResults = document.getElementById('searchResults');
+    const searchSuggestion = document.getElementById('searchSuggestion');
 
     // State
     let authMode = "signup";
     let selectedAgent = null;
+    let customBusinessType = "";
 
     // Referral
     const params = new URLSearchParams(location.search);
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
+    // Whitelabel Business Database
+    const whitelabelBusinesses = [
+      { id: "legal", name: "Legal Services AI", keywords: ["legal", "lawyer", "attorney", "contract", "ip", "compliance", "law"], desc: "Automate contracts, IP protection, and legal compliance" },
+      { id: "social", name: "Social Media AI", keywords: ["social", "content", "creator", "influencer", "tiktok", "instagram", "reels", "video"], desc: "Automated content creation and creator monetization" },
+      { id: "saas", name: "SaaS Development AI", keywords: ["saas", "software", "app", "tool", "development", "api", "platform"], desc: "Build and deploy AI-powered software tools" },
+      { id: "marketing", name: "Marketing Agency AI", keywords: ["marketing", "seo", "ads", "growth", "agency", "advertising", "campaign"], desc: "Automated SEO, ads, and growth campaigns" },
+      { id: "consulting", name: "Consulting Business AI", keywords: ["consulting", "consultant", "advisor", "coaching", "mentor", "strategy"], desc: "Client matching, scheduling, and deliverable automation" },
+      { id: "podcast", name: "Podcast Production AI", keywords: ["podcast", "audio", "radio", "show", "broadcasting", "media"], desc: "Automated podcast production and distribution" },
+      { id: "ecommerce", name: "E-Commerce AI", keywords: ["ecommerce", "shop", "store", "retail", "selling", "products", "dropship"], desc: "Automated inventory, fulfillment, and customer service" },
+      { id: "recruiting", name: "Recruiting Agency AI", keywords: ["recruiting", "hiring", "talent", "hr", "headhunting", "staffing"], desc: "Candidate sourcing, screening, and placement automation" },
+      { id: "real-estate", name: "Real Estate AI", keywords: ["real estate", "property", "realtor", "housing", "listings"], desc: "Lead generation, showing scheduling, and deal closing" },
+      { id: "finance", name: "Financial Planning AI", keywords: ["finance", "financial", "planning", "investment", "wealth", "accounting"], desc: "Automated financial analysis and planning" },
+      { id: "health", name: "Health & Wellness AI", keywords: ["health", "wellness", "fitness", "nutrition", "coaching", "training"], desc: "Client programs, tracking, and engagement automation" },
+      { id: "education", name: "Online Education AI", keywords: ["education", "course", "training", "teaching", "learning", "tutoring"], desc: "Course delivery, student engagement, and assessment" }
+    ];
+
     // Helpers
     const companyTypeMap = (agent) => {
-      const map = { legal: "legal", social: "social", saas: "saas", marketing: "marketing", custom: "custom" };
+      const map = { 
+        legal: "legal", social: "social", saas: "saas", marketing: "marketing", 
+        consulting: "general", podcast: "general", ecommerce: "general",
+        recruiting: "general", "real-estate": "general", finance: "general",
+        health: "general", education: "general", custom: "custom" 
+      };
       return map[agent] || "general";
     };
 
-    function showSuggestion(value) {
-      if (!suggestionBox) return;
-      const v = (value || "").toLowerCase();
-      let msg = "💡 We'll build you a custom AI business based on your description.";
-      if (v.includes("legal") || v.includes("lawyer") || v.includes("attorney")) 
-        msg = "💡 Perfect! Try our Legal AI — contracts, IP & compliance on autopilot.";
-      else if (v.includes("podcast") || v.includes("audio") || v.includes("radio")) 
-        msg = "💡 Great idea! We'll build you a Podcast AI — auto-produce & distribute.";
-      else if (v.includes("saas") || v.includes("software") || v.includes("app")) 
-        msg = "💡 Awesome! Try our SaaS AI — deploy AI-powered tools instantly.";
-      else if (v.includes("ads") || v.includes("marketing") || v.includes("seo") || v.includes("growth")) 
-        msg = "💡 Perfect fit! Try our Marketing AI — SEO, ads & growth on autopilot.";
-      else if (v.includes("content") || v.includes("creator") || v.includes("influencer") || v.includes("tiktok") || v.includes("instagram"))
-        msg = "💡 Great choice! Try our Social Media AI — content & monetization automated.";
-      else if (v.includes("consult") || v.includes("coach") || v.includes("mentor"))
-        msg = "💡 Excellent! We'll build you a consulting AI with client matching & scheduling.";
-      
-      suggestionBox.textContent = msg;
+    // Search functionality
+    function searchBusinesses(query) {
+      if (!query || query.length < 2) {
+        searchResults.classList.remove('active');
+        searchSuggestion.textContent = "";
+        return;
+      }
+
+      const q = query.toLowerCase();
+      const matches = whitelabelBusinesses.filter(biz => 
+        biz.name.toLowerCase().includes(q) || 
+        biz.keywords.some(kw => kw.includes(q))
+      );
+
+      if (matches.length === 0) {
+        searchResults.innerHTML = `
+          <div class="search-result-item" data-agent="custom">
+            <div class="search-result-title">✨ Custom Business: "${query}"</div>
+            <div class="search-result-desc">We'll build you a custom AI business based on your description</div>
+          </div>
+        `;
+        searchResults.classList.add('active');
+        searchSuggestion.textContent = "💡 We'll create a custom AI business for you!";
+      } else {
+        searchResults.innerHTML = matches.map(biz => `
+          <div class="search-result-item" data-agent="${biz.id}">
+            <div class="search-result-title">${biz.name}</div>
+            <div class="search-result-desc">${biz.desc}</div>
+          </div>
+        `).join('');
+        searchResults.classList.add('active');
+        searchSuggestion.textContent = `💡 Found ${matches.length} perfect match${matches.length > 1 ? 'es' : ''} for you!`;
+      }
+
+      // Add click handlers
+      document.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const agent = item.getAttribute('data-agent');
+          selectBusiness(agent, item.querySelector('.search-result-title').textContent);
+          searchResults.classList.remove('active');
+        });
+      });
     }
+
+    function selectBusiness(agent, displayName) {
+      // Deselect all cards
+      document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
+      
+      // If it's a predefined card, select it
+      const matchingCard = document.querySelector(`.aigent-card[data-agent="${agent}"]`);
+      if (matchingCard) {
+        matchingCard.classList.add('selected');
+      }
+      
+      selectedAgent = agent;
+      customBusinessType = agent === "custom" ? businessSearch.value : "";
+      
+      searchSuggestion.textContent = `✅ Selected: ${displayName}`;
+      businessSearch.value = "";
+      
+      updateButtonState();
+    }
+
+    // Close search results when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchResults.contains(e.target) && e.target !== businessSearch) {
+        searchResults.classList.remove('active');
+      }
+    });
 
     async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
       if (!JSONBIN_URL || !JSONBIN_SECRET) {
@@ -340,7 +524,12 @@
       }
       
       const now = new Date().toISOString();
-      const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+      const roleMap = { 
+        legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", 
+        consulting: "CEO", podcast: "CEO", ecommerce: "COO", recruiting: "COO",
+        "real-estate": "CEO", finance: "CFO", health: "COO", education: "CEO",
+        custom: "CEO", general: "CEO" 
+      };
       
       const entry = {
         schemaVersion: 3,
@@ -350,7 +539,7 @@
         companyType: companyTypeMap(selectedAgent),
         created: now,
         mintTime: now,
-        customInput: customDescription || "",
+        customInput: customDescription || customBusinessType || "",
         meta_role: roleMap[selectedAgent || "general"],
         role: roleMap[selectedAgent || "general"],
         trait: selectedAgent || "founder",
@@ -455,12 +644,23 @@
     };
 
     // Events
+    businessSearch.addEventListener('input', (e) => {
+      searchBusinesses(e.target.value);
+    });
+
+    businessSearch.addEventListener('focus', (e) => {
+      if (e.target.value.length >= 2) {
+        searchBusinesses(e.target.value);
+      }
+    });
+
     document.querySelectorAll('.aigent-card').forEach(card => {
       card.addEventListener('click', () => {
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
-        showSuggestion(selectedAgent);
+        customBusinessType = "";
+        searchSuggestion.textContent = `✅ Selected: ${card.querySelector('.aigent-card-title').textContent}`;
         updateButtonState();
       });
     });
@@ -468,14 +668,11 @@
     document.querySelector('.toggle-auth').addEventListener('click', window.toggleAuthMode);
     usernameInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
-    if (searchInput) searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
 
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
       const username = usernameInput.value.trim();
       if (!username) { alert("Please enter a username"); return; }
-      
-      const idea = searchInput ? searchInput.value.trim() : "";
       
       try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
       try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
@@ -484,8 +681,8 @@
       enterBtn.innerHTML = "🚀 Building your AI business...";
       
       try {
-        console.log("📝 Registering:", username);
-        await registerUserToJSONBin(username, selectedAgent, idea, referral);
+        console.log("📝 Registering:", username, "as", selectedAgent);
+        await registerUserToJSONBin(username, selectedAgent, customBusinessType, referral);
         console.log("🚀 Redirecting...");
         window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
       } catch (e) {
