@@ -5,32 +5,46 @@
   <title>AiGentsy — Launch Your AI Business Empire Now</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    body {
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
       font-family: 'Inter', sans-serif;
       background: radial-gradient(circle at center, #101c2c, #000000);
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      text-align: center;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
+      position: relative;
     }
+    
+    .bg-animation {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+      background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
+      animation: bgPulse 6s ease-in-out infinite;
+      pointer-events: none;
+    }
+    
     .hero {
-      max-width: 900px;
-      padding: 40px 20px;
-      animation: fadeIn 1.5s ease-out;
+      position: relative;
       z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 60px 20px 80px;
+      animation: fadeIn 1.5s ease-out;
     }
+    
     .logo {
       display: block;
-      margin: 0 auto 20px;
-      max-width: 280px;
-      background: transparent;
-      filter: none;
+      margin: 0 auto 30px;
+      max-width: 240px;
     }
+    
     .hero h1 {
       font-size: 3.2rem;
       color: #fff;
@@ -38,37 +52,49 @@
       font-weight: 700;
       line-height: 1.2;
       text-shadow: 0 0 20px rgba(0,191,255,0.3);
+      text-align: center;
     }
+    
     .hero .subheadline {
       font-size: 1.3rem;
       color: #00bfff;
       margin-bottom: 15px;
       font-weight: 600;
+      text-align: center;
     }
+    
     .hero p {
       font-size: 1.15rem;
       color: #ccc;
       margin-bottom: 30px;
       line-height: 1.6;
+      text-align: center;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     /* SEARCH BAR STYLES */
     .search-section {
       max-width: 700px;
-      margin: 30px auto 40px;
+      margin: 40px auto;
       position: relative;
     }
+    
     .search-label {
       font-size: 1.1rem;
       color: #fff;
       margin-bottom: 12px;
       font-weight: 600;
       display: block;
+      text-align: center;
     }
+    
     .search-wrapper {
       position: relative;
       width: 100%;
     }
+    
     .search-input {
       width: 100%;
       padding: 16px 50px 16px 20px;
@@ -81,14 +107,17 @@
       transition: all 0.3s ease;
       box-shadow: 0 0 20px rgba(0,191,255,0.2);
     }
+    
     .search-input:focus {
       border-color: #00ffcc;
       box-shadow: 0 0 30px rgba(0,255,204,0.4);
       background: rgba(0,0,0,0.8);
     }
+    
     .search-input::placeholder {
       color: #888;
     }
+    
     .search-icon {
       position: absolute;
       right: 20px;
@@ -98,6 +127,7 @@
       color: #00bfff;
       pointer-events: none;
     }
+    
     .search-results {
       position: absolute;
       top: 100%;
@@ -113,9 +143,11 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
       z-index: 1000;
     }
+    
     .search-results.active {
       display: block;
     }
+    
     .search-result-item {
       padding: 14px 20px;
       cursor: pointer;
@@ -123,59 +155,68 @@
       border-bottom: 1px solid #222;
       text-align: left;
     }
+    
     .search-result-item:last-child {
       border-bottom: none;
     }
+    
     .search-result-item:hover {
       background: #1a1a1a;
       padding-left: 24px;
     }
+    
     .search-result-title {
       font-size: 1rem;
       font-weight: 600;
       color: #00bfff;
       margin-bottom: 4px;
     }
+    
     .search-result-desc {
       font-size: 0.85rem;
       color: #aaa;
     }
+    
     .search-suggestion {
       margin-top: 10px;
       font-size: 0.95rem;
       color: #00bfff;
       font-style: italic;
       min-height: 20px;
+      text-align: center;
     }
     
     .social-proof {
       font-size: 0.95rem;
       color: #888;
-      margin-bottom: 30px;
+      margin: 30px auto 40px;
       display: flex;
       gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
     }
+    
     .social-proof span {
       background: #111;
       padding: 8px 16px;
       border-radius: 20px;
       border: 1px solid #333;
     }
+    
     .consent-box {
-      background: #0d0d0d;
-      border: 1px solid #fff;
-      padding: 28px;
-      border-radius: 12px;
-      max-width: 640px;
+      background: rgba(13,13,13,0.95);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 32px;
+      border-radius: 16px;
+      max-width: 700px;
       margin: 0 auto;
-      box-shadow: 0 0 20px #ffffff44;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
     }
+    
     .consent-box input[type="text"],
     .consent-box input[type="password"] {
-      width: 90%;
-      padding: 12px;
+      width: 100%;
+      padding: 14px 16px;
       margin: 10px 0;
       border-radius: 8px;
       border: 1px solid #ffffff;
@@ -183,63 +224,92 @@
       color: #fff;
       font-size: 1rem;
     }
+    
     .consent-box label {
       display: block;
-      margin: 12px 0;
+      margin: 16px 0;
       font-size: 0.95rem;
       color: #ccc;
+      text-align: center;
     }
+    
     .toggle-auth {
-      margin: 10px 0;
+      margin: 12px 0;
       color: #00bfff;
       cursor: pointer;
       font-size: 0.95rem;
       text-decoration: underline;
+      text-align: center;
     }
+    
     .consent-box button {
-      margin-top: 20px;
-      padding: 14px 28px;
+      margin-top: 24px;
+      padding: 16px 32px;
       background: linear-gradient(135deg, #00bfff, #0080ff);
       color: #fff;
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
       width: 100%;
     }
+    
     .consent-box button:hover:not(:disabled) {
       transform: scale(1.02);
       box-shadow: 0 0 20px #00bfff;
     }
+    
     .consent-box button:disabled {
       background: #444;
       cursor: not-allowed;
       opacity: 0.6;
     }
+    
+    .section-title {
+      color: #00bfff;
+      margin: 30px 0 16px;
+      font-size: 1.15rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    
     .aigent-options {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
       margin-top: 20px;
     }
-    @media (max-width: 600px) {
-      .aigent-options { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 2.2rem; }
+    
+    @media (max-width: 700px) {
+      .aigent-options { 
+        grid-template-columns: 1fr; 
+      }
+      .hero h1 { 
+        font-size: 2.2rem; 
+      }
+      .hero {
+        padding: 40px 16px 60px;
+      }
+      .consent-box {
+        padding: 24px;
+      }
     }
+    
     .aigent-card {
       background: linear-gradient(135deg, #111 0%, #1a1a1a 100%);
       border: 2px solid #333;
       color: #fff;
       border-radius: 12px;
-      padding: 18px;
+      padding: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: left;
       position: relative;
       overflow: hidden;
     }
+    
     .aigent-card::before {
       content: '';
       position: absolute;
@@ -251,27 +321,32 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
+    
     .aigent-card.selected::before,
     .aigent-card:hover::before {
       opacity: 1;
     }
+    
     .aigent-card.selected,
     .aigent-card:hover {
       border-color: #00bfff;
       box-shadow: 0 0 20px rgba(0,191,255,0.4);
       transform: translateY(-2px);
     }
+    
     .aigent-card-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       margin-bottom: 8px;
       color: #00bfff;
     }
+    
     .aigent-card-desc {
       font-size: 0.9rem;
       color: #aaa;
-      line-height: 1.4;
+      line-height: 1.5;
     }
+    
     .aigent-card-badge {
       position: absolute;
       top: 12px;
@@ -285,26 +360,25 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
+    
     .aigent-card.selected .aigent-card-badge {
       opacity: 1;
     }
+    
     .footer-note {
-      margin-top: 50px;
+      margin-top: 60px;
+      padding-bottom: 40px;
       font-size: 0.95rem;
       color: #666;
       letter-spacing: 0.5px;
+      text-align: center;
     }
-    .bg-animation {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 1;
-      background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
-      animation: bgPulse 6s ease-in-out infinite;
-    }
+    
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
     }
+    
     @keyframes bgPulse {
       0%, 100% { transform: scale(1); opacity: 0.5; }
       50% { transform: scale(1.08); opacity: 0.7; }
@@ -313,6 +387,7 @@
 </head>
 <body>
   <div class="bg-animation"></div>
+  
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
     
@@ -349,37 +424,38 @@
       <input type="text" id="usernameInput" placeholder="Choose your username" />
       <input type="password" id="passwordInput" placeholder="Create a password" style="display:none;" />
       
-      <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#00bfff;text-decoration:underline;" target="_blank">protocol terms</a></label>
+      <label>
+        <input type="checkbox" id="agreeCheckbox"/> 
+        I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#00bfff;text-decoration:underline;" target="_blank">protocol terms</a>
+      </label>
       
       <div class="toggle-auth">Already have an account? Log in</div>
 
-      <div style="margin: 20px 0;">
-        <h3 style="color:#00bfff;margin-bottom:12px;font-size:1.1rem;">Or Pick a Pre-Built AI Business:</h3>
+      <h3 class="section-title">Or Pick a Pre-Built AI Business:</h3>
+      
+      <div class="aigent-options">
+        <div class="aigent-card" data-agent="legal">
+          <div class="aigent-card-badge">SELECTED</div>
+          <div class="aigent-card-title">⚖️ Legal AI</div>
+          <div class="aigent-card-desc">Contracts, IP, licensing, compliance — automated legal services</div>
+        </div>
         
-        <div class="aigent-options">
-          <div class="aigent-card" data-agent="legal">
-            <div class="aigent-card-badge">SELECTED</div>
-            <div class="aigent-card-title">⚖️ Legal AI</div>
-            <div class="aigent-card-desc">Contracts, IP, licensing, compliance — automated legal services</div>
-          </div>
-          
-          <div class="aigent-card" data-agent="social">
-            <div class="aigent-card-badge">SELECTED</div>
-            <div class="aigent-card-title">📱 Social Media AI</div>
-            <div class="aigent-card-desc">Content creation, Reels, TikToks, creator monetization</div>
-          </div>
-          
-          <div class="aigent-card" data-agent="saas">
-            <div class="aigent-card-badge">SELECTED</div>
-            <div class="aigent-card-title">💻 SaaS AI</div>
-            <div class="aigent-card-desc">Build & deploy AI-powered software tools and APIs</div>
-          </div>
-          
-          <div class="aigent-card" data-agent="marketing">
-            <div class="aigent-card-badge">SELECTED</div>
-            <div class="aigent-card-title">📈 Marketing AI</div>
-            <div class="aigent-card-desc">SEO, ads, campaigns, growth automation — fully autonomous</div>
-          </div>
+        <div class="aigent-card" data-agent="social">
+          <div class="aigent-card-badge">SELECTED</div>
+          <div class="aigent-card-title">📱 Social Media AI</div>
+          <div class="aigent-card-desc">Content creation, Reels, TikToks, creator monetization</div>
+        </div>
+        
+        <div class="aigent-card" data-agent="saas">
+          <div class="aigent-card-badge">SELECTED</div>
+          <div class="aigent-card-title">💻 SaaS AI</div>
+          <div class="aigent-card-desc">Build & deploy AI-powered software tools and APIs</div>
+        </div>
+        
+        <div class="aigent-card" data-agent="marketing">
+          <div class="aigent-card-badge">SELECTED</div>
+          <div class="aigent-card-title">📈 Marketing AI</div>
+          <div class="aigent-card-desc">SEO, ads, campaigns, growth automation — fully autonomous</div>
         </div>
       </div>
 
@@ -644,14 +720,9 @@
     };
 
     // Events
-    businessSearch.addEventListener('input', (e) => {
-      searchBusinesses(e.target.value);
-    });
-
+    businessSearch.addEventListener('input', (e) => searchBusinesses(e.target.value));
     businessSearch.addEventListener('focus', (e) => {
-      if (e.target.value.length >= 2) {
-        searchBusinesses(e.target.value);
-      }
+      if (e.target.value.length >= 2) searchBusinesses(e.target.value);
     });
 
     document.querySelectorAll('.aigent-card').forEach(card => {
