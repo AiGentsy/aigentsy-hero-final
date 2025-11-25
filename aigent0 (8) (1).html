@@ -46,8 +46,25 @@
   .gx-drawer header { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
   .gx-drawer .grp { padding: 12px 16px; }
   .gx-drawer .grp h4 { margin: 10px 0 6px; font-size: 12px; opacity: 0.75; letter-spacing: 0.04em; text-transform: uppercase; }
-  .gx-drawer .grp button { width: 100%; margin: 6px 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: #131722; color: #fff; cursor: pointer; text-align: left; }
-  .gx-drawer .grp button:hover { background: #1a2030; }
+  .gx-drawer .grp button { 
+  width: 100%; 
+  margin: 6px 0; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  border: 1px solid #00bfff; 
+  background: linear-gradient(135deg, #131722 0%, #1a2030 100%); 
+  color: #00bfff; 
+  cursor: pointer; 
+  text-align: left;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.gx-drawer .grp button:hover { 
+  background: linear-gradient(135deg, #00bfff 0%, #009cd8 100%); 
+  color: #000;
+  border-color: #00ffcc;
+  transform: translateX(-2px);
+}
   .gx-chip { display: inline-block; padding: 4px 8px; background: #0b5; color: #fff; border-radius: 999px; font-size: 12px; margin-left: 8px; }
   .gx-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 9999; }
   .gx-modal.open { display: flex; }
@@ -146,6 +163,7 @@
     <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
   </div>
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+  <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
   <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
     <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
       <span>💼 Service Payments</span>
@@ -710,22 +728,28 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
-    let endpoint = "https://aigentsy-ame-runtime.onrender.com/agent";
-    let roleName = "AiGent";
-    if (user.companyType === "legal") {
-      endpoint = "https://aigent-remix-runtime.onrender.com/agent";
-      roleName = "CLO (Legal)";
-    } else if (user.companyType === "social" || user.companyType === "marketing") {
-      endpoint = "https://aigent-growth-runtime.onrender.com/agent";
-      roleName = "CMO (Growth)";
-    } else if (user.companyType === "saas") {
-      endpoint = "https://aigent-sdk-runtime.onrender.com/agent";
-      roleName = "CTO (Tech)";
-    }
-    const res = await fetchWithRetry(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ input: input, memory, businessType: user.companyType, username: user.username }) }, 2, 15000);
+    
+    // ALL chat goes to Growth agent (the communicator)
+    const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+    
+    const res = await fetchWithRetry(endpoint, { 
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ 
+        input: input, 
+        memory, 
+        businessType: user.companyType, 
+        username: user.username 
+      }) 
+    }, 2, 15000);
+    
     const data = await res.json();
     let reply = data.output || "No response.";
-    loader.innerHTML = `**${roleName}**: ${reply}`;
+    
+    // Parse markdown-style bold for C-Suite labels
+    const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
+    loader.innerHTML = formattedReply;
+    
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
@@ -821,7 +845,19 @@ function openProposalInboxModal() {
       if (proposals.length === 0) {
         inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
       } else {
-        inboxBox.innerHTML = proposals.map(p => `<div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;"><strong>From:</strong> ${p.sender}<br><strong>Title:</strong> ${p.title}<br><p>${p.details}</p><div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}</div>`).join("");
+        inboxBox.innerHTML = proposals.map((p, idx) => `
+  <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
+    <strong>From:</strong> ${p.sender}<br>
+    <strong>Title:</strong> ${p.title}<br>
+    <p>${p.details}</p>
+    <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
+    ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
+    <div style="margin-top:8px; display:flex; gap:8px;">
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'accept', ${idx})" style="background:#00cc88;">✅ Accept</button>
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'decline', ${idx})" style="background:#666;">❌ Decline</button>
+    </div>
+  </div>
+`).join("");
       }
     })
     .catch(err => {
@@ -830,133 +866,608 @@ function openProposalInboxModal() {
     });
 }
 
-function sendInvite() {
-  const inviteInput = document.getElementById("inviteInput");
-  const feedback = document.getElementById("inviteFeedback");
-  const email = inviteInput.value.trim();
-  if (!email) {
-    feedback.textContent = "Please enter an email or handle.";
+  async function respondToProposal(sender, action, index) {
+  const username = localStorage.getItem("aigentsyUsername");
+  
+  try {
+    // For now, just show feedback (can wire to backend later)
+    if (action === 'accept') {
+      showToast(`✅ Accepted proposal from ${sender}!`, "success");
+      // TODO: Send acceptance notification to sender
+      // Could create a reverse proposal or update JSONBin status
+    } else {
+      showToast(`Declined proposal from ${sender}`, "info");
+    }
+    
+    // Optionally refresh the proposal list
+    setTimeout(() => {
+      openProposalInboxModal();
+    }, 1000);
+    
+  } catch (err) {
+    console.error("Proposal response error:", err);
+    showToast("Error responding to proposal", "error");
+  }
+}
+
+async function requestCashout() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const totalEarnings = parseFloat(document.getElementById("totalEarnings").textContent) || 0;
+  
+  if (totalEarnings <= 0) {
+    showToast("⚠️ No earnings available to cash out", "error");
     return;
   }
-  feedback.textContent = `✅ Invite sent to ${email}!`;
-  inviteInput.value = "";
-  setTimeout(() => { feedback.textContent = ""; }, 3000);
+  
+  // Ask user for payout method
+  const method = prompt("Choose payout method:\n\n1. Stripe (type 'stripe')\n2. Crypto (type 'crypto')", "stripe");
+  
+  if (!method) return; // User cancelled
+  
+  // Ask for amount
+  const amountStr = prompt(`How much would you like to cash out?\n\nAvailable: $${totalEarnings.toFixed(2)}`, totalEarnings.toFixed(2));
+  if (!amountStr) return;
+  
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    showToast("⚠️ Invalid amount", "error");
+    return;
+  }
+  
+  if (amount > totalEarnings) {
+    showToast("⚠️ Amount exceeds available balance", "error");
+    return;
+  }
+  
+  const confirmMsg = `Cash out $${amount.toFixed(2)} via ${method}?`;
+  if (!confirm(confirmMsg)) return;
+  
+  try {
+    showToast("Processing cashout request...", "info");
+    
+    // Get API key if stored (optional - depends on your auth setup)
+    const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+    
+    const res = await fetch(`${window.BACKEND_BASE}/payout/request`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...(apiKey && { "X-API-Key": apiKey })
+      },
+      body: JSON.stringify({
+        username: username,
+        amount: amount,
+        method: method.toLowerCase()
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.ok) {
+      showToast(`✅ Payout requested: $${amount.toFixed(2)}`, "success");
+      
+      // Show detailed info
+      const payout = result.payout;
+      alert(
+        `💸 Payout Request Submitted!\n\n` +
+        `ID: ${payout.id}\n` +
+        `Amount: $${payout.amount}\n` +
+        `Method: ${payout.method}\n` +
+        `Status: ${payout.status}\n\n` +
+        `You'll be notified when processed.`
+      );
+      
+      // Refresh user data to update balance
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+    } else if (result.error) {
+      // Handle specific errors
+      if (result.error.includes("minimum payout")) {
+        showToast(`⚠️ ${result.error}`, "error");
+      } else if (result.error.includes("no payout destination")) {
+        showToast("⚠️ Please connect your payout method first", "error");
+        alert("To receive payouts, please:\n\n1. Go to Actions drawer\n2. Click 'Register Business'\n3. Connect Stripe or add crypto address");
+      } else if (result.error.includes("insufficient")) {
+        showToast("⚠️ Insufficient available funds", "error");
+      } else {
+        showToast(`❌ ${result.error}`, "error");
+      }
+    } else {
+      showToast("⚠️ Unexpected response from server", "error");
+    }
+    
+  } catch (err) {
+    console.error("Cashout error:", err);
+    showToast("⚠️ Connection error. Please try again.", "error");
+  }
+}
+  
+async function sendInvite() {
+  const inviteInput = document.getElementById("inviteInput");
+  const feedback = document.getElementById("inviteFeedback");
+  const sendBtn = document.querySelector('#inviteFeedback').previousElementSibling;
+  const email = inviteInput.value.trim();
+  
+  if (!email) {
+    feedback.textContent = "⚠️ Please enter an email or handle.";
+    feedback.style.color = "#ff6b6b";
+    return;
+  }
+  
+  // Show loading state
+  const originalBtnText = sendBtn.textContent;
+  sendBtn.textContent = "Sending...";
+  sendBtn.disabled = true;
+  feedback.textContent = "📤 Sending invitation...";
+  feedback.style.color = "#00bfff";
+  
+  try {
+    const username = localStorage.getItem("aigentsyUsername");
+    const res = await fetch(`${window.BACKEND_BASE}/send_invite`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inviter: username,
+        target_email: email
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      feedback.textContent = result.message;
+      feedback.style.color = "#00ffcc";
+      inviteInput.value = "";
+      
+      // Extra feedback for existing users
+      if (result.existing_user) {
+        showToast("Invitation sent via Proposal System!", "success");
+      } else if (result.pending_email) {
+        showToast("Invite logged - email delivery coming soon!", "info");
+      }
+    } else {
+      feedback.textContent = `❌ ${result.message}`;
+      feedback.style.color = "#ff6b6b";
+    }
+  } catch (err) {
+    console.error("Invite error:", err);
+    feedback.textContent = "⚠️ Connection error. Please try again.";
+    feedback.style.color = "#ff6b6b";
+  } finally {
+    // Restore button
+    sendBtn.textContent = originalBtnText;
+    sendBtn.disabled = false;
+    
+    // Clear feedback after 5 seconds
+    setTimeout(() => {
+      feedback.textContent = "";
+    }, 5000);
+  }
 }
 
 window.GXA = (() => {
   const BASE = window.BACKEND_BASE;
   const U = { name: localStorage.getItem("aigentsyUsername") || "" };
+  
   function openModal(title, html) {
     document.getElementById("gxModalTitle").textContent = title || "Modal";
     document.getElementById("gxModalBody").innerHTML = html || "";
     document.getElementById("gxModal").classList.add("open");
   }
+  
   function closeModal() {
     document.getElementById("gxModal").classList.remove("open");
   }
+  
   return {
     closeModal,
+    
+    // ✅ ALREADY WORKS
     copyWidget() {
       const tag = `<script src="https://cdn.aigentsy.com/widget.min.js" data-user="${U.name}" data-backend="${BASE}"></` + `script>`;
       navigator.clipboard.writeText(tag);
       openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
     },
+    
+    // 🚀 Publish Storefront - CORRECTED
     async publishStorefront() {
-      showToast("Publishing...", "info");
-      const j = await jpost(BASE + "/storefront/publish", { username: U.name });
-      if (j.ok && j.url) { showToast("Published", "success"); window.open(j.url, "_blank"); }
-      else { showToast(j.error || "Failed", "error"); }
+      showToast("Publishing storefront...", "info");
+      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+      
+      try {
+        const res = await fetch(`${BASE}/storefront/publish`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(apiKey && { "X-API-Key": apiKey })
+          },
+          body: JSON.stringify({ username: U.name })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Storefront published!", "success");
+          openModal("Storefront Published", `<p>Your storefront is live at:</p><p><a href="${result.link}" target="_blank" style="color:#00bfff;">${result.link}</a></p>`);
+        } else {
+          showToast(result.error || "Failed to publish", "error");
+        }
+      } catch (err) {
+        console.error("Publish error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // ⚡ Quick Intent - CORRECTED
     async quickIntent() {
-      const brief = prompt("What do you need?", "Landing hero");
+      const brief = prompt("What do you need? (e.g., 'Landing page hero section')", "");
       if (!brief) return;
+      
       const budget = Number(prompt("Budget (USD)", "200") || "200");
+      
       showToast("Creating intent...", "info");
-      const j = await jpost(BASE + "/intent/create", { buyer: U.name, brief, budget });
-      if (j.ok) showToast("Intent created", "success");
-      else showToast(j.error, "error");
+      
+      try {
+        const res = await fetch(`${BASE}/intent/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            buyer: U.name, 
+            brief, 
+            budget 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Intent created! ID: ${result.intent.id}`, "success");
+          openModal("Intent Created", `<p><strong>ID:</strong> ${result.intent.id}</p><p><strong>Brief:</strong> ${brief}</p><p><strong>Budget:</strong> $${budget}</p><p>Matching with sellers...</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Intent error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🧪 Productize URL - CORRECTED
     async productizeUrl() {
-      const url = prompt("Paste a post/reel/article URL to productize");
+      const url = prompt("Paste a URL to productize (e.g., blog post, reel, article)");
       if (!url) return;
-      const j = await jpost(BASE + "/productize", { username: U.name, url });
-      showToast(j.ok ? `Offer created: ${j.offer.id}` : `Error: ${j.error}`, j.ok ? "success" : "error");
+      
+      showToast("Analyzing URL...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/productize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, url })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Offer created! ID: ${result.offer.id}`, "success");
+          openModal("Productized", `<p><strong>Offer ID:</strong> ${result.offer.id}</p><p><strong>URL:</strong> ${url}</p><p>Status: ${result.offer.status}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Productize error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 💳 Instant Quote/Escrow - CORRECTED
     async instantQuote() {
-      const seller = prompt("Quote from which seller?", "demo_seller");
+      const seller = prompt("Quote from which seller? (username)", "");
       if (!seller) return;
+      
       const scope = prompt("Scope summary", "Hero section + copy");
       if (!scope) return;
+      
       showToast("Generating quote...", "info");
-      const q = await jpost(BASE + "/quote", { buyer: U.name, seller, scope, ttr: "24h" });
-      if (q.ok) showToast(`Quote ready: $${q.quote.price}`, "success");
-      else showToast(q.error, "error");
+      
+      try {
+        const res = await fetch(`${BASE}/quote/instant`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            buyer: U.name, 
+            seller, 
+            scope, 
+            ttr: "24h" 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          const q = result.quote;
+          showToast(`✅ Quote ready: $${q.price}`, "success");
+          openModal("Quote Generated", `<p><strong>Price:</strong> $${q.price}</p><p><strong>Seller:</strong> ${q.seller}</p><p><strong>Scope:</strong> ${q.scope}</p><p><strong>TTR:</strong> ${q.ttr}</p><p>Escrow ready: ${q.escrow ? 'Yes' : 'No'}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Quote error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏅 Proof-of-Outcome - CORRECTED
     async issuePoO() {
       const title = prompt("What did you complete? (PoO title)");
       if (!title) return;
-      const j = await jpost(BASE + "/poo", { username: U.name, title, metrics: {}, evidence_urls: [] });
-      showToast(j.ok ? "PoO issued" : "Error", j.ok ? "success" : "error");
+      
+      showToast("Issuing PoO...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/poo/issue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            title, 
+            metrics: {}, 
+            evidence_urls: [] 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ PoO issued!", "success");
+          openModal("Proof-of-Outcome Issued", `<p><strong>ID:</strong> ${result.poo.id}</p><p><strong>Title:</strong> ${title}</p><p>Issued at: ${result.poo.ts}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("PoO error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🎞️ Bind Media - CORRECTED
     async bindMedia() {
       const media = prompt("Media ID (e.g., hero-video-001)");
       if (!media) return;
+      
       const offer = prompt("Offer ID to bind to");
       if (!offer) return;
-      const j = await jpost(BASE + "/media/bind_offer", { username: U.name, media_id: media, offer_id: offer });
-      showToast(j.ok ? "Media bound" : "Error", j.ok ? "success" : "error");
+      
+      showToast("Binding media...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/media/bind`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            media_id: media, 
+            offer_id: offer 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Media bound!", "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Bind error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🌐 Localize Offer - CORRECTED
     async localizeOffer() {
       const offer = prompt("Offer ID to localize");
       if (!offer) return;
-      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR");
+      
+      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR,de-DE");
       if (!locales) return;
+      
       const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
-      const j = await jpost(BASE + "/offer/localize", { username: U.name, offer_id: offer, locales: arr });
-      showToast(j.ok ? `Created ${j.variants.length} variants` : "Error", j.ok ? "success" : "error");
+      
+      showToast("Localizing offer...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/offer/localize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            offer_id: offer, 
+            locales: arr 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast(`✅ Created ${result.localized.length} variants`, "success");
+          openModal("Localized", `<p>Created ${result.localized.length} localized variants</p><ul>${result.localized.map(l => `<li>${l.locale}: ${l.id}</li>`).join('')}</ul>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Localize error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏢 Register Business - CORRECTED
     async registerBusiness() {
-      const biz = prompt("Legal business name");
-      if (!biz) return;
-      const j = await jpost(BASE + "/distribution/register", { username: U.name, business_name: biz });
-      openModal("Register Business", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      const bizName = prompt("Legal business name");
+      if (!bizName) return;
+      
+      const channel = prompt("Distribution channel", "partner");
+      const endpoint = prompt("Webhook endpoint URL", "https://example.com/webhook");
+      const token = prompt("API token", "");
+      
+      showToast("Registering business...", "info");
+      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+      
+      try {
+        const res = await fetch(`${BASE}/distribution/register`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            ...(apiKey && { "X-API-Key": apiKey })
+          },
+          body: JSON.stringify({ 
+            username: U.name, 
+            channel,
+            endpoint_url: endpoint,
+            token
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Business registered!", "success");
+          openModal("Business Registered", `<p>Business: ${bizName}</p><p>Channel: ${channel}</p><p>Status: Active</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Register error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🤝 Create JV - CORRECTED
     async createJV() {
       const partner = prompt("Partner username/email");
       if (!partner) return;
-      const split = prompt("Split (you,partner) e.g. 60,40", "60,40");
-      const [a, b] = (split || "60,40").split(",").map(x => parseFloat(x.trim()) / 100);
-      const j = await jpost(BASE + "/jv/create", { username: U.name, partner, split: [a, b] });
-      openModal("JV Created", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      
+      const split = prompt("Split (you,partner) e.g. 60,40", "50,50");
+      const [a, b] = (split || "50,50").split(",").map(x => parseFloat(x.trim()) / 100);
+      
+      showToast("Creating JV...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/jv/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            partner_username: partner, 
+            split: [a, b] 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ JV created!", "success");
+          openModal("JV Created", `<p><strong>ID:</strong> ${result.jv.id}</p><p><strong>Partners:</strong> ${U.name} & ${partner}</p><p><strong>Split:</strong> ${Math.round(a*100)}% / ${Math.round(b*100)}%</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("JV error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 💸 Payout - USE EXISTING requestCashout()
     async payout() {
-      const method = prompt("Method: stripe | crypto", "stripe");
-      const j = await jpost(BASE + "/payout", { username: U.name, method });
-      openModal("Payout", "<pre>" + JSON.stringify(j, null, 2) + "</pre>");
+      // Just call the existing requestCashout function
+      requestCashout();
     },
+    
+    // 🧩 Create Team - CORRECTED
     async createTeam() {
-      showToast("Creating team...", "info");
-      const members = prompt("Members (comma usernames)", "demo_seller,demo_integrator");
+      const members = prompt("Team members (comma-separated usernames)", "");
       if (!members) return;
+      
       const mem = members.split(",").map(s => s.trim()).filter(Boolean);
-      const t = await jpost(BASE + "/team/create", { lead_owner: U.name, members: mem, split: [0.5,0.3,0.2] });
-      showToast(t.ok ? "Team created" : "Error", t.ok ? "success" : "error");
+      
+      showToast("Creating team...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/team/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            lead_owner: U.name, 
+            members: mem 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Team created!", "success");
+          openModal("Team Created", `<p><strong>ID:</strong> ${result.team.id}</p><p><strong>Members:</strong> ${mem.length + 1}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Team error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 📣 Schedule Retargeter - CORRECTED
     async scheduleRetarget() {
-      const lead = prompt("Lead ID to retarget", "lead-123");
+      const lead = prompt("Lead ID to retarget", "");
       if (!lead) return;
-      const j = await jpost(BASE + "/retarget/schedule", { username: U.name, lead_id: lead, cadence: "3d", incentive: "AIGx10" });
-      showToast(j.ok ? "Retarget scheduled" : "Error", j.ok ? "success" : "error");
+      
+      const cadence = prompt("Cadence (e.g., 3d, 1w)", "3d");
+      const incentive = prompt("Incentive (e.g., AIGx10, 10% off)", "");
+      
+      showToast("Scheduling retargeter...", "info");
+      
+      try {
+        const res = await fetch(`${BASE}/retarget/schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: U.name, 
+            lead_id: lead, 
+            cadence, 
+            incentive 
+          })
+        });
+        const result = await res.json();
+        
+        if (result.ok) {
+          showToast("✅ Retargeter scheduled!", "success");
+          openModal("Retargeter Scheduled", `<p><strong>Lead:</strong> ${lead}</p><p><strong>Cadence:</strong> ${cadence}</p><p><strong>Incentive:</strong> ${incentive}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        console.error("Retarget error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     },
+    
+    // 🏬 Marketplace Top 20 - CORRECTED
     async openMarket() {
       showToast("Loading marketplace...", "info");
-      const j = await jget(BASE + "/market/rank");
-      const html = `<ol>` + (j.results || []).slice(0, 20).map(r => `<li>${r.username} — rank ${r.rank}</li>`).join("") + `</ol>`;
-      openModal("Marketplace Top 20", html);
+      
+      try {
+        const res = await fetch(`${BASE}/market/rank`);
+        const result = await res.json();
+        
+        if (result.ok || result.results) {
+          const results = result.results || [];
+          const html = `<ol style="padding-left:20px;">` + results.slice(0, 20).map(r => 
+            `<li>${r.username} — Score: ${r.score || r.rank}</li>`
+          ).join("") + `</ol>`;
+          openModal("Marketplace Top 20", html);
+        } else {
+          showToast("Failed to load marketplace", "error");
+        }
+      } catch (err) {
+        console.error("Market error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
     }
   };
 })();
-
+  
 const gxFab = document.getElementById("gxFab");
 const gxDrawer = document.getElementById("gxDrawer");
 const gxClose = document.getElementById("gxClose");
@@ -1005,9 +1516,9 @@ function initializeDashboard() {
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! I'm your ${window.aigentsyUser?.companyType || "business"} assistant. How can I help you grow today?`;
+    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
-  }
+}
 }
 
 if (document.readyState === 'loading') {
