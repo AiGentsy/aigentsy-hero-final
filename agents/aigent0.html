@@ -1490,31 +1490,424 @@ window.GXA = (() => {
         showToast("⚠️ Connection error", "error");
       }
     },
-        // 🤖 View Auto-Sales - Opens AME dashboard
-    viewAutoSales() {
-      openModal("Auto-Sales Dashboard", `
-        <p style="color:#ccc; margin-bottom:12px;">Your AI is finding customers automatically. Here's what's happening:</p>
-        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-bottom:16px;">
-          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
-            <div style="font-size:0.8rem; color:#888;">Pitches Sent</div>
-            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
-          </div>
-          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
-            <div style="font-size:0.8rem; color:#888;">Responses</div>
-            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
-          </div>
-          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
-            <div style="font-size:0.8rem; color:#888;">Conversations</div>
-            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
-          </div>
-          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00ffcc;">
-            <div style="font-size:0.8rem; color:#888;">Deals Closed</div>
-            <div style="font-size:1.4rem; font-weight:700; color:#00ffcc;">0</div>
-          </div>
+       // ========== AME AUTO-SALES DASHBOARD ==========
+// Replace the existing viewAutoSales() function in aigent0.html
+
+viewAutoSales() {
+    const modal = document.createElement('div');
+    modal.className = 'gxa-modal';
+    modal.innerHTML = `
+        <div class="gxa-modal-content" style="max-width: 800px; max-height: 85vh; overflow-y: auto;">
+            <div class="gxa-modal-header">
+                <h3>🤖 AME Auto-Sales Dashboard</h3>
+                <button class="gxa-close" onclick="this.closest('.gxa-modal').remove()">×</button>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div id="ame-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+                <div class="ame-stat-card">
+                    <div class="ame-stat-value" id="stat-queued">-</div>
+                    <div class="ame-stat-label">Queued</div>
+                </div>
+                <div class="ame-stat-card">
+                    <div class="ame-stat-value" id="stat-sent">-</div>
+                    <div class="ame-stat-label">Sent</div>
+                </div>
+                <div class="ame-stat-card">
+                    <div class="ame-stat-value" id="stat-responses">-</div>
+                    <div class="ame-stat-label">Responses</div>
+                </div>
+                <div class="ame-stat-card">
+                    <div class="ame-stat-value" id="stat-converted">-</div>
+                    <div class="ame-stat-label">Converted</div>
+                </div>
+            </div>
+            
+            <!-- Response Rate Bar -->
+            <div style="margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 13px; color: #666;">Response Rate</span>
+                    <span style="font-size: 13px; font-weight: 600;" id="response-rate-pct">--%</span>
+                </div>
+                <div style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
+                    <div id="response-rate-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.3s;"></div>
+                </div>
+            </div>
+            
+            <!-- Pending Pitches Queue -->
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <h4 style="margin: 0; font-size: 15px;">📋 Pending Approval</h4>
+                <button onclick="window.GXA.refreshAMEQueue()" style="padding: 6px 12px; font-size: 12px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer;">
+                    ↻ Refresh
+                </button>
+            </div>
+            
+            <div id="ame-queue" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                <div style="padding: 40px; text-align: center; color: #9ca3af;">
+                    Loading pitches...
+                </div>
+            </div>
+            
+            <!-- Empty State / Generate New -->
+            <div id="ame-empty" style="display: none; padding: 30px; text-align: center; background: #f9fafb; border-radius: 8px; margin-top: 16px;">
+                <div style="font-size: 32px; margin-bottom: 8px;">🎯</div>
+                <div style="color: #6b7280; margin-bottom: 16px;">No pitches in queue</div>
+                <button onclick="window.GXA.generateNewPitches()" style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
+                    Generate New Pitches
+                </button>
+            </div>
         </div>
-        <p style="font-size:0.85rem; color:#888;">Full AME dashboard coming soon!</p>
-      `);
-    },
+    `;
+    
+    // Add styles
+    if (!document.getElementById('ame-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'ame-styles';
+        styles.textContent = `
+            .ame-stat-card {
+                background: #f9fafb;
+                padding: 16px;
+                border-radius: 8px;
+                text-align: center;
+            }
+            .ame-stat-value {
+                font-size: 24px;
+                font-weight: 700;
+                color: #111827;
+            }
+            .ame-stat-label {
+                font-size: 12px;
+                color: #6b7280;
+                margin-top: 4px;
+            }
+            .ame-pitch-item {
+                padding: 16px;
+                border-bottom: 1px solid #e5e7eb;
+                transition: background 0.15s;
+            }
+            .ame-pitch-item:last-child {
+                border-bottom: none;
+            }
+            .ame-pitch-item:hover {
+                background: #f9fafb;
+            }
+            .ame-pitch-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 8px;
+            }
+            .ame-pitch-recipient {
+                font-weight: 600;
+                color: #111827;
+            }
+            .ame-pitch-channel {
+                font-size: 11px;
+                padding: 2px 8px;
+                background: #e0e7ff;
+                color: #4338ca;
+                border-radius: 4px;
+                text-transform: uppercase;
+            }
+            .ame-pitch-message {
+                font-size: 13px;
+                color: #4b5563;
+                background: #f3f4f6;
+                padding: 10px 12px;
+                border-radius: 6px;
+                margin-bottom: 12px;
+                white-space: pre-wrap;
+                max-height: 100px;
+                overflow-y: auto;
+            }
+            .ame-pitch-actions {
+                display: flex;
+                gap: 8px;
+            }
+            .ame-btn {
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                font-weight: 500;
+                cursor: pointer;
+                border: none;
+                transition: all 0.15s;
+            }
+            .ame-btn-approve {
+                background: #10b981;
+                color: white;
+            }
+            .ame-btn-approve:hover {
+                background: #059669;
+            }
+            .ame-btn-skip {
+                background: #f3f4f6;
+                color: #6b7280;
+                border: 1px solid #d1d5db;
+            }
+            .ame-btn-skip:hover {
+                background: #e5e7eb;
+            }
+            .ame-btn-edit {
+                background: transparent;
+                color: #6b7280;
+                padding: 8px 12px;
+            }
+            .ame-btn-edit:hover {
+                color: #4f46e5;
+            }
+        `;
+        document.head.appendChild(styles);
+    }
+    
+    document.body.appendChild(modal);
+    
+    // Load queue data
+    this.refreshAMEQueue();
+},
+
+refreshAMEQueue() {
+    fetch('/ame/queue')
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                console.error('AME queue error:', data);
+                return;
+            }
+            
+            const stats = data.stats || {};
+            const pitches = data.pitches || [];
+            
+            // Update stats
+            document.getElementById('stat-queued').textContent = stats.queue_size || 0;
+            document.getElementById('stat-sent').textContent = stats.sent || 0;
+            document.getElementById('stat-responses').textContent = stats.responded || 0;
+            document.getElementById('stat-converted').textContent = stats.converted || 0;
+            
+            // Update response rate
+            const responseRate = stats.response_rate || 0;
+            document.getElementById('response-rate-pct').textContent = responseRate + '%';
+            document.getElementById('response-rate-bar').style.width = responseRate + '%';
+            
+            // Render queue
+            const queueEl = document.getElementById('ame-queue');
+            const emptyEl = document.getElementById('ame-empty');
+            
+            if (pitches.length === 0) {
+                queueEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+            } else {
+                queueEl.style.display = 'block';
+                emptyEl.style.display = 'none';
+                queueEl.innerHTML = pitches.map(p => this.renderPitchItem(p)).join('');
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load AME queue:', err);
+            document.getElementById('ame-queue').innerHTML = `
+                <div style="padding: 20px; text-align: center; color: #ef4444;">
+                    Failed to load queue. <button onclick="window.GXA.refreshAMEQueue()" style="color: #4f46e5; background: none; border: none; cursor: pointer;">Retry</button>
+                </div>
+            `;
+        });
+},
+
+renderPitchItem(pitch) {
+    const channelColors = {
+        email: { bg: '#dbeafe', color: '#1d4ed8' },
+        dm: { bg: '#fce7f3', color: '#be185d' },
+        linkedin: { bg: '#e0e7ff', color: '#4338ca' },
+        fiverr: { bg: '#d1fae5', color: '#065f46' }
+    };
+    const ch = channelColors[pitch.channel] || { bg: '#f3f4f6', color: '#374151' };
+    
+    return `
+        <div class="ame-pitch-item" data-pitch-id="${pitch.id}">
+            <div class="ame-pitch-header">
+                <div>
+                    <span class="ame-pitch-recipient">${pitch.recipient}</span>
+                    <span style="color: #9ca3af; font-size: 12px; margin-left: 8px;">
+                        ${this.timeAgo(pitch.created_at)}
+                    </span>
+                </div>
+                <span class="ame-pitch-channel" style="background: ${ch.bg}; color: ${ch.color};">
+                    ${pitch.channel}
+                </span>
+            </div>
+            <div class="ame-pitch-message">${this.escapeHtml(pitch.message)}</div>
+            <div class="ame-pitch-actions">
+                <button class="ame-btn ame-btn-approve" onclick="window.GXA.approvePitch('${pitch.id}')">
+                    ✓ Approve & Send
+                </button>
+                <button class="ame-btn ame-btn-skip" onclick="window.GXA.skipPitch('${pitch.id}')">
+                    Skip
+                </button>
+                <button class="ame-btn ame-btn-edit" onclick="window.GXA.editPitch('${pitch.id}')">
+                    ✎ Edit
+                </button>
+            </div>
+        </div>
+    `;
+},
+
+approvePitch(pitchId) {
+    const item = document.querySelector(`[data-pitch-id="${pitchId}"]`);
+    if (item) {
+        item.style.opacity = '0.5';
+        item.style.pointerEvents = 'none';
+    }
+    
+    fetch(`/ame/approve/${pitchId}`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                this.showToast('✓ Pitch approved and sent!', 'success');
+                this.refreshAMEQueue();
+            } else {
+                this.showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
+                if (item) {
+                    item.style.opacity = '1';
+                    item.style.pointerEvents = 'auto';
+                }
+            }
+        })
+        .catch(err => {
+            this.showToast('Network error', 'error');
+            if (item) {
+                item.style.opacity = '1';
+                item.style.pointerEvents = 'auto';
+            }
+        });
+},
+
+skipPitch(pitchId) {
+    const item = document.querySelector(`[data-pitch-id="${pitchId}"]`);
+    if (item) {
+        item.style.opacity = '0.5';
+    }
+    
+    fetch(`/ame/skip/${pitchId}`, { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'user_skipped' })
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                this.showToast('Pitch skipped', 'info');
+                this.refreshAMEQueue();
+            }
+        });
+},
+
+editPitch(pitchId) {
+    // Fetch current pitch
+    fetch(`/ame/pitch/${pitchId}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) return;
+            
+            const pitch = data.pitch;
+            const newMessage = prompt('Edit pitch message:', pitch.message);
+            
+            if (newMessage && newMessage !== pitch.message) {
+                fetch(`/ame/edit/${pitchId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: newMessage })
+                })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.ok) {
+                            this.showToast('Pitch updated', 'success');
+                            this.refreshAMEQueue();
+                        }
+                    });
+            }
+        });
+},
+
+generateNewPitches() {
+    this.showToast('Generating pitches from recent matches...', 'info');
+    
+    // This would typically call your MetaBridge to get matches,
+    // then POST to /ame/generate-from-matches
+    // For now, show a placeholder
+    fetch('/ame/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            recipient: 'demo@example.com',
+            channel: 'email',
+            context: {
+                offer: 'AI-powered marketing automation',
+                match_reason: 'Based on your recent activity'
+            },
+            originator: 'manual_test'
+        })
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data.ok) {
+                this.showToast('Test pitch generated!', 'success');
+                this.refreshAMEQueue();
+            }
+        });
+},
+
+// Helper functions
+timeAgo(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    return Math.floor(seconds / 86400) + 'd ago';
+},
+
+escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, m => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[m]));
+},
+
+showToast(message, type = 'info') {
+    const colors = {
+        success: '#10b981',
+        error: '#ef4444',
+        info: '#6b7280'
+    };
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${colors[type] || colors.info};
+        color: white;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 10001;
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 
     // 💼 Browse Deals - Opens Intent Exchange
     browseDeals() {
