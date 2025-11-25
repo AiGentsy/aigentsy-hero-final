@@ -1086,32 +1086,74 @@ window.GXA = (() => {
     document.getElementById("gxModal").classList.remove("open");
   }
   
+  // Helper functions (outside return block)
+  function timeAgo(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    return Math.floor(seconds / 86400) + 'd ago';
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]));
+  }
+  
+  function renderPitchItem(pitch) {
+    const channelColors = {
+      email: { bg: '#dbeafe', color: '#1d4ed8' },
+      dm: { bg: '#fce7f3', color: '#be185d' },
+      linkedin: { bg: '#e0e7ff', color: '#4338ca' },
+      fiverr: { bg: '#d1fae5', color: '#065f46' }
+    };
+    const ch = channelColors[pitch.channel] || { bg: '#f3f4f6', color: '#374151' };
+    
+    return `
+      <div class="ame-pitch-item" data-pitch-id="${pitch.id}" style="padding:16px; border-bottom:1px solid #333; background:#111;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <span style="font-weight:600; color:#fff;">${pitch.recipient}</span>
+            <span style="color:#888; font-size:12px; margin-left:8px;">${timeAgo(pitch.created_at)}</span>
+          </div>
+          <span style="font-size:11px; padding:2px 8px; background:${ch.bg}; color:${ch.color}; border-radius:4px; text-transform:uppercase;">
+            ${pitch.channel}
+          </span>
+        </div>
+        <div style="font-size:13px; color:#ccc; background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:12px; white-space:pre-wrap; max-height:80px; overflow-y:auto;">
+          ${escapeHtml(pitch.message)}
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-glow" onclick="window.GXA.approvePitch('${pitch.id}')" style="background:#10b981; padding:8px 16px;">✓ Approve</button>
+          <button class="btn-glow" onclick="window.GXA.skipPitch('${pitch.id}')" style="background:#444; padding:8px 16px;">Skip</button>
+          <button class="btn-glow" onclick="window.GXA.editPitch('${pitch.id}')" style="background:transparent; border:1px solid #444; padding:8px 12px;">✎</button>
+        </div>
+      </div>
+    `;
+  }
+  
   return {
     closeModal,
     
-    // ✅ ALREADY WORKS
     copyWidget() {
       const tag = `<script src="https://cdn.aigentsy.com/widget.min.js" data-user="${U.name}" data-backend="${BASE}"></` + `script>`;
       navigator.clipboard.writeText(tag);
       openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
     },
     
-    // 🚀 Publish Storefront - CORRECTED
     async publishStorefront() {
       showToast("Publishing storefront...", "info");
       const apiKey = localStorage.getItem("aigentsyApiKey") || "";
-      
       try {
         const res = await fetch(`${BASE}/storefront/publish`, {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            ...(apiKey && { "X-API-Key": apiKey })
-          },
+          headers: { "Content-Type": "application/json", ...(apiKey && { "X-API-Key": apiKey }) },
           body: JSON.stringify({ username: U.name })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ Storefront published!", "success");
           openModal("Storefront Published", `<p>Your storefront is live at:</p><p><a href="${result.link}" target="_blank" style="color:#00bfff;">${result.link}</a></p>`);
@@ -1124,46 +1166,33 @@ window.GXA = (() => {
       }
     },
     
-    // ⚡ Quick Intent - CORRECTED
     async quickIntent() {
       const brief = prompt("What do you need? (e.g., 'Landing page hero section')", "");
       if (!brief) return;
-      
       const budget = Number(prompt("Budget (USD)", "200") || "200");
-      
       showToast("Creating intent...", "info");
-      
       try {
         const res = await fetch(`${BASE}/intent/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            buyer: U.name, 
-            brief, 
-            budget 
-          })
+          body: JSON.stringify({ buyer: U.name, brief, budget })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast(`✅ Intent created! ID: ${result.intent.id}`, "success");
-          openModal("Intent Created", `<p><strong>ID:</strong> ${result.intent.id}</p><p><strong>Brief:</strong> ${brief}</p><p><strong>Budget:</strong> $${budget}</p><p>Matching with sellers...</p>`);
+          openModal("Intent Created", `<p><strong>ID:</strong> ${result.intent.id}</p><p><strong>Brief:</strong> ${brief}</p><p><strong>Budget:</strong> $${budget}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Intent error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🧪 Productize URL - CORRECTED
     async productizeUrl() {
       const url = prompt("Paste a URL to productize (e.g., blog post, reel, article)");
       if (!url) return;
-      
       showToast("Analyzing URL...", "info");
-      
       try {
         const res = await fetch(`${BASE}/productize`, {
           method: "POST",
@@ -1171,311 +1200,213 @@ window.GXA = (() => {
           body: JSON.stringify({ username: U.name, url })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast(`✅ Offer created! ID: ${result.offer.id}`, "success");
-          openModal("Productized", `<p><strong>Offer ID:</strong> ${result.offer.id}</p><p><strong>URL:</strong> ${url}</p><p>Status: ${result.offer.status}</p>`);
+          openModal("Productized", `<p><strong>Offer ID:</strong> ${result.offer.id}</p><p><strong>URL:</strong> ${url}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Productize error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 💳 Instant Quote/Escrow - CORRECTED
     async instantQuote() {
       const seller = prompt("Quote from which seller? (username)", "");
       if (!seller) return;
-      
       const scope = prompt("Scope summary", "Hero section + copy");
       if (!scope) return;
-      
       showToast("Generating quote...", "info");
-      
       try {
         const res = await fetch(`${BASE}/quote/instant`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            buyer: U.name, 
-            seller, 
-            scope, 
-            ttr: "24h" 
-          })
+          body: JSON.stringify({ buyer: U.name, seller, scope, ttr: "24h" })
         });
         const result = await res.json();
-        
         if (result.ok) {
           const q = result.quote;
           showToast(`✅ Quote ready: $${q.price}`, "success");
-          openModal("Quote Generated", `<p><strong>Price:</strong> $${q.price}</p><p><strong>Seller:</strong> ${q.seller}</p><p><strong>Scope:</strong> ${q.scope}</p><p><strong>TTR:</strong> ${q.ttr}</p><p>Escrow ready: ${q.escrow ? 'Yes' : 'No'}</p>`);
+          openModal("Quote Generated", `<p><strong>Price:</strong> $${q.price}</p><p><strong>Seller:</strong> ${q.seller}</p><p><strong>Scope:</strong> ${q.scope}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Quote error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🏅 Proof-of-Outcome - CORRECTED
     async issuePoO() {
       const title = prompt("What did you complete? (PoO title)");
       if (!title) return;
-      
       showToast("Issuing PoO...", "info");
-      
       try {
         const res = await fetch(`${BASE}/poo/issue`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: U.name, 
-            title, 
-            metrics: {}, 
-            evidence_urls: [] 
-          })
+          body: JSON.stringify({ username: U.name, title, metrics: {}, evidence_urls: [] })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ PoO issued!", "success");
-          openModal("Proof-of-Outcome Issued", `<p><strong>ID:</strong> ${result.poo.id}</p><p><strong>Title:</strong> ${title}</p><p>Issued at: ${result.poo.ts}</p>`);
+          openModal("Proof-of-Outcome Issued", `<p><strong>ID:</strong> ${result.poo.id}</p><p><strong>Title:</strong> ${title}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("PoO error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🎞️ Bind Media - CORRECTED
     async bindMedia() {
       const media = prompt("Media ID (e.g., hero-video-001)");
       if (!media) return;
-      
       const offer = prompt("Offer ID to bind to");
       if (!offer) return;
-      
       showToast("Binding media...", "info");
-      
       try {
         const res = await fetch(`${BASE}/media/bind`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: U.name, 
-            media_id: media, 
-            offer_id: offer 
-          })
+          body: JSON.stringify({ username: U.name, media_id: media, offer_id: offer })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ Media bound!", "success");
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Bind error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🌐 Localize Offer - CORRECTED
     async localizeOffer() {
       const offer = prompt("Offer ID to localize");
       if (!offer) return;
-      
       const locales = prompt("Locales (comma separated)", "es-ES,fr-FR,de-DE");
       if (!locales) return;
-      
       const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
-      
       showToast("Localizing offer...", "info");
-      
       try {
         const res = await fetch(`${BASE}/offer/localize`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: U.name, 
-            offer_id: offer, 
-            locales: arr 
-          })
+          body: JSON.stringify({ username: U.name, offer_id: offer, locales: arr })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast(`✅ Created ${result.localized.length} variants`, "success");
-          openModal("Localized", `<p>Created ${result.localized.length} localized variants</p><ul>${result.localized.map(l => `<li>${l.locale}: ${l.id}</li>`).join('')}</ul>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Localize error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🏢 Register Business - CORRECTED
     async registerBusiness() {
       const bizName = prompt("Legal business name");
       if (!bizName) return;
-      
       const channel = prompt("Distribution channel", "partner");
       const endpoint = prompt("Webhook endpoint URL", "https://example.com/webhook");
-      const token = prompt("API token", "");
-      
       showToast("Registering business...", "info");
-      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
-      
       try {
         const res = await fetch(`${BASE}/distribution/register`, {
           method: "POST",
-          headers: { 
-            "Content-Type": "application/json",
-            ...(apiKey && { "X-API-Key": apiKey })
-          },
-          body: JSON.stringify({ 
-            username: U.name, 
-            channel,
-            endpoint_url: endpoint,
-            token
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, channel, endpoint_url: endpoint })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ Business registered!", "success");
-          openModal("Business Registered", `<p>Business: ${bizName}</p><p>Channel: ${channel}</p><p>Status: Active</p>`);
+          openModal("Business Registered", `<p>Business: ${bizName}</p><p>Channel: ${channel}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Register error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🤝 Create JV - CORRECTED
     async createJV() {
       const partner = prompt("Partner username/email");
       if (!partner) return;
-      
       const split = prompt("Split (you,partner) e.g. 60,40", "50,50");
       const [a, b] = (split || "50,50").split(",").map(x => parseFloat(x.trim()) / 100);
-      
       showToast("Creating JV...", "info");
-      
       try {
         const res = await fetch(`${BASE}/jv/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: U.name, 
-            partner_username: partner, 
-            split: [a, b] 
-          })
+          body: JSON.stringify({ username: U.name, partner_username: partner, split: [a, b] })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ JV created!", "success");
-          openModal("JV Created", `<p><strong>ID:</strong> ${result.jv.id}</p><p><strong>Partners:</strong> ${U.name} & ${partner}</p><p><strong>Split:</strong> ${Math.round(a*100)}% / ${Math.round(b*100)}%</p>`);
+          openModal("JV Created", `<p><strong>Partners:</strong> ${U.name} & ${partner}</p><p><strong>Split:</strong> ${Math.round(a*100)}% / ${Math.round(b*100)}%</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("JV error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 💸 Payout - USE EXISTING requestCashout()
     async payout() {
-      // Just call the existing requestCashout function
       requestCashout();
     },
     
-    // 🧩 Create Team - CORRECTED
     async createTeam() {
       const members = prompt("Team members (comma-separated usernames)", "");
       if (!members) return;
-      
       const mem = members.split(",").map(s => s.trim()).filter(Boolean);
-      
       showToast("Creating team...", "info");
-      
       try {
         const res = await fetch(`${BASE}/team/create`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            lead_owner: U.name, 
-            members: mem 
-          })
+          body: JSON.stringify({ lead_owner: U.name, members: mem })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ Team created!", "success");
-          openModal("Team Created", `<p><strong>ID:</strong> ${result.team.id}</p><p><strong>Members:</strong> ${mem.length + 1}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Team error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 📣 Schedule Retargeter - CORRECTED
     async scheduleRetarget() {
       const lead = prompt("Lead ID to retarget", "");
       if (!lead) return;
-      
       const cadence = prompt("Cadence (e.g., 3d, 1w)", "3d");
       const incentive = prompt("Incentive (e.g., AIGx10, 10% off)", "");
-      
       showToast("Scheduling retargeter...", "info");
-      
       try {
         const res = await fetch(`${BASE}/retarget/schedule`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ 
-            username: U.name, 
-            lead_id: lead, 
-            cadence, 
-            incentive 
-          })
+          body: JSON.stringify({ username: U.name, lead_id: lead, cadence, incentive })
         });
         const result = await res.json();
-        
         if (result.ok) {
           showToast("✅ Retargeter scheduled!", "success");
-          openModal("Retargeter Scheduled", `<p><strong>Lead:</strong> ${lead}</p><p><strong>Cadence:</strong> ${cadence}</p><p><strong>Incentive:</strong> ${incentive}</p>`);
         } else {
           showToast(result.error || "Failed", "error");
         }
       } catch (err) {
-        console.error("Retarget error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
     
-    // 🏬 Marketplace Top 20 - CORRECTED
     async openMarket() {
       showToast("Loading marketplace...", "info");
-      
       try {
         const res = await fetch(`${BASE}/market/rank`);
         const result = await res.json();
-        
         if (result.ok || result.results) {
           const results = result.results || [];
           const html = `<ol style="padding-left:20px;">` + results.slice(0, 20).map(r => 
@@ -1486,430 +1417,160 @@ window.GXA = (() => {
           showToast("Failed to load marketplace", "error");
         }
       } catch (err) {
-        console.error("Market error:", err);
         showToast("⚠️ Connection error", "error");
       }
     },
-       // ========== AME AUTO-SALES DASHBOARD ==========
-// Replace the existing viewAutoSales() function in aigent0.html
-
-viewAutoSales() {
-    const modal = document.createElement('div');
-    modal.className = 'gxa-modal';
-    modal.innerHTML = `
-        <div class="gxa-modal-content" style="max-width: 800px; max-height: 85vh; overflow-y: auto;">
-            <div class="gxa-modal-header">
-                <h3>🤖 AME Auto-Sales Dashboard</h3>
-                <button class="gxa-close" onclick="this.closest('.gxa-modal').remove()">×</button>
-            </div>
-            
-            <!-- Stats Cards -->
-            <div id="ame-stats" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
-                <div class="ame-stat-card">
-                    <div class="ame-stat-value" id="stat-queued">-</div>
-                    <div class="ame-stat-label">Queued</div>
-                </div>
-                <div class="ame-stat-card">
-                    <div class="ame-stat-value" id="stat-sent">-</div>
-                    <div class="ame-stat-label">Sent</div>
-                </div>
-                <div class="ame-stat-card">
-                    <div class="ame-stat-value" id="stat-responses">-</div>
-                    <div class="ame-stat-label">Responses</div>
-                </div>
-                <div class="ame-stat-card">
-                    <div class="ame-stat-value" id="stat-converted">-</div>
-                    <div class="ame-stat-label">Converted</div>
-                </div>
-            </div>
-            
-            <!-- Response Rate Bar -->
-            <div style="margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 8px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                    <span style="font-size: 13px; color: #666;">Response Rate</span>
-                    <span style="font-size: 13px; font-weight: 600;" id="response-rate-pct">--%</span>
-                </div>
-                <div style="height: 8px; background: #e9ecef; border-radius: 4px; overflow: hidden;">
-                    <div id="response-rate-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #34d399); transition: width 0.3s;"></div>
-                </div>
-            </div>
-            
-            <!-- Pending Pitches Queue -->
-            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <h4 style="margin: 0; font-size: 15px;">📋 Pending Approval</h4>
-                <button onclick="window.GXA.refreshAMEQueue()" style="padding: 6px 12px; font-size: 12px; background: #f3f4f6; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer;">
-                    ↻ Refresh
-                </button>
-            </div>
-            
-            <div id="ame-queue" style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
-                <div style="padding: 40px; text-align: center; color: #9ca3af;">
-                    Loading pitches...
-                </div>
-            </div>
-            
-            <!-- Empty State / Generate New -->
-            <div id="ame-empty" style="display: none; padding: 30px; text-align: center; background: #f9fafb; border-radius: 8px; margin-top: 16px;">
-                <div style="font-size: 32px; margin-bottom: 8px;">🎯</div>
-                <div style="color: #6b7280; margin-bottom: 16px;">No pitches in queue</div>
-                <button onclick="window.GXA.generateNewPitches()" style="padding: 10px 20px; background: #4f46e5; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">
-                    Generate New Pitches
-                </button>
-            </div>
-        </div>
-    `;
     
-    // Add styles
-    if (!document.getElementById('ame-styles')) {
-        const styles = document.createElement('style');
-        styles.id = 'ame-styles';
-        styles.textContent = `
-            .ame-stat-card {
-                background: #f9fafb;
-                padding: 16px;
-                border-radius: 8px;
-                text-align: center;
-            }
-            .ame-stat-value {
-                font-size: 24px;
-                font-weight: 700;
-                color: #111827;
-            }
-            .ame-stat-label {
-                font-size: 12px;
-                color: #6b7280;
-                margin-top: 4px;
-            }
-            .ame-pitch-item {
-                padding: 16px;
-                border-bottom: 1px solid #e5e7eb;
-                transition: background 0.15s;
-            }
-            .ame-pitch-item:last-child {
-                border-bottom: none;
-            }
-            .ame-pitch-item:hover {
-                background: #f9fafb;
-            }
-            .ame-pitch-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 8px;
-            }
-            .ame-pitch-recipient {
-                font-weight: 600;
-                color: #111827;
-            }
-            .ame-pitch-channel {
-                font-size: 11px;
-                padding: 2px 8px;
-                background: #e0e7ff;
-                color: #4338ca;
-                border-radius: 4px;
-                text-transform: uppercase;
-            }
-            .ame-pitch-message {
-                font-size: 13px;
-                color: #4b5563;
-                background: #f3f4f6;
-                padding: 10px 12px;
-                border-radius: 6px;
-                margin-bottom: 12px;
-                white-space: pre-wrap;
-                max-height: 100px;
-                overflow-y: auto;
-            }
-            .ame-pitch-actions {
-                display: flex;
-                gap: 8px;
-            }
-            .ame-btn {
-                padding: 8px 16px;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: 500;
-                cursor: pointer;
-                border: none;
-                transition: all 0.15s;
-            }
-            .ame-btn-approve {
-                background: #10b981;
-                color: white;
-            }
-            .ame-btn-approve:hover {
-                background: #059669;
-            }
-            .ame-btn-skip {
-                background: #f3f4f6;
-                color: #6b7280;
-                border: 1px solid #d1d5db;
-            }
-            .ame-btn-skip:hover {
-                background: #e5e7eb;
-            }
-            .ame-btn-edit {
-                background: transparent;
-                color: #6b7280;
-                padding: 8px 12px;
-            }
-            .ame-btn-edit:hover {
-                color: #4f46e5;
-            }
+    // ========== AME AUTO-SALES ==========
+    async viewAutoSales() {
+      showToast("Loading Auto-Sales...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/queue`);
+        const data = await res.json();
+        const stats = data.stats || {};
+        const pitches = data.pitches || [];
+        
+        const statsHtml = `
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#00bfff;">${stats.queue_size || 0}</div>
+              <div style="font-size:12px; color:#888;">Queued</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#00ff88;">${stats.sent || 0}</div>
+              <div style="font-size:12px; color:#888;">Sent</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#ffcc00;">${stats.responded || 0}</div>
+              <div style="font-size:12px; color:#888;">Responses</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#ff66cc;">${stats.converted || 0}</div>
+              <div style="font-size:12px; color:#888;">Converted</div>
+            </div>
+          </div>
+          <div style="margin-bottom:16px; padding:12px; background:#0a0a0a; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:13px; color:#888;">Response Rate</span>
+              <span style="font-size:13px; font-weight:600; color:#00bfff;">${stats.response_rate || 0}%</span>
+            </div>
+            <div style="height:8px; background:#222; border-radius:4px; overflow:hidden;">
+              <div style="height:100%; width:${stats.response_rate || 0}%; background:linear-gradient(90deg,#10b981,#34d399);"></div>
+            </div>
+          </div>
         `;
-        document.head.appendChild(styles);
-    }
-    
-    document.body.appendChild(modal);
-    
-    // Load queue data
-    this.refreshAMEQueue();
-},
-
-refreshAMEQueue() {
-    fetch('/ame/queue')
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok) {
-                console.error('AME queue error:', data);
-                return;
-            }
-            
-            const stats = data.stats || {};
-            const pitches = data.pitches || [];
-            
-            // Update stats
-            document.getElementById('stat-queued').textContent = stats.queue_size || 0;
-            document.getElementById('stat-sent').textContent = stats.sent || 0;
-            document.getElementById('stat-responses').textContent = stats.responded || 0;
-            document.getElementById('stat-converted').textContent = stats.converted || 0;
-            
-            // Update response rate
-            const responseRate = stats.response_rate || 0;
-            document.getElementById('response-rate-pct').textContent = responseRate + '%';
-            document.getElementById('response-rate-bar').style.width = responseRate + '%';
-            
-            // Render queue
-            const queueEl = document.getElementById('ame-queue');
-            const emptyEl = document.getElementById('ame-empty');
-            
-            if (pitches.length === 0) {
-                queueEl.style.display = 'none';
-                emptyEl.style.display = 'block';
-            } else {
-                queueEl.style.display = 'block';
-                emptyEl.style.display = 'none';
-                queueEl.innerHTML = pitches.map(p => this.renderPitchItem(p)).join('');
-            }
-        })
-        .catch(err => {
-            console.error('Failed to load AME queue:', err);
-            document.getElementById('ame-queue').innerHTML = `
-                <div style="padding: 20px; text-align: center; color: #ef4444;">
-                    Failed to load queue. <button onclick="window.GXA.refreshAMEQueue()" style="color: #4f46e5; background: none; border: none; cursor: pointer;">Retry</button>
-                </div>
-            `;
-        });
-},
-
-renderPitchItem(pitch) {
-    const channelColors = {
-        email: { bg: '#dbeafe', color: '#1d4ed8' },
-        dm: { bg: '#fce7f3', color: '#be185d' },
-        linkedin: { bg: '#e0e7ff', color: '#4338ca' },
-        fiverr: { bg: '#d1fae5', color: '#065f46' }
-    };
-    const ch = channelColors[pitch.channel] || { bg: '#f3f4f6', color: '#374151' };
-    
-    return `
-        <div class="ame-pitch-item" data-pitch-id="${pitch.id}">
-            <div class="ame-pitch-header">
-                <div>
-                    <span class="ame-pitch-recipient">${pitch.recipient}</span>
-                    <span style="color: #9ca3af; font-size: 12px; margin-left: 8px;">
-                        ${this.timeAgo(pitch.created_at)}
-                    </span>
-                </div>
-                <span class="ame-pitch-channel" style="background: ${ch.bg}; color: ${ch.color};">
-                    ${pitch.channel}
-                </span>
+        
+        let queueHtml = '';
+        if (pitches.length === 0) {
+          queueHtml = `
+            <div style="padding:30px; text-align:center; background:#0a0a0a; border-radius:8px;">
+              <div style="font-size:32px; margin-bottom:8px;">🎯</div>
+              <div style="color:#888; margin-bottom:16px;">No pitches in queue</div>
+              <button class="btn-glow" onclick="window.GXA.generateTestPitch()">Generate Test Pitch</button>
             </div>
-            <div class="ame-pitch-message">${this.escapeHtml(pitch.message)}</div>
-            <div class="ame-pitch-actions">
-                <button class="ame-btn ame-btn-approve" onclick="window.GXA.approvePitch('${pitch.id}')">
-                    ✓ Approve & Send
-                </button>
-                <button class="ame-btn ame-btn-skip" onclick="window.GXA.skipPitch('${pitch.id}')">
-                    Skip
-                </button>
-                <button class="ame-btn ame-btn-edit" onclick="window.GXA.editPitch('${pitch.id}')">
-                    ✎ Edit
-                </button>
+          `;
+        } else {
+          queueHtml = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="margin:0; color:#00bfff;">📋 Pending Approval (${pitches.length})</h4>
+              <button class="btn-glow btn-sm" onclick="window.GXA.viewAutoSales()">↻ Refresh</button>
             </div>
-        </div>
-    `;
-},
-
-approvePitch(pitchId) {
-    const item = document.querySelector(`[data-pitch-id="${pitchId}"]`);
-    if (item) {
-        item.style.opacity = '0.5';
-        item.style.pointerEvents = 'none';
-    }
+            <div style="border:1px solid #333; border-radius:8px; overflow:hidden; max-height:300px; overflow-y:auto;">
+              ${pitches.map(p => renderPitchItem(p)).join('')}
+            </div>
+          `;
+        }
+        
+        openModal("🤖 AME Auto-Sales Dashboard", statsHtml + queueHtml);
+      } catch (err) {
+        console.error("AME error:", err);
+        openModal("🤖 AME Auto-Sales Dashboard", `
+          <p style="color:#ff6b6b;">⚠️ Failed to load AME queue</p>
+          <button class="btn-glow" onclick="window.GXA.viewAutoSales()">Retry</button>
+        `);
+      }
+    },
     
-    fetch(`/ame/approve/${pitchId}`, { method: 'POST' })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                this.showToast('✓ Pitch approved and sent!', 'success');
-                this.refreshAMEQueue();
-            } else {
-                this.showToast('Failed: ' + (data.error || 'Unknown error'), 'error');
-                if (item) {
-                    item.style.opacity = '1';
-                    item.style.pointerEvents = 'auto';
-                }
-            }
-        })
-        .catch(err => {
-            this.showToast('Network error', 'error');
-            if (item) {
-                item.style.opacity = '1';
-                item.style.pointerEvents = 'auto';
-            }
+    async approvePitch(pitchId) {
+      showToast("Approving pitch...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/approve/${pitchId}`, { method: "POST" });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("✅ Pitch approved and sent!", "success");
+          this.viewAutoSales();
+        } else {
+          showToast("❌ " + (data.error || "Failed"), "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async skipPitch(pitchId) {
+      try {
+        const res = await fetch(`${BASE}/ame/skip/${pitchId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "user_skipped" })
         });
-},
-
-skipPitch(pitchId) {
-    const item = document.querySelector(`[data-pitch-id="${pitchId}"]`);
-    if (item) {
-        item.style.opacity = '0.5';
-    }
+        const data = await res.json();
+        if (data.ok) {
+          showToast("Pitch skipped", "info");
+          this.viewAutoSales();
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
     
-    fetch(`/ame/skip/${pitchId}`, { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'user_skipped' })
-    })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                this.showToast('Pitch skipped', 'info');
-                this.refreshAMEQueue();
-            }
+    async editPitch(pitchId) {
+      try {
+        const res = await fetch(`${BASE}/ame/pitch/${pitchId}`);
+        const data = await res.json();
+        if (!data.ok) return;
+        const newMessage = prompt("Edit pitch message:", data.pitch.message);
+        if (newMessage && newMessage !== data.pitch.message) {
+          const editRes = await fetch(`${BASE}/ame/edit/${pitchId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: newMessage })
+          });
+          const editData = await editRes.json();
+          if (editData.ok) {
+            showToast("✅ Pitch updated", "success");
+            this.viewAutoSales();
+          }
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
+    
+    async generateTestPitch() {
+      showToast("Generating test pitch...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recipient: "demo@example.com",
+            channel: "email",
+            context: { offer: "AI-powered automation", match_reason: "Based on your profile" },
+            originator: "manual_test"
+          })
         });
-},
-
-editPitch(pitchId) {
-    // Fetch current pitch
-    fetch(`/ame/pitch/${pitchId}`)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.ok) return;
-            
-            const pitch = data.pitch;
-            const newMessage = prompt('Edit pitch message:', pitch.message);
-            
-            if (newMessage && newMessage !== pitch.message) {
-                fetch(`/ame/edit/${pitchId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: newMessage })
-                })
-                    .then(r => r.json())
-                    .then(res => {
-                        if (res.ok) {
-                            this.showToast('Pitch updated', 'success');
-                            this.refreshAMEQueue();
-                        }
-                    });
-            }
-        });
-},
-
-generateNewPitches() {
-    this.showToast('Generating pitches from recent matches...', 'info');
+        const data = await res.json();
+        if (data.ok) {
+          showToast("✅ Test pitch generated!", "success");
+          this.viewAutoSales();
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
     
-    // This would typically call your MetaBridge to get matches,
-    // then POST to /ame/generate-from-matches
-    // For now, show a placeholder
-    fetch('/ame/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            recipient: 'demo@example.com',
-            channel: 'email',
-            context: {
-                offer: 'AI-powered marketing automation',
-                match_reason: 'Based on your recent activity'
-            },
-            originator: 'manual_test'
-        })
-    })
-        .then(r => r.json())
-        .then(data => {
-            if (data.ok) {
-                this.showToast('Test pitch generated!', 'success');
-                this.refreshAMEQueue();
-            }
-        });
-},
-
-// Helper functions
-timeAgo(isoString) {
-    if (!isoString) return '';
-    const date = new Date(isoString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-    
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
-    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
-    return Math.floor(seconds / 86400) + 'd ago';
-},
-
-escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>"']/g, m => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
-    }[m]));
-},
-
-showToast(message, type = 'info') {
-    const colors = {
-        success: '#10b981',
-        error: '#ef4444',
-        info: '#6b7280'
-    };
-    
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: ${colors[type] || colors.info};
-        color: white;
-        border-radius: 8px;
-        font-size: 14px;
-        z-index: 10001;
-        animation: slideIn 0.3s ease;
-    `;
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.3s';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-    // 💼 Browse Deals - Opens Intent Exchange
+    // ========== OTHER ACTIONS ==========
     browseDeals() {
       openModal("Browse Deals", `
         <p style="color:#ccc; margin-bottom:12px;">Active opportunities you can claim:</p>
@@ -1917,49 +1578,39 @@ showToast(message, type = 'info') {
           <div style="color:#00bfff; font-weight:600;">No active deals yet</div>
           <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">When buyers post needs matching your skills, they'll appear here.</p>
         </div>
-        <p style="font-size:0.85rem; color:#888;">Intent Exchange browser coming soon!</p>
+        <p style="font-size:0.85rem; color:#888;">Intent Exchange browser coming in Task 5!</p>
       `);
     },
-
-    // 👥 Find Partners - MetaBridge matching
+    
     findPartners() {
       openModal("Find Partners", `
-        <p style="color:#ccc; margin-bottom:12px;">Team up with other businesses for bigger projects:</p>
+        <p style="color:#ccc; margin-bottom:12px;">Team up with other businesses:</p>
         <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
-          <div style="color:#00bfff; font-weight:600;">Partner Matching</div>
-          <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">Find complementary businesses to create joint offerings and split revenue.</p>
+          <p style="font-size:0.85rem; color:#888;">Find complementary businesses to create joint offerings.</p>
         </div>
         <button class="btn-glow" onclick="GXA.createJV()" style="width:100%;">🤝 Create Partnership</button>
       `);
     },
-
-    // 📊 View Pipeline - Deal stages
+    
     viewPipeline() {
       const user = window.aigentsyUser || {};
       const oracle = user.outcomeOracle || { clicked: 0, authorized: 0, delivered: 0, paid: 0 };
-      
       openModal("Deal Pipeline", `
-        <p style="color:#ccc; margin-bottom:12px;">Track your deals from first contact to payment:</p>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #888;">
-            <span>🔍 Leads</span>
-            <span style="font-weight:700;">${oracle.clicked || 0}</span>
+            <span>🔍 Leads</span><span style="font-weight:700;">${oracle.clicked || 0}</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #ffcc00;">
-            <span>💬 In Discussion</span>
-            <span style="font-weight:700;">${Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0))}</span>
+            <span>💬 In Discussion</span><span style="font-weight:700;">${Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0))}</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00bfff;">
-            <span>✅ Won</span>
-            <span style="font-weight:700;">${oracle.authorized || 0}</span>
+            <span>✅ Won</span><span style="font-weight:700;">${oracle.authorized || 0}</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #9966ff;">
-            <span>🚀 In Progress</span>
-            <span style="font-weight:700;">${oracle.delivered || 0}</span>
+            <span>🚀 In Progress</span><span style="font-weight:700;">${oracle.delivered || 0}</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00ffcc;">
-            <span>✓ Completed</span>
-            <span style="font-weight:700;">${oracle.paid || 0}</span>
+            <span>✓ Completed</span><span style="font-weight:700;">${oracle.paid || 0}</span>
           </div>
         </div>
       `);
