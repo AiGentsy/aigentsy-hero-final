@@ -165,74 +165,82 @@
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
   <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
   <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>💼 Service Payments</span>
-      <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🛍️ Shopify Sales</span>
-      <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>📱 Affiliate Commissions</span>
-      <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>🎥 Content CPM</span>
-      <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-      <span>💎 Staking Returns</span>
-      <span style="color:#00ff88;">$<span id="stakingEarnings">0.00</span></span>
-    </div>
-    <div style="display:flex; justify-content:space-between; padding:4px 0;">
-      <span>🤝 JV Splits</span>
-      <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
-    </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🤖 Auto-Sales</span>
+    <span style="color:#00ff88;">$<span id="ameEarnings">0.00</span></span>
   </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💼 Claimed Deals</span>
+    <span style="color:#00ff88;">$<span id="intentEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>👥 Partnerships</span>
+    <span style="color:#00ff88;">$<span id="partnershipEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💼 Service Payments</span>
+    <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🛍️ Shopify Sales</span>
+    <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>📱 Affiliate Commissions</span>
+    <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🎥 Content CPM</span>
+    <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0;">
+    <span>🤝 JV Splits</span>
+    <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
+  </div>
+</div>
 </div>
 
 <div id="compactSnapshot" class="metric-box">
   <h3>🧭 Compact Snapshot</h3>
   <div class="csn-grid">
     <div class="csn-tile"><div class="csn-label">Proposals</div><div id="csnProposals" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Intents</div><div id="csnIntents" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Quotes</div><div id="csnQuotes" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Escrow</div><div id="csnEscrow" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">AIGx</div><div id="csnAIGx" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">OutcomeScore</div><div id="csnOS" class="csn-value">—</div></div>
+    <div class="csn-tile"><div class="csn-label">Leads</div><div id="csnLeads" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Won</div><div id="csnWon" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">In Progress</div><div id="csnInProgress" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Completed</div><div id="csnCompleted" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Revenue</div><div id="csnRevenue" class="csn-value">$0</div></div>
   </div>
   <button id="toggleSnapshotDetails" class="btn-glow" style="margin-top:10px;">Show details</button>
   <div id="snapshotDetails" style="display:none; margin-top:12px;">
     <div class="csn-details">
       <div class="csn-detail">
-        <h4 style="color:#00bfff;margin-bottom:6px;">📊 AiGentsy Snapshot</h4>
+        <h4 style="color:#00bfff;margin-bottom:6px;">📊 Deal Pipeline</h4>
         <ul style="padding-left:18px;margin:0;">
-          <li>🔁 Remix Count: <span id="snapshotRemix">0</span></li>
-          <li>🧬 Clone Lineage: <span id="snapshotLineage">0</span></li>
-          <li>🧑‍💼 New Clients: <span id="snapshotClients">0</span></li>
-          <li>💰 AIGx Earned: <span id="snapshotAigx">+0</span></li>
-          <li>🚀 Deployments: <span id="snapshotDeploy">0</span></li>
-          <li>📦 Real-World Services: <span id="snapshotServices">0</span></li>
+          <li>🔍 Leads: <span id="pipelineLeads">0</span></li>
+          <li>💬 In Discussion: <span id="pipelineDiscussing">0</span></li>
+          <li>✅ Won: <span id="pipelineWon">0</span></li>
+          <li>🚀 In Progress: <span id="pipelineInProgress">0</span></li>
+          <li>✓ Completed: <span id="pipelineCompleted">0</span></li>
         </ul>
       </div>
       <div class="csn-detail">
-        <h4 style="color:#00bfff;margin-bottom:6px;">🌱 Growth & Deployment</h4>
+        <h4 style="color:#00bfff;margin-bottom:6px;">💰 Revenue Sources</h4>
         <ul style="padding-left:18px;margin:0;">
-          <li>🧑‍💼 Clients: <span id="growthClients">0</span></li>
-          <li>🔗 Referrals: <span id="growthReferrals">0</span></li>
-          <li>🚀 Deployments: <span id="growthDeployments">0</span></li>
-          <li>📡 Integrations: <span id="growthIntegrations">0</span></li>
-          <li>📊 Live Status: <span id="growthStatus">—</span></li>
+          <li>🤖 Auto-Sales: $<span id="revAutoSales">0</span></li>
+          <li>💼 Claimed Deals: $<span id="revClaimedDeals">0</span></li>
+          <li>👥 Partnerships: $<span id="revPartnerships">0</span></li>
+          <li>📦 Products: $<span id="revProducts">0</span></li>
+          <li>🎯 Services: $<span id="revServices">0</span></li>
         </ul>
       </div>
       <div class="csn-detail">
-        <h4 style="color:#00bfff;margin-bottom:6px;">💼 Real-World Earnings</h4>
+        <h4 style="color:#00bfff;margin-bottom:6px;">📈 Business Growth</h4>
         <ul style="padding-left:18px;margin:0;">
-          <li>🧾 Services Rendered: <span id="earningsServices">0</span></li>
-          <li>🧑‍💼 Clients: <span id="earningsClients">0</span></li>
-          <li>🏦 Fiat Eligible: <span id="earningsFiat">—</span></li>
-          <li>💰 AIGx Earned (Real-World): <span id="earningsAigx">+0</span></li>
+          <li>🤝 Active Clients: <span id="growthClients">0</span></li>
+          <li>📧 Proposals Sent: <span id="growthProposals">0</span></li>
+          <li>📊 Close Rate: <span id="growthCloseRate">0</span>%</li>
+          <li>💵 Avg Deal Size: $<span id="growthAvgDeal">0</span></li>
+          <li>🔄 Repeat Rate: <span id="growthRepeatRate">0</span>%</li>
         </ul>
       </div>
     </div>
@@ -250,7 +258,7 @@
   <header>
     <h3>Actions</h3>
     <div>
-      <span id="gxOutcomeChip" class="gx-chip">OS: —</span>
+      <span id="gxOutcomeChip" class="gx-chip">Deals: —</span>
       <button id="gxClose" class="gx-chip" style="background:#333;cursor:pointer;">✕</button>
     </div>
   </header>
@@ -261,26 +269,20 @@
   </div>
   <div class="grp">
     <h4>Sell</h4>
-    <button onclick="GXA.quickIntent()">⚡ Quick Intent (90s)</button>
-    <button onclick="GXA.productizeUrl()">🧪 Productize URL</button>
+    <button onclick="GXA.viewAutoSales()">🤖 View Auto-Sales</button>
+    <button onclick="GXA.browseDeals()">💼 Browse Deals</button>
     <button onclick="GXA.instantQuote()">💳 Instant Quote / Escrow</button>
-  </div>
-  <div class="grp">
-    <h4>Deliver</h4>
-    <button onclick="GXA.issuePoO()">🏅 Proof‑of‑Outcome</button>
-    <button onclick="GXA.bindMedia()">🎞️ Bind Media ↔ Offer</button>
-    <button onclick="GXA.localizeOffer()">🌐 Localize Offer</button>
   </div>
   <div class="grp">
     <h4>Earnings & Payouts</h4>
     <button onclick="GXA.registerBusiness()">🏢 Register Business</button>
-    <button onclick="GXA.createJV()">🤝 Create JV</button>
+    <button onclick="GXA.createJV()">🤝 Create Partnership</button>
     <button onclick="GXA.payout()">💸 Payout</button>
   </div>
   <div class="grp">
     <h4>Grow</h4>
-    <button onclick="GXA.createTeam()">🧩 Create Team Bundle</button>
-    <button onclick="GXA.scheduleRetarget()">📣 Schedule Retargeter</button>
+    <button onclick="GXA.findPartners()">👥 Find Partners</button>
+    <button onclick="GXA.viewPipeline()">📊 View Pipeline</button>
     <button onclick="GXA.openMarket()">🏬 Marketplace Top 20</button>
   </div>
 </aside>
@@ -648,20 +650,43 @@ async function injectUserDashboard() {
 }
 
 function updateSnapshotData(user) {
-  document.getElementById("csnProposals").textContent = (user.proposals || []).length;
-  document.getElementById("csnIntents").textContent = (user.orders || []).length;
-  document.getElementById("csnQuotes").textContent = (user.invoices || []).length;
-  document.getElementById("csnAIGx").textContent = user.yield?.aigxEarned || 0;
-  document.getElementById("snapshotRemix").textContent = user.remix?.remixCount || 0;
-  document.getElementById("snapshotLineage").textContent = (user.cloneLineage || []).length;
-  document.getElementById("snapshotClients").textContent = (user.contacts || []).length;
-  document.getElementById("snapshotAigx").textContent = "+" + (user.yield?.aigxEarned || 0);
-  document.getElementById("snapshotServices").textContent = (user.offerings?.products || []).length;
-  document.getElementById("growthClients").textContent = (user.contacts || []).length;
-  document.getElementById("growthReferrals").textContent = (user.cloneLineage || []).length;
-  document.getElementById("earningsServices").textContent = (user.offerings?.products || []).length;
-  document.getElementById("earningsClients").textContent = (user.contacts || []).length;
-  document.getElementById("earningsAigx").textContent = "+" + (user.yield?.aigxEarned || 0);
+  const oracle = user.outcomeOracle || { clicked: 0, authorized: 0, delivered: 0, paid: 0 };
+  const revenue = user.revenue || { total: 0, bySource: {} };
+  const proposals = (user.proposals || []).length;
+  const clients = (user.contacts || []).length;
+  
+  // TOP TILES
+  document.getElementById("csnProposals").textContent = proposals;
+  document.getElementById("csnLeads").textContent = oracle.clicked || 0;
+  document.getElementById("csnWon").textContent = oracle.authorized || 0;
+  document.getElementById("csnInProgress").textContent = oracle.delivered || 0;
+  document.getElementById("csnCompleted").textContent = oracle.paid || 0;
+  document.getElementById("csnRevenue").textContent = "$" + (revenue.total || 0).toLocaleString();
+  
+  // COLLAPSIBLE - Deal Pipeline
+  document.getElementById("pipelineLeads").textContent = oracle.clicked || 0;
+  document.getElementById("pipelineDiscussing").textContent = Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0));
+  document.getElementById("pipelineWon").textContent = oracle.authorized || 0;
+  document.getElementById("pipelineInProgress").textContent = oracle.delivered || 0;
+  document.getElementById("pipelineCompleted").textContent = oracle.paid || 0;
+  
+  // COLLAPSIBLE - Revenue Sources
+  document.getElementById("revAutoSales").textContent = (revenue.bySource?.ame || 0).toLocaleString();
+  document.getElementById("revClaimedDeals").textContent = (revenue.bySource?.intentExchange || 0).toLocaleString();
+  document.getElementById("revPartnerships").textContent = (revenue.bySource?.jvMesh || 0).toLocaleString();
+  document.getElementById("revProducts").textContent = (revenue.bySource?.products || 0).toLocaleString();
+  document.getElementById("revServices").textContent = (revenue.bySource?.services || 0).toLocaleString();
+  
+  // COLLAPSIBLE - Growth Metrics
+  const won = oracle.authorized || 0;
+  const closeRate = proposals > 0 ? Math.round((won / proposals) * 100) : 0;
+  const avgDeal = won > 0 ? Math.round((revenue.total || 0) / won) : 0;
+  
+  document.getElementById("growthClients").textContent = clients;
+  document.getElementById("growthProposals").textContent = proposals;
+  document.getElementById("growthCloseRate").textContent = closeRate;
+  document.getElementById("growthAvgDeal").textContent = avgDeal.toLocaleString();
+  document.getElementById("growthRepeatRate").textContent = 0; // TODO: Calculate from repeat clients
 }
 
 function renderOfferingsWithData(user) {
@@ -1464,6 +1489,87 @@ window.GXA = (() => {
         console.error("Market error:", err);
         showToast("⚠️ Connection error", "error");
       }
+    },
+        // 🤖 View Auto-Sales - Opens AME dashboard
+    viewAutoSales() {
+      openModal("Auto-Sales Dashboard", `
+        <p style="color:#ccc; margin-bottom:12px;">Your AI is finding customers automatically. Here's what's happening:</p>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; margin-bottom:16px;">
+          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
+            <div style="font-size:0.8rem; color:#888;">Pitches Sent</div>
+            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
+          </div>
+          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
+            <div style="font-size:0.8rem; color:#888;">Responses</div>
+            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
+          </div>
+          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00bfff;">
+            <div style="font-size:0.8rem; color:#888;">Conversations</div>
+            <div style="font-size:1.4rem; font-weight:700; color:#fff;">0</div>
+          </div>
+          <div style="background:#0a0a0a; padding:12px; border-radius:8px; border-left:3px solid #00ffcc;">
+            <div style="font-size:0.8rem; color:#888;">Deals Closed</div>
+            <div style="font-size:1.4rem; font-weight:700; color:#00ffcc;">0</div>
+          </div>
+        </div>
+        <p style="font-size:0.85rem; color:#888;">Full AME dashboard coming soon!</p>
+      `);
+    },
+
+    // 💼 Browse Deals - Opens Intent Exchange
+    browseDeals() {
+      openModal("Browse Deals", `
+        <p style="color:#ccc; margin-bottom:12px;">Active opportunities you can claim:</p>
+        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
+          <div style="color:#00bfff; font-weight:600;">No active deals yet</div>
+          <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">When buyers post needs matching your skills, they'll appear here.</p>
+        </div>
+        <p style="font-size:0.85rem; color:#888;">Intent Exchange browser coming soon!</p>
+      `);
+    },
+
+    // 👥 Find Partners - MetaBridge matching
+    findPartners() {
+      openModal("Find Partners", `
+        <p style="color:#ccc; margin-bottom:12px;">Team up with other businesses for bigger projects:</p>
+        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
+          <div style="color:#00bfff; font-weight:600;">Partner Matching</div>
+          <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">Find complementary businesses to create joint offerings and split revenue.</p>
+        </div>
+        <button class="btn-glow" onclick="GXA.createJV()" style="width:100%;">🤝 Create Partnership</button>
+      `);
+    },
+
+    // 📊 View Pipeline - Deal stages
+    viewPipeline() {
+      const user = window.aigentsyUser || {};
+      const oracle = user.outcomeOracle || { clicked: 0, authorized: 0, delivered: 0, paid: 0 };
+      
+      openModal("Deal Pipeline", `
+        <p style="color:#ccc; margin-bottom:12px;">Track your deals from first contact to payment:</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #888;">
+            <span>🔍 Leads</span>
+            <span style="font-weight:700;">${oracle.clicked || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #ffcc00;">
+            <span>💬 In Discussion</span>
+            <span style="font-weight:700;">${Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0))}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00bfff;">
+            <span>✅ Won</span>
+            <span style="font-weight:700;">${oracle.authorized || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #9966ff;">
+            <span>🚀 In Progress</span>
+            <span style="font-weight:700;">${oracle.delivered || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00ffcc;">
+            <span>✓ Completed</span>
+            <span style="font-weight:700;">${oracle.paid || 0}</span>
+          </div>
+        </div>
+      `);
     }
   };
 })();
