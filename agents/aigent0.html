@@ -271,7 +271,7 @@
     <h4>Sell</h4>
     <button onclick="GXA.viewAutoSales()">🤖 View Auto-Sales</button>
     <button onclick="GXA.browseDeals()">💼 Browse Deals</button>
-    <button onclick="viewIntentExchange()">💼 Intent Exchange</button>
+    <button onclick="viewIntentExchange()">💼 Contracts</button>
     <button onclick="GXA.instantQuote()">💳 Instant Quote / Escrow</button>
   </div>
   <div class="grp">
@@ -917,9 +917,8 @@ function openProposalInboxModal() {
 }
 
 async function viewIntentExchange() {
-    // Use the modal like other GXA actions
     const modalBody = document.getElementById('gxModalBody');
-    document.getElementById('gxModalTitle').textContent = '💼 Intent Exchange';
+    document.getElementById('gxModalTitle').textContent = '💼 Contracts';
     document.getElementById('gxModal').classList.add('open');
     
     modalBody.innerHTML = '<div style="text-align:center; padding:20px;"><div style="color:#888;">Loading...</div></div>';
@@ -927,33 +926,36 @@ async function viewIntentExchange() {
     try {
         const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'user';
         
-        // Fetch user's intents
         const response = await fetch(`${window.BACKEND_BASE}/intent/list`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
         
-        if (!response.ok) throw new Error('Failed to fetch intents');
+        if (!response.ok) throw new Error('Failed to fetch contracts');
         
         const data = await response.json();
         const allIntents = data.intents || [];
         
-        // Separate intents by role
         const asAgent = allIntents.filter(i => i.claimed_by === username);
         const asBuyer = allIntents.filter(i => i.from === username);
         
-        // Count by status
         const needsAction = asAgent.filter(i => i.status === 'AWARDED').length + 
                            asBuyer.filter(i => i.status === 'AWARDED').length;
         const active = allIntents.filter(i => ['AUCTION', 'AWARDED'].includes(i.status)).length;
         const settled = allIntents.filter(i => i.status === 'SETTLED').length;
         
-        // Calculate total earned (as agent)
         const totalEarned = asAgent
             .filter(i => i.status === 'SETTLED')
             .reduce((sum, i) => sum + (i.price_usd || 0), 0);
         
         modalBody.innerHTML = `
+            <!-- Friendly Description -->
+            <div style="color: #888; font-size: 0.92rem; line-height: 1.5; margin-bottom: 20px; 
+                       padding: 12px; background: rgba(139, 92, 246, 0.05); border-left: 3px solid #8b5cf6; border-radius: 6px;">
+                🤖 Your agents find and bid on work automatically. 
+                Review completed deliveries here and approve to release payment.
+            </div>
+            
             <!-- Quick Stats -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
                 <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; 
@@ -1026,10 +1028,10 @@ async function viewIntentExchange() {
         `;
         
     } catch (error) {
-        console.error('Intent Exchange error:', error);
+        console.error('Contracts error:', error);
         modalBody.innerHTML = `
             <div style="text-align: center; padding: 40px 20px;">
-                <h3 style="color: #ef4444;">Error Loading Intents</h3>
+                <h3 style="color: #ef4444;">Error Loading Contracts</h3>
                 <p style="color: #888; margin-top: 10px;">${error.message}</p>
                 <button class="btn-glow" onclick="viewIntentExchange()" style="margin-top: 20px;">
                     Retry
