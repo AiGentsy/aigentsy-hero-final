@@ -917,12 +917,18 @@ function openProposalInboxModal() {
 }
 
 async function viewIntentExchange() {
-    const drawer = document.getElementById('action-drawer-content');
-    drawer.innerHTML = '<div class="loading-dots"><span>.</span><span>.</span><span>.</span></div>';
+    // Use the modal like other GXA actions
+    const modalBody = document.getElementById('gxModalBody');
+    document.getElementById('gxModalTitle').textContent = '💼 Intent Exchange';
+    document.getElementById('gxModal').classList.add('open');
+    
+    modalBody.innerHTML = '<div style="text-align:center; padding:20px;"><div style="color:#888;">Loading...</div></div>';
     
     try {
-        // Fetch user's intents (as buyer and agent)
-        const response = await fetch(`${window.GXA.baseURL}/intent/list`, {
+        const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'user';
+        
+        // Fetch user's intents
+        const response = await fetch(`${window.BACKEND_BASE}/intent/list`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' }
         });
@@ -931,7 +937,6 @@ async function viewIntentExchange() {
         
         const data = await response.json();
         const allIntents = data.intents || [];
-        const username = window.user?.username || 'user';
         
         // Separate intents by role
         const asAgent = allIntents.filter(i => i.claimed_by === username);
@@ -948,11 +953,7 @@ async function viewIntentExchange() {
             .filter(i => i.status === 'SETTLED')
             .reduce((sum, i) => sum + (i.price_usd || 0), 0);
         
-        drawer.innerHTML = `
-            <h2 style="color: #8b5cf6; font-size: 1.8rem; margin-bottom: 20px;">
-                💼 Intent Exchange
-            </h2>
-            
+        modalBody.innerHTML = `
             <!-- Quick Stats -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
                 <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; 
@@ -983,7 +984,9 @@ async function viewIntentExchange() {
                     <h3 style="color: #eab308; font-size: 1.3rem; margin-bottom: 15px;">
                         ⏳ Needs Your Action (${needsAction})
                     </h3>
-                    ${renderNeedsActionIntents(asAgent, asBuyer)}
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${renderNeedsActionIntents(asAgent, asBuyer)}
+                    </div>
                 </div>
             ` : ''}
             
@@ -993,7 +996,9 @@ async function viewIntentExchange() {
                     <h3 style="color: #8b5cf6; font-size: 1.3rem; margin-bottom: 15px;">
                         📋 Active Contracts (${active})
                     </h3>
-                    ${renderActiveIntents(allIntents.filter(i => ['AUCTION', 'AWARDED'].includes(i.status)), username)}
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        ${renderActiveIntents(allIntents.filter(i => ['AUCTION', 'AWARDED'].includes(i.status)), username)}
+                    </div>
                 </div>
             ` : ''}
             
@@ -1003,7 +1008,9 @@ async function viewIntentExchange() {
                     <h3 style="color: #22c55e; font-size: 1.3rem; margin-bottom: 15px;">
                         ✅ Recent Settlements (${Math.min(settled, 5)})
                     </h3>
-                    ${renderSettledIntents(allIntents.filter(i => i.status === 'SETTLED').slice(0, 5))}
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        ${renderSettledIntents(allIntents.filter(i => i.status === 'SETTLED').slice(0, 5))}
+                    </div>
                 </div>
             ` : ''}
             
@@ -1020,307 +1027,16 @@ async function viewIntentExchange() {
         
     } catch (error) {
         console.error('Intent Exchange error:', error);
-        drawer.innerHTML = `
-            <h2 style="color: #ef4444;">Error Loading Intents</h2>
-            <p style="color: #888;">${error.message}</p>
-        `;
-    }
-}
-
-function renderNeedsActionIntents(asAgent, asBuyer) {
-    const awarded = [...asAgent, ...asBuyer].filter(i => i.status === 'AWARDED');
-    
-    return awarded.map(intent => {
-        const role = intent.claimed_by === (window.user?.username || 'user') ? 'agent' : 'buyer';
-        const actionText = role === 'buyer' ? 'Review Delivery' : 'Awaiting Buyer Review';
-        const actionColor = role === 'buyer' ? '#eab308' : '#888';
-        
-        return `
-            <div style="background: rgba(30, 30, 30, 0.8); border: 2px solid ${actionColor}; 
-                       border-radius: 8px; padding: 20px; margin-bottom: 15px;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                    <div>
-                        <div style="color: ${actionColor}; font-size: 0.85rem; margin-bottom: 5px;">
-                            ${role === 'buyer' ? '🛒 You Requested' : '⚙️ You\'re Delivering'}
-                        </div>
-                        <div style="color: #fff; font-size: 1.1rem; font-weight: bold;">
-                            ${intent.intent?.brief || 'Contract'}
-                        </div>
-                        <div style="color: #888; font-size: 0.9rem; margin-top: 5px;">
-                            ${role === 'buyer' ? `Agent: ${intent.claimed_by}` : `Buyer: ${intent.from}`}
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: #22c55e; font-size: 1.3rem; font-weight: bold;">
-                            $${intent.price_usd || 0}
-                        </div>
-                        <div style="color: #888; font-size: 0.85rem;">
-                            ${intent.delivery_hours || 0}h delivery
-                        </div>
-                    </div>
-                </div>
-                
-                ${role === 'buyer' ? `
-                    <button onclick="openReviewModal('${intent.id}')" 
-                            style="background: #eab308; color: #000; border: none; 
-                                   padding: 12px 20px; border-radius: 6px; cursor: pointer; 
-                                   width: 100%; font-weight: bold; font-size: 1rem;">
-                        📋 Review Delivery
-                    </button>
-                ` : `
-                    <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; 
-                               border-radius: 6px; padding: 12px; text-align: center; color: #8b5cf6;">
-                        Waiting for buyer to review your work
-                    </div>
-                `}
-            </div>
-        `;
-    }).join('');
-}
-
-function renderActiveIntents(intents, username) {
-    return intents.map(intent => {
-        const role = intent.claimed_by === username ? 'agent' : (intent.from === username ? 'buyer' : 'auction');
-        const statusColor = intent.status === 'AUCTION' ? '#6366f1' : '#8b5cf6';
-        
-        return `
-            <div style="background: rgba(30, 30, 30, 0.8); border: 2px solid ${statusColor}; 
-                       border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div style="flex: 1;">
-                        <div style="color: ${statusColor}; font-size: 0.85rem; margin-bottom: 5px;">
-                            ${intent.status === 'AUCTION' ? '🔨 Auction' : '⚙️ In Progress'}
-                            ${role !== 'auction' ? ` • ${role === 'buyer' ? 'You Requested' : 'You\'re Delivering'}` : ''}
-                        </div>
-                        <div style="color: #fff; font-weight: bold;">
-                            ${intent.intent?.brief || 'Contract'}
-                        </div>
-                        <div style="color: #888; font-size: 0.85rem; margin-top: 5px;">
-                            ${intent.status === 'AUCTION' 
-                                ? `Ends: ${new Date(intent.auction_ends_at).toLocaleString()}`
-                                : `Claimed by: ${intent.claimed_by}`}
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: #22c55e; font-size: 1.1rem; font-weight: bold;">
-                            $${intent.escrow_usd || intent.price_usd || 0}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function renderSettledIntents(intents) {
-    return intents.map(intent => {
-        return `
-            <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; 
-                       border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="flex: 1;">
-                        <div style="color: #22c55e; font-size: 0.85rem; margin-bottom: 5px;">
-                            ✅ Completed
-                        </div>
-                        <div style="color: #fff; font-weight: bold;">
-                            ${intent.intent?.brief || 'Contract'}
-                        </div>
-                        <div style="color: #888; font-size: 0.85rem; margin-top: 5px;">
-                            ${new Date(intent.delivered_at || intent.created_at).toLocaleDateString()}
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color: #22c55e; font-size: 1.1rem; font-weight: bold;">
-                            $${intent.price_usd || 0}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-async function openReviewModal(intentId) {
-    try {
-        // Fetch full intent details
-        const response = await fetch(`${window.GXA.baseURL}/intent/${intentId}`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (!response.ok) throw new Error('Failed to fetch intent details');
-        
-        const data = await response.json();
-        const intent = data.intent;
-        
-        // Create modal
-        const modal = document.createElement('div');
-        modal.id = 'review-modal';
-        modal.style.cssText = `
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.9); z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        `;
-        
-        modal.innerHTML = `
-            <div style="background: #1a1a1a; border: 2px solid #8b5cf6; border-radius: 12px; 
-                       max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 30px;">
-                
-                <h2 style="color: #8b5cf6; margin-bottom: 20px;">📋 Review Delivery</h2>
-                
-                <div style="background: rgba(30, 30, 30, 0.8); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                    <div style="color: #888; font-size: 0.85rem; margin-bottom: 5px;">Contract</div>
-                    <div style="color: #fff; font-size: 1.3rem; font-weight: bold; margin-bottom: 15px;">
-                        ${intent.intent?.brief || 'Untitled'}
-                    </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
-                        <div>
-                            <div style="color: #888; font-size: 0.85rem;">Agent</div>
-                            <div style="color: #fff; font-weight: bold;">${intent.claimed_by}</div>
-                        </div>
-                        <div>
-                            <div style="color: #888; font-size: 0.85rem;">Payment</div>
-                            <div style="color: #22c55e; font-weight: bold; font-size: 1.2rem;">$${intent.price_usd}</div>
-                        </div>
-                        <div>
-                            <div style="color: #888; font-size: 0.85rem;">Delivery Time</div>
-                            <div style="color: #fff; font-weight: bold;">${intent.delivery_hours}h</div>
-                        </div>
-                        <div>
-                            <div style="color: #888; font-size: 0.85rem;">Escrow</div>
-                            <div style="color: #eab308; font-weight: bold;">$${intent.escrow_usd} locked</div>
-                        </div>
-                    </div>
-                    
-                    ${intent.intent?.description ? `
-                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; margin-top: 15px;">
-                            <div style="color: #888; font-size: 0.85rem; margin-bottom: 5px;">Original Request</div>
-                            <div style="color: #ccc; font-size: 0.95rem;">${intent.intent.description}</div>
-                        </div>
-                    ` : ''}
-                </div>
-                
-                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; 
-                           border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                    <div style="color: #8b5cf6; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">
-                        💡 What happens when you approve?
-                    </div>
-                    <ul style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin: 0; padding-left: 20px;">
-                        <li>Escrow ($${intent.escrow_usd}) releases to agent</li>
-                        <li>Agent's performance bond returns + SLA bonus</li>
-                        <li>Contract marked as completed</li>
-                        <li>20% auto-reinvested via R³</li>
-                    </ul>
-                </div>
-                
-                <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; 
-                           border-radius: 8px; padding: 20px; margin-bottom: 30px;">
-                    <div style="color: #ef4444; font-size: 1.1rem; font-weight: bold; margin-bottom: 10px;">
-                        ⚠️ What happens if you dispute?
-                    </div>
-                    <ul style="color: #ccc; font-size: 0.9rem; line-height: 1.6; margin: 0; padding-left: 20px;">
-                        <li>Escrow held pending admin review</li>
-                        <li>Agent's bond slashed based on severity</li>
-                        <li>Resolution within 48 hours</li>
-                        <li>Partial/full refund possible</li>
-                    </ul>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <button onclick="approveDelivery('${intent.id}')" 
-                            style="background: #22c55e; color: #000; border: none; 
-                                   padding: 15px; border-radius: 8px; cursor: pointer; 
-                                   font-weight: bold; font-size: 1.1rem;">
-                        ✅ Approve & Release
-                    </button>
-                    <button onclick="disputeDelivery('${intent.id}')" 
-                            style="background: #ef4444; color: #fff; border: none; 
-                                   padding: 15px; border-radius: 8px; cursor: pointer; 
-                                   font-weight: bold; font-size: 1.1rem;">
-                        ⚠️ Dispute
-                    </button>
-                </div>
-                
-                <button onclick="closeReviewModal()" 
-                        style="background: transparent; color: #888; border: 2px solid #444; 
-                               padding: 12px; border-radius: 8px; cursor: pointer; 
-                               width: 100%; margin-top: 15px;">
-                    Cancel
+        modalBody.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <h3 style="color: #ef4444;">Error Loading Intents</h3>
+                <p style="color: #888; margin-top: 10px;">${error.message}</p>
+                <button class="btn-glow" onclick="viewIntentExchange()" style="margin-top: 20px;">
+                    Retry
                 </button>
             </div>
         `;
-        
-        document.body.appendChild(modal);
-        
-    } catch (error) {
-        console.error('Failed to open review modal:', error);
-        alert('Failed to load delivery details. Please try again.');
     }
-}
-
-async function approveDelivery(intentId) {
-    const confirmApprove = confirm('Approve this delivery? Escrow will be released to the agent.');
-    if (!confirmApprove) return;
-    
-    try {
-        const response = await fetch(`${window.GXA.baseURL}/intent/verify_poo`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                intent_id: intentId,
-                poo_id: `poo_${Date.now()}`,
-                approved: true,
-                feedback: 'Approved via dashboard'
-            })
-        });
-        
-        if (!response.ok) throw new Error('Failed to approve delivery');
-        
-        const result = await response.json();
-        
-        alert(`✅ Delivery approved!\n\nEscrow released: $${result.escrow_released}\nBonus awarded: ${result.sla_bonus} AIGx`);
-        
-        closeReviewModal();
-        viewIntentExchange(); // Refresh the view
-        
-    } catch (error) {
-        console.error('Approval failed:', error);
-        alert('Failed to approve delivery. Please try again.');
-    }
-}
-
-async function disputeDelivery(intentId) {
-    const reason = prompt('Why are you disputing this delivery?\n\n(This will be reviewed by admin within 48h)');
-    if (!reason) return;
-    
-    try {
-        const response = await fetch(`${window.GXA.baseURL}/intent/dispute`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                intent_id: intentId,
-                reason: reason
-            })
-        });
-        
-        if (!response.ok) throw new Error('Failed to open dispute');
-        
-        alert('⚠️ Dispute opened. Escrow is held pending admin review.\n\nYou\'ll be notified of the resolution within 48 hours.');
-        
-        closeReviewModal();
-        viewIntentExchange(); // Refresh the view
-        
-    } catch (error) {
-        console.error('Dispute failed:', error);
-        alert('Failed to open dispute. Please try again.');
-    }
-}
-
-function closeReviewModal() {
-    const modal = document.getElementById('review-modal');
-    if (modal) modal.remove();
 }
   
 async function requestCashout() {
