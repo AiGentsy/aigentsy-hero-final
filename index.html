@@ -176,6 +176,8 @@
 
     // Config
     const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
+    const JSONBIN_URL = window.JSONBIN_URL || "https://api.jsonbin.io/v3/b/YOUR_BIN_ID";
+    const JSONBIN_SECRET = window.JSONBIN_SECRET || "$2a$10$YOUR_SECRET_KEY";
 
     // Elements
     const usernameInput = document.getElementById('usernameInput');
@@ -195,7 +197,7 @@
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
-    // Business Type Mapping (for dashboard tailoring)
+    // Business Type Mapping
     const companyTypeMap = (agent) => {
       const map = { 
         legal: "legal", 
@@ -207,20 +209,16 @@
       return map[agent] || "general";
     };
 
-    // Enhanced suggestion system with business type detection
+    // Enhanced suggestion system
     function showSuggestion(value) {
       if (!suggestionBox) return;
       const v = (value || "").toLowerCase();
       let msg = "We'll build you a custom AI business based on your input.";
       let detectedType = "custom";
       
-      // Detect business type and provide tailored suggestions
       if (v.includes("legal") || v.includes("law") || v.includes("attorney") || v.includes("contract")) {
         msg = "💼 Legal AI detected — Your C-Suite will handle contracts, IP protection, and compliance automation.";
         detectedType = "legal";
-      } else if (v.includes("podcast") || v.includes("audio") || v.includes("broadcasting")) {
-        msg = "🎙️ Podcast AI detected — Auto-production, distribution, guest booking, and monetization.";
-        detectedType = "podcast";
       } else if (v.includes("saas") || v.includes("software") || v.includes("app") || v.includes("tool")) {
         msg = "💻 SaaS AI detected — Your C-Suite will build, deploy, and scale AI-powered tools.";
         detectedType = "saas";
@@ -230,32 +228,10 @@
       } else if (v.includes("social") || v.includes("content") || v.includes("creator") || v.includes("influencer")) {
         msg = "📱 Social Media AI detected — Content creation, posting schedules, and creator monetization.";
         detectedType = "social";
-      } else if (v.includes("real estate") || v.includes("property") || v.includes("realtor")) {
-        msg = "🏠 Real Estate AI detected — Lead gen, showing schedules, deal closing, and property management.";
-        detectedType = "real-estate";
-      } else if (v.includes("consult") || v.includes("coach") || v.includes("advisor") || v.includes("mentor")) {
-        msg = "💼 Consulting AI detected — Client matching, scheduling, deliverable automation, and billing.";
-        detectedType = "consulting";
-      } else if (v.includes("ecommerce") || v.includes("shop") || v.includes("store") || v.includes("retail")) {
-        msg = "🛒 E-Commerce AI detected — Inventory, fulfillment, customer service, and sales automation.";
-        detectedType = "ecommerce";
-      } else if (v.includes("recruit") || v.includes("hiring") || v.includes("talent") || v.includes("hr")) {
-        msg = "👔 Recruiting AI detected — Candidate sourcing, screening, interviews, and placement.";
-        detectedType = "recruiting";
-      } else if (v.includes("health") || v.includes("wellness") || v.includes("fitness") || v.includes("nutrition")) {
-        msg = "💪 Health & Wellness AI detected — Client programs, progress tracking, and engagement.";
-        detectedType = "health";
-      } else if (v.includes("education") || v.includes("course") || v.includes("training") || v.includes("teach")) {
-        msg = "📚 Education AI detected — Course delivery, student engagement, and assessment automation.";
-        detectedType = "education";
-      } else if (v.includes("finance") || v.includes("accounting") || v.includes("bookkeep") || v.includes("tax")) {
-        msg = "💰 Finance AI detected — Financial planning, analysis, reporting, and compliance.";
-        detectedType = "finance";
       }
       
       suggestionBox.textContent = msg;
       
-      // Auto-select matching card if available and no card is selected
       if (detectedType !== "custom" && !selectedAgent) {
         const matchingCard = document.querySelector(`.aigent-card[data-agent="${detectedType}"]`);
         if (matchingCard) {
@@ -268,7 +244,6 @@
         }
       }
       
-      // If custom description, set it
       if (value && value.length > 10) {
         customBusinessIdea = value;
         if (!selectedAgent) {
@@ -296,7 +271,7 @@
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
-        customBusinessIdea = ""; // Clear custom idea when selecting template
+        customBusinessIdea = "";
         showSuggestion(selectedAgent);
         updateButtonState();
       });
@@ -309,6 +284,7 @@
       searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
     }
 
+    // MAIN SIGNUP LOGIC
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
       
@@ -331,69 +307,100 @@
       enterBtn.textContent = "🚀 Building your AI business...";
       
       try {
-        console.log("📝 Minting user via backend:", username, "Type:", selectedAgent);
+        console.log("📝 Attempting backend mint:", username, "Type:", selectedAgent);
         
-        // ============================================================
-        // CALL BACKEND /mint ENDPOINT (THIS ACTIVATES APEX ULTRA)
-        // ============================================================
-        const response = await fetch(`${API_BASE}/mint`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            username: username,
-            password: password || "default_password",
-            companyType: companyTypeMap(selectedAgent),
-            template: selectedAgent,
-            customInput: customBusinessIdea || idea,
-            referral: referral
-          })
-        });
-        
-        console.log("📡 Response status:", response.status);
-        console.log("📡 Response headers:", response.headers);
-        
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("❌ Server error response:", errorText);
-          throw new Error(`Server error: ${response.status} - ${errorText}`);
-        }
-        
-        // Get raw response text first
-        const responseText = await response.text();
-        console.log("📡 Raw response:", responseText);
-        
-        // Try to parse as JSON
-        let result;
+        // TRY BACKEND FIRST
         try {
-          result = JSON.parse(responseText);
-          console.log("✅ Parsed result:", result);
-        } catch (parseError) {
-          console.error("❌ JSON parse error:", parseError);
-          throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+          const response = await fetch(`${API_BASE}/mint`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: username,
+              password: password || "default_password",
+              companyType: companyTypeMap(selectedAgent),
+              template: selectedAgent,
+              customInput: customBusinessIdea || idea,
+              referral: referral
+            })
+          });
+          
+          console.log("📡 Backend response status:", response.status);
+          
+          if (response.ok) {
+            const text = await response.text();
+            console.log("📡 Backend raw response:", text.substring(0, 200));
+            
+            const result = JSON.parse(text);
+            console.log("✅ Backend parsed:", result.ok ? "SUCCESS" : "FAIL");
+            
+            if (result.ok) {
+              if (result.apex_ultra && result.apex_ultra.activated) {
+                console.log(`🌟 APEX ULTRA: ${result.apex_ultra.systems_operational} systems`);
+              }
+              
+              console.log("🚀 Redirecting...");
+              window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+              return; // SUCCESS - exit here
+            } else {
+              console.warn("⚠️ Backend returned ok:false:", result.error);
+              throw new Error(result.error || "Backend failed");
+            }
+          } else {
+            throw new Error(`Backend HTTP ${response.status}`);
+          }
+        } catch (backendError) {
+          console.warn("⚠️ Backend failed:", backendError.message);
+          console.log("📦 Falling back to direct JSONBin...");
+          
+          // FALLBACK TO JSONBIN
+          const now = new Date().toISOString();
+          const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+          
+          const newUser = {
+            schemaVersion: 3,
+            id: `user_${Date.now()}`,
+            username: username,
+            consent: { agreed: true, username: username, timestamp: now },
+            companyType: companyTypeMap(selectedAgent),
+            created: now,
+            mintTime: now,
+            customInput: customBusinessIdea || idea,
+            meta_role: roleMap[selectedAgent || "general"],
+            role: roleMap[selectedAgent || "general"],
+            traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
+            runtimeFlags: { vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false, sdkAccess_eligible: selectedAgent === "saas" },
+            wallet: { address: "0x0", staked: 0 },
+            yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
+            remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0 },
+            kits: { universal: { unlocked: true }, legal: { unlocked: selectedAgent === "legal" } },
+            referral: referral,
+            runtimeURL: "https://aigentsy.com/agents/aigent0.html"
+          };
+          
+          const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+          const currentData = await getRes.json();
+          let currentArray = Array.isArray(currentData.record) ? currentData.record : [];
+          
+          const existingIndex = currentArray.findIndex(u => u.username === username);
+          if (existingIndex >= 0) {
+            currentArray[existingIndex] = newUser;
+          } else {
+            currentArray.push(newUser);
+          }
+          
+          await fetch(JSONBIN_URL, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
+            body: JSON.stringify(currentArray)
+          });
+          
+          console.log("✅ JSONBin fallback successful");
+          console.warn("⚠️ Note: APEX ULTRA did not activate (backend unavailable)");
+          window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
         }
-        
-        if (!result.ok) {
-          throw new Error(result.error || "Failed to create account");
-        }
-        
-        console.log("✅ User minted successfully!");
-        
-        // Check if APEX ULTRA activated
-        if (result.apex_ultra && result.apex_ultra.activated) {
-          console.log(`🌟 APEX ULTRA ACTIVATED: ${result.apex_ultra.systems_operational} systems operational`);
-        } else {
-          console.warn("⚠️ APEX ULTRA may not have activated");
-        }
-        
-        console.log("🚀 Redirecting to dashboard...");
-        
-        // Redirect to welcome page (which then goes to dashboard)
-        window.location.assign(`/agents/welcome.html?user=${encodeURIComponent(username)}`);
         
       } catch (e) {
-        console.error("❌ Error:", e);
+        console.error("❌ Total failure:", e);
         alert(`Could not create your AiGentsy: ${e.message}`);
         enterBtn.disabled = false;
         enterBtn.textContent = "🚀 Launch Your AI Business Now";
