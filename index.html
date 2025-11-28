@@ -145,7 +145,7 @@
     <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Username" />
-      <input type="password" id="passwordInput" placeholder="Password" />
+      <input type="password" id="passwordInput" placeholder="Password (optional)" />
       <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
       <div class="toggle-auth">Don't have an account? Sign up</div>
 
@@ -176,8 +176,6 @@
 
     // Config
     const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
-    const JSONBIN_URL = window.JSONBIN_URL || null;
-    const JSONBIN_SECRET = window.JSONBIN_SECRET || null;
 
     // Elements
     const usernameInput = document.getElementById('usernameInput');
@@ -188,7 +186,7 @@
     const suggestionBox = document.getElementById('aigentsySuggestion');
 
     // State
-    let authMode = "login";
+    let authMode = "signup";
     let selectedAgent = null;
     let customBusinessIdea = "";
 
@@ -280,293 +278,6 @@
       }
     }
 
-async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-  if (!JSONBIN_URL || !JSONBIN_SECRET) {
-    console.warn("⚠️ JSONBin not configured");
-    return;
-  }
-  
-  const now = new Date().toISOString();
-  
-  // Role mapping based on business type (for C-Suite personalization)
-  const roleMap = { 
-    legal: "CLO",           // Chief Legal Officer
-    social: "CMO",          // Chief Marketing Officer
-    saas: "CTO",            // Chief Technology Officer
-    marketing: "CMO",       // Chief Marketing Officer
-    consulting: "CEO",      // Chief Executive Officer
-    podcast: "CEO",         // Chief Executive Officer
-    ecommerce: "COO",       // Chief Operations Officer
-    recruiting: "COO",      // Chief Operations Officer
-    "real-estate": "CEO",   // Chief Executive Officer
-    finance: "CFO",         // Chief Financial Officer
-    health: "COO",          // Chief Operations Officer
-    education: "CEO",       // Chief Executive Officer
-    custom: "CEO",          // Chief Executive Officer
-    general: "CEO"          // Chief Executive Officer
-  };
-  
-  // IMPORT STRATEGY TEMPLATES
-  const { monetizationTemplates } = await import('./strategies/templates.js');
-  const strategyTemplate = monetizationTemplates[selectedAgent] || monetizationTemplates.legal;
-  
-  const entry = {
-    schemaVersion: 3,
-    id: `user_${Date.now()}`,
-    username: username,
-    consent: { agreed: true, username: username, timestamp: now },
-    companyType: companyTypeMap(selectedAgent),
-    businessType: selectedAgent, // NEW: Specific business type for dashboard tailoring
-    created: now,
-    mintTime: now,
-    customInput: customDescription || "",
-    meta_role: roleMap[selectedAgent || "general"],
-    role: roleMap[selectedAgent || "general"],
-    trait: selectedAgent || "founder",
-    traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-    
-    runtimeFlags: { 
-      vaultAccess: true, 
-      remixUnlocked: false, 
-      cloneLicenseUnlocked: false, 
-      sdkAccess_eligible: selectedAgent === "saas",
-      
-      // PROTOCOL FEATURES
-      ameEnabled: true,
-      intentExchangeAccess: true,
-      autoMatchEnabled: true,
-      dealGraphEnabled: true,
-      oclEligible: false, // Unlocks after first PAID outcome
-      factoringEligible: false, // Unlocks after first DELIVERED outcome
-      performanceBondsEnabled: true,
-      r3AutopilotEnabled: true,
-      nudgeConvertEnabled: true,
-      automatedOutreachEnabled: true,
-      pricingArmEnabled: true,
-      syndicationEnabled: true,
-      jvMeshEnabled: true
-    },
-    
-    wallet: { address: "0x0", staked: 0 },
-    staked: 0,
-    
-    yield: { 
-      autoStake: false, 
-      aigxEarned: 0, 
-      vaultYield: 0, 
-      remixYield: 0, 
-      aigxAttributedTo: [], 
-      aigxEarnedEnabled: false 
-    },
-    
-    remixUnlocked: false,
-    remixUnlockedForks: 0,
-    remix: { 
-      remixCount: 0, 
-      remixCredits: 1000, 
-      lineageDepth: 0, 
-      royaltyTerms: "Standard 30%" 
-    },
-    
-    cloneLineage: [],
-    cloneLicenseUnlocked: false,
-    
-    proposals: [], 
-    orders: [], 
-    invoices: [], 
-    payments: [], 
-    contacts: [], 
-    meetings: [], 
-    kpi_snapshots: [], 
-    docs: [],
-    
-    ownership: { ledger: [] },
-    
-    kits: {
-      universal: { unlocked: true },
-      growth: { unlocked: false },
-      legal: { unlocked: selectedAgent === "legal" },
-      sdk: { unlocked: false },
-      branding: { unlocked: false },
-      marketing: { unlocked: selectedAgent === "marketing" },
-      social: { unlocked: selectedAgent === "social" }
-    },
-    
-    metaloop: { 
-      enabled: true, 
-      lastMatchCheck: null, 
-      proposalHistory: [] 
-    },
-    
-    metabridge: { 
-      active: true, 
-      lastBridge: null, 
-      bridgeCount: 0 
-    },
-    
-    automatch: { 
-      status: "pending", 
-      lastMatchResult: null, 
-      matchReady: true 
-    },
-    
-    referral: referralCode || "origin/hero",
-    runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-    protocol: "MetaUpgrade25+26",
-    
-    realm: { 
-      name: "Realm 101 — Strategic Expansion", 
-      joinedAt: now 
-    },
-    
-    metaVenture: { 
-      ventureHive: "Autonomous Launch", 
-      ventureRole: roleMap[selectedAgent || "general"], 
-      ventureStatus: "Pending", 
-      ventureID: `MV-${Date.now()}` 
-    },
-    
-    mirror: { 
-      mirroredInRealms: ["Realm 101 — Strategic Expansion"], 
-      mirrorIntegrity: "Verified", 
-      sentinelAlert: false 
-    },
-    
-    earningsEnabled: true,
-    listingStatus: "active",
-    protocolStatus: "Bound",
-    tethered: true,
-    sdkAccess_eligible: selectedAgent === "saas",
-    sdkAccess: false,
-    vaultAccess: true,
-    
-    licenses: { 
-      sdk: false, 
-      vault: false, 
-      remix: false, 
-      clone: false, 
-      aigx: false 
-    },
-    
-    transactions: { 
-      unlocks: [], 
-      yieldEvents: [], 
-      referralEvents: [] 
-    },
-    
-    packaging: { 
-      kits_sent: [], 
-      proposals: [], 
-      custom_files: [], 
-      active: false 
-    },
-    
-    // STRATEGY TEMPLATE INTEGRATION
-    offerings: strategyTemplate.offerings,
-    monetizationStrategy: strategyTemplate.strategy,
-    protocolRevenue: strategyTemplate.strategy.protocolRevenue,
-    
-    // OUTCOME ORACLE
-    outcomeOracle: {
-      clicked: 0,
-      authorized: 0,
-      delivered: 0,
-      paid: 0
-    },
-    
-    // OCL (OUTCOME-BACKED CREDIT LINE)
-    ocl: {
-      creditLine: 0,
-      used: 0,
-      available: 0,
-      repaymentRate: 0.10,
-      repaymentDue: 0
-    },
-    
-    // FACTORING
-    factoring: {
-      eligible: false,
-      advancesIssued: [],
-      totalAdvanced: 0,
-      totalRepaid: 0
-    },
-    
-    // PERFORMANCE BONDS
-    performanceBonds: {
-      bondsPosted: [],
-      bondsActive: 0,
-      bondsReleased: 0,
-      bondsSlashed: 0
-    },
-    
-    // REVENUE TRACKING
-    revenue: {
-      total: 0,
-      thisMonth: 0,
-      lastMonth: 0,
-      bySource: {
-        base: 0,
-        ame: 0,
-        intentExchange: 0,
-        dealGraph: 0,
-        performanceBonds: 0,
-        ocl: 0,
-        factoring: 0,
-        nudgeConvert: 0,
-        automatedOutreach: 0,
-        r3Autopilot: 0,
-        pricingArm: 0,
-        syndication: 0,
-        jvMesh: 0,
-        ipVault: 0
-      }
-    },
-    
-    // UNLOCK PROGRESS
-    unlockProgress: {
-      firstPaidOutcome: false,
-      firstDeliveredOutcome: false,
-      threePaidOutcomes: false,
-      tenThousandRevenue: false,
-      twentyFiveThousandRevenue: false
-    }
-  };
-  
-  try {
-    console.log("📡 Fetching JSONBin...");
-    const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-    if (!getRes.ok) throw new Error(`GET failed: ${getRes.status}`);
-    
-    const currentData = await getRes.json();
-    let currentArray = Array.isArray(currentData.record) ? currentData.record : (Array.isArray(currentData) ? currentData : []);
-    
-    console.log(`📝 Current users: ${currentArray.length}`);
-    
-    const existingIndex = currentArray.findIndex(u => u.username === username || u.consent?.username === username);
-    if (existingIndex >= 0) {
-      console.log("⚠️ Updating existing user");
-      currentArray[existingIndex] = entry;
-    } else {
-      console.log("✅ Adding new user");
-      currentArray.push(entry);
-    }
-    
-    console.log(`💾 Saving ${currentArray.length} users...`);
-    const putRes = await fetch(JSONBIN_URL, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-      body: JSON.stringify(currentArray)
-    });
-    
-    if (!putRes.ok) throw new Error(`PUT failed: ${putRes.status}`);
-    console.log("✅ Registered successfully!");
-    
-  } catch (err) {
-    console.error("❌ JSONBin error:", err);
-    throw err;
-  }
-}
-
     // UI
     function updateButtonState() {
       const valid = usernameInput.value.trim().length > 0 && agreeCheckbox.checked && !!selectedAgent;
@@ -600,11 +311,18 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
 
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
+      
       const username = usernameInput.value.trim();
-      if (!username) { alert("Enter a username"); return; }
+      const password = passwordInput.value.trim();
+      
+      if (!username) { 
+        alert("Enter a username"); 
+        return; 
+      }
       
       const idea = searchInput ? searchInput.value.trim() : "";
       
+      // Store in localStorage
       try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
       try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
       try { localStorage.setItem("aigentsyBusinessIdea", customBusinessIdea); } catch(e){}
@@ -613,50 +331,53 @@ async function registerUserToJSONBin(username, selectedAgent, customDescription,
       enterBtn.textContent = "🚀 Building your AI business...";
       
       try {
-        console.log("📝 Registering:", username, "Type:", selectedAgent, customBusinessIdea ? `Custom: ${customBusinessIdea}` : "Template");
-        await registerUserToJSONBin(username, selectedAgent, customBusinessIdea || idea, referral);
-        console.log("🚀 Redirecting to tailored dashboard...");
+        console.log("📝 Minting user via backend:", username, "Type:", selectedAgent);
+        
+        // ============================================================
+        // CALL BACKEND /mint ENDPOINT (THIS ACTIVATES APEX ULTRA)
+        // ============================================================
+        const response = await fetch(`${API_BASE}/mint`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password || "default_password",
+            companyType: companyTypeMap(selectedAgent),
+            template: selectedAgent,
+            customInput: customBusinessIdea || idea,
+            referral: referral
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Server error: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (!result.ok) {
+          throw new Error(result.error || "Failed to create account");
+        }
+        
+        console.log("✅ User minted successfully!");
+        
+        // Check if APEX ULTRA activated
+        if (result.apex_ultra && result.apex_ultra.activated) {
+          console.log(`🌟 APEX ULTRA ACTIVATED: ${result.apex_ultra.systems_operational} systems operational`);
+        } else {
+          console.warn("⚠️ APEX ULTRA may not have activated");
+        }
+        
+        console.log("🚀 Redirecting to dashboard...");
+        
+        // Redirect to welcome page (which then goes to dashboard)
         window.location.assign(`/agents/welcome.html?user=${encodeURIComponent(username)}`);
-```
-
----
-
-## ✅ **COMPLETE FLOW NOW:**
-
-### **NEW USER:**
-```
-index.html (registration)
-    ↓ (clicks "Launch Your AI Business Now")
-welcome.html (4-second loading animation)
-    ↓ (auto-redirect)
-tutorial.html (teach-in modal, can skip)
-    ↓ (clicks "Go to Dashboard")
-aigent0.html (main dashboard)
-```
-
-### **RETURNING USER:**
-```
-index.html (login)
-    ↓
-welcome.html (quick 2-second "Welcome back")
-    ↓ (auto-redirect, skips tutorial)
-aigent0.html (main dashboard)
-```
-
----
-
-## 📂 **FILE STRUCTURE:**
-```
-/
-├── index.html                    (updated redirect)
-├── agents/
-│   ├── welcome.html             (NEW - loading screen)
-│   ├── tutorial.html            (NEW - teach-in modal)
-│   └── aigent0.html             (existing dashboard)
         
       } catch (e) {
         console.error("❌ Error:", e);
-        alert("Could not create your AiGentsy. Please try again.");
+        alert(`Could not create your AiGentsy: ${e.message}`);
         enterBtn.disabled = false;
         enterBtn.textContent = "🚀 Launch Your AI Business Now";
       }
