@@ -351,11 +351,28 @@
           })
         });
         
+        console.log("📡 Response status:", response.status);
+        console.log("📡 Response headers:", response.headers);
+        
         if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+          const errorText = await response.text();
+          console.error("❌ Server error response:", errorText);
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
         
-        const result = await response.json();
+        // Get raw response text first
+        const responseText = await response.text();
+        console.log("📡 Raw response:", responseText);
+        
+        // Try to parse as JSON
+        let result;
+        try {
+          result = JSON.parse(responseText);
+          console.log("✅ Parsed result:", result);
+        } catch (parseError) {
+          console.error("❌ JSON parse error:", parseError);
+          throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}`);
+        }
         
         if (!result.ok) {
           throw new Error(result.error || "Failed to create account");
