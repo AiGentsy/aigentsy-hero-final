@@ -1779,8 +1779,8 @@ document.addEventListener("keydown", (e) => {
   } catch(e) { console.warn("SSE not available", e); }
 })();
 
-function initializeDashboard() {
-  console.log("🚀 Initializing dashboard...");
+async function initializeDashboard() {
+  console.log("🚀 Initializing dashboard with AIGx...");
   const username = localStorage.getItem("aigentsyUsername");
   if (!username) {
     console.warn("No username - redirecting");
@@ -1788,13 +1788,19 @@ function initializeDashboard() {
     return;
   }
   console.log("👤 Loading for:", username);
+  
+  // Call existing initialization
   injectUserDashboard();
+  
+  // ✨ ADD THIS: Fetch and display AIGx dashboard data
+  await fetchAIGxDashboardData(username);
+  
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
     preload.className = "chat-agent";
     preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
-}
+  }
 }
 
 if (document.readyState === 'loading') {
