@@ -558,9 +558,10 @@ function renderDynamicAchievements(user) {
 }
 
 function renderWalletChart(user) {
-  console.log("📊 Rendering chart");
+  console.log("📊 Rendering chart with AIGx metrics");
   const walletChart = document.getElementById('walletChart');
   if (!walletChart) return;
+  
   const renderChart = () => {
     if (!window.Chart) {
       console.warn("Chart.js not loaded yet, retrying...");
@@ -568,22 +569,35 @@ function renderWalletChart(user) {
       return;
     }
     if (walletChart.chartInstance) walletChart.chartInstance.destroy();
-    const remixCount = user.remix?.remixCount || user.remixUnlockedForks || 0;
-    const remixCredits = user.remix?.remixCredits || 0;
-    const vaultYield = user.yield?.vaultYield || 0;
-    const remixYield = user.yield?.remixYield || 0;
-    const aigxEarned = user.yield?.aigxEarned || 0;
-    const staked = user.wallet?.staked || user.staked || 0;
-    const referrals = (user.cloneLineage || []).length;
-    console.log("📊 Chart data for", user.companyType);
+    
+    // Get AIGx data from dashboard if available, otherwise use user data
+    const dashboardData = window.aigxDashboardData;
+    const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
+    const equityValue = dashboardData?.aigx_equity?.equity_value_usd || 0;
+    const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
+    const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
+    const clients = (user.contacts || []).length;
+    const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
+    const activeStreak = dashboardData?.activity_streaks?.current_streak || 0;
+    
+    console.log("📊 Chart data - AIGx:", aigxBalance, "Equity:", equityValue, "Revenue:", lifetimeRevenue);
+    
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
         data: {
-          labels: ['Projects', 'Credits', 'Vault Yield', 'Project Yield', 'AIGx Earned', 'Staked', 'Partners'],
+          labels: ['AIGx', 'Equity ($K)', 'Revenue', 'Referrals', 'Clients', 'Partnerships', 'Streak'],
           datasets: [{
-            data: [remixCount, remixCredits, vaultYield, remixYield, aigxEarned, staked, referrals],
-            backgroundColor: ['#00bfff', '#1ee0ff', '#4affdc', '#26f5a5', '#ffdc4a', '#ff924a', '#d746ff'],
+            data: [
+              aigxBalance, 
+              Math.round(equityValue / 1000), 
+              lifetimeRevenue, 
+              referrals,
+              clients,
+              partnerships,
+              activeStreak
+            ],
+            backgroundColor: ['#00bfff', '#00ff88', '#ffdc4a', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
             borderRadius: 6
           }]
         },
@@ -593,11 +607,11 @@ function renderWalletChart(user) {
           plugins: { legend: { display: false } },
           scales: {
             y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
-            x: { ticks: { color: '#aaa' }, grid: { display: false } }
+            x: { ticks: { color: '#aaa', font: { size: 10 } }, grid: { display: false } }
           }
         }
       });
-      console.log("✅ Chart rendered");
+      console.log("✅ Chart rendered with AIGx metrics");
     } catch (chartError) {
       console.error("❌ Chart error:", chartError);
     }
@@ -1850,66 +1864,85 @@ function updateAIGxAchievements(data) {
 }
 
 function updateAIGxWallet(data) {
+  // Update main wallet display to show $ value
   const totalEarningsEl = document.getElementById("totalEarnings");
   if (totalEarningsEl) {
-    const aigx = data.aigx_equity.aigx_balance;
     const equityValue = data.aigx_equity.equity_value_usd;
-    
-    totalEarningsEl.innerHTML = `
-      <div style="display:flex; flex-direction:column; align-items:flex-end;">
-        <div style="font-size:1.4rem; font-weight:700; color:#00bfff;">
-          ${aigx.toLocaleString()} AIGx
-        </div>
-        <div style="font-size:0.85rem; color:#00ff88;">
-          $${equityValue.toLocaleString()} equity
-        </div>
-      </div>
-    `;
+    totalEarningsEl.textContent = equityValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   
+  // Add AIGx breakdown to the dropdown
   const breakdownEl = document.getElementById("earningsBreakdown");
   if (breakdownEl) {
-    // ✅ Check if AIGx breakdown already exists
+    // Remove old AIGx breakdown if it exists
     let aigxBreakdownDiv = document.getElementById("aigxBreakdownSection");
-    
-    const sources = data.revenue_stats.aigx_by_source;
-    
-    const aigxBreakdown = `
-      <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
-        <div style="font-size:0.9rem; font-weight:600; color:#00bfff; margin-bottom:8px;">💎 AIGx Breakdown</div>
-        ${sources.signup_bonus > 0 ? `
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-            <span>🎁 Signup Bonus</span>
-            <span style="color:#00bfff;">${sources.signup_bonus.toLocaleString()} AIGx</span>
-          </div>
-        ` : ''}
-        ${sources.apex_ultra > 0 ? `
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-            <span>🌟 APEX ULTRA</span>
-            <span style="color:#00bfff;">${sources.apex_ultra.toLocaleString()} AIGx</span>
-          </div>
-        ` : ''}
-        ${sources.transactions > 0 ? `
-          <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-            <span>💳 Transactions</span>
-            <span style="color:#00bfff;">${sources.transactions.toLocaleString()} AIGx</span>
-          </div>
-        ` : ''}
-        ${sources.milestones > 0 ? `
-          <div style="display:flex; justify-content:space-between; padding:4px 0;">
-            <span>🏆 Milestones</span>
-            <span style="color:#00bfff;">${sources.milestones.toLocaleString()} AIGx</span>
-          </div>
-        ` : ''}
-      </div>
-    `;
-    
-    // ✅ Remove old breakdown if it exists
     if (aigxBreakdownDiv) {
       aigxBreakdownDiv.remove();
     }
     
-    // ✅ Add new breakdown
+    const sources = data.revenue_stats.aigx_by_source;
+    const totalAigx = data.aigx_equity.aigx_balance;
+    
+    const aigxBreakdown = `
+      <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <span style="font-size:0.9rem; font-weight:600; color:#00bfff;">💎 AIGx Balance</span>
+          <span style="font-size:1.1rem; font-weight:700; color:#00bfff;">${totalAigx.toLocaleString()} AIGx</span>
+        </div>
+        <div style="border-top:1px solid #222; padding-top:8px;">
+          ${sources.signup_bonus > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">🎁 Signup Bonus</span>
+              <span style="color:#00bfff;">${sources.signup_bonus.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.apex_ultra > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">🌟 APEX ULTRA</span>
+              <span style="color:#00bfff;">${sources.apex_ultra.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.transactions > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">💳 Transactions</span>
+              <span style="color:#00bfff;">${sources.transactions.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.daily_rewards > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">📅 Daily Rewards</span>
+              <span style="color:#00bfff;">${sources.daily_rewards.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.weekly_rewards > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">🔥 Weekly Streaks</span>
+              <span style="color:#00bfff;">${sources.weekly_rewards.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.monthly_rewards > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">⭐ Monthly Power User</span>
+              <span style="color:#00bfff;">${sources.monthly_rewards.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.milestones > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+              <span style="font-size:0.85rem;">🏆 Milestones</span>
+              <span style="color:#00bfff;">${sources.milestones.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+          ${sources.referrals > 0 ? `
+            <div style="display:flex; justify-content:space-between; padding:4px 0;">
+              <span style="font-size:0.85rem;">🤝 Referrals</span>
+              <span style="color:#00bfff;">${sources.referrals.toLocaleString()} AIGx</span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    
+    // Add AIGx breakdown at the top of the earnings breakdown
     breakdownEl.insertAdjacentHTML('afterbegin', aigxBreakdown);
   }
 }
