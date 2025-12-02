@@ -9,6 +9,48 @@
 <link rel="stylesheet" href="/theme.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
+  .tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 300px;
+  background-color: #1a1a1a;
+  color: #fff;
+  text-align: left;
+  border-radius: 8px;
+  padding: 12px;
+  position: absolute;
+  z-index: 10000;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -150px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border: 1px solid #00bfff;
+  box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.tooltip-container .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #00bfff transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
   .col-left { display: flex; flex-direction: column; gap: 20px; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: radial-gradient(circle at center, #0e101a, #000); color: #fff; display: flex; }
   .sidebar { width: 320px; background: #0a0a0a; padding: 30px 20px; }
@@ -156,7 +198,15 @@
 </div>
   </div>
   <div class="metric-box">
-    <h3>💰 Wallet & Off-Ramp</h3>
+    <h3>
+  <span class="tooltip-container">
+    💰 Wallet & Off-Ramp
+    <span class="tooltip-text">
+      <strong style="color:#00bfff;">💎 AIGx:</strong> Your internal currency earned through platform activity, transactions, and milestones. AIGx can be converted to AIGo at conversion events.<br><br>
+      <strong style="color:#00ff88;">💼 AIGo:</strong> AiGentsy Ownership Interest - your profit participation rights in the 20% equity pool. AIGo value increases as AiGentsy grows.
+    </span>
+  </span>
+</h3>
 <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
     <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
@@ -1886,7 +1936,12 @@ function updateAIGxWallet(data) {
     const aigxBreakdown = `
       <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
         <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-          <span style="font-size:0.9rem; font-weight:600; color:#00bfff;">💎 AIGx Balance</span>
+          <span class="tooltip-container" style="font-size:0.9rem; font-weight:600; color:#00bfff;">
+            💎 AIGx Balance
+            <span class="tooltip-text">
+              AIGx is your internal currency earned through activity. Total AIGx determines your AIGo (ownership stake).
+            </span>
+          </span>
           <span style="font-size:1.1rem; font-weight:700; color:#00bfff;">${totalAigx.toLocaleString()} AIGx</span>
         </div>
         <div style="border-top:1px solid #222; padding-top:8px;">
