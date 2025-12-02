@@ -2067,11 +2067,68 @@ async function initializeDashboard() {
   await fetchAIGxDashboardData(username);
   
   if (chatLog && chatLog.children.length === 0) {
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
-    chatLog.appendChild(preload);
-  }
+  const preload = document.createElement("div");
+  preload.className = "chat-agent";
+  
+  // Get user's business template
+  const companyType = window.aigentsyUser?.companyType || window.aigentsyUser?.consent?.companyType || 'general';
+  
+  // Template-specific greetings
+  const greetings = {
+    legal: `Congratulations on launching your Legal AiGentsy, ${username}! 
+
+I'm your C-Suite team, ready to help you monetize through:
+- Automated contract generation (NDAs, MSAs, IP assignments)
+- IP licensing marketplace
+- Compliance-as-a-service
+- Legal document generation at scale
+
+Ready to make your first $10k this month? Let's activate your revenue engines.`,
+
+    saas: `Your SaaS AiGentsy is live, ${username}! 
+
+I'm your C-Suite team, ready to help you build and monetize:
+- Micro-tools & APIs ($50-500 each)
+- White-label solutions for agencies
+- Custom integrations ($2k-10k per client)
+- One-click deployment tools
+
+Let's get your first paying customer today. What type of tool should we build first?`,
+
+    marketing: `Welcome to your Marketing AiGentsy, ${username}! 
+
+I'm your C-Suite team, ready to generate revenue through:
+- SEO services & audits ($500 each)
+- Ad campaign management (15% of spend)
+- Email sequence automation
+- Analytics & optimization
+
+Your growth engines are ready. Want to activate AMG and start pitching clients automatically?`,
+
+    social: `Your Social Media AiGentsy is ready, ${username}! 
+
+I'm your C-Suite team, ready to help you monetize through:
+- Sponsored content ($500-5k per post)
+- Creator kits & templates
+- Social media management ($1,500/mo per client)
+- Brand partnership matching
+
+Time to turn your content into cash. Should we start with brand deals or product sales?`,
+
+    general: `Hey ${username}! Your C-Suite team is on standby.
+
+Available revenue engines:
+- AMG Auto-Sales (pitch qualified leads automatically)
+- Contract Marketplace (bid on work, get paid via escrow)
+- MetaBridge (real-world partnerships)
+- P2P Financial Tools (OCL, Factoring, Performance Bonds - all peer-to-peer)
+
+How can we help you make money today?`
+  };
+  
+  preload.innerHTML = greetings[companyType] || greetings.general;
+  chatLog.appendChild(preload);
+ }
 }
 
 if (document.readyState === 'loading') {
