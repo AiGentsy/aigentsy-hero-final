@@ -2079,9 +2079,13 @@ async function initializeDashboard() {
   chatLog.appendChild(preload);
   
   // Auto-trigger C-Suite introduction
-  setTimeout(() => {
-    sendChatMessage("introduce my capabilities", true); // true = auto-send, don't show in chat
-  }, 1000);
+  setTimeout(async () => {
+  const textarea = document.getElementById("agentInput");
+  if (textarea) {
+    textarea.value = "introduce my capabilities";
+    await runAgent(true);  // ✅ CORRECT - uses runAgent with hideUserMessage=true
+  }
+}, 1000);
 }
 }
 
