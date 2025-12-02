@@ -573,24 +573,25 @@ function renderWalletChart(user) {
     // Get AIGx data from dashboard if available, otherwise use user data
     const dashboardData = window.aigxDashboardData;
     const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
-    const equityValue = dashboardData?.aigx_equity?.equity_value_usd || 0;
+    const aigoValue = dashboardData?.aigx_equity?.equity_value_usd || 0;
     const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
     const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
     const clients = (user.contacts || []).length;
     const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
     const activeStreak = dashboardData?.activity_streaks?.current_streak || 0;
     
-    console.log("📊 Chart data - AIGx:", aigxBalance, "Equity:", equityValue, "Revenue:", lifetimeRevenue);
+    console.log("📊 Chart data - AIGx:", aigxBalance, "AIGo:", aigoValue, "Revenue:", lifetimeRevenue);
     
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
         data: {
-          labels: ['AIGx', 'Equity ($K)', 'Revenue', 'Referrals', 'Clients', 'Partnerships', 'Streak'],
+          labels: ['AIGx', 'AIGo ($K)', 'Revenue', 'Referrals', 'Clients', 'Partnerships', 'Streak'],
           datasets: [{
             data: [
               aigxBalance, 
-              Math.round(equityValue / 1000), 
+              Math.round(aigoValue / 1000), 
+              lifetimeRevenue,
               lifetimeRevenue, 
               referrals,
               clients,
@@ -1825,7 +1826,7 @@ function updateAIGxAchievements(data) {
   const equityPercent = data.aigx_equity.equity_percent.toFixed(4);
   const equityValue = data.aigx_equity.equity_value_usd.toLocaleString();
   
-  achievements.push(`💎 ${aigx.toLocaleString()} AIGx — $${equityValue} equity (${equityPercent}%)`);
+  achievements.push(`💎 ${aigx.toLocaleString()} AIGx — $${equityValue} AIGo (${equityPercent}%)`);
   
   if (data.early_adopter.badge) {
     achievements.push(`🎖️ ${data.early_adopter.badge} #${data.user.user_number} — ${data.early_adopter.multiplier}x permanent multiplier`);
@@ -1864,11 +1865,10 @@ function updateAIGxAchievements(data) {
 }
 
 function updateAIGxWallet(data) {
-  // Update main wallet display to show $ value
   const totalEarningsEl = document.getElementById("totalEarnings");
   if (totalEarningsEl) {
-    const equityValue = data.aigx_equity.equity_value_usd;
-    totalEarningsEl.textContent = equityValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const aigoValue = data.aigx_equity.equity_value_usd;
+    totalEarningsEl.textContent = aigoValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   
   // Add AIGx breakdown to the dropdown
