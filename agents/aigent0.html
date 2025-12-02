@@ -1869,10 +1869,13 @@ function updateAIGxWallet(data) {
   
   const breakdownEl = document.getElementById("earningsBreakdown");
   if (breakdownEl) {
+    // ✅ Check if AIGx breakdown already exists
+    let aigxBreakdownDiv = document.getElementById("aigxBreakdownSection");
+    
     const sources = data.revenue_stats.aigx_by_source;
     
     const aigxBreakdown = `
-      <div style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
+      <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
         <div style="font-size:0.9rem; font-weight:600; color:#00bfff; margin-bottom:8px;">💎 AIGx Breakdown</div>
         ${sources.signup_bonus > 0 ? `
           <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
@@ -1901,6 +1904,12 @@ function updateAIGxWallet(data) {
       </div>
     `;
     
+    // ✅ Remove old breakdown if it exists
+    if (aigxBreakdownDiv) {
+      aigxBreakdownDiv.remove();
+    }
+    
+    // ✅ Add new breakdown
     breakdownEl.insertAdjacentHTML('afterbegin', aigxBreakdown);
   }
 }
