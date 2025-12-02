@@ -2075,56 +2075,53 @@ async function initializeDashboard() {
   
   // Template-specific greetings
   const greetings = {
-    legal: `Congratulations on launching your Legal AiGentsy, ${username}! 
+  
+  legal: `Hey ${username}! Welcome to your legal business on steroids.
 
-I'm your C-Suite team, ready to help you monetize through:
-- Automated contract generation (NDAs, MSAs, IP assignments)
-- IP licensing marketplace
-- Compliance-as-a-service
-- Legal document generation at scale
+Here's what I can do for you right now:
+- Auto-generate contracts and get paid $200 per NDA without lifting a finger
+- License your legal templates to other firms for recurring revenue
+- Run compliance audits at $1,500 a pop
 
-Ready to make your first $10k this month? Let's activate your revenue engines.`,
+I literally find clients, send proposals, and close deals while you sleep. Want to activate auto-pilot and wake up to new customers tomorrow?`,
 
-    saas: `Your SaaS AiGentsy is live, ${username}! 
+  saas: `Hey ${username}! Your software business just got superpowers.
 
-I'm your C-Suite team, ready to help you build and monetize:
-- Micro-tools & APIs ($50-500 each)
-- White-label solutions for agencies
-- Custom integrations ($2k-10k per client)
-- One-click deployment tools
+I can help you:
+- Build micro-tools and sell them for $50-500 each (I'll find the buyers)
+- Create APIs and license them to agencies for $5k+
+- Find enterprise clients who need custom integrations
 
-Let's get your first paying customer today. What type of tool should we build first?`,
+Think of me as a sales team that never sleeps, plus I handle all the contracts and payments. Ready to launch your first product?`,
 
-    marketing: `Welcome to your Marketing AiGentsy, ${username}! 
+  marketing: `Hey ${username}! Let's turn your marketing skills into automatic income.
 
-I'm your C-Suite team, ready to generate revenue through:
-- SEO services & audits ($500 each)
-- Ad campaign management (15% of spend)
-- Email sequence automation
-- Analytics & optimization
+Here's what's ready to go:
+- I'll pitch your SEO services to 50 businesses tonight while you sleep
+- Run ad campaigns and charge clients 15% of their spend
+- Sell marketing templates and playbooks on autopilot
 
-Your growth engines are ready. Want to activate AMG and start pitching clients automatically?`,
+I find the clients, send the proposals, and handle the deals. You just deliver the work. Want me to start hunting for customers?`,
 
-    social: `Your Social Media AiGentsy is ready, ${username}! 
+  social: `Hey ${username}! Time to monetize your social media hustle.
 
-I'm your C-Suite team, ready to help you monetize through:
-- Sponsored content ($500-5k per post)
-- Creator kits & templates
-- Social media management ($1,500/mo per client)
-- Brand partnership matching
+I've got you set up to:
+- Get matched with brands who'll pay $500-5k per sponsored post
+- Sell creator kits and content templates automatically
+- Manage client accounts at $1,500/month each
 
-Time to turn your content into cash. Should we start with brand deals or product sales?`,
+While you create content, I'm out there finding sponsorships, selling your products, and booking clients. Sound good?`,
 
-    general: `Hey ${username}! Your C-Suite team is on standby.
+  general: `Hey ${username}! Your business just got an AI-powered growth engine.
 
-Available revenue engines:
-- AMG Auto-Sales (pitch qualified leads automatically)
-- Contract Marketplace (bid on work, get paid via escrow)
-- MetaBridge (real-world partnerships)
-- P2P Financial Tools (OCL, Factoring, Performance Bonds - all peer-to-peer)
+Here's what I can do starting right now:
+- Find and pitch qualified customers automatically (you wake up to new leads)
+- Get you paid upfront on work before you even start (backed by other users, not us)
+- Match you with businesses that need exactly what you offer
+- Handle all the contracts, payments, and escrow automatically
 
-How can we help you make money today?`
-  };
+Think of me as a sales team, financial department, and deal-maker all in one. What do you want to sell first?`
+};
   
   preload.innerHTML = greetings[companyType] || greetings.general;
   chatLog.appendChild(preload);
