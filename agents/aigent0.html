@@ -1935,64 +1935,14 @@ function updateAIGxWallet(data) {
     
     const aigxBreakdown = `
       <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
           <span class="tooltip-container" style="font-size:0.9rem; font-weight:600; color:#00bfff;">
             💎 AIGx Balance
             <span class="tooltip-text">
               AIGx is your internal currency earned through activity. Total AIGx determines your AIGo (ownership stake).
             </span>
           </span>
-          <span style="font-size:1.1rem; font-weight:700; color:#00bfff;">${totalAigx.toLocaleString()} AIGx</span>
-        </div>
-        <div style="border-top:1px solid #222; padding-top:8px;">
-          ${sources.signup_bonus > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">🎁 Signup Bonus</span>
-              <span style="color:#00bfff;">${sources.signup_bonus.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.apex_ultra > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">🌟 APEX ULTRA</span>
-              <span style="color:#00bfff;">${sources.apex_ultra.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.transactions > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">💳 Transactions</span>
-              <span style="color:#00bfff;">${sources.transactions.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.daily_rewards > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">📅 Daily Rewards</span>
-              <span style="color:#00bfff;">${sources.daily_rewards.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.weekly_rewards > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">🔥 Weekly Streaks</span>
-              <span style="color:#00bfff;">${sources.weekly_rewards.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.monthly_rewards > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">⭐ Monthly Power User</span>
-              <span style="color:#00bfff;">${sources.monthly_rewards.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.milestones > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-              <span style="font-size:0.85rem;">🏆 Milestones</span>
-              <span style="color:#00bfff;">${sources.milestones.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
-          ${sources.referrals > 0 ? `
-            <div style="display:flex; justify-content:space-between; padding:4px 0;">
-              <span style="font-size:0.85rem;">🤝 Referrals</span>
-              <span style="color:#00bfff;">${sources.referrals.toLocaleString()} AIGx</span>
-            </div>
-          ` : ''}
+          <span style="font-size:1.4rem; font-weight:700; color:#00bfff;">${totalAigx.toLocaleString()} AIGx</span>
         </div>
       </div>
     `;
