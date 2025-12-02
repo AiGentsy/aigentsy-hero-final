@@ -453,6 +453,31 @@ const BUSINESS_CONFIGS = {
   }
 };
 
+// ============================================================
+// 💼 AIGENTSY FINANCIAL TOOLS REFERENCE
+// ============================================================
+// CRITICAL: All financial tools are PEER-TO-PEER, not platform-provided
+
+const FINANCIAL_TOOLS = {
+  ocl: {
+    name: "Operating Capital Line",
+    description: "Peer-to-peer working capital - users lend to each other from their operating capital pool",
+    disclaimer: "AiGentsy facilitates P2P lending; users lend to other users, not from AiGentsy"
+  },
+  factoring: {
+    name: "Invoice Factoring",
+    description: "Get 80% of invoice value upfront from peer pool, they collect 100% when client pays",
+    disclaimer: "Community-backed invoice advances - peers fund each other"
+  },
+  bonds: {
+    name: "Performance Bonds",
+    description: "Community-backed delivery guarantees - peers stake on your delivery",
+    disclaimer: "Bonds are backed by user pool, not AiGentsy platform"
+  }
+};
+
+// Use this reference in chat responses to ensure P2P language
+  
 function getStarterData(username, companyType) {
   return {
     username: username,
