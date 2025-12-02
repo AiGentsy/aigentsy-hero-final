@@ -827,14 +827,19 @@ const memory = [];
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
 
-async function runAgent() {
+async function runAgent(hideUserMessage = false) {
   const input = textarea.value.trim();
   if (!input) return;
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
+  
+  // Only show user message if not hidden
+  if (!hideUserMessage) {
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-user";
+    userMsg.textContent = `You: ${input}`;
+    chatLog.appendChild(userMsg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+  
   memory.push(input);
   textarea.value = "";
   const loader = document.createElement("div");
