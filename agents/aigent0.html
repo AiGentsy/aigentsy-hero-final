@@ -827,14 +827,18 @@ const memory = [];
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
 
-async function runAgent() {
+async function runAgent(hideUserMessage = false) {
   const input = textarea.value.trim();
   if (!input) return;
-  const userMsg = document.createElement("div");
-  userMsg.className = "chat-user";
-  userMsg.textContent = `You: ${input}`;
-  chatLog.appendChild(userMsg);
-  chatLog.scrollTop = chatLog.scrollHeight;
+  
+  // Only show user message if not hidden
+  if (!hideUserMessage) {
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-user";
+    userMsg.textContent = `You: ${input}`;
+    chatLog.appendChild(userMsg);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
   memory.push(input);
   textarea.value = "";
   const loader = document.createElement("div");
@@ -2060,18 +2064,22 @@ async function initializeDashboard() {
   }
   console.log("👤 Loading for:", username);
   
-  // Call existing initialization
-  injectUserDashboard();
+  // Call existing initialization and WAIT for it
+  await injectUserDashboard();
   
   // ✨ ADD THIS: Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
-  if (chatLog && chatLog.children.length === 0) {
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
-    chatLog.appendChild(preload);
-  }
+  // Auto-trigger C-Suite greeting after user data loads
+if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
+  setTimeout(() => {
+    const textarea = document.getElementById("agentInput");
+    if (textarea) {
+      // Trigger greeting from backend agent
+      textarea.value = "introduce my capabilities";
+      runAgent(true);  // true = hide the trigger message
+    }
+  }, 1000);
 }
 
 if (document.readyState === 'loading') {
