@@ -2065,28 +2065,22 @@ async function initializeDashboard() {
   }
   console.log("👤 Loading for:", username);
   
-  // Call existing initialization
-  injectUserDashboard();
+  // ⚡ CRITICAL: Wait for user data to load FIRST
+  await injectUserDashboard();
   
   // ✨ ADD THIS: Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
+  // Auto-trigger C-Suite greeting in chat
   if (chatLog && chatLog.children.length === 0) {
-  // Simple welcome message
-  const preload = document.createElement("div");
-  preload.className = "chat-agent";
-  preload.innerHTML = `Hey ${username}! Your C-Suite team is getting ready...`;
-  chatLog.appendChild(preload);
-  
-  // Auto-trigger C-Suite introduction
-  setTimeout(async () => {
-  const textarea = document.getElementById("agentInput");
-  if (textarea) {
-    textarea.value = "introduce my capabilities";
-    await runAgent(true);  // ✅ CORRECT - uses runAgent with hideUserMessage=true
+    setTimeout(async () => {
+      const textarea = document.getElementById("agentInput");
+      if (textarea && window.aigentsyUser) {
+        textarea.value = "introduce my capabilities";
+        await runAgent(true);  // true = hide the trigger message
+      }
+    }, 1500);
   }
-}, 1000);
-}
 }
 
 if (document.readyState === 'loading') {
