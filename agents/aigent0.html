@@ -831,6 +831,10 @@ async function runAgent(hideUserMessage = false) {
   const input = textarea.value.trim();
   if (!input) return;
   
+  // DEBUG: Verify chatLog exists
+  console.log("📦 chatLog element:", chatLog);
+  console.log("📦 chatLog children BEFORE:", chatLog.children.length);
+  
   // Only show user message if not hidden
   if (!hideUserMessage) {
     const userMsg = document.createElement("div");
@@ -845,10 +849,27 @@ async function runAgent(hideUserMessage = false) {
   const loader = document.createElement("div");
   loader.className = "chat-agent";
   loader.textContent = "Thinking...";
+  
+  // DEBUG: Verify loader is being appended to chatLog
+  console.log("📦 Appending loader to chatLog...");
+  console.log("📦 loader parent BEFORE appendChild:", loader.parentElement);
+  
   chatLog.appendChild(loader);
+  
+  console.log("📦 loader parent AFTER appendChild:", loader.parentElement);
+  console.log("📦 chatLog children AFTER:", chatLog.children.length);
+  
   chatLog.scrollTop = chatLog.scrollHeight;
+  
   try {
     const user = window.aigentsyUser || {};
+    
+    // DEBUG: Log what we're sending to the agent
+    console.log("🎯 Sending to agent:", {
+      username: user.username,
+      businessType: user.companyType,
+      fullUser: user
+    });
     
     // ALL chat goes to Growth agent (the communicator)
     const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
