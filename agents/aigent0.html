@@ -2067,19 +2067,19 @@ async function initializeDashboard() {
   // Call existing initialization and WAIT for it
   await injectUserDashboard();
   
-  // ✨ ADD THIS: Fetch and display AIGx dashboard data
+  // Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
   // Auto-trigger C-Suite greeting after user data loads
-if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
-  setTimeout(() => {
-    const textarea = document.getElementById("agentInput");
-    if (textarea) {
-      // Trigger greeting from backend agent
-      textarea.value = "introduce my capabilities";
-      runAgent(true);  // true = hide the trigger message
-    }
-  }, 1000);
+  if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
+    setTimeout(() => {
+      const textarea = document.getElementById("agentInput");
+      if (textarea) {
+        textarea.value = "introduce my capabilities";
+        runAgent(true);  // true = hide the trigger message
+      }
+    }, 1000);
+  }
 }
 
 if (document.readyState === 'loading') {
@@ -2087,24 +2087,12 @@ if (document.readyState === 'loading') {
 } else {
   initializeDashboard();
 }
-
-window.addEventListener("load", () => {
-  setTimeout(() => {
-    const chart = document.getElementById("walletChart");
-    if (chart && !chart.chartInstance) {
-      console.log("🔄 Fallback init");
-      initializeDashboard();
-    }
-  }, 500);
-});
-
-setTimeout(() => {
-  const chart = document.getElementById("walletChart");
-  if (chart && !chart.chartInstance) {
-    console.log("🔄 Final fallback");
-    initializeDashboard();
-  }
-}, 3000);
+// Initialize dashboard when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeDashboard);
+} else {
+  initializeDashboard();
+}
 
 console.log("✅ Script loaded");
 </script>
