@@ -824,26 +824,17 @@ async function unlockOffering(username, offeringId, stripeLink) {
 }
 
 const memory = [];
-// Don't cache these - get them fresh each time
-function getChatLog() { return document.getElementById("chatLog"); }
-function getTextarea() { return document.getElementById("agentInput"); }
+const chatLog = document.getElementById("chatLog");
+const textarea = document.getElementById("agentInput");
 
-async function runAgent(hideUserMessage = false) {
-  const chatLog = getChatLog();  // GET FRESH REFERENCE
-  const textarea = getTextarea();  // GET FRESH REFERENCE
-  
+async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
-  
-  // Only show user message if not hidden
-  if (!hideUserMessage) {
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-user";
-    userMsg.textContent = `You: ${input}`;
-    chatLog.appendChild(userMsg);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-  
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
   textarea.value = "";
   const loader = document.createElement("div");
@@ -851,7 +842,6 @@ async function runAgent(hideUserMessage = false) {
   loader.textContent = "Thinking...";
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
-  
   try {
     const user = window.aigentsyUser || {};
     
@@ -2070,31 +2060,43 @@ async function initializeDashboard() {
   }
   console.log("👤 Loading for:", username);
   
-  // Call existing initialization and WAIT for it
-  await injectUserDashboard();
+  // Call existing initialization
+  injectUserDashboard();
   
-  // Fetch and display AIGx dashboard data
+  // ✨ ADD THIS: Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
-  // Auto-trigger C-Suite greeting after user data loads
-  const chatLog = getChatLog();  // GET FRESH REFERENCE
-  if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
-    setTimeout(() => {
-      const textarea = getTextarea();  // GET FRESH REFERENCE
-      if (textarea) {
-        textarea.value = "introduce my capabilities";
-        runAgent(true);  // true = hide the trigger message
-      }
-    }, 1000);
+  if (chatLog && chatLog.children.length === 0) {
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
+    chatLog.appendChild(preload);
   }
 }
 
-// Initialize dashboard when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeDashboard);
 } else {
   initializeDashboard();
 }
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const chart = document.getElementById("walletChart");
+    if (chart && !chart.chartInstance) {
+      console.log("🔄 Fallback init");
+      initializeDashboard();
+    }
+  }, 500);
+});
+
+setTimeout(() => {
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Final fallback");
+    initializeDashboard();
+  }
+}, 3000);
 
 console.log("✅ Script loaded");
 </script>
