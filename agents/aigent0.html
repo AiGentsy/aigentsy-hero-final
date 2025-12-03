@@ -824,10 +824,14 @@ async function unlockOffering(username, offeringId, stripeLink) {
 }
 
 const memory = [];
-const chatLog = document.getElementById("chatLog");
-const textarea = document.getElementById("agentInput");
+// Don't cache these - get them fresh each time
+function getChatLog() { return document.getElementById("chatLog"); }
+function getTextarea() { return document.getElementById("agentInput"); }
 
 async function runAgent(hideUserMessage = false) {
+  const chatLog = getChatLog();  // GET FRESH REFERENCE
+  const textarea = getTextarea();  // GET FRESH REFERENCE
+  
   const input = textarea.value.trim();
   if (!input) return;
   
@@ -839,6 +843,7 @@ async function runAgent(hideUserMessage = false) {
     chatLog.appendChild(userMsg);
     chatLog.scrollTop = chatLog.scrollHeight;
   }
+  
   memory.push(input);
   textarea.value = "";
   const loader = document.createElement("div");
@@ -846,6 +851,7 @@ async function runAgent(hideUserMessage = false) {
   loader.textContent = "Thinking...";
   chatLog.appendChild(loader);
   chatLog.scrollTop = chatLog.scrollHeight;
+  
   try {
     const user = window.aigentsyUser || {};
     
@@ -2071,15 +2077,15 @@ async function initializeDashboard() {
   await fetchAIGxDashboardData(username);
   
   // Auto-trigger C-Suite greeting after user data loads
-  if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
-    setTimeout(() => {
-      const textarea = document.getElementById("agentInput");
-      if (textarea) {
-        textarea.value = "introduce my capabilities";
-        runAgent(true);  // true = hide the trigger message
-      }
-    }, 1000);
-  }
+const chatLog = getChatLog();  // GET FRESH REFERENCE
+if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
+  setTimeout(() => {
+    const textarea = getTextarea();  // GET FRESH REFERENCE
+    if (textarea) {
+      textarea.value = "introduce my capabilities";
+      runAgent(true);  // true = hide the trigger message
+    }
+  }, 1000);
 }
 
 if (document.readyState === 'loading') {
