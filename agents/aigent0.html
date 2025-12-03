@@ -2077,22 +2077,18 @@ async function initializeDashboard() {
   await fetchAIGxDashboardData(username);
   
   // Auto-trigger C-Suite greeting after user data loads
-const chatLog = getChatLog();  // GET FRESH REFERENCE
-if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
-  setTimeout(() => {
-    const textarea = getTextarea();  // GET FRESH REFERENCE
-    if (textarea) {
-      textarea.value = "introduce my capabilities";
-      runAgent(true);  // true = hide the trigger message
-    }
-  }, 1000);
+  const chatLog = getChatLog();  // GET FRESH REFERENCE
+  if (chatLog && chatLog.children.length === 0 && window.aigentsyUser) {
+    setTimeout(() => {
+      const textarea = getTextarea();  // GET FRESH REFERENCE
+      if (textarea) {
+        textarea.value = "introduce my capabilities";
+        runAgent(true);  // true = hide the trigger message
+      }
+    }, 1000);
+  }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeDashboard);
-} else {
-  initializeDashboard();
-}
 // Initialize dashboard when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeDashboard);
