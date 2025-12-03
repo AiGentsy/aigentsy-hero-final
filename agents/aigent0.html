@@ -827,49 +827,23 @@ const memory = [];
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
 
-async function runAgent(hideUserMessage = false) {
+async function runAgent() {
   const input = textarea.value.trim();
   if (!input) return;
-  
-  // DEBUG: Verify chatLog exists
-  console.log("📦 chatLog element:", chatLog);
-  console.log("📦 chatLog children BEFORE:", chatLog.children.length);
-  
-  // Only show user message if not hidden
-  if (!hideUserMessage) {
-    const userMsg = document.createElement("div");
-    userMsg.className = "chat-user";
-    userMsg.textContent = `You: ${input}`;
-    chatLog.appendChild(userMsg);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-  
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
   textarea.value = "";
   const loader = document.createElement("div");
   loader.className = "chat-agent";
   loader.textContent = "Thinking...";
-  
-  // DEBUG: Verify loader is being appended to chatLog
-  console.log("📦 Appending loader to chatLog...");
-  console.log("📦 loader parent BEFORE appendChild:", loader.parentElement);
-  
   chatLog.appendChild(loader);
-  
-  console.log("📦 loader parent AFTER appendChild:", loader.parentElement);
-  console.log("📦 chatLog children AFTER:", chatLog.children.length);
-  
   chatLog.scrollTop = chatLog.scrollHeight;
-  
   try {
     const user = window.aigentsyUser || {};
-    
-    // DEBUG: Log what we're sending to the agent
-    console.log("🎯 Sending to agent:", {
-      username: user.username,
-      businessType: user.companyType,
-      fullUser: user
-    });
     
     // ALL chat goes to Growth agent (the communicator)
     const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
@@ -2086,21 +2060,17 @@ async function initializeDashboard() {
   }
   console.log("👤 Loading for:", username);
   
-  // ⚡ CRITICAL: Wait for user data to load FIRST
-  await injectUserDashboard();
+  // Call existing initialization
+  injectUserDashboard();
   
   // ✨ ADD THIS: Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
-  // Auto-trigger C-Suite greeting in chat
   if (chatLog && chatLog.children.length === 0) {
-    setTimeout(async () => {
-      const textarea = document.getElementById("agentInput");
-      if (textarea && window.aigentsyUser) {
-        textarea.value = "introduce my capabilities";
-        await runAgent(true);  // true = hide the trigger message
-      }
-    }, 1500);
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
+    chatLog.appendChild(preload);
   }
 }
 
