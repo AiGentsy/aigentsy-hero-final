@@ -180,8 +180,8 @@
       </div>
       <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
     </div>
-<!-- Tier & Reputation -->
-<div class="metric-box" style="border: 1px solid #00bfff;">
+<!-- Tier & Reputation (with Team Achievements) -->
+<div class="metric-box">
   <div style="display: flex; justify-content: space-between; align-items: start; gap: 20px;">
     <!-- Left: Tier Badge -->
     <div style="flex: 1;">
@@ -254,13 +254,14 @@
       </div>
     </div>
   </div>
-</div>
-
-<div class="metric-box">
-  <h3>🏆 Team Achievements</h3>
-  <ul id="achievementList">
-    <li>Loading your business wins...</li>
-  </ul>
+  
+  <!-- ✨ TEAM ACHIEVEMENTS (Consolidated Here) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <h4 style="color:#00bfff; margin: 0 0 10px 0; font-size: 14px;">🏆 Team Achievements</h4>
+    <ul id="achievementList" style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.8;">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
 </div>
 
   </div>
@@ -830,16 +831,75 @@ function renderDynamicAchievements(user) {
   console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
+  
   const achievements = [];
-  const config = getBusinessConfig(user.companyType);
-  if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
-    achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+  
+  // Pull from AIGx dashboard if available
+  const dashboardData = window.aigxDashboardData;
+  
+  if (dashboardData) {
+    // Use AIGx Dashboard data
+    const aigx = dashboardData.aigx_equity.aigx_balance;
+    const revenue = dashboardData.tier_progression.lifetime_revenue;
+    
+    if (aigx > 0) {
+      achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
+    }
+    
+    if (dashboardData.early_adopter.badge) {
+      achievements.push(`🎖️ ${dashboardData.early_adopter.badge} #${dashboardData.user.user_number} — ${dashboardData.early_adopter.multiplier}x permanent multiplier`);
+    }
+    
+    const tier = dashboardData.tier_progression.current_tier.toUpperCase();
+    const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
+    achievements.push(`${tierEmoji} ${tier} Tier — ${dashboardData.tier_progression.tier_multiplier}x earning rate`);
+    
+    if (revenue > 0) {
+      achievements.push(`💵 Revenue Generated — $${revenue.toLocaleString()}`);
+    }
+    
+    if (dashboardData.activity_streaks.current_streak > 0) {
+      achievements.push(`🔥 ${dashboardData.activity_streaks.current_streak}-day activity streak`);
+    }
+    
+    if (dashboardData.referrals.total_referrals > 0) {
+      achievements.push(`🤝 ${dashboardData.referrals.total_referrals} referrals made`);
+    }
+    
+    if (dashboardData.apex_ultra.activated) {
+      const rate = dashboardData.apex_ultra.success_rate;
+      achievements.push(`🌟 APEX ULTRA — ${dashboardData.apex_ultra.systems_operational}/${dashboardData.apex_ultra.total_systems} systems (${rate}%)`);
+    }
+    
+  } else {
+    // Fallback to user object
+    const config = getBusinessConfig(user.companyType);
+    
+    if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
+      achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+    }
+    
+    if ((user.cloneLineage || []).length > 0) {
+      achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
+    }
+    
+    if ((user.yield?.aigxEarned || 0) > 0) {
+      achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
+    }
+    
+    if ((user.traits || []).includes(user.companyType)) {
+      achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+    }
+    
+    if ((user.contacts || []).length > 0) {
+      achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
+    }
+    
+    if ((user.proposals || []).length > 0) {
+      achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
+    }
   }
-  if ((user.cloneLineage || []).length > 0) achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
-  if ((user.yield?.aigxEarned || 0) > 0) achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
-  if ((user.traits || []).includes(user.companyType)) achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
-  if ((user.contacts || []).length > 0) achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
-  if ((user.proposals || []).length > 0) achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
+  
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
