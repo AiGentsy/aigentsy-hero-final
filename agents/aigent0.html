@@ -923,32 +923,31 @@ function renderWalletChart(user) {
     // Get AIGx data from dashboard if available, otherwise use user data
     const dashboardData = window.aigxDashboardData;
     const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
-    const aigoValue = dashboardData?.aigx_equity?.equity_value_usd || 0;
     const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
+    const reputation = dashboardData?.user?.reputation_score || 0;
     const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
     const clients = (user.contacts || []).length;
     const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
     const activeStreak = dashboardData?.activity_streaks?.current_streak || 0;
     
-    console.log("📊 Chart data - AIGx:", aigxBalance, "AIGo:", aigoValue, "Revenue:", lifetimeRevenue);
+    console.log("📊 Chart data - AIGx:", aigxBalance, "Reputation:", reputation, "Revenue:", lifetimeRevenue);
     
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
         data: {
-          labels: ['AIGx', 'AIGo ($K)', 'Revenue', 'Referrals', 'Clients', 'Partnerships', 'Streak'],
+          labels: ['AIGx', 'Revenue', 'Reputation', 'Referrals', 'Clients', 'Partners', 'Streak'],
           datasets: [{
             data: [
               aigxBalance, 
-              Math.round(aigoValue / 1000), 
               lifetimeRevenue,
-              lifetimeRevenue, 
+              reputation,
               referrals,
               clients,
               partnerships,
               activeStreak
             ],
-            backgroundColor: ['#00bfff', '#00ff88', '#ffdc4a', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
+            backgroundColor: ['#00bfff', '#00ff88', '#a78bfa', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
             borderRadius: 6
           }]
         },
@@ -962,7 +961,7 @@ function renderWalletChart(user) {
           }
         }
       });
-      console.log("✅ Chart rendered with AIGx metrics");
+      console.log("✅ Chart rendered with updated metrics");
     } catch (chartError) {
       console.error("❌ Chart error:", chartError);
     }
