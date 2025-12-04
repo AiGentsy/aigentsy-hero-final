@@ -924,7 +924,12 @@ function renderWalletChart(user) {
     const dashboardData = window.aigxDashboardData;
     const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
     const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
-    const reputation = dashboardData?.user?.reputation_score || 0;
+    
+    // ✨ GET REPUTATION - check multiple sources
+    const reputation = dashboardData?.user?.reputation_score || 
+                      parseInt(document.getElementById('reputation-score')?.textContent) || 
+                      0;
+    
     const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
     const clients = (user.contacts || []).length;
     const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
@@ -2406,6 +2411,11 @@ async function loadTierAndReputation() {
     const repData = await repResponse.json();
     
     if (repData.ok) {
+      // ✨ STORE REPUTATION GLOBALLY
+      if (!window.aigxDashboardData) window.aigxDashboardData = {};
+      if (!window.aigxDashboardData.user) window.aigxDashboardData.user = {};
+      window.aigxDashboardData.user.reputation_score = repData.reputation_score;
+      
       // Update reputation score
       document.getElementById('reputation-score').textContent = repData.reputation_score;
       
@@ -2440,6 +2450,11 @@ async function loadTierAndReputation() {
       
       // Update premium services grid
       updatePremiumServicesGrid(repData.reputation_score);
+      
+      // ✨ RE-RENDER CHART WITH REPUTATION DATA
+      if (window.aigentsyUser) {
+        renderWalletChart(window.aigentsyUser);
+      }
     }
     
   } catch (error) {
