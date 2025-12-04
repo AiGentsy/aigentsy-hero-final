@@ -2177,10 +2177,9 @@ function updateAIGxAchievements(data) {
   
   const achievements = [];
   const aigx = data.aigx_equity.aigx_balance;
-  const equityPercent = data.aigx_equity.equity_percent.toFixed(4);
-  const equityValue = data.aigx_equity.equity_value_usd.toLocaleString();
   
-  achievements.push(`💎 ${aigx.toLocaleString()} AIGx — $${equityValue} AIGo (${equityPercent}%)`);
+  // ✨ FIXED: Remove AIGo reference, show only AIGx
+  achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
   
   if (data.early_adopter.badge) {
     achievements.push(`🎖️ ${data.early_adopter.badge} #${data.user.user_number} — ${data.early_adopter.multiplier}x permanent multiplier`);
@@ -2298,17 +2297,35 @@ function updateLiveActivityFeed(data) {
 
 function getActivityEmoji(basis) {
   const emojiMap = {
+    // Platform milestones
     "apex_ultra_activation": "🌟",
     "amg_revenue_brain_activation": "🧠",
     "early_adopter_signup_bonus": "🎁",
+    
+    // Revenue & transactions
     "transaction_revenue": "💳",
+    "ame_auto_sale": "🤖",
+    "intent_exchange_win": "💼",
+    "jv_partnership_split": "🤝",
+    "shopify_sale": "🛍️",
+    "affiliate_commission": "📱",
+    
+    // Milestones
     "milestone_first_sale": "🎊",
     "milestone_reward": "🏆",
+    "reputation_milestone": "⭐",
+    
+    // Activity rewards
     "daily_activity_reward": "📅",
     "weekly_streak_reward": "🔥",
     "monthly_power_user_reward": "⭐",
     "referral_milestone": "🤝",
-    "tier_upgrade": "🚀"
+    "tier_upgrade": "🚀",
+    
+    // Reputation gains
+    "deal_completed": "✅",
+    "positive_review": "⭐",
+    "client_milestone": "🎯"
   };
   
   return emojiMap[basis] || "💎";
