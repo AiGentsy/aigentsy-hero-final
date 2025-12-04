@@ -175,9 +175,80 @@
       </div>
       <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
     </div>
-<div class="metric-box">
-  <h3>🔐 Unlocks & Licensing</h3>
-  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+<!-- Tier & Reputation -->
+<div class="metric-box" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(59, 130, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.3);">
+  <div style="display: flex; justify-content: space-between; align-items: start; gap: 20px;">
+    <!-- Left: Tier Badge -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">YOUR TIER</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div id="user-tier-badge" style="font-size: 48px;">🏆</div>
+        <div>
+          <div id="user-tier-name" style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Founder</div>
+          <div id="user-tier-description" style="font-size: 12px; color: #888;">User #5 • First 100</div>
+        </div>
+      </div>
+      <div style="background: rgba(139, 92, 246, 0.15); border-radius: 6px; padding: 8px 12px; display: inline-block;">
+        <span style="font-size: 20px; font-weight: 700; color: #a78bfa;" id="user-multiplier">3.0x</span>
+        <span style="font-size: 11px; color: #888; margin-left: 4px;">earnings boost</span>
+      </div>
+    </div>
+    
+    <!-- Right: Reputation Score -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">REPUTATION</div>
+      <div id="reputation-score" style="font-size: 36px; font-weight: 700; color: #22c55e; margin-bottom: 8px;">127</div>
+      
+      <!-- Breakdown -->
+      <div style="font-size: 11px; color: #64748b; line-height: 1.8;">
+        <div>💼 <span id="rep-deals">12</span> deals (+60)</div>
+        <div>⭐ <span id="rep-reviews">8</span> reviews (+24)</div>
+        <div>💰 $<span id="rep-revenue">6,601</span> (+66)</div>
+        <div>📅 <span id="rep-months">3</span> months (+6)</div>
+      </div>
+      
+      <!-- Next Unlock -->
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 10px; color: #888; margin-bottom: 4px; text-transform: uppercase;">Next: <span id="next-unlock-name">White Label</span> (<span id="next-unlock-required">150</span>)</div>
+        <div style="background: rgba(100, 116, 139, 0.2); border-radius: 4px; height: 4px; overflow: hidden;">
+          <div id="reputation-progress" style="background: linear-gradient(90deg, #8b5cf6, #3b82f6); height: 100%; width: 84.6%; transition: width 0.3s;"></div>
+        </div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 2px;"><span id="points-needed">23</span> points to go</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Premium Services (Reputation-Gated) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">🎖️ Premium Services</div>
+    <div id="premium-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
+      <!-- Populated by JavaScript -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🎭</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Dark Pool</div>
+        <div style="color: #64748b; font-size: 10px;">+5% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 50</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🤝</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">JV Admin</div>
+        <div style="color: #64748b; font-size: 10px;">+2% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 75</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🛡️</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Insurance</div>
+        <div style="color: #64748b; font-size: 10px;">1-2% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 100</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">💸</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Factoring</div>
+        <div style="color: #64748b; font-size: 10px;">1-3% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 25</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="metric-box">
@@ -209,9 +280,15 @@
 </h3>
 <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div>
     <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
-    <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+    <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
+      <span id="wallet-tier-badge" style="font-size: 16px;" title="Early Adopter Tier">🏆</span>
+      <span id="wallet-multiplier" style="font-size: 11px; color: #a78bfa; font-weight: 600;" title="Earnings Multiplier">3.0x</span>
+    </div>
   </div>
+  <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+</div>
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
   <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
   <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
@@ -2063,8 +2140,11 @@ async function initializeDashboard() {
   // Call existing initialization
   injectUserDashboard();
   
-  // ✨ ADD THIS: Fetch and display AIGx dashboard data
+  // Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
+  
+  // ✨ ADD THIS LINE:
+  await loadTierAndReputation();
   
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
@@ -2072,12 +2152,6 @@ async function initializeDashboard() {
     preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
   }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeDashboard);
-} else {
-  initializeDashboard();
 }
 
 window.addEventListener("load", () => {
@@ -2099,6 +2173,114 @@ setTimeout(() => {
 }, 3000);
 
 console.log("✅ Script loaded");
+
+  // ============================================================
+// 🎖️ TIER & REPUTATION SYSTEM
+// ============================================================
+
+async function loadTierAndReputation() {
+  try {
+    const userData = window.aigentsyUser || {};
+    const username = userData.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Fetch tier info
+    const tierResponse = await fetch(`${window.BACKEND_BASE}/user/${username}/tier`);
+    const tierData = await tierResponse.json();
+    
+    if (tierData.ok && tierData.has_tier) {
+      const tier = tierData.tier;
+      
+      // Update main tier card
+      document.getElementById('user-tier-badge').textContent = tier.badge;
+      document.getElementById('user-tier-name').textContent = tier.name;
+      document.getElementById('user-tier-description').textContent = 
+        `User #${tierData.user_number} • ${tier.description.split(' - ')[0]}`;
+      document.getElementById('user-multiplier').textContent = `${tier.multiplier}x`;
+      
+      // Update wallet tier indicator
+      document.getElementById('wallet-tier-badge').textContent = tier.badge;
+      document.getElementById('wallet-multiplier').textContent = `${tier.multiplier}x`;
+      document.getElementById('wallet-tier-badge').title = `${tier.name} - ${tier.multiplier}x earnings`;
+    }
+    
+    // Fetch reputation info
+    const repResponse = await fetch(`${window.BACKEND_BASE}/reputation/${username}`);
+    const repData = await repResponse.json();
+    
+    if (repData.ok) {
+      // Update reputation score
+      document.getElementById('reputation-score').textContent = repData.reputation_score;
+      
+      // Update breakdown
+      const breakdown = repData.reputation_breakdown;
+      document.getElementById('rep-deals').textContent = breakdown.deals_completed || 0;
+      document.getElementById('rep-reviews').textContent = breakdown.positive_reviews || 0;
+      document.getElementById('rep-revenue').textContent = 
+        Math.floor(breakdown.revenue_generated || 0).toLocaleString();
+      
+      // Calculate months (rough estimate from reputation)
+      const months = Math.floor((repData.reputation_score - 10 - 
+        (breakdown.deals_completed * 5) - 
+        (breakdown.positive_reviews * 3) - 
+        Math.floor(breakdown.revenue_generated / 100)) / 2);
+      document.getElementById('rep-months').textContent = Math.max(0, months);
+      
+      // Update next unlock progress
+      if (repData.next_unlock) {
+        const progress = ((repData.reputation_score / repData.next_unlock.required_reputation) * 100).toFixed(1);
+        document.getElementById('reputation-progress').style.width = `${progress}%`;
+        document.getElementById('next-unlock-name').textContent = repData.next_unlock.feature.replace(/_/g, ' ');
+        document.getElementById('next-unlock-required').textContent = repData.next_unlock.required_reputation;
+        document.getElementById('points-needed').textContent = repData.next_unlock.points_needed;
+      } else {
+        // All unlocked
+        document.getElementById('reputation-progress').style.width = '100%';
+        document.getElementById('next-unlock-name').textContent = 'All Features';
+        document.getElementById('next-unlock-required').textContent = '✓';
+        document.getElementById('points-needed').textContent = '0';
+      }
+      
+      // Update premium services grid
+      updatePremiumServicesGrid(repData.reputation_score);
+    }
+    
+  } catch (error) {
+    console.error('Failed to load tier/reputation:', error);
+  }
+}
+
+function updatePremiumServicesGrid(repScore) {
+  const services = [
+    { name: 'Dark Pool', icon: '🎭', fee: '+5%', repRequired: 50 },
+    { name: 'JV Admin', icon: '🤝', fee: '+2%', repRequired: 75 },
+    { name: 'Insurance', icon: '🛡️', fee: '1-2%', repRequired: 100 },
+    { name: 'Factoring', icon: '💸', fee: '1-3%', repRequired: 25 }
+  ];
+  
+  const grid = document.getElementById('premium-services-grid');
+  if (!grid) return;
+  
+  grid.innerHTML = services.map(service => {
+    const unlocked = repScore >= service.repRequired;
+    const bgColor = unlocked ? 'rgba(59, 130, 246, 0.08)' : 'rgba(100, 116, 139, 0.05)';
+    const borderColor = unlocked ? 'rgba(59, 130, 246, 0.3)' : 'rgba(100, 116, 139, 0.2)';
+    const opacity = unlocked ? '1' : '0.6';
+    const status = unlocked ? '✅' : `🔒 Rep ${service.repRequired}`;
+    
+    return `
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 6px; padding: 8px; text-align: center; opacity: ${opacity};">
+        <div style="font-size: 18px; margin-bottom: 4px;">${service.icon}</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">${service.name}</div>
+        <div style="color: #64748b; font-size: 10px;">${service.fee}</div>
+        <div style="color: ${unlocked ? '#3b82f6' : '#64748b'}; font-size: 9px; margin-top: 4px;">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Add to initializeDashboard function - find the function and add this line at the end:
+// await loadTierAndReputation();
+
 </script>
 </body>
 </html>
