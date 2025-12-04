@@ -51,6 +51,13 @@
   visibility: visible;
   opacity: 1;
 }
+  .metric-box {
+  background: #111;
+  border: 1px solid #00bfff !important; /* Blue borders for all boxes */
+  border-radius: 10px;
+  padding: 18px 24px;
+  box-shadow: 0 0 12px rgba(0,240,255,0.05);
+}
   .col-left { display: flex; flex-direction: column; gap: 20px; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: radial-gradient(circle at center, #0e101a, #000); color: #fff; display: flex; }
   .sidebar { width: 320px; background: #0a0a0a; padding: 30px 20px; }
@@ -137,16 +144,20 @@
     <p id="csuiteNote" style="font-size: 0.85rem; color: #888;"></p>
   </div>
   <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-    <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
-    <div style="margin-bottom:10px;">
-      <strong style="color:#fff;">Business Kit Overview:</strong>
-      <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
-        Loading your kit details...
-      </div>
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+  
+  <!-- Kit Items (Clickable) -->
+  <div style="margin-bottom:12px;">
+    <strong style="color:#fff; font-size:0.9rem;">📂 Kit Documents:</strong>
+    <div id="dynamicKitDoc" style="margin-top:6px;">
+      <!-- Populated by JavaScript with clickable items -->
     </div>
-    <strong style="color:#fff;">Modules Unlocked:</strong>
-    <ul id="businessSummaryList" style="padding-left:18px;"></ul>
   </div>
+  
+  <!-- Unlocks (All Unlocked) -->
+  <strong style="color:#fff; font-size:0.9rem;">✅ Modules Unlocked:</strong>
+  <ul id="businessSummaryList" style="padding-left:18px; font-size:0.85rem; line-height:1.8;"></ul>
+</div>
 </div>
 <div class="main">
   <div class="metric-box full-width">
@@ -176,7 +187,7 @@
       <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
     </div>
 <!-- Tier & Reputation -->
-<div class="metric-box" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(59, 130, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.3);">
+<div class="metric-box" style="border: 1px solid #00bfff;">
   <div style="display: flex; justify-content: space-between; align-items: start; gap: 20px;">
     <!-- Left: Tier Badge -->
     <div style="flex: 1;">
@@ -258,15 +269,6 @@
   </ul>
 </div>
 
-<div class="metric-box">
-  <h3>🌐 Expand Your Business Circle</h3>
-  <p style="font-size: 0.85rem; color:#999;">
-    Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
-  </p>
-  <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
-  <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
-  <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
-</div>
   </div>
   <div class="metric-box">
     <h3>
@@ -371,6 +373,20 @@
         </ul>
       </div>
     </div>
+    
+    <!-- ✨ PATCH F: Expand Your Business Circle (Moved from standalone box) -->
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #222;">
+      <h4 style="color:#00bfff; margin-bottom: 10px;">🌐 Expand Your Business Circle</h4>
+      <p style="font-size: 0.85rem; color:#999; margin-bottom: 10px;">
+        Invite collaborators, partners, or clients to join your AiGentsy business.
+      </p>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="flex: 1; padding:8px; border-radius:4px; border:1px solid #444; background:#000; color:#fff;">
+        <button class="btn-glow" onclick="sendInvite()" style="white-space: nowrap;">📨 Send</button>
+      </div>
+      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+    </div>
+    
   </div>
 </div>
 
@@ -673,19 +689,147 @@ function renderDynamicCSuite(user) {
 function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
   const config = getBusinessConfig(user.companyType);
+  
+  // Render clickable kit items
   const kitDocBox = document.getElementById("dynamicKitDoc");
-  if (kitDocBox) kitDocBox.innerHTML = config.kitDoc;
+  if (kitDocBox) {
+    const kitItems = getKitItemsForType(user.companyType);
+    kitDocBox.innerHTML = kitItems.map(item => `
+      <div onclick="openKitDocument('${item.id}')" 
+           style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+           onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+           onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+        📄 ${item.name}
+      </div>
+    `).join('');
+  }
+  
+  // Render unlocked modules (ALL UNLOCKED)
   const summaryBox = document.getElementById("businessSummaryList");
   if (summaryBox) {
     const summaryItems = [
-      { label: "SDK Toolkit", check: user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible },
-      { label: "Vault Access", check: user.vaultAccess || user.runtimeFlags?.vaultAccess },
-      { label: "Remix License", check: user.remixUnlocked || user.runtimeFlags?.remixUnlocked },
-      { label: "Clone License", check: user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked },
-      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, check: (user.traits || []).includes(user.companyType) }
+      { label: "SDK Toolkit" },
+      { label: "Vault Access" },
+      { label: "Remix License" },
+      { label: "Clone License" },
+      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit` }
     ];
-    summaryBox.innerHTML = summaryItems.map(({ label, check }) => `<li>${check ? "✅" : "🔒"} ${label}</li>`).join("");
+    summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
   }
+}
+
+// Helper: Get kit items based on business type
+function getKitItemsForType(companyType) {
+  const kitTemplates = {
+    legal: [
+      { id: 'nda_template', name: 'NDA Template' },
+      { id: 'ip_assignment', name: 'IP Assignment Agreement' },
+      { id: 'licensing_agreement', name: 'Licensing Agreement' },
+      { id: 'compliance_checklist', name: 'Compliance Checklist' },
+      { id: 'contract_template', name: 'Service Contract Template' }
+    ],
+    social: [
+      { id: 'content_calendar', name: 'Content Calendar Template' },
+      { id: 'brand_kit', name: 'Brand Voice Guidelines' },
+      { id: 'hashtag_strategy', name: 'Hashtag Strategy Doc' },
+      { id: 'creator_pitch', name: 'Creator Pitch Deck' },
+      { id: 'media_kit', name: 'Media Kit Template' }
+    ],
+    saas: [
+      { id: 'api_docs', name: 'API Documentation Template' },
+      { id: 'database_schema', name: 'Database Schema Guide' },
+      { id: 'auth_flow', name: 'Auth & Subscription Flow' },
+      { id: 'deployment_guide', name: 'Deployment Checklist' },
+      { id: 'stripe_integration', name: 'Stripe Integration Guide' }
+    ],
+    marketing: [
+      { id: 'seo_audit', name: 'SEO Audit Framework' },
+      { id: 'ad_campaign', name: 'Ad Campaign Template' },
+      { id: 'email_sequence', name: 'Email Sequence Builder' },
+      { id: 'analytics_dashboard', name: 'Analytics Dashboard' },
+      { id: 'outreach_scripts', name: 'Outreach Scripts' }
+    ],
+    general: [
+      { id: 'business_plan', name: 'Business Plan Template' },
+      { id: 'proposal_template', name: 'Proposal Template' },
+      { id: 'contract_basics', name: 'Basic Contract Template' },
+      { id: 'financial_planning', name: 'Financial Planning Guide' },
+      { id: 'operations_playbook', name: 'Operations Playbook' }
+    ]
+  };
+  
+  return kitTemplates[companyType] || kitTemplates.general;
+}
+
+// Open kit document in modal
+function openKitDocument(docId) {
+  const docContent = getKitDocumentContent(docId);
+  
+  const modalBody = document.getElementById('gxModalBody');
+  document.getElementById('gxModalTitle').textContent = docContent.title;
+  
+  modalBody.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <textarea id="kitDocEditor" style="width:100%; min-height:300px; padding:12px; background:#0a0a0a; color:#fff; border:1px solid #444; border-radius:6px; font-family:monospace; font-size:0.9rem;">${docContent.content}</textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn-glow" onclick="saveKitDocument('${docId}')">💾 Save Changes</button>
+      <button class="btn-glow" onclick="downloadKitDocument('${docId}')" style="background:#444;">⬇️ Download</button>
+    </div>
+  `;
+  
+  document.getElementById('gxModal').classList.add('open');
+}
+
+// Get document content (stub - would load from backend)
+function getKitDocumentContent(docId) {
+  const templates = {
+    nda_template: {
+      title: '📄 NDA Template',
+      content: `NON-DISCLOSURE AGREEMENT\n\nThis Agreement is entered into as of [DATE] by and between:\n\nDisclosing Party: [COMPANY NAME]\nReceiving Party: [RECIPIENT NAME]\n\n1. CONFIDENTIAL INFORMATION\nFor purposes of this Agreement, "Confidential Information" includes...\n\n2. OBLIGATIONS\nReceiving Party agrees to...\n\n3. TERM\nThis Agreement shall remain in effect for...\n\n[Add your custom terms here]`
+    },
+    business_plan: {
+      title: '📄 Business Plan Template',
+      content: `BUSINESS PLAN\n\n1. EXECUTIVE SUMMARY\n[Describe your business in 2-3 sentences]\n\n2. PROBLEM & SOLUTION\nProblem: [What problem are you solving?]\nSolution: [How does your business solve it?]\n\n3. TARGET MARKET\n[Who are your customers?]\n\n4. REVENUE MODEL\n[How will you make money?]\n\n5. MARKETING STRATEGY\n[How will you reach customers?]\n\n[Customize this plan for your business]`
+    },
+    // Add more templates as needed
+    default: {
+      title: '📄 Document Template',
+      content: `This is a placeholder document.\n\nYou can edit this content and save your changes.\n\nAdd your custom content here...`
+    }
+  };
+  
+  return templates[docId] || templates.default;
+}
+
+// Save document (stub - would save to backend)
+function saveKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  
+  // TODO: Send to backend
+  // await fetch(`${window.BACKEND_BASE}/kit/save`, {
+  //   method: 'POST',
+  //   body: JSON.stringify({ docId, content, username })
+  // });
+  
+  showToast(`✅ ${docId} saved!`, "success");
+  GXA.closeModal();
+}
+
+// Download document
+function downloadKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${docId}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast(`⬇️ ${docId} downloaded!`, "success");
 }
 
 function renderDynamicAchievements(user) {
@@ -2019,8 +2163,9 @@ function updateAIGxAchievements(data) {
 function updateAIGxWallet(data) {
   const totalEarningsEl = document.getElementById("totalEarnings");
   if (totalEarningsEl) {
-    const aigoValue = data.aigx_equity.equity_value_usd;
-    totalEarningsEl.textContent = aigoValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // Use actual revenue, not equity value
+    const actualRevenue = data.tier_progression?.lifetime_revenue || 0;
+    totalEarningsEl.textContent = actualRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   
   // Add AIGx breakdown to the dropdown
