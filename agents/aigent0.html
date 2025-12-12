@@ -866,7 +866,8 @@ function downloadKitDocument(docId) {
 }
 
 function renderDynamicAchievements(user) {
-  console.log("🏆 Rendering achievements");
+  console.log("🏆 [DEBUG] renderDynamicAchievements called");
+  console.log("🏆 [DEBUG] Stack trace:", new Error().stack.split('\n').slice(1, 4).join('\n'));
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
   
@@ -940,8 +941,10 @@ function renderDynamicAchievements(user) {
   
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+    console.log("🏆 [DEBUG] Rendered", achievements.length, "achievements:", achievements.slice(0, 3));
   } else {
     achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
+    console.log("🏆 [DEBUG] Rendered fallback achievement");
   }
 }
 
