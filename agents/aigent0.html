@@ -3234,58 +3234,17 @@ async function loadKitSpecificMetricsData() {
     }
     
     // ============================================================
-    // ENHANCE ACHIEVEMENTS WITH REAL DATA
+    // REMOVED: ENHANCE ACHIEVEMENTS WITH REAL DATA
     // ============================================================
-    const achievementsList = document.getElementById('achievementList');
-    
-    if (achievementsList && franchiseData?.summary) {
-      const metrics = franchiseData.summary;
-      
-      // Get subscription data
-      const subRes = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
-      const subData = await subRes.json();
-      
-      // Get booster data
-      const boosterRes = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
-      const boosterData = await boosterRes.json();
-      
-      // Build dynamic achievements based on real data
-      const baseAchievements = {
-        social: [
-          `🎥 Created ${metrics.total_outcomes || 0}+ content pieces using templates`,
-          `📋 ${metrics.active_licenses || 0} franchise template${metrics.active_licenses !== 1 ? 's' : ''} licensed`,
-          `💰 Earned $${(metrics.total_revenue || 0).toFixed(0)} from franchised content`,
-          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining}/${subData.subscription.monthly_allocation} credits` : null,
-          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
-        ],
-        saas: [
-          `💻 Deployed ${metrics.total_outcomes || 0} integration${metrics.total_outcomes !== 1 ? 's' : ''} using templates`,
-          `📋 ${metrics.active_licenses || 0} template license${metrics.active_licenses !== 1 ? 's' : ''} active`,
-          `💰 Generated $${(metrics.total_revenue || 0).toFixed(0)} in template revenue`,
-          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining} builds remaining` : null,
-          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
-        ],
-        marketing: [
-          `🎯 Launched ${metrics.total_outcomes || 0} campaign${metrics.total_outcomes !== 1 ? 's' : ''} using templates`,
-          `📋 ${metrics.active_licenses || 0} marketing template${metrics.active_licenses !== 1 ? 's' : ''} licensed`,
-          `💰 Campaign revenue: $${(metrics.total_revenue || 0).toFixed(0)}`,
-          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining} campaigns remaining` : null,
-          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
-        ]
-      };
-      
-      const achievements = (baseAchievements[kit] || []).filter(a => a !== null);
-      
-      if (achievements.length > 0) {
-        achievementsList.innerHTML = achievements
-          .map(a => `<li>${a}</li>`)
-          .join('');
-      }
-    }
+    // ✅ This was the THIRD place overwriting achievements!
+    // All achievements are handled by renderDynamicAchievements() which already
+    // pulls in AIGx data, early adopter bonuses, tier info, AND can integrate
+    // Week 1 franchise data if needed.
+    //
+    // Having multiple functions write to the same DOM element causes race conditions.
     
   } catch (error) {
     console.warn('Kit-specific metrics API not available:', error);
-    // Keep static achievements if API fails
   }
 }
 
