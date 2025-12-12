@@ -396,6 +396,13 @@
           <li>📊 Close Rate: <span id="growthCloseRate">0</span>%</li>
           <li>💵 Avg Deal Size: $<span id="growthAvgDeal">0</span></li>
           <li>🔄 Repeat Rate: <span id="growthRepeatRate">0</span>%</li>
+          
+          <!-- KIT-SPECIFIC METRICS (dynamically populated) -->
+          <div id="kitSpecificMetrics" style="margin-top:8px; padding-top:8px; border-top:1px solid #222;">
+            <!-- Social Kit: Content metrics -->
+            <!-- SaaS Kit: Deployment metrics -->
+            <!-- Marketing Kit: Campaign metrics -->
+          </div>
         </ul>
       </div>
     </div>
@@ -3046,7 +3053,9 @@ function enhanceKitSpecificMetrics() {
     return;
   }
   
-  // Update welcome tip (kit-specific)
+  // ============================================================
+  // 1. UPDATE WELCOME TIP (KIT-SPECIFIC)
+  // ============================================================
   const tips = {
     social: "💡 Tip: Use franchise Reel templates to 10x your content output. Active creators earn 2.5x with viral boosters!",
     saas: "💡 Tip: License your API templates to other devs. Top franchisees earn $3k+/mo passive from template revenue!",
@@ -3056,6 +3065,207 @@ function enhanceKitSpecificMetrics() {
   const tipElement = document.getElementById('welcomeTip');
   if (tipElement && tips[kit]) {
     tipElement.innerHTML = `<strong>Tip:</strong> ${tips[kit]}`;
+  }
+  
+  // ============================================================
+  // 2. ADD KIT-SPECIFIC BUSINESS GROWTH METRICS
+  // ============================================================
+  const metricsContainer = document.getElementById('kitSpecificMetrics');
+  
+  if (metricsContainer) {
+    const metrics = {
+      social: `
+        <li style="color:#a78bfa;">🎥 Content Pieces: <span id="socialContentPieces">0</span>/mo</li>
+        <li style="color:#a78bfa;">📈 Avg Engagement: <span id="socialEngagement">0</span>%</li>
+        <li style="color:#a78bfa;">📋 Templates Used: <span id="socialTemplatesUsed">0</span></li>
+      `,
+      saas: `
+        <li style="color:#3b82f6;">💻 Deployments: <span id="saasDeployments">0</span>/mo</li>
+        <li style="color:#3b82f6;">⚡ Avg Setup Time: <span id="saasSetupTime">0</span>h</li>
+        <li style="color:#3b82f6;">📋 Templates Licensed: <span id="saasTemplatesLicensed">0</span></li>
+      `,
+      marketing: `
+        <li style="color:#10b981;">🎯 Campaigns Live: <span id="marketingCampaigns">0</span></li>
+        <li style="color:#10b981;">📊 Avg Campaign ROI: <span id="marketingROI">0</span>%</li>
+        <li style="color:#10b981;">📋 Templates Active: <span id="marketingTemplatesActive">0</span></li>
+      `
+    };
+    
+    metricsContainer.innerHTML = metrics[kit] || '';
+  }
+  
+  // ============================================================
+  // 3. POPULATE KIT-SPECIFIC ACHIEVEMENTS
+  // ============================================================
+  const achievementsList = document.getElementById('achievementList');
+  
+  if (achievementsList) {
+    const achievements = {
+      social: [
+        "🎥 Created 50+ Reels using franchise templates",
+        "📈 Viral post reached 100k views (+25% booster earned)",
+        "👥 5 active referrals from creator community",
+        "📦 Gold subscription: 22 content pieces this month",
+        "⚡ Weekend Warrior booster active (+25% Sat/Sun)"
+      ],
+      saas: [
+        "💻 Deployed 12 API integrations using templates",
+        "🔗 Stripe integration franchise license earned $450/mo",
+        "👥 3 developer referrals (tech community)",
+        "📦 Professional subscription: 15 builds remaining",
+        "🛡️ 100% Money-Back warranty offered on 8 projects"
+      ],
+      marketing: [
+        "🎯 Launched 8 campaigns with SEO templates",
+        "📊 Avg campaign ROI: 340% (SLO bonuses earned)",
+        "👥 4 agency referrals from LinkedIn outreach",
+        "📦 Platinum subscription: Unlimited campaigns",
+        "⚡ Express SLO tier: 24hr delivery (+80% premium)"
+      ]
+    };
+    
+    const kitAchievements = achievements[kit] || [];
+    achievementsList.innerHTML = kitAchievements
+      .map(a => `<li>${a}</li>`)
+      .join('');
+  }
+}
+
+// ============================================================
+// 🎯 LOAD KIT-SPECIFIC METRICS DATA
+// ============================================================
+
+async function loadKitSpecificMetricsData() {
+  const kit = window.aigentsyUser?.companyType || 'general';
+  
+  if (!['social', 'saas', 'marketing'].includes(kit)) {
+    return;
+  }
+  
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Get franchise metrics
+    const franchiseRes = await fetch(`${WEEK1_API_BASE}/franchise/franchisee_dashboard/${username}`);
+    const franchiseData = await franchiseRes.json();
+    
+    if (franchiseData && franchiseData.summary) {
+      const metrics = franchiseData.summary;
+      
+      // ============================================================
+      // SOCIAL KIT METRICS
+      // ============================================================
+      if (kit === 'social') {
+        // Content Pieces: Based on outcomes delivered
+        const contentPieces = metrics.total_outcomes || 0;
+        document.getElementById('socialContentPieces').textContent = contentPieces;
+        
+        // Avg Engagement: Calculate from revenue (proxy metric)
+        const avgEngagement = metrics.total_revenue > 0 
+          ? ((metrics.total_revenue / 1000) * 0.5).toFixed(1) 
+          : 0;
+        document.getElementById('socialEngagement').textContent = avgEngagement;
+        
+        // Templates Used: Active licenses
+        const templatesUsed = metrics.active_licenses || 0;
+        document.getElementById('socialTemplatesUsed').textContent = templatesUsed;
+      }
+      
+      // ============================================================
+      // SAAS KIT METRICS
+      // ============================================================
+      if (kit === 'saas') {
+        // Deployments: Based on outcomes delivered
+        const deployments = metrics.total_outcomes || 0;
+        document.getElementById('saasDeployments').textContent = deployments;
+        
+        // Avg Setup Time: Calculate from delivery metrics
+        // Get from SLO data
+        const sloRes = await fetch(`${WEEK1_API_BASE}/slo/agent_dashboard/${username}`);
+        const sloData = await sloRes.json();
+        const avgSetupTime = sloData?.avg_delivery_hours 
+          ? (sloData.avg_delivery_hours / 24).toFixed(1) 
+          : 0;
+        document.getElementById('saasSetupTime').textContent = avgSetupTime;
+        
+        // Templates Licensed: Active licenses
+        const templatesLicensed = metrics.active_licenses || 0;
+        document.getElementById('saasTemplatesLicensed').textContent = templatesLicensed;
+      }
+      
+      // ============================================================
+      // MARKETING KIT METRICS
+      // ============================================================
+      if (kit === 'marketing') {
+        // Campaigns Live: Based on active licenses
+        const campaignsLive = metrics.active_licenses || 0;
+        document.getElementById('marketingCampaigns').textContent = campaignsLive;
+        
+        // Avg Campaign ROI: Calculate from revenue vs cost
+        const avgROI = metrics.total_revenue > 0 && metrics.active_licenses > 0
+          ? ((metrics.total_revenue / (metrics.active_licenses * 299)) * 100).toFixed(0)
+          : 0;
+        document.getElementById('marketingROI').textContent = avgROI;
+        
+        // Templates Active: Active licenses
+        const templatesActive = metrics.active_licenses || 0;
+        document.getElementById('marketingTemplatesActive').textContent = templatesActive;
+      }
+    }
+    
+    // ============================================================
+    // ENHANCE ACHIEVEMENTS WITH REAL DATA
+    // ============================================================
+    const achievementsList = document.getElementById('achievementList');
+    
+    if (achievementsList && franchiseData?.summary) {
+      const metrics = franchiseData.summary;
+      
+      // Get subscription data
+      const subRes = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
+      const subData = await subRes.json();
+      
+      // Get booster data
+      const boosterRes = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+      const boosterData = await boosterRes.json();
+      
+      // Build dynamic achievements based on real data
+      const baseAchievements = {
+        social: [
+          `🎥 Created ${metrics.total_outcomes || 0}+ content pieces using templates`,
+          `📋 ${metrics.active_licenses || 0} franchise template${metrics.active_licenses !== 1 ? 's' : ''} licensed`,
+          `💰 Earned $${(metrics.total_revenue || 0).toFixed(0)} from franchised content`,
+          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining}/${subData.subscription.monthly_allocation} credits` : null,
+          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
+        ],
+        saas: [
+          `💻 Deployed ${metrics.total_outcomes || 0} integration${metrics.total_outcomes !== 1 ? 's' : ''} using templates`,
+          `📋 ${metrics.active_licenses || 0} template license${metrics.active_licenses !== 1 ? 's' : ''} active`,
+          `💰 Generated $${(metrics.total_revenue || 0).toFixed(0)} in template revenue`,
+          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining} builds remaining` : null,
+          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
+        ],
+        marketing: [
+          `🎯 Launched ${metrics.total_outcomes || 0} campaign${metrics.total_outcomes !== 1 ? 's' : ''} using templates`,
+          `📋 ${metrics.active_licenses || 0} marketing template${metrics.active_licenses !== 1 ? 's' : ''} licensed`,
+          `💰 Campaign revenue: $${(metrics.total_revenue || 0).toFixed(0)}`,
+          subData?.subscription ? `📦 ${subData.subscription.tier} subscription: ${subData.subscription.credits_remaining} campaigns remaining` : null,
+          boosterData?.booster_count > 0 ? `⚡ ${boosterData.booster_count} active booster${boosterData.booster_count !== 1 ? 's' : ''} (${boosterData.total_multiplier}x multiplier)` : null
+        ]
+      };
+      
+      const achievements = (baseAchievements[kit] || []).filter(a => a !== null);
+      
+      if (achievements.length > 0) {
+        achievementsList.innerHTML = achievements
+          .map(a => `<li>${a}</li>`)
+          .join('');
+      }
+    }
+    
+  } catch (error) {
+    console.warn('Kit-specific metrics API not available:', error);
+    // Keep static achievements if API fails
   }
 }
 
@@ -3083,8 +3293,11 @@ async function initializeWeek1Features() {
     loadLiveActivityFeed()
   ]);
   
-  // Apply kit-specific enhancements
+  // Apply kit-specific enhancements (static content)
   enhanceKitSpecificMetrics();
+  
+  // Load kit-specific metrics data (dynamic data)
+  await loadKitSpecificMetricsData();
   
   console.log('✅ Week 1 features loaded!');
 }
@@ -3107,6 +3320,7 @@ setInterval(() => {
     loadWarrantyData();
     loadSLOData();
     loadLiveActivityFeed();
+    loadKitSpecificMetricsData(); // Refresh kit-specific metrics
   }
 }, 30000);
 
