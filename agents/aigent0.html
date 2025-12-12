@@ -1037,7 +1037,7 @@ async function injectUserDashboard() {
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
-    renderDynamicAchievements(user);
+    // ✅ DON'T render achievements yet - wait for AIGx data to load first
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
@@ -1049,7 +1049,7 @@ async function injectUserDashboard() {
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
-    renderDynamicAchievements(user);
+    // ✅ DON'T render achievements yet - wait for AIGx data attempt
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
@@ -2219,10 +2219,26 @@ async function fetchAIGxDashboardData(username) {
       updateAIGxAchievements(data);
       updateAIGxWallet(data);
       updateLiveActivityFeed(data);
+      
+      // ✅ NOW render achievements with complete AIGx data
+      const user = window.aigentsyUser;
+      if (user) {
+        console.log("🏆 Rendering achievements with AIGx data");
+        renderDynamicAchievements(user);
+      }
+      
       return data;
     }
   } catch (error) {
     console.warn("AIGx Dashboard API not available:", error);
+    
+    // ✅ If AIGx API fails, render achievements with fallback user data
+    const user = window.aigentsyUser;
+    if (user) {
+      console.log("🏆 Rendering achievements with fallback data");
+      renderDynamicAchievements(user);
+    }
+    
     return null;
   }
 }
