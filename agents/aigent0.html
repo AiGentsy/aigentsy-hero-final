@@ -1171,8 +1171,26 @@ async function runAgent() {
       body: JSON.stringify({ 
         input: input, 
         memory, 
-        businessType: user.companyType, 
-        username: user.username 
+        businessType: user.companyType || 'general',
+        username: user.username,
+        // ✨ NEW: Include Week 1 feature context
+        context: {
+          kit: user.companyType,
+          activeFeatures: {
+            boosters: true,
+            subscriptions: true,
+            pwp: true,
+            warranties: true,
+            slo: true,
+            franchise: true
+          },
+          // Include current metrics for context-aware responses
+          metrics: {
+            revenue: parseFloat(document.getElementById('totalEarnings')?.textContent || 0),
+            multiplier: parseFloat(document.getElementById('user-multiplier')?.textContent?.replace('x', '') || 1),
+            tier: document.getElementById('user-tier-name')?.textContent || 'Founder'
+          }
+        }
       }) 
     }, 2, 15000);
     
@@ -2396,18 +2414,33 @@ async function initializeDashboard() {
   console.log("👤 Loading for:", username);
   
   // Call existing initialization
-  injectUserDashboard();
+  await injectUserDashboard();
   
   // Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
-  // ✨ ADD THIS LINE:
+  // Load tier and reputation
   await loadTierAndReputation();
   
+  // ✨ NEW: Initialize Week 1 features
+  await initializeWeek1Features();
+  
+  // ✨ NEW: Kit-aware welcome message
   if (chatLog && chatLog.children.length === 0) {
+    const user = window.aigentsyUser || {};
+    const kit = user.companyType || 'general';
+    
+    const kitWelcomes = {
+      social: `Hey ${username}! Your Social Media C-Suite is ready. We've got content templates, Reel frameworks, and franchise licensing loaded. What content do you want to create today?`,
+      saas: `Hey ${username}! Your SaaS C-Suite is online. We've got API templates, deployment guides, and subscription systems ready. What do you want to build?`,
+      marketing: `Hey ${username}! Your Marketing C-Suite is standing by. We've got SEO templates, campaign frameworks, and growth tools loaded. What campaigns should we launch?`,
+      legal: `Hey ${username}! Your Legal C-Suite is ready. We've got contract templates, IP frameworks, and compliance tools loaded. What legal work can we handle?`,
+      general: `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`
+    };
+    
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
+    preload.innerHTML = kitWelcomes[kit] || kitWelcomes.general;
     chatLog.appendChild(preload);
   }
 }
