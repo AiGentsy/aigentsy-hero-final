@@ -51,6 +51,7 @@
   visibility: visible;
   opacity: 1;
 }
+  .metric-box { background: #111; border: 1px solid #222; border-radius: 10px; padding: 18px 24px; box-shadow: 0 0 12px rgba(0,240,255,0.05); }
   .col-left { display: flex; flex-direction: column; gap: 20px; }
   body { font-family: 'Inter', sans-serif; margin: 0; background: radial-gradient(circle at center, #0e101a, #000); color: #fff; display: flex; }
   .sidebar { width: 320px; background: #0a0a0a; padding: 30px 20px; }
@@ -137,16 +138,20 @@
     <p id="csuiteNote" style="font-size: 0.85rem; color: #888;"></p>
   </div>
   <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-    <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
-    <div style="margin-bottom:10px;">
-      <strong style="color:#fff;">Business Kit Overview:</strong>
-      <div id="dynamicKitDoc" style="font-size:0.85rem; line-height:1.4; color:#ccc; margin-top:4px;">
-        Loading your kit details...
-      </div>
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+  
+  <!-- Kit Items (Clickable) -->
+  <div style="margin-bottom:12px;">
+    <strong style="color:#fff; font-size:0.9rem;">📂 Kit Documents:</strong>
+    <div id="dynamicKitDoc" style="margin-top:6px;">
+      <!-- Populated by JavaScript with clickable items -->
     </div>
-    <strong style="color:#fff;">Modules Unlocked:</strong>
-    <ul id="businessSummaryList" style="padding-left:18px;"></ul>
   </div>
+  
+  <!-- Unlocks (All Unlocked) -->
+  <strong style="color:#fff; font-size:0.9rem;">✅ Modules Unlocked:</strong>
+  <ul id="businessSummaryList" style="padding-left:18px; font-size:0.85rem; line-height:1.8;"></ul>
+</div>
 </div>
 <div class="main">
   <div class="metric-box full-width">
@@ -175,27 +180,90 @@
       </div>
       <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
     </div>
+<!-- Tier & Reputation (with Team Achievements) -->
 <div class="metric-box">
-  <h3>🔐 Unlocks & Licensing</h3>
-  <ul id="autoMatchOfferings" style="margin-bottom: 10px;"></ul>
+  <div style="display: flex; justify-content: space-between; align-items: start; gap: 20px;">
+    <!-- Left: Tier Badge -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">YOUR TIER</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div id="user-tier-badge" style="font-size: 48px;">🏆</div>
+        <div>
+          <div id="user-tier-name" style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Founder</div>
+          <div id="user-tier-description" style="font-size: 12px; color: #888;">User #5 • First 100</div>
+        </div>
+      </div>
+      <div style="background: rgba(139, 92, 246, 0.15); border-radius: 6px; padding: 8px 12px; display: inline-block;">
+        <span style="font-size: 20px; font-weight: 700; color: #a78bfa;" id="user-multiplier">3.0x</span>
+        <span style="font-size: 11px; color: #888; margin-left: 4px;">earnings boost</span>
+      </div>
+    </div>
+    
+    <!-- Right: Reputation Score -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">REPUTATION</div>
+      <div id="reputation-score" style="font-size: 36px; font-weight: 700; color: #22c55e; margin-bottom: 8px;">127</div>
+      
+      <!-- Breakdown -->
+      <div style="font-size: 11px; color: #64748b; line-height: 1.8;">
+        <div>💼 <span id="rep-deals">12</span> deals (+60)</div>
+        <div>⭐ <span id="rep-reviews">8</span> reviews (+24)</div>
+        <div>💰 $<span id="rep-revenue">6,601</span> (+66)</div>
+        <div>📅 <span id="rep-months">3</span> months (+6)</div>
+      </div>
+      
+      <!-- Next Unlock -->
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 10px; color: #888; margin-bottom: 4px; text-transform: uppercase;">Next: <span id="next-unlock-name">White Label</span> (<span id="next-unlock-required">150</span>)</div>
+        <div style="background: rgba(100, 116, 139, 0.2); border-radius: 4px; height: 4px; overflow: hidden;">
+          <div id="reputation-progress" style="background: linear-gradient(90deg, #8b5cf6, #3b82f6); height: 100%; width: 84.6%; transition: width 0.3s;"></div>
+        </div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 2px;"><span id="points-needed">23</span> points to go</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Premium Services (Reputation-Gated) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">🎖️ Premium Services</div>
+    <div id="premium-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
+      <!-- Populated by JavaScript -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🎭</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Dark Pool</div>
+        <div style="color: #64748b; font-size: 10px;">+5% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 50</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🤝</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">JV Admin</div>
+        <div style="color: #64748b; font-size: 10px;">+2% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 75</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">🛡️</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Insurance</div>
+        <div style="color: #64748b; font-size: 10px;">1-2% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 100</div>
+      </div>
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+        <div style="font-size: 18px; margin-bottom: 4px;">💸</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Factoring</div>
+        <div style="color: #64748b; font-size: 10px;">1-3% fee</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 25</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ✨ TEAM ACHIEVEMENTS (Consolidated Here) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <h4 style="color:#00bfff; margin: 0 0 10px 0; font-size: 14px;">🏆 Team Achievements</h4>
+    <ul id="achievementList" style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.8;">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
 </div>
 
-<div class="metric-box">
-  <h3>🏆 Team Achievements</h3>
-  <ul id="achievementList">
-    <li>Loading your business wins...</li>
-  </ul>
-</div>
-
-<div class="metric-box">
-  <h3>🌐 Expand Your Business Circle</h3>
-  <p style="font-size: 0.85rem; color:#999;">
-    Invite collaborators, partners, or clients to join your AiGentsy business. Every invite expands your reach, revenue, and remix lineage.
-  </p>
-  <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="width:100%;padding:8px;margin-bottom:8px;border-radius:4px;border:1px solid #444;background:#000;color:#fff;">
-  <button class="btn-glow" onclick="sendInvite()">📨 Send Invite</button>
-  <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
-</div>
   </div>
   <div class="metric-box">
     <h3>
@@ -209,9 +277,15 @@
 </h3>
 <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div>
     <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
-    <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+    <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
+      <span id="wallet-tier-badge" style="font-size: 16px;" title="Early Adopter Tier">🏆</span>
+      <span id="wallet-multiplier" style="font-size: 11px; color: #a78bfa; font-weight: 600;" title="Earnings Multiplier">3.0x</span>
+    </div>
   </div>
+  <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+</div>
   <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
   <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
   <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
@@ -294,6 +368,20 @@
         </ul>
       </div>
     </div>
+    
+    <!-- ✨ PATCH F: Expand Your Business Circle (Moved from standalone box) -->
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #222;">
+      <h4 style="color:#00bfff; margin-bottom: 10px;">🌐 Expand Your Business Circle</h4>
+      <p style="font-size: 0.85rem; color:#999; margin-bottom: 10px;">
+        Invite collaborators, partners, or clients to join your AiGentsy business.
+      </p>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="flex: 1; padding:8px; border-radius:4px; border:1px solid #444; background:#000; color:#fff;">
+        <button class="btn-glow" onclick="sendInvite()" style="white-space: nowrap;">📨 Send</button>
+      </div>
+      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+    </div>
+    
   </div>
 </div>
 
@@ -596,35 +684,222 @@ function renderDynamicCSuite(user) {
 function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
   const config = getBusinessConfig(user.companyType);
+  
+  // Render clickable kit items
   const kitDocBox = document.getElementById("dynamicKitDoc");
-  if (kitDocBox) kitDocBox.innerHTML = config.kitDoc;
+  if (kitDocBox) {
+    const kitItems = getKitItemsForType(user.companyType);
+    kitDocBox.innerHTML = kitItems.map(item => `
+      <div onclick="openKitDocument('${item.id}')" 
+           style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+           onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+           onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+        📄 ${item.name}
+      </div>
+    `).join('');
+  }
+  
+  // Render unlocked modules (ALL UNLOCKED)
   const summaryBox = document.getElementById("businessSummaryList");
   if (summaryBox) {
     const summaryItems = [
-      { label: "SDK Toolkit", check: user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible },
-      { label: "Vault Access", check: user.vaultAccess || user.runtimeFlags?.vaultAccess },
-      { label: "Remix License", check: user.remixUnlocked || user.runtimeFlags?.remixUnlocked },
-      { label: "Clone License", check: user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked },
-      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, check: (user.traits || []).includes(user.companyType) }
+      { label: "SDK Toolkit" },
+      { label: "Vault Access" },
+      { label: "Remix License" },
+      { label: "Clone License" },
+      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit` }
     ];
-    summaryBox.innerHTML = summaryItems.map(({ label, check }) => `<li>${check ? "✅" : "🔒"} ${label}</li>`).join("");
+    summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
   }
+}
+
+// Helper: Get kit items based on business type
+function getKitItemsForType(companyType) {
+  const kitTemplates = {
+    legal: [
+      { id: 'nda_template', name: 'NDA Template' },
+      { id: 'ip_assignment', name: 'IP Assignment Agreement' },
+      { id: 'licensing_agreement', name: 'Licensing Agreement' },
+      { id: 'compliance_checklist', name: 'Compliance Checklist' },
+      { id: 'contract_template', name: 'Service Contract Template' }
+    ],
+    social: [
+      { id: 'content_calendar', name: 'Content Calendar Template' },
+      { id: 'brand_kit', name: 'Brand Voice Guidelines' },
+      { id: 'hashtag_strategy', name: 'Hashtag Strategy Doc' },
+      { id: 'creator_pitch', name: 'Creator Pitch Deck' },
+      { id: 'media_kit', name: 'Media Kit Template' }
+    ],
+    saas: [
+      { id: 'api_docs', name: 'API Documentation Template' },
+      { id: 'database_schema', name: 'Database Schema Guide' },
+      { id: 'auth_flow', name: 'Auth & Subscription Flow' },
+      { id: 'deployment_guide', name: 'Deployment Checklist' },
+      { id: 'stripe_integration', name: 'Stripe Integration Guide' }
+    ],
+    marketing: [
+      { id: 'seo_audit', name: 'SEO Audit Framework' },
+      { id: 'ad_campaign', name: 'Ad Campaign Template' },
+      { id: 'email_sequence', name: 'Email Sequence Builder' },
+      { id: 'analytics_dashboard', name: 'Analytics Dashboard' },
+      { id: 'outreach_scripts', name: 'Outreach Scripts' }
+    ],
+    general: [
+      { id: 'business_plan', name: 'Business Plan Template' },
+      { id: 'proposal_template', name: 'Proposal Template' },
+      { id: 'contract_basics', name: 'Basic Contract Template' },
+      { id: 'financial_planning', name: 'Financial Planning Guide' },
+      { id: 'operations_playbook', name: 'Operations Playbook' }
+    ]
+  };
+  
+  return kitTemplates[companyType] || kitTemplates.general;
+}
+
+// Open kit document in modal
+function openKitDocument(docId) {
+  const docContent = getKitDocumentContent(docId);
+  
+  const modalBody = document.getElementById('gxModalBody');
+  document.getElementById('gxModalTitle').textContent = docContent.title;
+  
+  modalBody.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <textarea id="kitDocEditor" style="width:100%; min-height:300px; padding:12px; background:#0a0a0a; color:#fff; border:1px solid #444; border-radius:6px; font-family:monospace; font-size:0.9rem;">${docContent.content}</textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn-glow" onclick="saveKitDocument('${docId}')">💾 Save Changes</button>
+      <button class="btn-glow" onclick="downloadKitDocument('${docId}')" style="background:#444;">⬇️ Download</button>
+    </div>
+  `;
+  
+  document.getElementById('gxModal').classList.add('open');
+}
+
+// Get document content (stub - would load from backend)
+function getKitDocumentContent(docId) {
+  const templates = {
+    nda_template: {
+      title: '📄 NDA Template',
+      content: `NON-DISCLOSURE AGREEMENT\n\nThis Agreement is entered into as of [DATE] by and between:\n\nDisclosing Party: [COMPANY NAME]\nReceiving Party: [RECIPIENT NAME]\n\n1. CONFIDENTIAL INFORMATION\nFor purposes of this Agreement, "Confidential Information" includes...\n\n2. OBLIGATIONS\nReceiving Party agrees to...\n\n3. TERM\nThis Agreement shall remain in effect for...\n\n[Add your custom terms here]`
+    },
+    business_plan: {
+      title: '📄 Business Plan Template',
+      content: `BUSINESS PLAN\n\n1. EXECUTIVE SUMMARY\n[Describe your business in 2-3 sentences]\n\n2. PROBLEM & SOLUTION\nProblem: [What problem are you solving?]\nSolution: [How does your business solve it?]\n\n3. TARGET MARKET\n[Who are your customers?]\n\n4. REVENUE MODEL\n[How will you make money?]\n\n5. MARKETING STRATEGY\n[How will you reach customers?]\n\n[Customize this plan for your business]`
+    },
+    // Add more templates as needed
+    default: {
+      title: '📄 Document Template',
+      content: `This is a placeholder document.\n\nYou can edit this content and save your changes.\n\nAdd your custom content here...`
+    }
+  };
+  
+  return templates[docId] || templates.default;
+}
+
+// Save document (stub - would save to backend)
+function saveKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  
+  // TODO: Send to backend
+  // await fetch(`${window.BACKEND_BASE}/kit/save`, {
+  //   method: 'POST',
+  //   body: JSON.stringify({ docId, content, username })
+  // });
+  
+  showToast(`✅ ${docId} saved!`, "success");
+  GXA.closeModal();
+}
+
+// Download document
+function downloadKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${docId}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast(`⬇️ ${docId} downloaded!`, "success");
 }
 
 function renderDynamicAchievements(user) {
   console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
+  
   const achievements = [];
-  const config = getBusinessConfig(user.companyType);
-  if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
-    achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+  
+  // Pull from AIGx dashboard if available
+  const dashboardData = window.aigxDashboardData;
+  
+  if (dashboardData) {
+    // Use AIGx Dashboard data
+    const aigx = dashboardData.aigx_equity.aigx_balance;
+    const revenue = dashboardData.tier_progression.lifetime_revenue;
+    
+    if (aigx > 0) {
+      achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
+    }
+    
+    if (dashboardData.early_adopter.badge) {
+      achievements.push(`🎖️ ${dashboardData.early_adopter.badge} #${dashboardData.user.user_number} — ${dashboardData.early_adopter.multiplier}x permanent multiplier`);
+    }
+    
+    const tier = dashboardData.tier_progression.current_tier.toUpperCase();
+    const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
+    achievements.push(`${tierEmoji} ${tier} Tier — ${dashboardData.tier_progression.tier_multiplier}x earning rate`);
+    
+    if (revenue > 0) {
+      achievements.push(`💵 Revenue Generated — $${revenue.toLocaleString()}`);
+    }
+    
+    if (dashboardData.activity_streaks.current_streak > 0) {
+      achievements.push(`🔥 ${dashboardData.activity_streaks.current_streak}-day activity streak`);
+    }
+    
+    if (dashboardData.referrals.total_referrals > 0) {
+      achievements.push(`🤝 ${dashboardData.referrals.total_referrals} referrals made`);
+    }
+    
+    if (dashboardData.apex_ultra.activated) {
+      const rate = dashboardData.apex_ultra.success_rate;
+      achievements.push(`🌟 APEX ULTRA — ${dashboardData.apex_ultra.systems_operational}/${dashboardData.apex_ultra.total_systems} systems (${rate}%)`);
+    }
+    
+  } else {
+    // Fallback to user object
+    const config = getBusinessConfig(user.companyType);
+    
+    if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
+      achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+    }
+    
+    if ((user.cloneLineage || []).length > 0) {
+      achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
+    }
+    
+    if ((user.yield?.aigxEarned || 0) > 0) {
+      achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
+    }
+    
+    if ((user.traits || []).includes(user.companyType)) {
+      achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+    }
+    
+    if ((user.contacts || []).length > 0) {
+      achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
+    }
+    
+    if ((user.proposals || []).length > 0) {
+      achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
+    }
   }
-  if ((user.cloneLineage || []).length > 0) achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
-  if ((user.yield?.aigxEarned || 0) > 0) achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
-  if ((user.traits || []).includes(user.companyType)) achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
-  if ((user.contacts || []).length > 0) achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
-  if ((user.proposals || []).length > 0) achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
+  
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
@@ -648,32 +923,36 @@ function renderWalletChart(user) {
     // Get AIGx data from dashboard if available, otherwise use user data
     const dashboardData = window.aigxDashboardData;
     const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
-    const aigoValue = dashboardData?.aigx_equity?.equity_value_usd || 0;
     const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
+    
+    // ✨ GET REPUTATION - check multiple sources
+    const reputation = dashboardData?.user?.reputation_score || 
+                      parseInt(document.getElementById('reputation-score')?.textContent) || 
+                      0;
+    
     const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
     const clients = (user.contacts || []).length;
     const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
     const activeStreak = dashboardData?.activity_streaks?.current_streak || 0;
     
-    console.log("📊 Chart data - AIGx:", aigxBalance, "AIGo:", aigoValue, "Revenue:", lifetimeRevenue);
+    console.log("📊 Chart data - AIGx:", aigxBalance, "Reputation:", reputation, "Revenue:", lifetimeRevenue);
     
     try {
       walletChart.chartInstance = new Chart(walletChart, {
         type: 'bar',
         data: {
-          labels: ['AIGx', 'AIGo ($K)', 'Revenue', 'Referrals', 'Clients', 'Partnerships', 'Streak'],
+          labels: ['AIGx', 'Revenue', 'Reputation', 'Referrals', 'Clients', 'Partners', 'Streak'],
           datasets: [{
             data: [
               aigxBalance, 
-              Math.round(aigoValue / 1000), 
               lifetimeRevenue,
-              lifetimeRevenue, 
+              reputation,
               referrals,
               clients,
               partnerships,
               activeStreak
             ],
-            backgroundColor: ['#00bfff', '#00ff88', '#ffdc4a', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
+            backgroundColor: ['#00bfff', '#00ff88', '#a78bfa', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
             borderRadius: 6
           }]
         },
@@ -687,7 +966,7 @@ function renderWalletChart(user) {
           }
         }
       });
-      console.log("✅ Chart rendered with AIGx metrics");
+      console.log("✅ Chart rendered with updated metrics");
     } catch (chartError) {
       console.error("❌ Chart error:", chartError);
     }
@@ -1898,10 +2177,9 @@ function updateAIGxAchievements(data) {
   
   const achievements = [];
   const aigx = data.aigx_equity.aigx_balance;
-  const equityPercent = data.aigx_equity.equity_percent.toFixed(4);
-  const equityValue = data.aigx_equity.equity_value_usd.toLocaleString();
   
-  achievements.push(`💎 ${aigx.toLocaleString()} AIGx — $${equityValue} AIGo (${equityPercent}%)`);
+  // ✨ FIXED: Remove AIGo reference, show only AIGx
+  achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
   
   if (data.early_adopter.badge) {
     achievements.push(`🎖️ ${data.early_adopter.badge} #${data.user.user_number} — ${data.early_adopter.multiplier}x permanent multiplier`);
@@ -1942,8 +2220,9 @@ function updateAIGxAchievements(data) {
 function updateAIGxWallet(data) {
   const totalEarningsEl = document.getElementById("totalEarnings");
   if (totalEarningsEl) {
-    const aigoValue = data.aigx_equity.equity_value_usd;
-    totalEarningsEl.textContent = aigoValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // Use actual revenue, not equity value
+    const actualRevenue = data.tier_progression?.lifetime_revenue || 0;
+    totalEarningsEl.textContent = actualRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
   
   // Add AIGx breakdown to the dropdown
@@ -2018,17 +2297,35 @@ function updateLiveActivityFeed(data) {
 
 function getActivityEmoji(basis) {
   const emojiMap = {
+    // Platform milestones
     "apex_ultra_activation": "🌟",
     "amg_revenue_brain_activation": "🧠",
     "early_adopter_signup_bonus": "🎁",
+    
+    // Revenue & transactions
     "transaction_revenue": "💳",
+    "ame_auto_sale": "🤖",
+    "intent_exchange_win": "💼",
+    "jv_partnership_split": "🤝",
+    "shopify_sale": "🛍️",
+    "affiliate_commission": "📱",
+    
+    // Milestones
     "milestone_first_sale": "🎊",
     "milestone_reward": "🏆",
+    "reputation_milestone": "⭐",
+    
+    // Activity rewards
     "daily_activity_reward": "📅",
     "weekly_streak_reward": "🔥",
     "monthly_power_user_reward": "⭐",
     "referral_milestone": "🤝",
-    "tier_upgrade": "🚀"
+    "tier_upgrade": "🚀",
+    
+    // Reputation gains
+    "deal_completed": "✅",
+    "positive_review": "⭐",
+    "client_milestone": "🎯"
   };
   
   return emojiMap[basis] || "💎";
@@ -2063,8 +2360,11 @@ async function initializeDashboard() {
   // Call existing initialization
   injectUserDashboard();
   
-  // ✨ ADD THIS: Fetch and display AIGx dashboard data
+  // Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
+  
+  // ✨ ADD THIS LINE:
+  await loadTierAndReputation();
   
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
@@ -2072,12 +2372,6 @@ async function initializeDashboard() {
     preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
   }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeDashboard);
-} else {
-  initializeDashboard();
 }
 
 window.addEventListener("load", () => {
@@ -2099,6 +2393,124 @@ setTimeout(() => {
 }, 3000);
 
 console.log("✅ Script loaded");
+
+  // ============================================================
+// 🎖️ TIER & REPUTATION SYSTEM
+// ============================================================
+
+async function loadTierAndReputation() {
+  try {
+    const userData = window.aigentsyUser || {};
+    const username = userData.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Fetch tier info
+    const tierResponse = await fetch(`${window.BACKEND_BASE}/user/${username}/tier`);
+    const tierData = await tierResponse.json();
+    
+    if (tierData.ok && tierData.has_tier) {
+      const tier = tierData.tier;
+      
+      // Update main tier card
+      document.getElementById('user-tier-badge').textContent = tier.badge;
+      document.getElementById('user-tier-name').textContent = tier.name;
+      document.getElementById('user-tier-description').textContent = 
+        `User #${tierData.user_number} • ${tier.description.split(' - ')[0]}`;
+      document.getElementById('user-multiplier').textContent = `${tier.multiplier}x`;
+      
+      // Update wallet tier indicator
+      document.getElementById('wallet-tier-badge').textContent = tier.badge;
+      document.getElementById('wallet-multiplier').textContent = `${tier.multiplier}x`;
+      document.getElementById('wallet-tier-badge').title = `${tier.name} - ${tier.multiplier}x earnings`;
+    }
+    
+    // Fetch reputation info
+    const repResponse = await fetch(`${window.BACKEND_BASE}/reputation/${username}`);
+    const repData = await repResponse.json();
+    
+    if (repData.ok) {
+      // ✨ STORE REPUTATION GLOBALLY
+      if (!window.aigxDashboardData) window.aigxDashboardData = {};
+      if (!window.aigxDashboardData.user) window.aigxDashboardData.user = {};
+      window.aigxDashboardData.user.reputation_score = repData.reputation_score;
+      
+      // Update reputation score
+      document.getElementById('reputation-score').textContent = repData.reputation_score;
+      
+      // Update breakdown
+      const breakdown = repData.reputation_breakdown;
+      document.getElementById('rep-deals').textContent = breakdown.deals_completed || 0;
+      document.getElementById('rep-reviews').textContent = breakdown.positive_reviews || 0;
+      document.getElementById('rep-revenue').textContent = 
+        Math.floor(breakdown.revenue_generated || 0).toLocaleString();
+      
+      // Calculate months (rough estimate from reputation)
+      const months = Math.floor((repData.reputation_score - 10 - 
+        (breakdown.deals_completed * 5) - 
+        (breakdown.positive_reviews * 3) - 
+        Math.floor(breakdown.revenue_generated / 100)) / 2);
+      document.getElementById('rep-months').textContent = Math.max(0, months);
+      
+      // Update next unlock progress
+      if (repData.next_unlock) {
+        const progress = ((repData.reputation_score / repData.next_unlock.required_reputation) * 100).toFixed(1);
+        document.getElementById('reputation-progress').style.width = `${progress}%`;
+        document.getElementById('next-unlock-name').textContent = repData.next_unlock.feature.replace(/_/g, ' ');
+        document.getElementById('next-unlock-required').textContent = repData.next_unlock.required_reputation;
+        document.getElementById('points-needed').textContent = repData.next_unlock.points_needed;
+      } else {
+        // All unlocked
+        document.getElementById('reputation-progress').style.width = '100%';
+        document.getElementById('next-unlock-name').textContent = 'All Features';
+        document.getElementById('next-unlock-required').textContent = '✓';
+        document.getElementById('points-needed').textContent = '0';
+      }
+      
+      // Update premium services grid
+      updatePremiumServicesGrid(repData.reputation_score);
+      
+      // ✨ RE-RENDER CHART WITH REPUTATION DATA
+      if (window.aigentsyUser) {
+        renderWalletChart(window.aigentsyUser);
+      }
+    }
+    
+  } catch (error) {
+    console.error('Failed to load tier/reputation:', error);
+  }
+}
+
+function updatePremiumServicesGrid(repScore) {
+  const services = [
+    { name: 'Dark Pool', icon: '🎭', fee: '+5%', repRequired: 50 },
+    { name: 'JV Admin', icon: '🤝', fee: '+2%', repRequired: 75 },
+    { name: 'Insurance', icon: '🛡️', fee: '1-2%', repRequired: 100 },
+    { name: 'Factoring', icon: '💸', fee: '1-3%', repRequired: 25 }
+  ];
+  
+  const grid = document.getElementById('premium-services-grid');
+  if (!grid) return;
+  
+  grid.innerHTML = services.map(service => {
+    const unlocked = repScore >= service.repRequired;
+    const bgColor = unlocked ? 'rgba(59, 130, 246, 0.08)' : 'rgba(100, 116, 139, 0.05)';
+    const borderColor = unlocked ? 'rgba(59, 130, 246, 0.3)' : 'rgba(100, 116, 139, 0.2)';
+    const opacity = unlocked ? '1' : '0.6';
+    const status = unlocked ? '✅' : `🔒 Rep ${service.repRequired}`;
+    
+    return `
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 6px; padding: 8px; text-align: center; opacity: ${opacity};">
+        <div style="font-size: 18px; margin-bottom: 4px;">${service.icon}</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">${service.name}</div>
+        <div style="color: #64748b; font-size: 10px;">${service.fee}</div>
+        <div style="color: ${unlocked ? '#3b82f6' : '#64748b'}; font-size: 9px; margin-top: 4px;">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Add to initializeDashboard function - find the function and add this line at the end:
+// await loadTierAndReputation();
+
 </script>
 </body>
 </html>
