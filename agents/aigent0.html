@@ -866,8 +866,7 @@ function downloadKitDocument(docId) {
 }
 
 function renderDynamicAchievements(user) {
-  console.log("🏆 [DEBUG] renderDynamicAchievements called");
-  console.log("🏆 [DEBUG] Stack trace:", new Error().stack.split('\n').slice(1, 4).join('\n'));
+  console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
   if (!achievementBox) return;
   
@@ -941,10 +940,8 @@ function renderDynamicAchievements(user) {
   
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
-    console.log("🏆 [DEBUG] Rendered", achievements.length, "achievements:", achievements.slice(0, 3));
   } else {
     achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
-    console.log("🏆 [DEBUG] Rendered fallback achievement");
   }
 }
 
@@ -3284,27 +3281,18 @@ async function initializeWeek1Features() {
   console.log('✅ Week 1 features loaded!');
 }
 
-// Auto-initialize when user data is ready
-if (window.aigentsyUser) {
-  initializeWeek1Features();
-} else {
-  window.addEventListener('load', () => {
-    setTimeout(initializeWeek1Features, 1000);
-  });
-}
+// ✅ REMOVED: Auto-initialization code
+// This was causing initializeWeek1Features() to be called multiple times:
+// 1. From initializeDashboard() (line 2426) - CORRECT
+// 2. From here on page load - DUPLICATE
+// 3. From setInterval every 30 seconds - SPAM
+//
+// Now it's ONLY called from initializeDashboard() which ensures proper sequencing.
 
-// Refresh Week 1 data every 30 seconds
-setInterval(() => {
-  if (window.aigentsyUser) {
-    loadBoosterData();
-    loadSubscriptionData();
-    loadPWPData();
-    loadWarrantyData();
-    loadSLOData();
-    loadLiveActivityFeed();
-    loadKitSpecificMetricsData(); // Refresh kit-specific metrics
-  }
-}, 30000);
+// ✅ REMOVED: setInterval for refreshing
+// The 30-second refresh was causing the achievements to flicker every 30 seconds
+// because loadKitSpecificMetricsData() was being called repeatedly.
+// If you need auto-refresh, implement it without touching achievements.
 
 </script>
 </body>
