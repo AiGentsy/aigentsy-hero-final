@@ -193,9 +193,12 @@
           <div id="user-tier-description" style="font-size: 12px; color: #888;">User #5 • First 100</div>
         </div>
       </div>
-      <div style="background: rgba(139, 92, 246, 0.15); border-radius: 6px; padding: 8px 12px; display: inline-block;">
+      <div style="background: rgba(139, 92, 246, 0.15); border-radius: 6px; padding: 8px 12px; display: inline-block; cursor: pointer;" onclick="toggleBoosterBreakdown()">
         <span style="font-size: 20px; font-weight: 700; color: #a78bfa;" id="user-multiplier">3.0x</span>
-        <span style="font-size: 11px; color: #888; margin-left: 4px;">earnings boost</span>
+        <span style="font-size: 11px; color: #888; margin-left: 4px;" id="multiplier-label">earnings boost</span>
+      </div>
+      <div id="booster-breakdown" style="display:none; margin-top:8px; font-size:10px; color:#888; line-height: 1.6;">
+        <!-- Populated by loadBoosterData() -->
       </div>
     </div>
     
@@ -223,35 +226,43 @@
     </div>
   </div>
   
-  <!-- Premium Services (Reputation-Gated) -->
+  <!-- Premium Services (Week 1 Features) -->
   <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-    <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">🎖️ Premium Services</div>
+    <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">💼 Financial Tools</div>
     <div id="premium-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
-      <!-- Populated by JavaScript -->
-      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
-        <div style="font-size: 18px; margin-bottom: 4px;">🎭</div>
-        <div style="font-weight: 600; margin-bottom: 2px;">Dark Pool</div>
-        <div style="color: #64748b; font-size: 10px;">+5% fee</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 50</div>
+      
+      <!-- Subscriptions -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewSubscriptions()">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Subscriptions</div>
+        <div style="color: #00ff88; font-size: 10px;" id="subStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="subCreditsMini">— credits</div>
       </div>
-      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
-        <div style="font-size: 18px; margin-bottom: 4px;">🤝</div>
-        <div style="font-weight: 600; margin-bottom: 2px;">JV Admin</div>
-        <div style="color: #64748b; font-size: 10px;">+2% fee</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 75</div>
+      
+      <!-- PWP Finance -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewPWP()">
+        <div style="font-size: 18px; margin-bottom: 4px;">💰</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">PWP Finance</div>
+        <div style="color: #00ff88; font-size: 10px;" id="pwpStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="pwpAmountMini">—</div>
       </div>
-      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
+      
+      <!-- Warranties -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewWarranties()">
         <div style="font-size: 18px; margin-bottom: 4px;">🛡️</div>
-        <div style="font-weight: 600; margin-bottom: 2px;">Insurance</div>
-        <div style="color: #64748b; font-size: 10px;">1-2% fee</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 100</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Warranties</div>
+        <div style="color: #00ff88; font-size: 10px;" id="warrantyStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="warrantyBondMini">—</div>
       </div>
-      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(100, 116, 139, 0.2); border-radius: 6px; padding: 8px; text-align: center; opacity: 0.6;">
-        <div style="font-size: 18px; margin-bottom: 4px;">💸</div>
-        <div style="font-weight: 600; margin-bottom: 2px;">Factoring</div>
-        <div style="color: #64748b; font-size: 10px;">1-3% fee</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 4px;">🔒 Rep 25</div>
+      
+      <!-- Boosters -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewBoosters()">
+        <div style="font-size: 18px; margin-bottom: 4px;">⚡</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Boosters</div>
+        <div style="color: #a78bfa; font-size: 10px;" id="boosterMultiplierMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="boosterCountMini">— active</div>
       </div>
+      
     </div>
   </div>
   
@@ -317,9 +328,25 @@
     <span>🎥 Content CPM</span>
     <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
   </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0;">
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
     <span>🤝 JV Splits</span>
     <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>📦 Subscription Credits</span>
+    <span style="color:#888;" id="subCredits">— / —</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>⚡ Booster Bonus</span>
+    <span style="color:#00ff88;">+$<span id="boosterBonus">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💰 PWP Financed</span>
+    <span style="color:#888;">$<span id="pwpFinanced">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0;">
+    <span>🛡️ Warranty Earnings</span>
+    <span style="color:#00ff88;">$<span id="warrantyEarnings">0.00</span></span>
   </div>
 </div>
 </div>
@@ -333,6 +360,7 @@
     <div class="csn-tile"><div class="csn-label">In Progress</div><div id="csnInProgress" class="csn-value">0</div></div>
     <div class="csn-tile"><div class="csn-label">Completed</div><div id="csnCompleted" class="csn-value">0</div></div>
     <div class="csn-tile"><div class="csn-label">Revenue</div><div id="csnRevenue" class="csn-value">$0</div></div>
+    <div class="csn-tile"><div class="csn-label">Avg Delivery</div><div id="csnAvgDelivery" class="csn-value">—</div></div>
   </div>
   <button id="toggleSnapshotDetails" class="btn-glow" style="margin-top:10px;">Show details</button>
   <div id="snapshotDetails" style="display:none; margin-top:12px;">
@@ -355,6 +383,9 @@
           <li>👥 Partnerships: $<span id="revPartnerships">0</span></li>
           <li>📦 Products: $<span id="revProducts">0</span></li>
           <li>🎯 Services: $<span id="revServices">0</span></li>
+          <li>⚡ SLO Bonuses: $<span id="revSLOBonus">0</span></li>
+          <li>🛡️ Warranties: $<span id="revWarranties">0</span></li>
+          <li>📦 Subscription: <span id="revSubscription">—</span></li>
         </ul>
       </div>
       <div class="csn-detail">
@@ -2510,6 +2541,574 @@ function updatePremiumServicesGrid(repScore) {
 
 // Add to initializeDashboard function - find the function and add this line at the end:
 // await loadTierAndReputation();
+
+// ============================================================
+// 🚀 WEEK 1 FEATURES INTEGRATION
+// ============================================================
+
+// API Base URL for Week 1 features
+const WEEK1_API_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+
+// ============================================================
+// ⚡ BOOSTERS
+// ============================================================
+
+async function loadBoosterData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+    const data = await response.json();
+    
+    if (data && data.total_multiplier) {
+      // Update tier badge multiplier
+      const baseTier = window.aigentsyUser?.tier?.multiplier || 3.0;
+      const totalMultiplier = data.total_multiplier;
+      const boosterBonus = (totalMultiplier - baseTier).toFixed(1);
+      
+      document.getElementById('user-multiplier').textContent = `${totalMultiplier}x`;
+      document.getElementById('multiplier-label').innerHTML = 
+        `Base ${baseTier}x + Boosters ${boosterBonus}x`;
+      
+      // Update wallet boosted earnings
+      const totalEarnings = parseFloat(document.getElementById('totalEarnings').textContent || 0);
+      const boosterBonusAmount = totalEarnings * (totalMultiplier - baseTier) / baseTier;
+      document.getElementById('boosterBonus').textContent = boosterBonusAmount.toFixed(2);
+      
+      // Update booster breakdown
+      const breakdown = data.active_boosters.map(b => 
+        `${b.icon} ${b.name}: ${b.multiplier}x ${b.expires_at ? '(expires ' + new Date(b.expires_at).toLocaleDateString() + ')' : '(permanent)'}`
+      ).join('<br>');
+      document.getElementById('booster-breakdown').innerHTML = breakdown || 'No active boosters';
+      
+      // Update mini tile
+      document.getElementById('boosterMultiplierMini').textContent = `${totalMultiplier}x Active`;
+      document.getElementById('boosterCountMini').textContent = `${data.booster_count} boosters`;
+    }
+  } catch (error) {
+    console.warn('Boosters API not available:', error);
+  }
+}
+
+function toggleBoosterBreakdown() {
+  const breakdown = document.getElementById('booster-breakdown');
+  breakdown.style.display = breakdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function viewBoosters() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '⚡ Your Active Boosters';
+  body.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div id="boosterListModal" style="font-size:0.9rem;">Loading...</div>
+    </div>
+    <button class="btn-glow" onclick="GXA.closeModal(); purchasePowerUp()">⚡ Buy Power-Up</button>
+  `;
+  modal.style.display = 'flex';
+  
+  // Load booster details
+  loadBoosterDetailsForModal();
+}
+
+async function loadBoosterDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+    const data = await response.json();
+    
+    if (data && data.active_boosters) {
+      const html = data.active_boosters.map(b => `
+        <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #222;">
+          <div style="display:flex; justify-content:space-between;">
+            <div><strong>${b.icon} ${b.name}</strong></div>
+            <div style="color:#a78bfa;">${b.multiplier}x</div>
+          </div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px;">${b.description}</div>
+          <div style="font-size:0.75rem; color:#666; margin-top:4px;">
+            ${b.expires_at ? 'Expires: ' + new Date(b.expires_at).toLocaleDateString() : 'Permanent'}
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('boosterListModal').innerHTML = html + `
+        <div style="margin-top:16px; padding:12px; background:#111; border-radius:6px; border:1px solid #00bfff;">
+          <div style="font-size:1.2rem; font-weight:700; color:#a78bfa;">Total Multiplier: ${data.total_multiplier}x</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px;">
+            Your $1,000 earnings → $${(1000 * data.total_multiplier).toFixed(0)} with boosters
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load booster details:', error);
+    document.getElementById('boosterListModal').innerHTML = 'Failed to load boosters.';
+  }
+}
+
+function purchasePowerUp() {
+  showToast('Power-Up purchase coming soon! Connect Stripe to enable.');
+}
+
+// ============================================================
+// 📦 SUBSCRIPTIONS
+// ============================================================
+
+async function loadSubscriptionData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
+    const data = await response.json();
+    
+    if (data && data.subscription) {
+      const sub = data.subscription;
+      
+      // Update wallet breakdown
+      document.getElementById('subCredits').textContent = 
+        `${sub.credits_remaining} / ${sub.monthly_allocation}`;
+      
+      // Update mini tile
+      document.getElementById('subStatusMini').textContent = `${sub.tier} Active`;
+      document.getElementById('subCreditsMini').textContent = `${sub.credits_remaining}/${sub.monthly_allocation} credits`;
+      
+      // Update revenue sources
+      document.getElementById('revSubscription').textContent = `$${sub.cost}/mo`;
+    } else {
+      document.getElementById('subStatusMini').textContent = 'No subscription';
+      document.getElementById('subCreditsMini').textContent = 'Upgrade now';
+    }
+  } catch (error) {
+    console.warn('Subscriptions API not available:', error);
+  }
+}
+
+function viewSubscriptions() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '📦 Subscription Management';
+  body.innerHTML = `
+    <div id="subscriptionDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="upgradeSubscription()" style="margin-top:12px;">⬆️ Upgrade Plan</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadSubscriptionDetailsForModal();
+}
+
+async function loadSubscriptionDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
+    const data = await response.json();
+    
+    if (data && data.subscription) {
+      const sub = data.subscription;
+      document.getElementById('subscriptionDetails').innerHTML = `
+        <div style="background:#0a0a0a; padding:12px; border-radius:6px; border:1px solid #00bfff;">
+          <h4 style="color:#00bfff; margin-top:0;">Current Plan: ${sub.tier}</h4>
+          <div style="margin:8px 0;">💰 Cost: $${sub.cost}/month</div>
+          <div style="margin:8px 0;">📦 Credits: ${sub.credits_remaining} / ${sub.monthly_allocation}</div>
+          <div style="margin:8px 0;">📅 Renews: ${new Date(sub.next_billing_date).toLocaleDateString()}</div>
+          <div style="margin:8px 0;">🔄 Rollover: ${sub.rollover_credits} credits banked</div>
+        </div>
+      `;
+    } else {
+      document.getElementById('subscriptionDetails').innerHTML = `
+        <div style="background:#0a0a0a; padding:12px; border-radius:6px;">
+          <p>You don't have an active subscription.</p>
+          <p style="font-size:0.85rem; color:#888;">Subscribe to get monthly outcome credits and priority queue access!</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load subscription:', error);
+    document.getElementById('subscriptionDetails').innerHTML = 'Failed to load subscription details.';
+  }
+}
+
+function upgradeSubscription() {
+  showToast('Subscription upgrade coming soon! Connect Stripe to enable.');
+}
+
+// ============================================================
+// 💰 PWP (PAY-WITH-PERFORMANCE)
+// ============================================================
+
+async function loadPWPData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      // Update wallet breakdown
+      document.getElementById('pwpFinanced').textContent = data.summary.total_financed.toFixed(2);
+      
+      // Update mini tile
+      const activeCount = data.summary.active_contracts || 0;
+      document.getElementById('pwpStatusMini').textContent = 
+        activeCount > 0 ? `${activeCount} Active` : 'No contracts';
+      document.getElementById('pwpAmountMini').textContent = 
+        `$${data.summary.total_remaining.toFixed(0)} remaining`;
+    }
+  } catch (error) {
+    console.warn('PWP API not available:', error);
+  }
+}
+
+function viewPWP() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '💰 Pay-With-Performance Dashboard';
+  body.innerHTML = `
+    <div id="pwpDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="GXA.closeModal()" style="margin-top:12px;">Close</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadPWPDetailsForModal();
+}
+
+async function loadPWPDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      let html = `
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Active Contracts</div>
+            <div style="font-size:1.5rem; font-weight:700;">${data.summary.active_contracts}</div>
+          </div>
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Total Financed</div>
+            <div style="font-size:1.5rem; font-weight:700;">$${data.summary.total_financed.toFixed(0)}</div>
+          </div>
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Remaining</div>
+            <div style="font-size:1.5rem; font-weight:700;">$${data.summary.total_remaining.toFixed(0)}</div>
+          </div>
+        </div>
+      `;
+      
+      if (data.active_contracts && data.active_contracts.length > 0) {
+        html += `<h4 style="color:#00bfff;">Active Contracts:</h4>`;
+        data.active_contracts.forEach(contract => {
+          html += `
+            <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #222;">
+              <div><strong>Outcome:</strong> ${contract.outcome_id}</div>
+              <div style="font-size:0.85rem; margin-top:4px;">
+                <span style="color:#888;">Financed:</span> $${contract.financed.toFixed(2)} • 
+                <span style="color:#00ff88;">Paid:</span> $${contract.paid.toFixed(2)} • 
+                <span style="color:#ff8800;">Remaining:</span> $${contract.remaining.toFixed(2)}
+              </div>
+              <div style="background:#111; border-radius:4px; height:6px; margin-top:6px; overflow:hidden;">
+                <div style="background:#00ff88; height:100%; width:${contract.progress_pct}%;"></div>
+              </div>
+              <div style="font-size:0.75rem; color:#666; margin-top:2px;">${contract.progress_pct.toFixed(1)}% complete</div>
+            </div>
+          `;
+        });
+      } else {
+        html += `<p style="color:#888;">No active PWP contracts.</p>`;
+      }
+      
+      document.getElementById('pwpDetails').innerHTML = html;
+    }
+  } catch (error) {
+    console.error('Failed to load PWP data:', error);
+    document.getElementById('pwpDetails').innerHTML = 'Failed to load PWP contracts.';
+  }
+}
+
+// ============================================================
+// 🛡️ WARRANTIES
+// ============================================================
+
+async function loadWarrantyData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/warranties/agent/${username}`);
+    const data = await response.json();
+    
+    if (data && data.warranties) {
+      const active = data.warranties.filter(w => w.status === 'active');
+      const totalBond = active.reduce((sum, w) => sum + (w.bond_amount || 0), 0);
+      const totalEarned = data.warranties.filter(w => w.status === 'completed' && !w.claimed)
+        .reduce((sum, w) => sum + (w.bond_amount || 0), 0);
+      
+      // Update wallet
+      document.getElementById('warrantyEarnings').textContent = totalEarned.toFixed(2);
+      
+      // Update revenue sources
+      document.getElementById('revWarranties').textContent = totalEarned.toFixed(0);
+      
+      // Update mini tile
+      document.getElementById('warrantyStatusMini').textContent = 
+        active.length > 0 ? `${active.length} Active` : 'No warranties';
+      document.getElementById('warrantyBondMini').textContent = 
+        `$${totalBond.toFixed(0)} bonded`;
+    }
+  } catch (error) {
+    console.warn('Warranties API not available:', error);
+  }
+}
+
+function viewWarranties() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '🛡️ Warranty Dashboard';
+  body.innerHTML = `
+    <div id="warrantyDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="GXA.closeModal()" style="margin-top:12px;">Close</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadWarrantyDetailsForModal();
+}
+
+async function loadWarrantyDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/warranties/agent/${username}`);
+    const data = await response.json();
+    
+    if (data && data.warranties && data.warranties.length > 0) {
+      const html = data.warranties.map(w => `
+        <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid ${w.status === 'active' ? '#00bfff' : '#222'};">
+          <div><strong>${w.warranty_type}</strong> - ${w.outcome_id}</div>
+          <div style="font-size:0.85rem; margin-top:4px;">
+            <span style="color:#888;">Bond:</span> $${w.bond_amount?.toFixed(2) || 0} • 
+            <span style="color:${w.status === 'active' ? '#00ff88' : '#888'};">${w.status}</span>
+          </div>
+          ${w.expires_at ? `<div style="font-size:0.75rem; color:#666; margin-top:2px;">Expires: ${new Date(w.expires_at).toLocaleDateString()}</div>` : ''}
+        </div>
+      `).join('');
+      
+      document.getElementById('warrantyDetails').innerHTML = html;
+    } else {
+      document.getElementById('warrantyDetails').innerHTML = '<p style="color:#888;">No warranties on record.</p>';
+    }
+  } catch (error) {
+    console.error('Failed to load warranties:', error);
+    document.getElementById('warrantyDetails').innerHTML = 'Failed to load warranty data.';
+  }
+}
+
+// ============================================================
+// ⚡ SLO (SERVICE LEVEL OBJECTIVES)
+// ============================================================
+
+async function loadSLOData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/slo/agent_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data) {
+      // Update avg delivery in compact snapshot
+      const avgHours = data.avg_delivery_hours || 0;
+      document.getElementById('csnAvgDelivery').textContent = 
+        avgHours > 0 ? `${avgHours}h` : '—';
+      
+      // Update SLO bonuses in revenue
+      const totalBonuses = data.total_bonuses_earned || 0;
+      document.getElementById('revSLOBonus').textContent = totalBonuses.toFixed(0);
+    }
+  } catch (error) {
+    console.warn('SLO API not available:', error);
+  }
+}
+
+// ============================================================
+// 📋 FRANCHISE TEMPLATES (KIT-AWARE)
+// ============================================================
+
+async function loadFranchiseData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const kit = window.aigentsyUser?.companyType || 'general';
+    
+    // Map kit to franchise category
+    const kitToCategoryMap = {
+      'social': 'creative',
+      'saas': 'technical',
+      'marketing': 'marketing',
+      'general': null
+    };
+    
+    const category = kitToCategoryMap[kit];
+    
+    // Load franchisee dashboard for kit-specific metrics
+    const response = await fetch(`${WEEK1_API_BASE}/franchise/franchisee_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      // These will be used for kit-specific business growth metrics
+      window.franchiseMetrics = {
+        templates_licensed: data.summary.active_licenses || 0,
+        outcomes_delivered: data.summary.total_outcomes || 0,
+        revenue_generated: data.summary.total_revenue || 0
+      };
+    }
+  } catch (error) {
+    console.warn('Franchise API not available:', error);
+  }
+}
+
+// ============================================================
+// 🔄 LIVE ACTIVITY FEED
+// ============================================================
+
+async function loadLiveActivityFeed() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Aggregate events from multiple Week 1 features
+    const events = [];
+    
+    // Add booster events
+    try {
+      const boosterRes = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+      const boosterData = await boosterRes.json();
+      if (boosterData && boosterData.active_boosters) {
+        boosterData.active_boosters.slice(0, 2).forEach(b => {
+          events.push({
+            icon: b.icon,
+            text: `${b.name} activated: ${b.multiplier}x earnings`,
+            time: new Date(b.activated_at).toLocaleTimeString(),
+            type: 'booster'
+          });
+        });
+      }
+    } catch (e) {}
+    
+    // Add PWP events
+    try {
+      const pwpRes = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+      const pwpData = await pwpRes.json();
+      if (pwpData && pwpData.active_contracts) {
+        pwpData.active_contracts.slice(0, 2).forEach(c => {
+          events.push({
+            icon: '💰',
+            text: `PWP payment: $${c.paid.toFixed(0)} collected (${c.progress_pct.toFixed(0)}% complete)`,
+            time: 'Recent',
+            type: 'pwp'
+          });
+        });
+      }
+    } catch (e) {}
+    
+    // Render to feed
+    const list = document.getElementById('gxLiveList');
+    if (list && events.length > 0) {
+      const html = events.map(e => `
+        <div class="gx-live-item" style="padding:8px; border-bottom:1px solid #222;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">${e.icon}</span>
+            <div style="flex:1;">
+              <div style="font-size:0.85rem;">${e.text}</div>
+              <div style="font-size:0.7rem; color:#666; margin-top:2px;">${e.time}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      list.innerHTML = html;
+    }
+  } catch (error) {
+    console.warn('Live feed API not available:', error);
+  }
+}
+
+// ============================================================
+// 🎯 KIT-SPECIFIC ENHANCEMENTS
+// ============================================================
+
+function enhanceKitSpecificMetrics() {
+  const kit = window.aigentsyUser?.companyType || 'general';
+  
+  // Only enhance for active kits
+  if (!['social', 'saas', 'marketing'].includes(kit)) {
+    return;
+  }
+  
+  // Update welcome tip (kit-specific)
+  const tips = {
+    social: "💡 Tip: Use franchise Reel templates to 10x your content output. Active creators earn 2.5x with viral boosters!",
+    saas: "💡 Tip: License your API templates to other devs. Top franchisees earn $3k+/mo passive from template revenue!",
+    marketing: "💡 Tip: Your SEO templates are in high demand. Franchise your proven campaigns and earn 15% revenue share!"
+  };
+  
+  const tipElement = document.getElementById('welcomeTip');
+  if (tipElement && tips[kit]) {
+    tipElement.innerHTML = `<strong>Tip:</strong> ${tips[kit]}`;
+  }
+}
+
+// ============================================================
+// 🚀 INITIALIZATION
+// ============================================================
+
+async function initializeWeek1Features() {
+  console.log('🚀 Initializing Week 1 features...');
+  
+  // Wait for user data to be loaded
+  if (!window.aigentsyUser) {
+    setTimeout(initializeWeek1Features, 500);
+    return;
+  }
+  
+  // Load all Week 1 features in parallel
+  await Promise.all([
+    loadBoosterData(),
+    loadSubscriptionData(),
+    loadPWPData(),
+    loadWarrantyData(),
+    loadSLOData(),
+    loadFranchiseData(),
+    loadLiveActivityFeed()
+  ]);
+  
+  // Apply kit-specific enhancements
+  enhanceKitSpecificMetrics();
+  
+  console.log('✅ Week 1 features loaded!');
+}
+
+// Auto-initialize when user data is ready
+if (window.aigentsyUser) {
+  initializeWeek1Features();
+} else {
+  window.addEventListener('load', () => {
+    setTimeout(initializeWeek1Features, 1000);
+  });
+}
+
+// Refresh Week 1 data every 30 seconds
+setInterval(() => {
+  if (window.aigentsyUser) {
+    loadBoosterData();
+    loadSubscriptionData();
+    loadPWPData();
+    loadWarrantyData();
+    loadSLOData();
+    loadLiveActivityFeed();
+  }
+}, 30000);
 
 </script>
 </body>
