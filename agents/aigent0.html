@@ -3144,40 +3144,11 @@ function enhanceKitSpecificMetrics() {
   }
   
   // ============================================================
-  // 3. POPULATE KIT-SPECIFIC ACHIEVEMENTS
+  // 3. REMOVED: POPULATE KIT-SPECIFIC ACHIEVEMENTS
   // ============================================================
-  const achievementsList = document.getElementById('achievementList');
-  
-  if (achievementsList) {
-    const achievements = {
-      social: [
-        "🎥 Created 50+ Reels using franchise templates",
-        "📈 Viral post reached 100k views (+25% booster earned)",
-        "👥 5 active referrals from creator community",
-        "📦 Gold subscription: 22 content pieces this month",
-        "⚡ Weekend Warrior booster active (+25% Sat/Sun)"
-      ],
-      saas: [
-        "💻 Deployed 12 API integrations using templates",
-        "🔗 Stripe integration franchise license earned $450/mo",
-        "👥 3 developer referrals (tech community)",
-        "📦 Professional subscription: 15 builds remaining",
-        "🛡️ 100% Money-Back warranty offered on 8 projects"
-      ],
-      marketing: [
-        "🎯 Launched 8 campaigns with SEO templates",
-        "📊 Avg campaign ROI: 340% (SLO bonuses earned)",
-        "👥 4 agency referrals from LinkedIn outreach",
-        "📦 Platinum subscription: Unlimited campaigns",
-        "⚡ Express SLO tier: 24hr delivery (+80% premium)"
-      ]
-    };
-    
-    const kitAchievements = achievements[kit] || [];
-    achievementsList.innerHTML = kitAchievements
-      .map(a => `<li>${a}</li>`)
-      .join('');
-  }
+  // ✅ This was overwriting the dynamic achievements from renderDynamicAchievements()
+  // Achievements are now handled entirely by renderDynamicAchievements() which uses
+  // real data from window.aigxDashboardData instead of static fake data.
 }
 
 // ============================================================
