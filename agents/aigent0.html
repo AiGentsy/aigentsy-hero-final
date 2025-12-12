@@ -2216,11 +2216,11 @@ async function fetchAIGxDashboardData(username) {
     
     if (data.ok) {
       window.aigxDashboardData = data;
-      updateAIGxAchievements(data);
+      // ✅ REMOVED: updateAIGxAchievements(data) - causes conflict with renderDynamicAchievements
       updateAIGxWallet(data);
       updateLiveActivityFeed(data);
       
-      // ✅ NOW render achievements with complete AIGx data
+      // ✅ NOW render achievements with complete AIGx data (this handles everything)
       const user = window.aigentsyUser;
       if (user) {
         console.log("🏆 Rendering achievements with AIGx data");
