@@ -396,13 +396,6 @@
           <li>📊 Close Rate: <span id="growthCloseRate">0</span>%</li>
           <li>💵 Avg Deal Size: $<span id="growthAvgDeal">0</span></li>
           <li>🔄 Repeat Rate: <span id="growthRepeatRate">0</span>%</li>
-          
-          <!-- KIT-SPECIFIC METRICS (dynamically populated) -->
-          <div id="kitSpecificMetrics" style="margin-top:8px; padding-top:8px; border-top:1px solid #222;">
-            <!-- Social Kit: Content metrics -->
-            <!-- SaaS Kit: Deployment metrics -->
-            <!-- Marketing Kit: Campaign metrics -->
-          </div>
         </ul>
       </div>
     </div>
@@ -2386,11 +2379,6 @@ setInterval(() => {
 }, 30000);
   
 async function initializeDashboard() {
-  console.log("═══════════════════════════════════════════════════");
-  console.log("🚀 AIGENTSY DASHBOARD v1002 - COMPLETE FIX");
-  console.log("📅 Build: December 15, 2024 - 10:30 AM");
-  console.log("✅ Fixed ALL achievement overwrites");
-  console.log("═══════════════════════════════════════════════════");
   console.log("🚀 Initializing dashboard with AIGx...");
   const username = localStorage.getItem("aigentsyUsername");
   if (!username) {
@@ -2401,16 +2389,13 @@ async function initializeDashboard() {
   console.log("👤 Loading for:", username);
   
   // Call existing initialization
-  await injectUserDashboard();
+  injectUserDashboard();
   
-  // Fetch and display AIGx dashboard data (this renders achievements)
+  // Fetch and display AIGx dashboard data
   await fetchAIGxDashboardData(username);
   
-  // Load tier and reputation
+  // ✨ ADD THIS LINE:
   await loadTierAndReputation();
-  
-  // ✨ Initialize Week 1 features (WITHOUT touching achievements)
-  await initializeWeek1Features();
   
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
@@ -2430,14 +2415,13 @@ window.addEventListener("load", () => {
   }, 500);
 });
 
-// ✅ REMOVED: 3-second fallback that was causing double initialization
-// setTimeout(() => {
-//   const chart = document.getElementById("walletChart");
-//   if (chart && !chart.chartInstance) {
-//     console.log("🔄 Final fallback");
-//     initializeDashboard();
-//   }
-// }, 3000);
+setTimeout(() => {
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Final fallback");
+    initializeDashboard();
+  }
+}, 3000);
 
 console.log("✅ Script loaded");
 
@@ -3062,9 +3046,7 @@ function enhanceKitSpecificMetrics() {
     return;
   }
   
-  // ============================================================
-  // 1. UPDATE WELCOME TIP (KIT-SPECIFIC)
-  // ============================================================
+  // Update welcome tip (kit-specific)
   const tips = {
     social: "💡 Tip: Use franchise Reel templates to 10x your content output. Active creators earn 2.5x with viral boosters!",
     saas: "💡 Tip: License your API templates to other devs. Top franchisees earn $3k+/mo passive from template revenue!",
@@ -3074,134 +3056,6 @@ function enhanceKitSpecificMetrics() {
   const tipElement = document.getElementById('welcomeTip');
   if (tipElement && tips[kit]) {
     tipElement.innerHTML = `<strong>Tip:</strong> ${tips[kit]}`;
-  }
-  
-  // ============================================================
-  // 2. ADD KIT-SPECIFIC BUSINESS GROWTH METRICS
-  // ============================================================
-  const metricsContainer = document.getElementById('kitSpecificMetrics');
-  
-  if (metricsContainer) {
-    const metrics = {
-      social: `
-        <li style="color:#a78bfa;">🎥 Content Pieces: <span id="socialContentPieces">0</span>/mo</li>
-        <li style="color:#a78bfa;">📈 Avg Engagement: <span id="socialEngagement">0</span>%</li>
-        <li style="color:#a78bfa;">📋 Templates Used: <span id="socialTemplatesUsed">0</span></li>
-      `,
-      saas: `
-        <li style="color:#3b82f6;">💻 Deployments: <span id="saasDeployments">0</span>/mo</li>
-        <li style="color:#3b82f6;">⚡ Avg Setup Time: <span id="saasSetupTime">0</span>h</li>
-        <li style="color:#3b82f6;">📋 Templates Licensed: <span id="saasTemplatesLicensed">0</span></li>
-      `,
-      marketing: `
-        <li style="color:#10b981;">🎯 Campaigns Live: <span id="marketingCampaigns">0</span></li>
-        <li style="color:#10b981;">📊 Avg Campaign ROI: <span id="marketingROI">0</span>%</li>
-        <li style="color:#10b981;">📋 Templates Active: <span id="marketingTemplatesActive">0</span></li>
-      `
-    };
-    
-    metricsContainer.innerHTML = metrics[kit] || '';
-  }
-  
-  // ============================================================
-  // 3. REMOVED: FAKE HARDCODED ACHIEVEMENTS
-  // ============================================================
-  // ✅ This was overwriting real AIGx achievements with fake demo data
-  // Achievements are handled entirely by renderDynamicAchievements() which
-  // shows real data from window.aigxDashboardData
-}
-
-// ============================================================
-// 🎯 LOAD KIT-SPECIFIC METRICS DATA
-// ============================================================
-
-async function loadKitSpecificMetricsData() {
-  const kit = window.aigentsyUser?.companyType || 'general';
-  
-  if (!['social', 'saas', 'marketing'].includes(kit)) {
-    return;
-  }
-  
-  try {
-    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
-    
-    // Get franchise metrics
-    const franchiseRes = await fetch(`${WEEK1_API_BASE}/franchise/franchisee_dashboard/${username}`);
-    const franchiseData = await franchiseRes.json();
-    
-    if (franchiseData && franchiseData.summary) {
-      const metrics = franchiseData.summary;
-      
-      // ============================================================
-      // SOCIAL KIT METRICS
-      // ============================================================
-      if (kit === 'social') {
-        // Content Pieces: Based on outcomes delivered
-        const contentPieces = metrics.total_outcomes || 0;
-        document.getElementById('socialContentPieces').textContent = contentPieces;
-        
-        // Avg Engagement: Calculate from revenue (proxy metric)
-        const avgEngagement = metrics.total_revenue > 0 
-          ? ((metrics.total_revenue / 1000) * 0.5).toFixed(1) 
-          : 0;
-        document.getElementById('socialEngagement').textContent = avgEngagement;
-        
-        // Templates Used: Active licenses
-        const templatesUsed = metrics.active_licenses || 0;
-        document.getElementById('socialTemplatesUsed').textContent = templatesUsed;
-      }
-      
-      // ============================================================
-      // SAAS KIT METRICS
-      // ============================================================
-      if (kit === 'saas') {
-        // Deployments: Based on outcomes delivered
-        const deployments = metrics.total_outcomes || 0;
-        document.getElementById('saasDeployments').textContent = deployments;
-        
-        // Avg Setup Time: Calculate from delivery metrics
-        // Get from SLO data
-        const sloRes = await fetch(`${WEEK1_API_BASE}/slo/agent_dashboard/${username}`);
-        const sloData = await sloRes.json();
-        const avgSetupTime = sloData?.avg_delivery_hours 
-          ? (sloData.avg_delivery_hours / 24).toFixed(1) 
-          : 0;
-        document.getElementById('saasSetupTime').textContent = avgSetupTime;
-        
-        // Templates Licensed: Active licenses
-        const templatesLicensed = metrics.active_licenses || 0;
-        document.getElementById('saasTemplatesLicensed').textContent = templatesLicensed;
-      }
-      
-      // ============================================================
-      // MARKETING KIT METRICS
-      // ============================================================
-      if (kit === 'marketing') {
-        // Campaigns Live: Based on active licenses
-        const campaignsLive = metrics.active_licenses || 0;
-        document.getElementById('marketingCampaigns').textContent = campaignsLive;
-        
-        // Avg Campaign ROI: Calculate from revenue vs cost
-        const avgROI = metrics.total_revenue > 0 && metrics.active_licenses > 0
-          ? ((metrics.total_revenue / (metrics.active_licenses * 299)) * 100).toFixed(0)
-          : 0;
-        document.getElementById('marketingROI').textContent = avgROI;
-        
-        // Templates Active: Active licenses
-        const templatesActive = metrics.active_licenses || 0;
-        document.getElementById('marketingTemplatesActive').textContent = templatesActive;
-      }
-    }
-    
-    // ============================================================
-    // REMOVED: WEEK 1 ACHIEVEMENTS OVERWRITE
-    // ============================================================
-    // ✅ This was the SECOND place overwriting achievements with Week 1 data!
-    // All achievements are handled by renderDynamicAchievements() which shows
-    // AIGx data from window.aigxDashboardData - don't touch them here
-    
-  } catch (error) {
-    console.warn('Kit-specific metrics API not available:', error);
   }
 }
 
@@ -3229,38 +3083,32 @@ async function initializeWeek1Features() {
     loadLiveActivityFeed()
   ]);
   
-  // Apply kit-specific enhancements (static content)
+  // Apply kit-specific enhancements
   enhanceKitSpecificMetrics();
-  
-  // Load kit-specific metrics data (dynamic data)
-  await loadKitSpecificMetricsData();
   
   console.log('✅ Week 1 features loaded!');
 }
 
-// ✅ REMOVED: Auto-initialization and 30s refresh that caused achievement flickering
-// Week 1 features are now initialized ONLY from initializeDashboard() to ensure
-// proper sequencing and prevent race conditions with AIGx data loading
-//
-// if (window.aigentsyUser) {
-//   initializeWeek1Features();
-// } else {
-//   window.addEventListener('load', () => {
-//     setTimeout(initializeWeek1Features, 1000);
-//   });
-// }
-//
-// setInterval(() => {
-//   if (window.aigentsyUser) {
-//     loadBoosterData();
-//     loadSubscriptionData();
-//     loadPWPData();
-//     loadWarrantyData();
-//     loadSLOData();
-//     loadLiveActivityFeed();
-//     loadKitSpecificMetricsData(); 
-//   }
-// }, 30000);
+// Auto-initialize when user data is ready
+if (window.aigentsyUser) {
+  initializeWeek1Features();
+} else {
+  window.addEventListener('load', () => {
+    setTimeout(initializeWeek1Features, 1000);
+  });
+}
+
+// Refresh Week 1 data every 30 seconds
+setInterval(() => {
+  if (window.aigentsyUser) {
+    loadBoosterData();
+    loadSubscriptionData();
+    loadPWPData();
+    loadWarrantyData();
+    loadSLOData();
+    loadLiveActivityFeed();
+  }
+}, 30000);
 
 </script>
 </body>
