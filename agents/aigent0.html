@@ -2434,9 +2434,9 @@ setInterval(() => {
   
 async function initializeDashboard() {
   console.log("═══════════════════════════════════════════════════");
-  console.log("🚀 AIGENTSY DASHBOARD v999 - ULTRA DEBUG VERSION");
-  console.log("📅 Build: December 12, 2024 - 9:30 AM");
-  console.log("✅ All fixes applied + comprehensive debug logging");
+  console.log("🚀 AIGENTSY DASHBOARD v1000 - REMOVED 3s FALLBACK");
+  console.log("📅 Build: December 15, 2024 - 9:50 AM");
+  console.log("✅ Fixed: Removed 3-second re-init that caused flickering");
   console.log("═══════════════════════════════════════════════════");
   console.log("🚀 Initializing dashboard with AIGx...");
   const username = localStorage.getItem("aigentsyUsername");
@@ -2489,13 +2489,15 @@ window.addEventListener("load", () => {
   }, 500);
 });
 
-setTimeout(() => {
-  const chart = document.getElementById("walletChart");
-  if (chart && !chart.chartInstance) {
-    console.log("🔄 Final fallback");
-    initializeDashboard();
-  }
-}, 3000);
+// ✅ REMOVED: This 3-second fallback was causing the dashboard to re-initialize
+// and overwriting achievements with stale data!
+// setTimeout(() => {
+//   const chart = document.getElementById("walletChart");
+//   if (chart && !chart.chartInstance) {
+//     console.log("🔄 Final fallback");
+//     initializeDashboard();
+//   }
+// }, 3000);
 
 console.log("✅ Script loaded");
 
