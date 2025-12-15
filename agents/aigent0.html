@@ -883,7 +883,9 @@ function renderDynamicAchievements(user) {
     
     const tier = dashboardData.tier_progression.current_tier.toUpperCase();
     const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
-    achievements.push(`${tierEmoji} ${tier} Tier — ${dashboardData.tier_progression.tier_multiplier}x earning rate`);
+    // ✅ FIX: Use total earning rate (tier + early adopter) instead of just tier multiplier
+    const totalMultiplier = dashboardData.earning_rates?.total_multiplier || dashboardData.early_adopter.multiplier || 1.0;
+    achievements.push(`${tierEmoji} ${tier} Tier — ${totalMultiplier}x earning rate`);
     
     if (revenue > 0) {
       achievements.push(`💵 Revenue Generated — $${revenue.toLocaleString()}`);
@@ -2517,30 +2519,26 @@ async function loadBoosterData() {
     const response = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
     const data = await response.json();
     
-    if (data && data.total_multiplier) {
-      // Update tier badge multiplier
-      const baseTier = window.aigentsyUser?.tier?.multiplier || 3.0;
-      const totalMultiplier = data.total_multiplier;
-      const boosterBonus = (totalMultiplier - baseTier).toFixed(1);
+    if (data && data.total_multiplier !== undefined) {
+      // Calculate booster bonus (API returns total_multiplier where 1.0 = no boost)
+      const boosterMultiplier = data.total_multiplier - 1.0;
       
-      document.getElementById('user-multiplier').textContent = `${totalMultiplier}x`;
-      document.getElementById('multiplier-label').innerHTML = 
-        `Base ${baseTier}x + Boosters ${boosterBonus}x`;
+      // Update booster bonus in breakdown (line 341)
+      const totalEarningsEl = document.getElementById('totalEarnings');
+      const totalEarnings = totalEarningsEl ? parseFloat(totalEarningsEl.textContent || 0) : 0;
+      const boosterBonusAmount = totalEarnings * boosterMultiplier;
       
-      // Update wallet boosted earnings
-      const totalEarnings = parseFloat(document.getElementById('totalEarnings').textContent || 0);
-      const boosterBonusAmount = totalEarnings * (totalMultiplier - baseTier) / baseTier;
-      document.getElementById('boosterBonus').textContent = boosterBonusAmount.toFixed(2);
+      const boosterBonusEl = document.getElementById('boosterBonus');
+      if (boosterBonusEl) {
+        boosterBonusEl.textContent = boosterBonusAmount.toFixed(2);
+      }
       
-      // Update booster breakdown
-      const breakdown = data.active_boosters.map(b => 
-        `${b.icon} ${b.name}: ${b.multiplier}x ${b.expires_at ? '(expires ' + new Date(b.expires_at).toLocaleDateString() + ')' : '(permanent)'}`
-      ).join('<br>');
-      document.getElementById('booster-breakdown').innerHTML = breakdown || 'No active boosters';
-      
-      // Update mini tile
-      document.getElementById('boosterMultiplierMini').textContent = `${totalMultiplier}x Active`;
-      document.getElementById('boosterCountMini').textContent = `${data.booster_count} boosters`;
+      console.log('✅ Booster data loaded:', {
+        totalMultiplier: data.total_multiplier,
+        boosterBonus: boosterMultiplier,
+        bonusAmount: boosterBonusAmount,
+        activeCount: data.active_boosters?.length || 0
+      });
     }
   } catch (error) {
     console.warn('Boosters API not available:', error);
@@ -2623,19 +2621,22 @@ async function loadSubscriptionData() {
     if (data && data.subscription) {
       const sub = data.subscription;
       
-      // Update wallet breakdown
-      document.getElementById('subCredits').textContent = 
-        `${sub.credits_remaining} / ${sub.monthly_allocation}`;
+      // Update wallet breakdown (line 337) - with null check
+      const subCreditsEl = document.getElementById('subCredits');
+      if (subCreditsEl) {
+        subCreditsEl.textContent = `${sub.credits_remaining || 0} / ${sub.monthly_allocation || 0}`;
+      }
       
-      // Update mini tile
-      document.getElementById('subStatusMini').textContent = `${sub.tier} Active`;
-      document.getElementById('subCreditsMini').textContent = `${sub.credits_remaining}/${sub.monthly_allocation} credits`;
-      
-      // Update revenue sources
-      document.getElementById('revSubscription').textContent = `$${sub.cost}/mo`;
+      console.log('✅ Subscription data loaded:', {
+        tier: sub.tier,
+        credits: `${sub.credits_remaining}/${sub.monthly_allocation}`
+      });
     } else {
-      document.getElementById('subStatusMini').textContent = 'No subscription';
-      document.getElementById('subCreditsMini').textContent = 'Upgrade now';
+      // No subscription - set default
+      const subCreditsEl = document.getElementById('subCredits');
+      if (subCreditsEl) {
+        subCreditsEl.textContent = '0 / 0';
+      }
     }
   } catch (error) {
     console.warn('Subscriptions API not available:', error);
@@ -2704,15 +2705,16 @@ async function loadPWPData() {
     const data = await response.json();
     
     if (data && data.summary) {
-      // Update wallet breakdown
-      document.getElementById('pwpFinanced').textContent = data.summary.total_financed.toFixed(2);
+      // Update wallet breakdown (line 345) - with null check
+      const pwpFinancedEl = document.getElementById('pwpFinanced');
+      if (pwpFinancedEl) {
+        pwpFinancedEl.textContent = (data.summary.total_financed || 0).toFixed(2);
+      }
       
-      // Update mini tile
-      const activeCount = data.summary.active_contracts || 0;
-      document.getElementById('pwpStatusMini').textContent = 
-        activeCount > 0 ? `${activeCount} Active` : 'No contracts';
-      document.getElementById('pwpAmountMini').textContent = 
-        `$${data.summary.total_remaining.toFixed(0)} remaining`;
+      console.log('✅ PWP data loaded:', {
+        totalFinanced: data.summary.total_financed,
+        activeContracts: data.summary.active_contracts || 0
+      });
     }
   } catch (error) {
     console.warn('PWP API not available:', error);
@@ -2801,21 +2803,19 @@ async function loadWarrantyData() {
     
     if (data && data.warranties) {
       const active = data.warranties.filter(w => w.status === 'active');
-      const totalBond = active.reduce((sum, w) => sum + (w.bond_amount || 0), 0);
       const totalEarned = data.warranties.filter(w => w.status === 'completed' && !w.claimed)
         .reduce((sum, w) => sum + (w.bond_amount || 0), 0);
       
-      // Update wallet
-      document.getElementById('warrantyEarnings').textContent = totalEarned.toFixed(2);
+      // Update wallet breakdown (line 349) - with null check
+      const warrantyEarningsEl = document.getElementById('warrantyEarnings');
+      if (warrantyEarningsEl) {
+        warrantyEarningsEl.textContent = totalEarned.toFixed(2);
+      }
       
-      // Update revenue sources
-      document.getElementById('revWarranties').textContent = totalEarned.toFixed(0);
-      
-      // Update mini tile
-      document.getElementById('warrantyStatusMini').textContent = 
-        active.length > 0 ? `${active.length} Active` : 'No warranties';
-      document.getElementById('warrantyBondMini').textContent = 
-        `$${totalBond.toFixed(0)} bonded`;
+      console.log('✅ Warranty data loaded:', {
+        totalEarned,
+        activeCount: active.length
+      });
     }
   } catch (error) {
     console.warn('Warranties API not available:', error);
