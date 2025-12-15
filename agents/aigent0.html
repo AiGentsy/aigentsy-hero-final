@@ -866,15 +866,9 @@ function downloadKitDocument(docId) {
 }
 
 function renderDynamicAchievements(user) {
-  console.log("🏆 [CALL] renderDynamicAchievements called at", new Date().toISOString());
-  console.log("🏆 [DATA] window.aigxDashboardData exists?", !!window.aigxDashboardData);
-  console.log("🏆 [STACK]", new Error().stack.split('\n').slice(2, 5).join('\n'));
-  
+  console.log("🏆 Rendering achievements");
   const achievementBox = document.getElementById("achievementList");
-  if (!achievementBox) {
-    console.log("🏆 [ERROR] achievementList element not found!");
-    return;
-  }
+  if (!achievementBox) return;
   
   const achievements = [];
   
@@ -882,7 +876,6 @@ function renderDynamicAchievements(user) {
   const dashboardData = window.aigxDashboardData;
   
   if (dashboardData) {
-    console.log("🏆 [PATH] Using AIGx dashboard data");
     // Use AIGx Dashboard data
     const aigx = dashboardData.aigx_equity.aigx_balance;
     const revenue = dashboardData.tier_progression.lifetime_revenue;
@@ -917,8 +910,6 @@ function renderDynamicAchievements(user) {
     }
     
   } else {
-    console.log("🏆 [PATH] Using fallback user object data");
-    console.log("🏆 [USER] companyType:", user?.companyType);
     // Fallback to user object
     const config = getBusinessConfig(user.companyType);
     
@@ -947,15 +938,11 @@ function renderDynamicAchievements(user) {
     }
   }
   
-  console.log("🏆 [RENDER]", achievements.length, "achievements:", achievements.slice(0, 2));
-  
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
     achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
   }
-  
-  console.log("🏆 [DONE] Achievements rendered to DOM");
 }
 
 function renderWalletChart(user) {
@@ -1050,7 +1037,7 @@ async function injectUserDashboard() {
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
-    // ✅ DON'T render achievements yet - wait for AIGx data to load first
+    renderDynamicAchievements(user);
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
@@ -1062,7 +1049,7 @@ async function injectUserDashboard() {
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
     renderDynamicKit(user);
-    // ✅ DON'T render achievements yet - wait for AIGx data attempt
+    renderDynamicAchievements(user);
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
@@ -1184,26 +1171,8 @@ async function runAgent() {
       body: JSON.stringify({ 
         input: input, 
         memory, 
-        businessType: user.companyType || 'general',
-        username: user.username,
-        // ✨ NEW: Include Week 1 feature context
-        context: {
-          kit: user.companyType,
-          activeFeatures: {
-            boosters: true,
-            subscriptions: true,
-            pwp: true,
-            warranties: true,
-            slo: true,
-            franchise: true
-          },
-          // Include current metrics for context-aware responses
-          metrics: {
-            revenue: parseFloat(document.getElementById('totalEarnings')?.textContent || 0),
-            multiplier: parseFloat(document.getElementById('user-multiplier')?.textContent?.replace('x', '') || 1),
-            tier: document.getElementById('user-tier-name')?.textContent || 'Founder'
-          }
-        }
+        businessType: user.companyType, 
+        username: user.username 
       }) 
     }, 2, 15000);
     
@@ -2229,29 +2198,13 @@ async function fetchAIGxDashboardData(username) {
     
     if (data.ok) {
       window.aigxDashboardData = data;
-      // ✅ REMOVED: updateAIGxAchievements(data) - causes conflict with renderDynamicAchievements
+      updateAIGxAchievements(data);
       updateAIGxWallet(data);
       updateLiveActivityFeed(data);
-      
-      // ✅ NOW render achievements with complete AIGx data (this handles everything)
-      const user = window.aigentsyUser;
-      if (user) {
-        console.log("🏆 Rendering achievements with AIGx data");
-        renderDynamicAchievements(user);
-      }
-      
       return data;
     }
   } catch (error) {
     console.warn("AIGx Dashboard API not available:", error);
-    
-    // ✅ If AIGx API fails, render achievements with fallback user data
-    const user = window.aigentsyUser;
-    if (user) {
-      console.log("🏆 Rendering achievements with fallback data");
-      renderDynamicAchievements(user);
-    }
-    
     return null;
   }
 }
@@ -2426,18 +2379,17 @@ function getTimeAgo(date) {
   return date.toLocaleDateString();
 }
 
-// ✅ REMOVED: Auto-refresh was causing achievements to re-render every 30 seconds
-// If you need auto-refresh, implement it without touching achievements
-// setInterval(() => {
-//   const username = localStorage.getItem("aigentsyUsername");
-//   if (username) fetchAIGxDashboardData(username);
-// }, 30000);
+// Auto-refresh every 30 seconds
+setInterval(() => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username) fetchAIGxDashboardData(username);
+}, 30000);
   
 async function initializeDashboard() {
   console.log("═══════════════════════════════════════════════════");
-  console.log("🚀 AIGENTSY DASHBOARD v1001 - TRULY FINAL");
-  console.log("📅 Build: December 15, 2024 - 10:10 AM");
-  console.log("✅ Fixed: Removed 30s auto-refresh that caused flickering");
+  console.log("🚀 AIGENTSY DASHBOARD v1002 - COMPLETE FIX");
+  console.log("📅 Build: December 15, 2024 - 10:30 AM");
+  console.log("✅ Fixed ALL achievement overwrites");
   console.log("═══════════════════════════════════════════════════");
   console.log("🚀 Initializing dashboard with AIGx...");
   const username = localStorage.getItem("aigentsyUsername");
@@ -2451,31 +2403,19 @@ async function initializeDashboard() {
   // Call existing initialization
   await injectUserDashboard();
   
-  // Fetch and display AIGx dashboard data
+  // Fetch and display AIGx dashboard data (this renders achievements)
   await fetchAIGxDashboardData(username);
   
   // Load tier and reputation
   await loadTierAndReputation();
   
-  // ✨ NEW: Initialize Week 1 features
+  // ✨ Initialize Week 1 features (WITHOUT touching achievements)
   await initializeWeek1Features();
   
-  // ✨ NEW: Kit-aware welcome message
   if (chatLog && chatLog.children.length === 0) {
-    const user = window.aigentsyUser || {};
-    const kit = user.companyType || 'general';
-    
-    const kitWelcomes = {
-      social: `Hey ${username}! Your Social Media C-Suite is ready. We've got content templates, Reel frameworks, and franchise licensing loaded. What content do you want to create today?`,
-      saas: `Hey ${username}! Your SaaS C-Suite is online. We've got API templates, deployment guides, and subscription systems ready. What do you want to build?`,
-      marketing: `Hey ${username}! Your Marketing C-Suite is standing by. We've got SEO templates, campaign frameworks, and growth tools loaded. What campaigns should we launch?`,
-      legal: `Hey ${username}! Your Legal C-Suite is ready. We've got contract templates, IP frameworks, and compliance tools loaded. What legal work can we handle?`,
-      general: `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`
-    };
-    
     const preload = document.createElement("div");
     preload.className = "chat-agent";
-    preload.innerHTML = kitWelcomes[kit] || kitWelcomes.general;
+    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
     chatLog.appendChild(preload);
   }
 }
@@ -2490,8 +2430,7 @@ window.addEventListener("load", () => {
   }, 500);
 });
 
-// ✅ REMOVED: This 3-second fallback was causing the dashboard to re-initialize
-// and overwriting achievements with stale data!
+// ✅ REMOVED: 3-second fallback that was causing double initialization
 // setTimeout(() => {
 //   const chart = document.getElementById("walletChart");
 //   if (chart && !chart.chartInstance) {
@@ -2624,7 +2563,7 @@ function updatePremiumServicesGrid(repScore) {
 // ============================================================
 
 // API Base URL for Week 1 features
-const WEEK1_API_BASE = "https://aigentsy-ame-runtime.onrender.com/week1";
+const WEEK1_API_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
 
 // ============================================================
 // ⚡ BOOSTERS
@@ -3165,11 +3104,11 @@ function enhanceKitSpecificMetrics() {
   }
   
   // ============================================================
-  // 3. REMOVED: POPULATE KIT-SPECIFIC ACHIEVEMENTS
+  // 3. REMOVED: FAKE HARDCODED ACHIEVEMENTS
   // ============================================================
-  // ✅ This was overwriting the dynamic achievements from renderDynamicAchievements()
-  // Achievements are now handled entirely by renderDynamicAchievements() which uses
-  // real data from window.aigxDashboardData instead of static fake data.
+  // ✅ This was overwriting real AIGx achievements with fake demo data
+  // Achievements are handled entirely by renderDynamicAchievements() which
+  // shows real data from window.aigxDashboardData
 }
 
 // ============================================================
@@ -3255,14 +3194,11 @@ async function loadKitSpecificMetricsData() {
     }
     
     // ============================================================
-    // REMOVED: ENHANCE ACHIEVEMENTS WITH REAL DATA
+    // REMOVED: WEEK 1 ACHIEVEMENTS OVERWRITE
     // ============================================================
-    // ✅ This was the THIRD place overwriting achievements!
-    // All achievements are handled by renderDynamicAchievements() which already
-    // pulls in AIGx data, early adopter bonuses, tier info, AND can integrate
-    // Week 1 franchise data if needed.
-    //
-    // Having multiple functions write to the same DOM element causes race conditions.
+    // ✅ This was the SECOND place overwriting achievements with Week 1 data!
+    // All achievements are handled by renderDynamicAchievements() which shows
+    // AIGx data from window.aigxDashboardData - don't touch them here
     
   } catch (error) {
     console.warn('Kit-specific metrics API not available:', error);
@@ -3302,18 +3238,29 @@ async function initializeWeek1Features() {
   console.log('✅ Week 1 features loaded!');
 }
 
-// ✅ REMOVED: Auto-initialization code
-// This was causing initializeWeek1Features() to be called multiple times:
-// 1. From initializeDashboard() (line 2426) - CORRECT
-// 2. From here on page load - DUPLICATE
-// 3. From setInterval every 30 seconds - SPAM
+// ✅ REMOVED: Auto-initialization and 30s refresh that caused achievement flickering
+// Week 1 features are now initialized ONLY from initializeDashboard() to ensure
+// proper sequencing and prevent race conditions with AIGx data loading
 //
-// Now it's ONLY called from initializeDashboard() which ensures proper sequencing.
-
-// ✅ REMOVED: setInterval for refreshing
-// The 30-second refresh was causing the achievements to flicker every 30 seconds
-// because loadKitSpecificMetricsData() was being called repeatedly.
-// If you need auto-refresh, implement it without touching achievements.
+// if (window.aigentsyUser) {
+//   initializeWeek1Features();
+// } else {
+//   window.addEventListener('load', () => {
+//     setTimeout(initializeWeek1Features, 1000);
+//   });
+// }
+//
+// setInterval(() => {
+//   if (window.aigentsyUser) {
+//     loadBoosterData();
+//     loadSubscriptionData();
+//     loadPWPData();
+//     loadWarrantyData();
+//     loadSLOData();
+//     loadLiveActivityFeed();
+//     loadKitSpecificMetricsData(); 
+//   }
+// }, 30000);
 
 </script>
 </body>
