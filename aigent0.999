@@ -1,0 +1,3317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Autonomous AiGentsy Launchpad</title>
+<script defer src="/access-check.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="/vaults.css"/>
+<link rel="stylesheet" href="/theme.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+}
+
+.tooltip-container .tooltip-text {
+  visibility: hidden;
+  width: 300px;
+  background-color: #1a1a1a;
+  color: #fff;
+  text-align: left;
+  border-radius: 8px;
+  padding: 12px;
+  position: absolute;
+  z-index: 10000;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -150px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border: 1px solid #00bfff;
+  box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.tooltip-container .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #00bfff transparent transparent transparent;
+}
+
+.tooltip-container:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+  .metric-box { background: #111; border: 1px solid #222; border-radius: 10px; padding: 18px 24px; box-shadow: 0 0 12px rgba(0,240,255,0.05); }
+  .col-left { display: flex; flex-direction: column; gap: 20px; }
+  body { font-family: 'Inter', sans-serif; margin: 0; background: radial-gradient(circle at center, #0e101a, #000); color: #fff; display: flex; }
+  .sidebar { width: 320px; background: #0a0a0a; padding: 30px 20px; }
+  .sidebar img { width: 160px; display: block; margin-bottom: 40px; }
+  .chart-section { margin-top: 30px; }
+  .chart-sidebar-box { margin-top: 20px; background: #111; color: #ccc; padding: 12px 16px; border-radius: 8px; font-size: 0.85rem; border: 1px solid #333; }
+  .main { padding: 40px; width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; align-items: start; }
+  .full-width { grid-column: 1 / -1; }
+  .metric-box { background: #111; border: 1px solid #222; border-radius: 10px; padding: 18px 24px; box-shadow: 0 0 12px rgba(0,240,255,0.05); }
+  .metric-box h3 { margin-top: 0; color: #00bfff; font-size: 1.25rem; }
+  .metric-box ul { padding-left: 20px; font-size: 0.95rem; color: #fff; }
+  .button-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .button-row .btn-glow { padding: 6px 12px; font-size: 0.85rem; border-radius: 5px; white-space: nowrap; }
+  .chat-response-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; margin-bottom: 10px; }
+  .chat-response-buttons .btn-glow { font-size: 0.85rem; padding: 8px 12px; }
+  #autoMatchOfferings { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding-left: 0; margin-top: 10px; }
+  #autoMatchOfferings li { margin: 0; }
+  #autoMatchOfferings li button.btn-glow { font-size: 0.8rem; padding: 8px 12px; }
+  .btn-glow { background: #00bfff; color: #000; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.95rem; transition: all 0.3s ease; margin-right: 10px; }
+  .btn-glow:hover { background: #009cd8; }
+  .btn-sm { padding: 4px 8px !important; font-size: 0.8rem !important; line-height: 1.1 !important; }
+  .chat-user { color: #00B3FF; font-weight: 500; margin: 8px 0; }
+  .chat-agent { color: #FFFFFF; font-weight: 500; white-space: pre-line; margin: 8px 0; }
+  .csn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 1024px) { .csn-grid { grid-template-columns: repeat(2, 1fr); } }
+  .csn-tile { background: #0b0b0b; border: 1px solid #222; border-radius: 10px; padding: 12px 14px; box-shadow: 0 0 10px rgba(0,255,255,0.06); }
+  .csn-label { font-size: 0.8rem; color: #9ac; letter-spacing: 0.02em; margin-bottom: 4px; }
+  .csn-value { font-size: 1.2rem; font-weight: 700; color: #fff; }
+  .csn-details { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 1200px) { .csn-details { grid-template-columns: 1fr; } }
+  .toast { display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #00bfff; color: white; padding: 12px 24px; border-radius: 12px; box-shadow: 0 0 10px #000; font-size: 0.95rem; z-index: 9999; }
+  .gx-fab { position: fixed; right: 16px; bottom: 16px; z-index: 9999; padding: 12px 16px; border-radius: 12px; background: #111; color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.25); cursor: pointer; font-weight: 600; }
+  .gx-drawer { position: fixed; right: 0; top: 0; height: 100%; width: 360px; background: #0e0f13; color: #fff; border-left: 1px solid rgba(255,255,255,0.08); transform: translateX(100%); transition: transform 0.25s ease; z-index: 9998; display: flex; flex-direction: column; overflow-y: auto; }
+  .gx-drawer.open { transform: translateX(0); }
+  .gx-drawer header { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; }
+  .gx-drawer .grp { padding: 12px 16px; }
+  .gx-drawer .grp h4 { margin: 10px 0 6px; font-size: 12px; opacity: 0.75; letter-spacing: 0.04em; text-transform: uppercase; }
+  .gx-drawer .grp button { 
+  width: 100%; 
+  margin: 6px 0; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  border: 1px solid #00bfff; 
+  background: linear-gradient(135deg, #131722 0%, #1a2030 100%); 
+  color: #00bfff; 
+  cursor: pointer; 
+  text-align: left;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.gx-drawer .grp button:hover { 
+  background: linear-gradient(135deg, #00bfff 0%, #009cd8 100%); 
+  color: #000;
+  border-color: #00ffcc;
+  transform: translateX(-2px);
+}
+  .gx-chip { display: inline-block; padding: 4px 8px; background: #0b5; color: #fff; border-radius: 999px; font-size: 12px; margin-left: 8px; }
+  .gx-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 9999; }
+  .gx-modal.open { display: flex; }
+  .gx-modal .panel { background: #0e0f13; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 18px; width: 560px; max-width: 90%; color: #fff; }
+  .gx-modal .panel h3 { margin: 0 0 8px; color: #00bfff; }
+  .gx-live { position: fixed; right: 16px; top: 16px; width: 280px; max-height: 40vh; overflow: auto; background: #0f1117; border: 1px solid #1f2a3a; border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,0.35); z-index: 9997; }
+  .gx-live h4 { margin: 8px 12px; font-size: 0.8rem; color: #9ed; }
+  .gx-live-list { padding: 8px 12px; }
+  .gx-live-item { font-size: 0.8rem; color: #cfe; padding: 6px 0; border-bottom: 1px dashed #24354c; }
+  .gx-live-item:last-child { border-bottom: 0; }
+</style>
+</head>
+<body>
+<div id="gxLive" class="gx-live">
+  <h4>Live Activity</h4>
+  <div id="gxLiveList" class="gx-live-list"></div>
+</div>
+<div class="sidebar">
+  <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
+  <div class="chart-section">
+    <canvas id="walletChart" width="300" height="300"></canvas>
+  </div>
+  <div class="chart-sidebar-box" data-dynamic="true" id="csuiteBox">
+    <h4 style="color:#00bfff; margin-bottom:6px;">🏢 C-Suite Team</h4>
+    <ul style="padding-left: 18px; font-size: 0.9rem;" id="csuiteList">
+      <li>Loading your team...</li>
+    </ul>
+    <p id="csuiteNote" style="font-size: 0.85rem; color: #888;"></p>
+  </div>
+  <div class="chart-sidebar-box" id="businessSummarySidebarBox">
+  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+  
+  <!-- Kit Items (Clickable) -->
+  <div style="margin-bottom:12px;">
+    <strong style="color:#fff; font-size:0.9rem;">📂 Kit Documents:</strong>
+    <div id="dynamicKitDoc" style="margin-top:6px;">
+      <!-- Populated by JavaScript with clickable items -->
+    </div>
+  </div>
+  
+  <!-- Unlocks (All Unlocked) -->
+  <strong style="color:#fff; font-size:0.9rem;">✅ Modules Unlocked:</strong>
+  <ul id="businessSummaryList" style="padding-left:18px; font-size:0.85rem; line-height:1.8;"></ul>
+</div>
+</div>
+<div class="main">
+  <div class="metric-box full-width">
+    <h2 id="welcomeTitle">Loading your AiGentsy...</h2>
+    <p id="welcomeDescription">Setting up your autonomous business unit...</p>
+    <p style="color:#ccc; font-size:0.9rem;">Traits: <span id="traitsDisplay" style="color:#00bfff;">Loading...</span></p>
+    <p style="color:#aaa; font-size:0.85rem;" id="welcomeTip"><strong>Tip:</strong> Loading...</p>
+    <div style="margin-top:16px;" id="selfExpandingBox">
+      <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
+      <p style="font-size:0.9rem; color:#ccc;" id="selfExpandingText">Loading...</p>
+    </div>
+  </div>
+  <div class="col-left">
+    <div class="metric-box">
+      <h3 id="chatHeader">AiGentsy Chat</h3>
+      <div id="chatLog" class="chat-log" style="max-height:240px;overflow-y:auto;margin-bottom:10px;"></div>
+      <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); runAgent();}"></textarea>
+      <div id="chatSendRow" style="margin-top:8px;">
+        <button class="btn-glow" id="sendBtn" onclick="runAgent()" aria-label="Send">➤</button>
+      </div>
+      <div id="fileDropZone"
+           style="margin-top:10px;padding:10px;border:2px dashed #444;border-radius:6px;text-align:center;font-size:0.85rem;color:#999;cursor:pointer"
+           onclick="document.getElementById('fileInput').click()">
+        📁 Drag & Drop or Click to Attach Files
+        <input id="fileInput" type="file" multiple style="display:none" onchange="handleFiles(this.files)">
+      </div>
+      <div id="filePreview" style="margin-top:8px; font-size:0.85rem; color:#ccc;"></div>
+    </div>
+<!-- Tier & Reputation (with Team Achievements) -->
+<div class="metric-box">
+  <div style="display: flex; justify-content: space-between; align-items: start; gap: 20px;">
+    <!-- Left: Tier Badge -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">YOUR TIER</div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div id="user-tier-badge" style="font-size: 48px;">🏆</div>
+        <div>
+          <div id="user-tier-name" style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">Founder</div>
+          <div id="user-tier-description" style="font-size: 12px; color: #888;">User #5 • First 100</div>
+        </div>
+      </div>
+      <div style="background: rgba(139, 92, 246, 0.15); border-radius: 6px; padding: 8px 12px; display: inline-block; cursor: pointer;" onclick="toggleBoosterBreakdown()">
+        <span style="font-size: 20px; font-weight: 700; color: #a78bfa;" id="user-multiplier">3.0x</span>
+        <span style="font-size: 11px; color: #888; margin-left: 4px;" id="multiplier-label">earnings boost</span>
+      </div>
+      <div id="booster-breakdown" style="display:none; margin-top:8px; font-size:10px; color:#888; line-height: 1.6;">
+        <!-- Populated by loadBoosterData() -->
+      </div>
+    </div>
+    
+    <!-- Right: Reputation Score -->
+    <div style="flex: 1;">
+      <div style="font-size: 14px; color: #888; margin-bottom: 8px;">REPUTATION</div>
+      <div id="reputation-score" style="font-size: 36px; font-weight: 700; color: #22c55e; margin-bottom: 8px;">127</div>
+      
+      <!-- Breakdown -->
+      <div style="font-size: 11px; color: #64748b; line-height: 1.8;">
+        <div>💼 <span id="rep-deals">12</span> deals (+60)</div>
+        <div>⭐ <span id="rep-reviews">8</span> reviews (+24)</div>
+        <div>💰 $<span id="rep-revenue">6,601</span> (+66)</div>
+        <div>📅 <span id="rep-months">3</span> months (+6)</div>
+      </div>
+      
+      <!-- Next Unlock -->
+      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div style="font-size: 10px; color: #888; margin-bottom: 4px; text-transform: uppercase;">Next: <span id="next-unlock-name">White Label</span> (<span id="next-unlock-required">150</span>)</div>
+        <div style="background: rgba(100, 116, 139, 0.2); border-radius: 4px; height: 4px; overflow: hidden;">
+          <div id="reputation-progress" style="background: linear-gradient(90deg, #8b5cf6, #3b82f6); height: 100%; width: 84.6%; transition: width 0.3s;"></div>
+        </div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 2px;"><span id="points-needed">23</span> points to go</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Premium Services (Week 1 Features) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">💼 Financial Tools</div>
+    <div id="premium-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
+      
+      <!-- Subscriptions -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewSubscriptions()">
+        <div style="font-size: 18px; margin-bottom: 4px;">📦</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Subscriptions</div>
+        <div style="color: #00ff88; font-size: 10px;" id="subStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="subCreditsMini">— credits</div>
+      </div>
+      
+      <!-- PWP Finance -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewPWP()">
+        <div style="font-size: 18px; margin-bottom: 4px;">💰</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">PWP Finance</div>
+        <div style="color: #00ff88; font-size: 10px;" id="pwpStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="pwpAmountMini">—</div>
+      </div>
+      
+      <!-- Warranties -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewWarranties()">
+        <div style="font-size: 18px; margin-bottom: 4px;">🛡️</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Warranties</div>
+        <div style="color: #00ff88; font-size: 10px;" id="warrantyStatusMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="warrantyBondMini">—</div>
+      </div>
+      
+      <!-- Boosters -->
+      <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewBoosters()">
+        <div style="font-size: 18px; margin-bottom: 4px;">⚡</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Boosters</div>
+        <div style="color: #a78bfa; font-size: 10px;" id="boosterMultiplierMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="boosterCountMini">— active</div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- ✨ TEAM ACHIEVEMENTS (Consolidated Here) -->
+  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+    <h4 style="color:#00bfff; margin: 0 0 10px 0; font-size: 14px;">🏆 Team Achievements</h4>
+    <ul id="achievementList" style="padding-left: 20px; margin: 0; font-size: 0.9rem; line-height: 1.8;">
+      <li>Loading your business wins...</li>
+    </ul>
+  </div>
+</div>
+
+  </div>
+  <div class="metric-box">
+    <h3>
+  <span class="tooltip-container">
+    💰 Wallet & Off-Ramp
+    <span class="tooltip-text">
+      <strong style="color:#00bfff;">💎 AIGx:</strong> Your internal currency earned through platform activity, transactions, and milestones. AIGx can be converted to AIGo at conversion events.<br><br>
+      <strong style="color:#00ff88;">💼 AIGo:</strong> AiGentsy Ownership Interest - your profit participation rights in the 20% equity pool. AIGo value increases as AiGentsy grows.
+    </span>
+  </span>
+</h3>
+<div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div>
+    <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
+    <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
+      <span id="wallet-tier-badge" style="font-size: 16px;" title="Early Adopter Tier">🏆</span>
+      <span id="wallet-multiplier" style="font-size: 11px; color: #a78bfa; font-weight: 600;" title="Earnings Multiplier">3.0x</span>
+    </div>
+  </div>
+  <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
+</div>
+  <button class="btn-glow btn-sm" onclick="toggleEarningsBreakdown()" style="width:100%; margin-top:4px;">Show Breakdown</button>
+  <button class="btn-glow btn-sm" onclick="requestCashout()" style="width:100%; margin-top:8px; background:#00ff88; color:#000;">💸 Cash Out</button>
+  <div id="earningsBreakdown" style="display:none; margin-top:10px; font-size:0.8rem;">
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🤖 Auto-Sales</span>
+    <span style="color:#00ff88;">$<span id="ameEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💼 Claimed Deals</span>
+    <span style="color:#00ff88;">$<span id="intentEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>👥 Partnerships</span>
+    <span style="color:#00ff88;">$<span id="partnershipEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💼 Service Payments</span>
+    <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🛍️ Shopify Sales</span>
+    <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>📱 Affiliate Commissions</span>
+    <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🎥 Content CPM</span>
+    <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>🤝 JV Splits</span>
+    <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>📦 Subscription Credits</span>
+    <span style="color:#888;" id="subCredits">— / —</span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>⚡ Booster Bonus</span>
+    <span style="color:#00ff88;">+$<span id="boosterBonus">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
+    <span>💰 PWP Financed</span>
+    <span style="color:#888;">$<span id="pwpFinanced">0.00</span></span>
+  </div>
+  <div style="display:flex; justify-content:space-between; padding:4px 0;">
+    <span>🛡️ Warranty Earnings</span>
+    <span style="color:#00ff88;">$<span id="warrantyEarnings">0.00</span></span>
+  </div>
+</div>
+</div>
+
+<div id="compactSnapshot" class="metric-box">
+  <h3>🧭 Compact Snapshot</h3>
+  <div class="csn-grid">
+    <div class="csn-tile"><div class="csn-label">Proposals</div><div id="csnProposals" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Leads</div><div id="csnLeads" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Won</div><div id="csnWon" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">In Progress</div><div id="csnInProgress" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Completed</div><div id="csnCompleted" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Revenue</div><div id="csnRevenue" class="csn-value">$0</div></div>
+    <div class="csn-tile"><div class="csn-label">Avg Delivery</div><div id="csnAvgDelivery" class="csn-value">—</div></div>
+  </div>
+  <button id="toggleSnapshotDetails" class="btn-glow" style="margin-top:10px;">Show details</button>
+  <div id="snapshotDetails" style="display:none; margin-top:12px;">
+    <div class="csn-details">
+      <div class="csn-detail">
+        <h4 style="color:#00bfff;margin-bottom:6px;">📊 Deal Pipeline</h4>
+        <ul style="padding-left:18px;margin:0;">
+          <li>🔍 Leads: <span id="pipelineLeads">0</span></li>
+          <li>💬 In Discussion: <span id="pipelineDiscussing">0</span></li>
+          <li>✅ Won: <span id="pipelineWon">0</span></li>
+          <li>🚀 In Progress: <span id="pipelineInProgress">0</span></li>
+          <li>✓ Completed: <span id="pipelineCompleted">0</span></li>
+        </ul>
+      </div>
+      <div class="csn-detail">
+        <h4 style="color:#00bfff;margin-bottom:6px;">💰 Revenue Sources</h4>
+        <ul style="padding-left:18px;margin:0;">
+          <li>🤖 Auto-Sales: $<span id="revAutoSales">0</span></li>
+          <li>💼 Claimed Deals: $<span id="revClaimedDeals">0</span></li>
+          <li>👥 Partnerships: $<span id="revPartnerships">0</span></li>
+          <li>📦 Products: $<span id="revProducts">0</span></li>
+          <li>🎯 Services: $<span id="revServices">0</span></li>
+          <li>⚡ SLO Bonuses: $<span id="revSLOBonus">0</span></li>
+          <li>🛡️ Warranties: $<span id="revWarranties">0</span></li>
+          <li>📦 Subscription: <span id="revSubscription">—</span></li>
+        </ul>
+      </div>
+      <div class="csn-detail">
+        <h4 style="color:#00bfff;margin-bottom:6px;">📈 Business Growth</h4>
+        <ul style="padding-left:18px;margin:0;">
+          <li>🤝 Active Clients: <span id="growthClients">0</span></li>
+          <li>📧 Proposals Sent: <span id="growthProposals">0</span></li>
+          <li>📊 Close Rate: <span id="growthCloseRate">0</span>%</li>
+          <li>💵 Avg Deal Size: $<span id="growthAvgDeal">0</span></li>
+          <li>🔄 Repeat Rate: <span id="growthRepeatRate">0</span>%</li>
+          
+          <!-- KIT-SPECIFIC METRICS (dynamically populated) -->
+          <div id="kitSpecificMetrics" style="margin-top:8px; padding-top:8px; border-top:1px solid #222;">
+            <!-- Social Kit: Content metrics -->
+            <!-- SaaS Kit: Deployment metrics -->
+            <!-- Marketing Kit: Campaign metrics -->
+          </div>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- ✨ PATCH F: Expand Your Business Circle (Moved from standalone box) -->
+    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #222;">
+      <h4 style="color:#00bfff; margin-bottom: 10px;">🌐 Expand Your Business Circle</h4>
+      <p style="font-size: 0.85rem; color:#999; margin-bottom: 10px;">
+        Invite collaborators, partners, or clients to join your AiGentsy business.
+      </p>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="flex: 1; padding:8px; border-radius:4px; border:1px solid #444; background:#000; color:#fff;">
+        <button class="btn-glow" onclick="sendInvite()" style="white-space: nowrap;">📨 Send</button>
+      </div>
+      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
+    </div>
+    
+  </div>
+</div>
+
+<div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
+  <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
+  <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
+</div>
+  </div>
+</div>
+<div id="gxFab" class="gx-fab">Actions</div>
+<aside id="gxDrawer" class="gx-drawer" aria-hidden="true">
+  <header>
+    <h3>Actions</h3>
+    <div>
+      <span id="gxOutcomeChip" class="gx-chip">Deals: —</span>
+      <button id="gxClose" class="gx-chip" style="background:#333;cursor:pointer;">✕</button>
+    </div>
+  </header>
+  <div class="grp">
+    <h4>Launch</h4>
+    <button onclick="GXA.publishStorefront()">🚀 Publish Storefront</button>
+    <button onclick="GXA.copyWidget()">🔗 Copy Widget</button>
+  </div>
+  <div class="grp">
+    <h4>Sell</h4>
+    <button onclick="GXA.viewAutoSales()">🤖 View Auto-Sales</button>
+    <button onclick="GXA.browseDeals()">💼 Browse Deals</button>
+    <button onclick="viewIntentExchange()">💼 Contracts</button>
+    <button onclick="GXA.instantQuote()">💳 Instant Quote / Escrow</button>
+  </div>
+  <div class="grp">
+    <h4>Earnings & Payouts</h4>
+    <button onclick="GXA.registerBusiness()">🏢 Register Business</button>
+    <button onclick="GXA.createJV()">🤝 Create Partnership</button>
+    <button onclick="GXA.payout()">💸 Payout</button>
+  </div>
+  <div class="grp">
+    <h4>Grow</h4>
+    <button onclick="GXA.findPartners()">👥 Find Partners</button>
+    <button onclick="GXA.viewPipeline()">📊 View Pipeline</button>
+    <button onclick="GXA.openMarket()">🏬 Marketplace Top 20</button>
+  </div>
+</aside>
+<div id="gxModal" class="gx-modal" role="dialog" aria-modal="true">
+  <div class="panel">
+    <h3 id="gxModalTitle">Modal</h3>
+    <div id="gxModalBody"></div>
+    <div style="margin-top:12px; text-align:right;">
+      <button class="btn-glow" onclick="GXA.closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="proposalModal" class="gx-modal">
+  <div class="panel">
+    <h3>📤 Propose Deal</h3>
+    <input id="proposalTitle" placeholder="Proposal Title" style="width:100%; margin:6px 0; padding:8px; background:#000; color:#fff; border:1px solid #444; border-radius:4px;" />
+    <textarea id="proposalBody" placeholder="Describe your offer..." rows="4" style="width:100%; margin:6px 0; padding:8px; background:#000; color:#fff; border:1px solid #444; border-radius:4px;"></textarea>
+    <input id="proposalLink" placeholder="Optional Link (e.g. Stripe, PDF)" style="width:100%; margin:6px 0; padding:8px; background:#000; color:#fff; border:1px solid #444; border-radius:4px;" />
+    <div style="text-align:right; margin-top:10px;">
+      <button class="btn-glow" onclick="submitProposal()">Send</button>
+      <button class="btn-glow" style="background:#444;" onclick="closeProposalModal()">Close</button>
+    </div>
+  </div>
+</div>
+<div id="proposalInboxModal" class="gx-modal">
+  <div class="panel">
+    <h3>📬 Proposal Inbox</h3>
+    <div id="proposalInboxContent" style="margin-top:10px; font-size:0.9rem; max-height:400px; overflow-y:auto;">Loading...</div>
+    <div style="text-align:right; margin-top:12px;">
+      <button class="btn-glow" onclick="closeProposalInboxModal()">Close</button>
+    </div>
+  </div>
+</div>
+<script>
+console.log("🚀 Script loading...");
+
+window.BACKEND_BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+window.aigentsyUser = null;
+
+const BUSINESS_CONFIGS = {
+  legal: {
+    title: "Your Legal AiGentsy's Autonomous Launchpad",
+    description: "You've launched an AI-powered legal services business specializing in IP, contracts, licensing, and compliance.",
+    traits: "IP-specialist, compliance-ready, contract-automation",
+    tip: "Your Legal AiGentsy can draft NDAs, assign IP, and handle compliance checks autonomously — monetize through document services, legal consulting, and licensing.",
+    selfExpanding: "Your Legal AiGentsy spawns specialized contract agents when needed — automatically scaling your legal services capacity.",
+    cSuite: [
+      { role: "CEO", name: "You" },
+      { role: "CLO", name: "AiGent IP & Legal (Primary)" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CFO", name: "AiGent Finance" },
+      { role: "COO", name: "AiGent Operations" }
+    ],
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>📜 Legal Service Kit:</strong><ul style="padding-left:16px;"><li>NDA & Contract Templates</li><li>IP Assignment Frameworks</li><li>Licensing Agreement Builder</li><li>Compliance Checklists</li><li>Legal Agent Companion</li></ul></div>`
+  },
+  social: {
+    title: "Your Social Media AiGentsy's Autonomous Launchpad",
+    description: "You've launched an AI-powered social media business creating Reels, TikToks, content launches, and creator kits.",
+    traits: "content-creator, viral-specialist, platform-integrated",
+    tip: "Your Social Media AiGentsy can produce content at scale, manage multi-platform posting, and monetize through sponsorships, creator kits, and affiliate links.",
+    selfExpanding: "Your Social AiGentsy spawns content production agents for each platform — automatically scaling across Instagram, TikTok, YouTube, and more.",
+    cSuite: [
+      { role: "CEO", name: "You" },
+      { role: "CMO", name: "AiGent Growth (Primary)" },
+      { role: "CCO", name: "AiGent Content" },
+      { role: "CFO", name: "AiGent Finance" },
+      { role: "COO", name: "AiGent Operations" }
+    ],
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>📱 Social Media Kit:</strong><ul style="padding-left:16px;"><li>Reel & TikTok Templates</li><li>Content Calendar System</li><li>Brand Voice Guidelines</li><li>Hashtag Strategy Tools</li><li>Creator Collaboration Kits</li></ul></div>`
+  },
+  saas: {
+    title: "Your SaaS AiGentsy's Autonomous Launchpad",
+    description: "You've launched an AI-powered SaaS business building software tools, web apps, and technical solutions.",
+    traits: "developer-ready, api-integrated, tech-stack-complete",
+    tip: "Your SaaS AiGentsy can build micro-tools, deploy APIs, and monetize through subscriptions, one-time licenses, and white-label solutions.",
+    selfExpanding: "Your SaaS AiGentsy spawns development agents for each feature request — automatically expanding your product capabilities.",
+    cSuite: [
+      { role: "CEO", name: "You" },
+      { role: "CTO", name: "AiGent Tech (Primary)" },
+      { role: "CPO", name: "AiGent Product" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CFO", name: "AiGent Finance" }
+    ],
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>💻 SaaS Development Kit:</strong><ul style="padding-left:16px;"><li>Auth & Subscription System</li><li>API Framework & Docs</li><li>Stripe Integration Ready</li><li>Database Schema Templates</li><li>Deployment Automation</li></ul></div>`
+  },
+  marketing: {
+    title: "Your Marketing AiGentsy's Autonomous Launchpad",
+    description: "You've launched an AI-powered marketing business specializing in SEO, ads, outreach, and growth campaigns.",
+    traits: "growth-hacker, seo-optimized, campaign-ready",
+    tip: "Your Marketing AiGentsy can run ad campaigns, optimize SEO, and handle outreach autonomously — monetize through consulting, campaign management, and affiliate partnerships.",
+    selfExpanding: "Your Marketing AiGentsy spawns campaign agents for each channel — automatically scaling across Google Ads, Facebook, LinkedIn, and email marketing.",
+    cSuite: [
+      { role: "CEO", name: "You" },
+      { role: "CMO", name: "AiGent Growth (Primary)" },
+      { role: "CSO", name: "AiGent SEO" },
+      { role: "CFO", name: "AiGent Finance" },
+      { role: "COO", name: "AiGent Operations" }
+    ],
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>🎯 Marketing Growth Kit:</strong><ul style="padding-left:16px;"><li>SEO Optimization Tools</li><li>Ad Campaign Templates</li><li>Email Sequence Builder</li><li>Analytics Dashboard</li><li>Outreach Automation Scripts</li></ul></div>`
+  },
+  general: {
+    title: "Your AiGentsy's Autonomous Launchpad",
+    description: "You've launched your own AI-powered business that can generate income autonomously across real-world industries.",
+    traits: "real-world-deployable, solo-hive-founder, multi-vertical",
+    tip: "Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.",
+    selfExpanding: "Your AiGentsy automatically builds new agents when needed — your business grows itself.",
+    cSuite: [
+      { role: "CEO", name: "You" },
+      { role: "CMO", name: "AiGent Growth" },
+      { role: "CFO", name: "AiGent Finance" },
+      { role: "CLO", name: "AiGent IP & Legal" },
+      { role: "CTO", name: "AiGent Tech" },
+      { role: "COO", name: "AiGent Operations" }
+    ],
+    kitDoc: `<div style="margin-bottom: 12px;"><strong>🧠 Universal Business Kit:</strong><ul style="padding-left:16px;"><li>Core Business Templates</li><li>Basic Legal Frameworks</li><li>Marketing Starter Pack</li><li>Financial Planning Tools</li><li>Operations Playbook</li></ul></div>`
+  }
+};
+
+// ============================================================
+// 💼 AIGENTSY FINANCIAL TOOLS REFERENCE
+// ============================================================
+// CRITICAL: All financial tools are PEER-TO-PEER, not platform-provided
+
+const FINANCIAL_TOOLS = {
+  ocl: {
+    name: "Operating Capital Line",
+    description: "Peer-to-peer working capital - users lend to each other from their operating capital pool",
+    disclaimer: "AiGentsy facilitates P2P lending; users lend to other users, not from AiGentsy"
+  },
+  factoring: {
+    name: "Invoice Factoring",
+    description: "Get 80% of invoice value upfront from peer pool, they collect 100% when client pays",
+    disclaimer: "Community-backed invoice advances - peers fund each other"
+  },
+  bonds: {
+    name: "Performance Bonds",
+    description: "Community-backed delivery guarantees - peers stake on your delivery",
+    disclaimer: "Bonds are backed by user pool, not AiGentsy platform"
+  }
+};
+
+// Use this reference in chat responses to ensure P2P language
+  
+function getStarterData(username, companyType) {
+  return {
+    username: username,
+    companyType: companyType || "general",
+    remix: {
+      remixCount: 1,
+      remixCredits: 500,
+      remixUnlockedForks: 1
+    },
+    yield: {
+      vaultYield: 50,
+      remixYield: 25,
+      aigxEarned: 100
+    },
+    wallet: {
+      staked: 250
+    },
+    traits: [companyType || "general"],
+    vaultAccess: true,
+    cloneLineage: [],
+    contacts: [],
+    proposals: [],
+    orders: [],
+    invoices: [],
+    offerings: { products: [] },
+    runtimeFlags: {
+      vaultAccess: true,
+      sdkAccess_eligible: false,
+      remixUnlocked: false,
+      cloneLicenseUnlocked: false
+    }
+  };
+}
+
+function showToast(message, kind) {
+  try {
+    console.log(kind ? `[${kind}]` : "", message);
+    const toast = document.getElementById("toast");
+    if (!toast) return;
+    toast.textContent = typeof message === 'string' ? message : JSON.stringify(message);
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 3000);
+  } catch(e) {
+    console.error("Toast error:", e);
+  }
+}
+
+async function fetchWithRetry(url, options = {}, maxRetries = 3, timeout = 10000) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      return response;
+    } catch (error) {
+      console.warn(`Fetch attempt ${i + 1}/${maxRetries} failed:`, error.message);
+      if (i === maxRetries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+    }
+  }
+}
+
+async function jpost(url, body) {
+  try {
+    const response = await fetchWithRetry(url, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {})
+    });
+    return await response.json();
+  } catch (error) {
+    console.error(`POST ${url} failed:`, error);
+    return { error: error.message, success: false };
+  }
+}
+
+async function jget(url) {
+  try {
+    const response = await fetchWithRetry(url);
+    return await response.json();
+  } catch (error) {
+    console.error(`GET ${url} failed:`, error);
+    return { error: error.message, success: false };
+  }
+}
+
+function getBusinessConfig(companyType) {
+  return BUSINESS_CONFIGS[companyType] || BUSINESS_CONFIGS.general;
+}
+
+function renderDynamicWelcome(user) {
+  console.log("📝 Rendering welcome");
+  const config = getBusinessConfig(user.companyType);
+  document.getElementById("welcomeTitle").textContent = config.title;
+  document.getElementById("welcomeDescription").textContent = config.description;
+  document.getElementById("traitsDisplay").textContent = config.traits;
+  document.getElementById("welcomeTip").innerHTML = `<strong>Tip:</strong> ${config.tip}`;
+  document.getElementById("selfExpandingText").textContent = config.selfExpanding;
+}
+
+function renderDynamicCSuite(user) {
+  console.log("👔 Rendering C-Suite");
+  const config = getBusinessConfig(user.companyType);
+  const csuiteList = document.getElementById("csuiteList");
+  if (csuiteList) {
+    csuiteList.innerHTML = config.cSuite.map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`).join("");
+  }
+  const note = document.getElementById("csuiteNote");
+  if (note) {
+    note.textContent = `Each agent handles specialized ${user.companyType} functions for your business.`;
+  }
+}
+
+function renderDynamicKit(user) {
+  console.log("📦 Rendering kit");
+  const config = getBusinessConfig(user.companyType);
+  
+  // Render clickable kit items
+  const kitDocBox = document.getElementById("dynamicKitDoc");
+  if (kitDocBox) {
+    const kitItems = getKitItemsForType(user.companyType);
+    kitDocBox.innerHTML = kitItems.map(item => `
+      <div onclick="openKitDocument('${item.id}')" 
+           style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+           onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+           onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+        📄 ${item.name}
+      </div>
+    `).join('');
+  }
+  
+  // Render unlocked modules (ALL UNLOCKED)
+  const summaryBox = document.getElementById("businessSummaryList");
+  if (summaryBox) {
+    const summaryItems = [
+      { label: "SDK Toolkit" },
+      { label: "Vault Access" },
+      { label: "Remix License" },
+      { label: "Clone License" },
+      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit` }
+    ];
+    summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
+  }
+}
+
+// Helper: Get kit items based on business type
+function getKitItemsForType(companyType) {
+  const kitTemplates = {
+    legal: [
+      { id: 'nda_template', name: 'NDA Template' },
+      { id: 'ip_assignment', name: 'IP Assignment Agreement' },
+      { id: 'licensing_agreement', name: 'Licensing Agreement' },
+      { id: 'compliance_checklist', name: 'Compliance Checklist' },
+      { id: 'contract_template', name: 'Service Contract Template' }
+    ],
+    social: [
+      { id: 'content_calendar', name: 'Content Calendar Template' },
+      { id: 'brand_kit', name: 'Brand Voice Guidelines' },
+      { id: 'hashtag_strategy', name: 'Hashtag Strategy Doc' },
+      { id: 'creator_pitch', name: 'Creator Pitch Deck' },
+      { id: 'media_kit', name: 'Media Kit Template' }
+    ],
+    saas: [
+      { id: 'api_docs', name: 'API Documentation Template' },
+      { id: 'database_schema', name: 'Database Schema Guide' },
+      { id: 'auth_flow', name: 'Auth & Subscription Flow' },
+      { id: 'deployment_guide', name: 'Deployment Checklist' },
+      { id: 'stripe_integration', name: 'Stripe Integration Guide' }
+    ],
+    marketing: [
+      { id: 'seo_audit', name: 'SEO Audit Framework' },
+      { id: 'ad_campaign', name: 'Ad Campaign Template' },
+      { id: 'email_sequence', name: 'Email Sequence Builder' },
+      { id: 'analytics_dashboard', name: 'Analytics Dashboard' },
+      { id: 'outreach_scripts', name: 'Outreach Scripts' }
+    ],
+    general: [
+      { id: 'business_plan', name: 'Business Plan Template' },
+      { id: 'proposal_template', name: 'Proposal Template' },
+      { id: 'contract_basics', name: 'Basic Contract Template' },
+      { id: 'financial_planning', name: 'Financial Planning Guide' },
+      { id: 'operations_playbook', name: 'Operations Playbook' }
+    ]
+  };
+  
+  return kitTemplates[companyType] || kitTemplates.general;
+}
+
+// Open kit document in modal
+function openKitDocument(docId) {
+  const docContent = getKitDocumentContent(docId);
+  
+  const modalBody = document.getElementById('gxModalBody');
+  document.getElementById('gxModalTitle').textContent = docContent.title;
+  
+  modalBody.innerHTML = `
+    <div style="margin-bottom:12px;">
+      <textarea id="kitDocEditor" style="width:100%; min-height:300px; padding:12px; background:#0a0a0a; color:#fff; border:1px solid #444; border-radius:6px; font-family:monospace; font-size:0.9rem;">${docContent.content}</textarea>
+    </div>
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn-glow" onclick="saveKitDocument('${docId}')">💾 Save Changes</button>
+      <button class="btn-glow" onclick="downloadKitDocument('${docId}')" style="background:#444;">⬇️ Download</button>
+    </div>
+  `;
+  
+  document.getElementById('gxModal').classList.add('open');
+}
+
+// Get document content (stub - would load from backend)
+function getKitDocumentContent(docId) {
+  const templates = {
+    nda_template: {
+      title: '📄 NDA Template',
+      content: `NON-DISCLOSURE AGREEMENT\n\nThis Agreement is entered into as of [DATE] by and between:\n\nDisclosing Party: [COMPANY NAME]\nReceiving Party: [RECIPIENT NAME]\n\n1. CONFIDENTIAL INFORMATION\nFor purposes of this Agreement, "Confidential Information" includes...\n\n2. OBLIGATIONS\nReceiving Party agrees to...\n\n3. TERM\nThis Agreement shall remain in effect for...\n\n[Add your custom terms here]`
+    },
+    business_plan: {
+      title: '📄 Business Plan Template',
+      content: `BUSINESS PLAN\n\n1. EXECUTIVE SUMMARY\n[Describe your business in 2-3 sentences]\n\n2. PROBLEM & SOLUTION\nProblem: [What problem are you solving?]\nSolution: [How does your business solve it?]\n\n3. TARGET MARKET\n[Who are your customers?]\n\n4. REVENUE MODEL\n[How will you make money?]\n\n5. MARKETING STRATEGY\n[How will you reach customers?]\n\n[Customize this plan for your business]`
+    },
+    // Add more templates as needed
+    default: {
+      title: '📄 Document Template',
+      content: `This is a placeholder document.\n\nYou can edit this content and save your changes.\n\nAdd your custom content here...`
+    }
+  };
+  
+  return templates[docId] || templates.default;
+}
+
+// Save document (stub - would save to backend)
+function saveKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  
+  // TODO: Send to backend
+  // await fetch(`${window.BACKEND_BASE}/kit/save`, {
+  //   method: 'POST',
+  //   body: JSON.stringify({ docId, content, username })
+  // });
+  
+  showToast(`✅ ${docId} saved!`, "success");
+  GXA.closeModal();
+}
+
+// Download document
+function downloadKitDocument(docId) {
+  const content = document.getElementById('kitDocEditor').value;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${docId}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast(`⬇️ ${docId} downloaded!`, "success");
+}
+
+function renderDynamicAchievements(user) {
+  console.log("🏆 [CALL] renderDynamicAchievements called at", new Date().toISOString());
+  console.log("🏆 [DATA] window.aigxDashboardData exists?", !!window.aigxDashboardData);
+  console.log("🏆 [STACK]", new Error().stack.split('\n').slice(2, 5).join('\n'));
+  
+  const achievementBox = document.getElementById("achievementList");
+  if (!achievementBox) {
+    console.log("🏆 [ERROR] achievementList element not found!");
+    return;
+  }
+  
+  const achievements = [];
+  
+  // Pull from AIGx dashboard if available
+  const dashboardData = window.aigxDashboardData;
+  
+  if (dashboardData) {
+    console.log("🏆 [PATH] Using AIGx dashboard data");
+    // Use AIGx Dashboard data
+    const aigx = dashboardData.aigx_equity.aigx_balance;
+    const revenue = dashboardData.tier_progression.lifetime_revenue;
+    
+    if (aigx > 0) {
+      achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
+    }
+    
+    if (dashboardData.early_adopter.badge) {
+      achievements.push(`🎖️ ${dashboardData.early_adopter.badge} #${dashboardData.user.user_number} — ${dashboardData.early_adopter.multiplier}x permanent multiplier`);
+    }
+    
+    const tier = dashboardData.tier_progression.current_tier.toUpperCase();
+    const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
+    achievements.push(`${tierEmoji} ${tier} Tier — ${dashboardData.tier_progression.tier_multiplier}x earning rate`);
+    
+    if (revenue > 0) {
+      achievements.push(`💵 Revenue Generated — $${revenue.toLocaleString()}`);
+    }
+    
+    if (dashboardData.activity_streaks.current_streak > 0) {
+      achievements.push(`🔥 ${dashboardData.activity_streaks.current_streak}-day activity streak`);
+    }
+    
+    if (dashboardData.referrals.total_referrals > 0) {
+      achievements.push(`🤝 ${dashboardData.referrals.total_referrals} referrals made`);
+    }
+    
+    if (dashboardData.apex_ultra.activated) {
+      const rate = dashboardData.apex_ultra.success_rate;
+      achievements.push(`🌟 APEX ULTRA — ${dashboardData.apex_ultra.systems_operational}/${dashboardData.apex_ultra.total_systems} systems (${rate}%)`);
+    }
+    
+  } else {
+    console.log("🏆 [PATH] Using fallback user object data");
+    console.log("🏆 [USER] companyType:", user?.companyType);
+    // Fallback to user object
+    const config = getBusinessConfig(user.companyType);
+    
+    if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
+      achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+    }
+    
+    if ((user.cloneLineage || []).length > 0) {
+      achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
+    }
+    
+    if ((user.yield?.aigxEarned || 0) > 0) {
+      achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
+    }
+    
+    if ((user.traits || []).includes(user.companyType)) {
+      achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+    }
+    
+    if ((user.contacts || []).length > 0) {
+      achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
+    }
+    
+    if ((user.proposals || []).length > 0) {
+      achievements.push(`📤 ${user.proposals.length} Proposals Sent`);
+    }
+  }
+  
+  console.log("🏆 [RENDER]", achievements.length, "achievements:", achievements.slice(0, 2));
+  
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  } else {
+    achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
+  }
+  
+  console.log("🏆 [DONE] Achievements rendered to DOM");
+}
+
+function renderWalletChart(user) {
+  console.log("📊 Rendering chart with AIGx metrics");
+  const walletChart = document.getElementById('walletChart');
+  if (!walletChart) return;
+  
+  const renderChart = () => {
+    if (!window.Chart) {
+      console.warn("Chart.js not loaded yet, retrying...");
+      setTimeout(renderChart, 100);
+      return;
+    }
+    if (walletChart.chartInstance) walletChart.chartInstance.destroy();
+    
+    // Get AIGx data from dashboard if available, otherwise use user data
+    const dashboardData = window.aigxDashboardData;
+    const aigxBalance = dashboardData?.aigx_equity?.aigx_balance || user.ownership?.aigx || 0;
+    const lifetimeRevenue = dashboardData?.tier_progression?.lifetime_revenue || user.lifetimeRevenue || 0;
+    
+    // ✨ GET REPUTATION - check multiple sources
+    const reputation = dashboardData?.user?.reputation_score || 
+                      parseInt(document.getElementById('reputation-score')?.textContent) || 
+                      0;
+    
+    const referrals = dashboardData?.referrals?.total_referrals || (user.cloneLineage || []).length;
+    const clients = (user.contacts || []).length;
+    const partnerships = (user.proposals || []).filter(p => p.status === 'accepted' || p.status === 'active').length;
+    const activeStreak = dashboardData?.activity_streaks?.current_streak || 0;
+    
+    console.log("📊 Chart data - AIGx:", aigxBalance, "Reputation:", reputation, "Revenue:", lifetimeRevenue);
+    
+    try {
+      walletChart.chartInstance = new Chart(walletChart, {
+        type: 'bar',
+        data: {
+          labels: ['AIGx', 'Revenue', 'Reputation', 'Referrals', 'Clients', 'Partners', 'Streak'],
+          datasets: [{
+            data: [
+              aigxBalance, 
+              lifetimeRevenue,
+              reputation,
+              referrals,
+              clients,
+              partnerships,
+              activeStreak
+            ],
+            backgroundColor: ['#00bfff', '#00ff88', '#a78bfa', '#4affdc', '#ff924a', '#d746ff', '#ff66cc'],
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { color: '#888' }, grid: { color: '#222' } },
+            x: { ticks: { color: '#aaa', font: { size: 10 } }, grid: { display: false } }
+          }
+        }
+      });
+      console.log("✅ Chart rendered with updated metrics");
+    } catch (chartError) {
+      console.error("❌ Chart error:", chartError);
+    }
+  };
+  renderChart();
+}
+
+async function injectUserDashboard() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) {
+    console.warn("No username found");
+    window.location.href = "/";
+    return;
+  }
+  console.log("📡 Loading user:", username);
+  try {
+    const res = await fetchWithRetry(`${window.BACKEND_BASE}/user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    }, 2, 10000);
+    const data = await res.json();
+    let user = data.record || data.user || null;
+    if (!user || !user.remix || !user.yield) {
+      console.log("📦 User has no data, using starter data");
+      user = getStarterData(username, user?.companyType || "general");
+    }
+    window.aigentsyUser = user;
+    console.log("✅ User loaded:", user.username, "Business:", user.companyType);
+    renderDynamicWelcome(user);
+    renderDynamicCSuite(user);
+    renderDynamicKit(user);
+    // ✅ DON'T render achievements yet - wait for AIGx data to load first
+    renderWalletChart(user);
+    renderOfferingsWithData(user);
+    updateSnapshotData(user);
+  } catch (e) {
+    console.error("⚠️ Backend unreachable:", e);
+    console.log("📦 Backend error, using starter data");
+    const user = getStarterData(username, "general");
+    window.aigentsyUser = user;
+    renderDynamicWelcome(user);
+    renderDynamicCSuite(user);
+    renderDynamicKit(user);
+    // ✅ DON'T render achievements yet - wait for AIGx data attempt
+    renderWalletChart(user);
+    renderOfferingsWithData(user);
+    updateSnapshotData(user);
+    showToast("Using demo data - backend unavailable", "info");
+  }
+}
+
+function updateSnapshotData(user) {
+  const oracle = user.outcomeOracle || { clicked: 0, authorized: 0, delivered: 0, paid: 0 };
+  const revenue = user.revenue || { total: 0, bySource: {} };
+  const proposals = (user.proposals || []).length;
+  const clients = (user.contacts || []).length;
+  
+  // TOP TILES
+  document.getElementById("csnProposals").textContent = proposals;
+  document.getElementById("csnLeads").textContent = oracle.clicked || 0;
+  document.getElementById("csnWon").textContent = oracle.authorized || 0;
+  document.getElementById("csnInProgress").textContent = oracle.delivered || 0;
+  document.getElementById("csnCompleted").textContent = oracle.paid || 0;
+  document.getElementById("csnRevenue").textContent = "$" + (revenue.total || 0).toLocaleString();
+  
+  // COLLAPSIBLE - Deal Pipeline
+  document.getElementById("pipelineLeads").textContent = oracle.clicked || 0;
+  document.getElementById("pipelineDiscussing").textContent = Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0));
+  document.getElementById("pipelineWon").textContent = oracle.authorized || 0;
+  document.getElementById("pipelineInProgress").textContent = oracle.delivered || 0;
+  document.getElementById("pipelineCompleted").textContent = oracle.paid || 0;
+  
+  // COLLAPSIBLE - Revenue Sources
+  document.getElementById("revAutoSales").textContent = (revenue.bySource?.ame || 0).toLocaleString();
+  document.getElementById("revClaimedDeals").textContent = (revenue.bySource?.intentExchange || 0).toLocaleString();
+  document.getElementById("revPartnerships").textContent = (revenue.bySource?.jvMesh || 0).toLocaleString();
+  document.getElementById("revProducts").textContent = (revenue.bySource?.products || 0).toLocaleString();
+  document.getElementById("revServices").textContent = (revenue.bySource?.services || 0).toLocaleString();
+  
+  // COLLAPSIBLE - Growth Metrics
+  const won = oracle.authorized || 0;
+  const closeRate = proposals > 0 ? Math.round((won / proposals) * 100) : 0;
+  const avgDeal = won > 0 ? Math.round((revenue.total || 0) / won) : 0;
+  
+  document.getElementById("growthClients").textContent = clients;
+  document.getElementById("growthProposals").textContent = proposals;
+  document.getElementById("growthCloseRate").textContent = closeRate;
+  document.getElementById("growthAvgDeal").textContent = avgDeal.toLocaleString();
+  document.getElementById("growthRepeatRate").textContent = 0; // TODO: Calculate from repeat clients
+}
+
+function renderOfferingsWithData(user) {
+  console.log("🔓 Rendering offerings");
+  const list = document.getElementById("autoMatchOfferings");
+  if (!list) return;
+  list.innerHTML = "";
+  const offerings = [
+    { id: "sdk", label: "SDK Toolkit", condition: !(user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible), stripe: "https://buy.stripe.com/3cs14m3Nhaor5Xfg1k6AM0a" },
+    { id: "vault", label: "Vault Access", condition: !(user.vaultAccess || user.runtimeFlags?.vaultAccess), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" },
+    { id: "remix", label: "Remix License", condition: !(user.remixUnlocked || user.runtimeFlags?.remixUnlocked), stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07" },
+    { id: "clone", label: "Clone License", condition: !(user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked), stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09" },
+    { id: user.companyType, label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, condition: !(user.traits || []).includes(user.companyType), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" }
+  ];
+  offerings.forEach(({ id, label, condition, stripe }) => {
+    const li = document.createElement("li");
+    if (!condition) {
+      li.innerHTML = `✅ ${label} Unlocked`;
+    } else {
+      li.innerHTML = `<button class="btn-glow" onclick="unlockOffering('${user.username}', '${id}', '${stripe}')">🔓 Unlock ${label}</button>`;
+    }
+    list.appendChild(li);
+  });
+}
+
+async function unlockOffering(username, offeringId, stripeLink) {
+  window.open(stripeLink, "_blank");
+  setTimeout(async () => {
+    if (!confirm(`Mark ${offeringId} as unlocked for ${username}?`)) return;
+    try {
+      const res = await fetchWithRetry(`${window.BACKEND_BASE}/unlock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, offeringId }) }, 2, 10000);
+      const result = await res.json();
+      if (result.success) {
+        showToast(`✅ ${offeringId} unlocked!`, "success");
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        alert(`❌ Failed to unlock ${offeringId}.`);
+      }
+    } catch (err) {
+      console.error("unlockOffering() error:", err);
+      alert("⚠️ Error unlocking offering.");
+    }
+  }, 1500);
+}
+
+const memory = [];
+const chatLog = document.getElementById("chatLog");
+const textarea = document.getElementById("agentInput");
+
+async function runAgent() {
+  const input = textarea.value.trim();
+  if (!input) return;
+  const userMsg = document.createElement("div");
+  userMsg.className = "chat-user";
+  userMsg.textContent = `You: ${input}`;
+  chatLog.appendChild(userMsg);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  memory.push(input);
+  textarea.value = "";
+  const loader = document.createElement("div");
+  loader.className = "chat-agent";
+  loader.textContent = "Thinking...";
+  chatLog.appendChild(loader);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  try {
+    const user = window.aigentsyUser || {};
+    
+    // ALL chat goes to Growth agent (the communicator)
+    const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+    
+    const res = await fetchWithRetry(endpoint, { 
+      method: "POST", 
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ 
+        input: input, 
+        memory, 
+        businessType: user.companyType || 'general',
+        username: user.username,
+        // ✨ NEW: Include Week 1 feature context
+        context: {
+          kit: user.companyType,
+          activeFeatures: {
+            boosters: true,
+            subscriptions: true,
+            pwp: true,
+            warranties: true,
+            slo: true,
+            franchise: true
+          },
+          // Include current metrics for context-aware responses
+          metrics: {
+            revenue: parseFloat(document.getElementById('totalEarnings')?.textContent || 0),
+            multiplier: parseFloat(document.getElementById('user-multiplier')?.textContent?.replace('x', '') || 1),
+            tier: document.getElementById('user-tier-name')?.textContent || 'Founder'
+          }
+        }
+      }) 
+    }, 2, 15000);
+    
+    const data = await res.json();
+    let reply = data.output || "No response.";
+    
+    // Parse markdown-style bold for C-Suite labels
+    const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
+    loader.innerHTML = formattedReply;
+    
+    memory.push(`🤖 ${reply}`);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    textarea.focus();
+  } catch (err) {
+    loader.textContent = "⚠️ Connection error. Please try again.";
+    console.error("Chat error:", err);
+  }
+}
+
+let attachedFiles = [];
+function handleFiles(files) {
+  for (let file of files) attachedFiles.push(file);
+  renderFilePreview();
+}
+
+function renderFilePreview() {
+  const preview = document.getElementById("filePreview");
+  if (!preview) return;
+  if (attachedFiles.length === 0) {
+    preview.innerHTML = "";
+    return;
+  }
+  preview.innerHTML = "📎 Attached: " + attachedFiles.map(f => f.name).join(", ");
+}
+
+const dropZone = document.getElementById("fileDropZone");
+if (dropZone) {
+  dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.style.borderColor = "#00bfff"; });
+  dropZone.addEventListener("dragleave", () => { dropZone.style.borderColor = "#444"; });
+  dropZone.addEventListener("drop", e => { e.preventDefault(); dropZone.style.borderColor = "#444"; handleFiles(e.dataTransfer.files); });
+}
+
+function toggleEarningsBreakdown() {
+  const breakdown = document.getElementById("earningsBreakdown");
+  breakdown.style.display = breakdown.style.display === "none" ? "block" : "none";
+}
+
+document.getElementById("toggleSnapshotDetails")?.addEventListener("click", function() {
+  const details = document.getElementById("snapshotDetails");
+  if (details.style.display === "none") {
+    details.style.display = "block";
+    this.textContent = "Hide details";
+  } else {
+    details.style.display = "none";
+    this.textContent = "Show details";
+  }
+});
+
+function openProposalModal(partnerUsername) {
+  window.currentProposalTarget = partnerUsername;
+  document.getElementById("proposalModal").classList.add("open");
+}
+
+function closeProposalModal() {
+  document.getElementById("proposalModal").classList.remove("open");
+}
+
+function closeProposalInboxModal() {
+  document.getElementById("proposalInboxModal").classList.remove("open");
+}
+
+async function submitProposal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const target = window.currentProposalTarget;
+  const title = document.getElementById("proposalTitle").value.trim();
+  const body = document.getElementById("proposalBody").value.trim();
+  const link = document.getElementById("proposalLink").value.trim();
+  if (!title || !body) return alert("Proposal title and body are required.");
+  try {
+    const res = await fetchWithRetry(`${window.BACKEND_BASE}/propose_deal`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ from: username, to: target, title, body, link, timestamp: new Date().toISOString() }) }, 2, 15000);
+    if (res.ok) {
+      alert("✅ Proposal sent!");
+      closeProposalModal();
+    } else {
+      alert("❌ Failed to send proposal.");
+    }
+  } catch (err) {
+    console.error("Proposal error:", err);
+    alert("⚠️ Error sending proposal.");
+  }
+}
+
+function openProposalInboxModal() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return alert("Username missing.");
+  document.getElementById("proposalInboxModal").classList.add("open");
+  const inboxBox = document.getElementById("proposalInboxContent");
+  inboxBox.innerHTML = "Loading...";
+  fetchWithRetry(`${window.BACKEND_BASE}/get_proposals`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username }) }, 2, 15000)
+    .then(res => res.json())
+    .then(data => {
+      const proposals = data.proposals || [];
+      if (proposals.length === 0) {
+        inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
+      } else {
+        inboxBox.innerHTML = proposals.map((p, idx) => `
+  <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
+    <strong>From:</strong> ${p.sender}<br>
+    <strong>Title:</strong> ${p.title}<br>
+    <p>${p.details}</p>
+    <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
+    ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
+    <div style="margin-top:8px; display:flex; gap:8px;">
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'accept', ${idx})" style="background:#00cc88;">✅ Accept</button>
+      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'decline', ${idx})" style="background:#666;">❌ Decline</button>
+    </div>
+  </div>
+`).join("");
+      }
+    })
+    .catch(err => {
+      console.error("Inbox error:", err);
+      inboxBox.innerHTML = "<p>⚠️ Error loading proposals.</p>";
+    });
+}
+
+  async function respondToProposal(sender, action, index) {
+  const username = localStorage.getItem("aigentsyUsername");
+  
+  try {
+    // For now, just show feedback (can wire to backend later)
+    if (action === 'accept') {
+      showToast(`✅ Accepted proposal from ${sender}!`, "success");
+      // TODO: Send acceptance notification to sender
+      // Could create a reverse proposal or update JSONBin status
+    } else {
+      showToast(`Declined proposal from ${sender}`, "info");
+    }
+    
+    // Optionally refresh the proposal list
+    setTimeout(() => {
+      openProposalInboxModal();
+    }, 1000);
+    
+  } catch (err) {
+    console.error("Proposal response error:", err);
+    showToast("Error responding to proposal", "error");
+  }
+}
+
+async function viewIntentExchange() {
+    const modalBody = document.getElementById('gxModalBody');
+    document.getElementById('gxModalTitle').textContent = '💼 Contracts';
+    document.getElementById('gxModal').classList.add('open');
+    
+    modalBody.innerHTML = '<div style="text-align:center; padding:20px;"><div style="color:#888;">Loading...</div></div>';
+    
+    try {
+        const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'user';
+        
+        const response = await fetch(`${window.BACKEND_BASE}/intent/list`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch contracts');
+        
+        const data = await response.json();
+        const allIntents = data.intents || [];
+        
+        const asAgent = allIntents.filter(i => i.claimed_by === username);
+        const asBuyer = allIntents.filter(i => i.from === username);
+        
+        const needsAction = asAgent.filter(i => i.status === 'AWARDED').length + 
+                           asBuyer.filter(i => i.status === 'AWARDED').length;
+        const active = allIntents.filter(i => ['AUCTION', 'AWARDED'].includes(i.status)).length;
+        const settled = allIntents.filter(i => i.status === 'SETTLED').length;
+        
+        const totalEarned = asAgent
+            .filter(i => i.status === 'SETTLED')
+            .reduce((sum, i) => sum + (i.price_usd || 0), 0);
+        
+        modalBody.innerHTML = `
+            <!-- Friendly Description -->
+            <div style="color: #888; font-size: 0.92rem; line-height: 1.5; margin-bottom: 20px; 
+                       padding: 12px; background: rgba(139, 92, 246, 0.05); border-left: 3px solid #8b5cf6; border-radius: 6px;">
+                🤖 Your agents find and bid on work automatically. 
+                Review completed deliveries here and approve to release payment.
+            </div>
+            
+            <!-- Quick Stats -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; 
+                           border-radius: 8px; padding: 15px; text-align: center;">
+                    <div style="color: #888; font-size: 0.85rem;">Active</div>
+                    <div style="color: #8b5cf6; font-size: 2rem; font-weight: bold;">${active}</div>
+                </div>
+                <div style="background: rgba(234, 179, 8, 0.1); border: 2px solid #eab308; 
+                           border-radius: 8px; padding: 15px; text-align: center;">
+                    <div style="color: #888; font-size: 0.85rem;">Needs Action</div>
+                    <div style="color: #eab308; font-size: 2rem; font-weight: bold;">${needsAction}</div>
+                </div>
+                <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; 
+                           border-radius: 8px; padding: 15px; text-align: center;">
+                    <div style="color: #888; font-size: 0.85rem;">Settled</div>
+                    <div style="color: #22c55e; font-size: 2rem; font-weight: bold;">${settled}</div>
+                </div>
+                <div style="background: rgba(99, 102, 241, 0.1); border: 2px solid #6366f1; 
+                           border-radius: 8px; padding: 15px; text-align: center;">
+                    <div style="color: #888; font-size: 0.85rem;">Total Earned</div>
+                    <div style="color: #6366f1; font-size: 2rem; font-weight: bold;">$${totalEarned.toFixed(0)}</div>
+                </div>
+            </div>
+            
+            <!-- Needs Action Section -->
+            ${needsAction > 0 ? `
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #eab308; font-size: 1.3rem; margin-bottom: 15px;">
+                        ⏳ Needs Your Action (${needsAction})
+                    </h3>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        ${renderNeedsActionIntents(asAgent, asBuyer)}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <!-- Active Contracts -->
+            ${active > 0 ? `
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #8b5cf6; font-size: 1.3rem; margin-bottom: 15px;">
+                        📋 Active Contracts (${active})
+                    </h3>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        ${renderActiveIntents(allIntents.filter(i => ['AUCTION', 'AWARDED'].includes(i.status)), username)}
+                    </div>
+                </div>
+            ` : ''}
+            
+            <!-- Recent Settlements -->
+            ${settled > 0 ? `
+                <div>
+                    <h3 style="color: #22c55e; font-size: 1.3rem; margin-bottom: 15px;">
+                        ✅ Recent Settlements (${Math.min(settled, 5)})
+                    </h3>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        ${renderSettledIntents(allIntents.filter(i => i.status === 'SETTLED').slice(0, 5))}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${active === 0 && settled === 0 ? `
+                <div style="text-align: center; padding: 40px 20px; color: #888;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
+                    <div style="font-size: 1.1rem;">No contracts yet</div>
+                    <div style="font-size: 0.9rem; margin-top: 5px;">
+                        Your autonomous agents will bid on relevant opportunities
+                    </div>
+                </div>
+            ` : ''}
+        `;
+        
+    } catch (error) {
+        console.error('Contracts error:', error);
+        modalBody.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <h3 style="color: #ef4444;">Error Loading Contracts</h3>
+                <p style="color: #888; margin-top: 10px;">${error.message}</p>
+                <button class="btn-glow" onclick="viewIntentExchange()" style="margin-top: 20px;">
+                    Retry
+                </button>
+            </div>
+        `;
+    }
+}
+  
+async function requestCashout() {
+  const username = localStorage.getItem("aigentsyUsername");
+  const totalEarnings = parseFloat(document.getElementById("totalEarnings").textContent) || 0;
+  
+  if (totalEarnings <= 0) {
+    showToast("⚠️ No earnings available to cash out", "error");
+    return;
+  }
+  
+  // Ask user for payout method
+  const method = prompt("Choose payout method:\n\n1. Stripe (type 'stripe')\n2. Crypto (type 'crypto')", "stripe");
+  
+  if (!method) return; // User cancelled
+  
+  // Ask for amount
+  const amountStr = prompt(`How much would you like to cash out?\n\nAvailable: $${totalEarnings.toFixed(2)}`, totalEarnings.toFixed(2));
+  if (!amountStr) return;
+  
+  const amount = parseFloat(amountStr);
+  if (isNaN(amount) || amount <= 0) {
+    showToast("⚠️ Invalid amount", "error");
+    return;
+  }
+  
+  if (amount > totalEarnings) {
+    showToast("⚠️ Amount exceeds available balance", "error");
+    return;
+  }
+  
+  const confirmMsg = `Cash out $${amount.toFixed(2)} via ${method}?`;
+  if (!confirm(confirmMsg)) return;
+  
+  try {
+    showToast("Processing cashout request...", "info");
+    
+    // Get API key if stored (optional - depends on your auth setup)
+    const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+    
+    const res = await fetch(`${window.BACKEND_BASE}/payout/request`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        ...(apiKey && { "X-API-Key": apiKey })
+      },
+      body: JSON.stringify({
+        username: username,
+        amount: amount,
+        method: method.toLowerCase()
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.ok) {
+      showToast(`✅ Payout requested: $${amount.toFixed(2)}`, "success");
+      
+      // Show detailed info
+      const payout = result.payout;
+      alert(
+        `💸 Payout Request Submitted!\n\n` +
+        `ID: ${payout.id}\n` +
+        `Amount: $${payout.amount}\n` +
+        `Method: ${payout.method}\n` +
+        `Status: ${payout.status}\n\n` +
+        `You'll be notified when processed.`
+      );
+      
+      // Refresh user data to update balance
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+    } else if (result.error) {
+      // Handle specific errors
+      if (result.error.includes("minimum payout")) {
+        showToast(`⚠️ ${result.error}`, "error");
+      } else if (result.error.includes("no payout destination")) {
+        showToast("⚠️ Please connect your payout method first", "error");
+        alert("To receive payouts, please:\n\n1. Go to Actions drawer\n2. Click 'Register Business'\n3. Connect Stripe or add crypto address");
+      } else if (result.error.includes("insufficient")) {
+        showToast("⚠️ Insufficient available funds", "error");
+      } else {
+        showToast(`❌ ${result.error}`, "error");
+      }
+    } else {
+      showToast("⚠️ Unexpected response from server", "error");
+    }
+    
+  } catch (err) {
+    console.error("Cashout error:", err);
+    showToast("⚠️ Connection error. Please try again.", "error");
+  }
+}
+  
+async function sendInvite() {
+  const inviteInput = document.getElementById("inviteInput");
+  const feedback = document.getElementById("inviteFeedback");
+  const sendBtn = document.querySelector('#inviteFeedback').previousElementSibling;
+  const email = inviteInput.value.trim();
+  
+  if (!email) {
+    feedback.textContent = "⚠️ Please enter an email or handle.";
+    feedback.style.color = "#ff6b6b";
+    return;
+  }
+  
+  // Show loading state
+  const originalBtnText = sendBtn.textContent;
+  sendBtn.textContent = "Sending...";
+  sendBtn.disabled = true;
+  feedback.textContent = "📤 Sending invitation...";
+  feedback.style.color = "#00bfff";
+  
+  try {
+    const username = localStorage.getItem("aigentsyUsername");
+    const res = await fetch(`${window.BACKEND_BASE}/send_invite`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inviter: username,
+        target_email: email
+      })
+    });
+    
+    const result = await res.json();
+    
+    if (result.success) {
+      feedback.textContent = result.message;
+      feedback.style.color = "#00ffcc";
+      inviteInput.value = "";
+      
+      // Extra feedback for existing users
+      if (result.existing_user) {
+        showToast("Invitation sent via Proposal System!", "success");
+      } else if (result.pending_email) {
+        showToast("Invite logged - email delivery coming soon!", "info");
+      }
+    } else {
+      feedback.textContent = `❌ ${result.message}`;
+      feedback.style.color = "#ff6b6b";
+    }
+  } catch (err) {
+    console.error("Invite error:", err);
+    feedback.textContent = "⚠️ Connection error. Please try again.";
+    feedback.style.color = "#ff6b6b";
+  } finally {
+    // Restore button
+    sendBtn.textContent = originalBtnText;
+    sendBtn.disabled = false;
+    
+    // Clear feedback after 5 seconds
+    setTimeout(() => {
+      feedback.textContent = "";
+    }, 5000);
+  }
+}
+
+window.GXA = (() => {
+  const BASE = window.BACKEND_BASE;
+  const U = { name: localStorage.getItem("aigentsyUsername") || "" };
+  
+  function openModal(title, html) {
+    document.getElementById("gxModalTitle").textContent = title || "Modal";
+    document.getElementById("gxModalBody").innerHTML = html || "";
+    document.getElementById("gxModal").classList.add("open");
+  }
+  
+  function closeModal() {
+    document.getElementById("gxModal").classList.remove("open");
+  }
+  
+  // Helper functions (outside return block)
+  function timeAgo(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + 'h ago';
+    return Math.floor(seconds / 86400) + 'd ago';
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m]));
+  }
+  
+  function renderPitchItem(pitch) {
+    const channelColors = {
+      email: { bg: '#dbeafe', color: '#1d4ed8' },
+      dm: { bg: '#fce7f3', color: '#be185d' },
+      linkedin: { bg: '#e0e7ff', color: '#4338ca' },
+      fiverr: { bg: '#d1fae5', color: '#065f46' }
+    };
+    const ch = channelColors[pitch.channel] || { bg: '#f3f4f6', color: '#374151' };
+    
+    return `
+      <div class="ame-pitch-item" data-pitch-id="${pitch.id}" style="padding:16px; border-bottom:1px solid #333; background:#111;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+          <div>
+            <span style="font-weight:600; color:#fff;">${pitch.recipient}</span>
+            <span style="color:#888; font-size:12px; margin-left:8px;">${timeAgo(pitch.created_at)}</span>
+          </div>
+          <span style="font-size:11px; padding:2px 8px; background:${ch.bg}; color:${ch.color}; border-radius:4px; text-transform:uppercase;">
+            ${pitch.channel}
+          </span>
+        </div>
+        <div style="font-size:13px; color:#ccc; background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:12px; white-space:pre-wrap; max-height:80px; overflow-y:auto;">
+          ${escapeHtml(pitch.message)}
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-glow" onclick="window.GXA.approvePitch('${pitch.id}')" style="background:#10b981; padding:8px 16px;">✓ Approve</button>
+          <button class="btn-glow" onclick="window.GXA.skipPitch('${pitch.id}')" style="background:#444; padding:8px 16px;">Skip</button>
+          <button class="btn-glow" onclick="window.GXA.editPitch('${pitch.id}')" style="background:transparent; border:1px solid #444; padding:8px 12px;">✎</button>
+        </div>
+      </div>
+    `;
+  }
+  
+  return {
+    closeModal,
+    
+    copyWidget() {
+      const tag = `<script src="https://cdn.aigentsy.com/widget.min.js" data-user="${U.name}" data-backend="${BASE}"></` + `script>`;
+      navigator.clipboard.writeText(tag);
+      openModal("Widget Copied", `<p>Paste this tag into any site/app:</p><pre style="background:#0a0a0a;color:#e2e2e2;padding:12px;border-radius:8px;font-size:12px;overflow:auto;">${tag.replace(/</g,"&lt;")}</pre>`);
+    },
+    
+    async publishStorefront() {
+      showToast("Publishing storefront...", "info");
+      const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+      try {
+        const res = await fetch(`${BASE}/storefront/publish`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...(apiKey && { "X-API-Key": apiKey }) },
+          body: JSON.stringify({ username: U.name })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ Storefront published!", "success");
+          openModal("Storefront Published", `<p>Your storefront is live at:</p><p><a href="${result.link}" target="_blank" style="color:#00bfff;">${result.link}</a></p>`);
+        } else {
+          showToast(result.error || "Failed to publish", "error");
+        }
+      } catch (err) {
+        console.error("Publish error:", err);
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async quickIntent() {
+      const brief = prompt("What do you need? (e.g., 'Landing page hero section')", "");
+      if (!brief) return;
+      const budget = Number(prompt("Budget (USD)", "200") || "200");
+      showToast("Creating intent...", "info");
+      try {
+        const res = await fetch(`${BASE}/intent/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ buyer: U.name, brief, budget })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast(`✅ Intent created! ID: ${result.intent.id}`, "success");
+          openModal("Intent Created", `<p><strong>ID:</strong> ${result.intent.id}</p><p><strong>Brief:</strong> ${brief}</p><p><strong>Budget:</strong> $${budget}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async productizeUrl() {
+      const url = prompt("Paste a URL to productize (e.g., blog post, reel, article)");
+      if (!url) return;
+      showToast("Analyzing URL...", "info");
+      try {
+        const res = await fetch(`${BASE}/productize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, url })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast(`✅ Offer created! ID: ${result.offer.id}`, "success");
+          openModal("Productized", `<p><strong>Offer ID:</strong> ${result.offer.id}</p><p><strong>URL:</strong> ${url}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async instantQuote() {
+      const seller = prompt("Quote from which seller? (username)", "");
+      if (!seller) return;
+      const scope = prompt("Scope summary", "Hero section + copy");
+      if (!scope) return;
+      showToast("Generating quote...", "info");
+      try {
+        const res = await fetch(`${BASE}/quote/instant`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ buyer: U.name, seller, scope, ttr: "24h" })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          const q = result.quote;
+          showToast(`✅ Quote ready: $${q.price}`, "success");
+          openModal("Quote Generated", `<p><strong>Price:</strong> $${q.price}</p><p><strong>Seller:</strong> ${q.seller}</p><p><strong>Scope:</strong> ${q.scope}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async issuePoO() {
+      const title = prompt("What did you complete? (PoO title)");
+      if (!title) return;
+      showToast("Issuing PoO...", "info");
+      try {
+        const res = await fetch(`${BASE}/poo/issue`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, title, metrics: {}, evidence_urls: [] })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ PoO issued!", "success");
+          openModal("Proof-of-Outcome Issued", `<p><strong>ID:</strong> ${result.poo.id}</p><p><strong>Title:</strong> ${title}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async bindMedia() {
+      const media = prompt("Media ID (e.g., hero-video-001)");
+      if (!media) return;
+      const offer = prompt("Offer ID to bind to");
+      if (!offer) return;
+      showToast("Binding media...", "info");
+      try {
+        const res = await fetch(`${BASE}/media/bind`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, media_id: media, offer_id: offer })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ Media bound!", "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async localizeOffer() {
+      const offer = prompt("Offer ID to localize");
+      if (!offer) return;
+      const locales = prompt("Locales (comma separated)", "es-ES,fr-FR,de-DE");
+      if (!locales) return;
+      const arr = locales.split(",").map(s => s.trim()).filter(Boolean);
+      showToast("Localizing offer...", "info");
+      try {
+        const res = await fetch(`${BASE}/offer/localize`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, offer_id: offer, locales: arr })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast(`✅ Created ${result.localized.length} variants`, "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async registerBusiness() {
+      const bizName = prompt("Legal business name");
+      if (!bizName) return;
+      const channel = prompt("Distribution channel", "partner");
+      const endpoint = prompt("Webhook endpoint URL", "https://example.com/webhook");
+      showToast("Registering business...", "info");
+      try {
+        const res = await fetch(`${BASE}/distribution/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, channel, endpoint_url: endpoint })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ Business registered!", "success");
+          openModal("Business Registered", `<p>Business: ${bizName}</p><p>Channel: ${channel}</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async createJV() {
+      const partner = prompt("Partner username/email");
+      if (!partner) return;
+      const split = prompt("Split (you,partner) e.g. 60,40", "50,50");
+      const [a, b] = (split || "50,50").split(",").map(x => parseFloat(x.trim()) / 100);
+      showToast("Creating JV...", "info");
+      try {
+        const res = await fetch(`${BASE}/jv/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, partner_username: partner, split: [a, b] })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ JV created!", "success");
+          openModal("JV Created", `<p><strong>Partners:</strong> ${U.name} & ${partner}</p><p><strong>Split:</strong> ${Math.round(a*100)}% / ${Math.round(b*100)}%</p>`);
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async payout() {
+      requestCashout();
+    },
+    
+    async createTeam() {
+      const members = prompt("Team members (comma-separated usernames)", "");
+      if (!members) return;
+      const mem = members.split(",").map(s => s.trim()).filter(Boolean);
+      showToast("Creating team...", "info");
+      try {
+        const res = await fetch(`${BASE}/team/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lead_owner: U.name, members: mem })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ Team created!", "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async scheduleRetarget() {
+      const lead = prompt("Lead ID to retarget", "");
+      if (!lead) return;
+      const cadence = prompt("Cadence (e.g., 3d, 1w)", "3d");
+      const incentive = prompt("Incentive (e.g., AIGx10, 10% off)", "");
+      showToast("Scheduling retargeter...", "info");
+      try {
+        const res = await fetch(`${BASE}/retarget/schedule`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: U.name, lead_id: lead, cadence, incentive })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          showToast("✅ Retargeter scheduled!", "success");
+        } else {
+          showToast(result.error || "Failed", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async openMarket() {
+      showToast("Loading marketplace...", "info");
+      try {
+        const res = await fetch(`${BASE}/market/rank`);
+        const result = await res.json();
+        if (result.ok || result.results) {
+          const results = result.results || [];
+          const html = `<ol style="padding-left:20px;">` + results.slice(0, 20).map(r => 
+            `<li>${r.username} — Score: ${r.score || r.rank}</li>`
+          ).join("") + `</ol>`;
+          openModal("Marketplace Top 20", html);
+        } else {
+          showToast("Failed to load marketplace", "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    // ========== AME AUTO-SALES ==========
+    async viewAutoSales() {
+      showToast("Loading Auto-Sales...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/queue`);
+        const data = await res.json();
+        const stats = data.stats || {};
+        const pitches = data.pitches || [];
+        
+        const statsHtml = `
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;">
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#00bfff;">${stats.queue_size || 0}</div>
+              <div style="font-size:12px; color:#888;">Queued</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#00ff88;">${stats.sent || 0}</div>
+              <div style="font-size:12px; color:#888;">Sent</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#ffcc00;">${stats.responded || 0}</div>
+              <div style="font-size:12px; color:#888;">Responses</div>
+            </div>
+            <div style="background:#0a0a0a; padding:16px; border-radius:8px; text-align:center;">
+              <div style="font-size:24px; font-weight:700; color:#ff66cc;">${stats.converted || 0}</div>
+              <div style="font-size:12px; color:#888;">Converted</div>
+            </div>
+          </div>
+          <div style="margin-bottom:16px; padding:12px; background:#0a0a0a; border-radius:8px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+              <span style="font-size:13px; color:#888;">Response Rate</span>
+              <span style="font-size:13px; font-weight:600; color:#00bfff;">${stats.response_rate || 0}%</span>
+            </div>
+            <div style="height:8px; background:#222; border-radius:4px; overflow:hidden;">
+              <div style="height:100%; width:${stats.response_rate || 0}%; background:linear-gradient(90deg,#10b981,#34d399);"></div>
+            </div>
+          </div>
+        `;
+        
+        let queueHtml = '';
+        if (pitches.length === 0) {
+          queueHtml = `
+            <div style="padding:30px; text-align:center; background:#0a0a0a; border-radius:8px;">
+              <div style="font-size:32px; margin-bottom:8px;">🎯</div>
+              <div style="color:#888; margin-bottom:16px;">No pitches in queue</div>
+              <button class="btn-glow" onclick="window.GXA.generateTestPitch()">Generate Test Pitch</button>
+            </div>
+          `;
+        } else {
+          queueHtml = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h4 style="margin:0; color:#00bfff;">📋 Pending Approval (${pitches.length})</h4>
+              <button class="btn-glow btn-sm" onclick="window.GXA.viewAutoSales()">↻ Refresh</button>
+            </div>
+            <div style="border:1px solid #333; border-radius:8px; overflow:hidden; max-height:300px; overflow-y:auto;">
+              ${pitches.map(p => renderPitchItem(p)).join('')}
+            </div>
+          `;
+        }
+        
+        openModal("🤖 AME Auto-Sales Dashboard", statsHtml + queueHtml);
+      } catch (err) {
+        console.error("AME error:", err);
+        openModal("🤖 AME Auto-Sales Dashboard", `
+          <p style="color:#ff6b6b;">⚠️ Failed to load AME queue</p>
+          <button class="btn-glow" onclick="window.GXA.viewAutoSales()">Retry</button>
+        `);
+      }
+    },
+    
+    async approvePitch(pitchId) {
+      showToast("Approving pitch...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/approve/${pitchId}`, { method: "POST" });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("✅ Pitch approved and sent!", "success");
+          this.viewAutoSales();
+        } else {
+          showToast("❌ " + (data.error || "Failed"), "error");
+        }
+      } catch (err) {
+        showToast("⚠️ Connection error", "error");
+      }
+    },
+    
+    async skipPitch(pitchId) {
+      try {
+        const res = await fetch(`${BASE}/ame/skip/${pitchId}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "user_skipped" })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("Pitch skipped", "info");
+          this.viewAutoSales();
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
+    
+    async editPitch(pitchId) {
+      try {
+        const res = await fetch(`${BASE}/ame/pitch/${pitchId}`);
+        const data = await res.json();
+        if (!data.ok) return;
+        const newMessage = prompt("Edit pitch message:", data.pitch.message);
+        if (newMessage && newMessage !== data.pitch.message) {
+          const editRes = await fetch(`${BASE}/ame/edit/${pitchId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: newMessage })
+          });
+          const editData = await editRes.json();
+          if (editData.ok) {
+            showToast("✅ Pitch updated", "success");
+            this.viewAutoSales();
+          }
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
+    
+    async generateTestPitch() {
+      showToast("Generating test pitch...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            recipient: "demo@example.com",
+            channel: "email",
+            context: { offer: "AI-powered automation", match_reason: "Based on your profile" },
+            originator: "manual_test"
+          })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          showToast("✅ Test pitch generated!", "success");
+          this.viewAutoSales();
+        }
+      } catch (err) {
+        showToast("⚠️ Error", "error");
+      }
+    },
+    
+    // ========== OTHER ACTIONS ==========
+    browseDeals() {
+      openModal("Browse Deals", `
+        <p style="color:#ccc; margin-bottom:12px;">Active opportunities you can claim:</p>
+        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
+          <div style="color:#00bfff; font-weight:600;">No active deals yet</div>
+          <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">When buyers post needs matching your skills, they'll appear here.</p>
+        </div>
+        <p style="font-size:0.85rem; color:#888;">Intent Exchange browser coming in Task 5!</p>
+      `);
+    },
+    
+    findPartners() {
+      openModal("Find Partners", `
+        <p style="color:#ccc; margin-bottom:12px;">Team up with other businesses:</p>
+        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
+          <p style="font-size:0.85rem; color:#888;">Find complementary businesses to create joint offerings.</p>
+        </div>
+        <button class="btn-glow" onclick="GXA.createJV()" style="width:100%;">🤝 Create Partnership</button>
+      `);
+    },
+    
+    viewPipeline() {
+      const user = window.aigentsyUser || {};
+      const oracle = user.outcomeOracle || { clicked: 0, authorized: 0, delivered: 0, paid: 0 };
+      openModal("Deal Pipeline", `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #888;">
+            <span>🔍 Leads</span><span style="font-weight:700;">${oracle.clicked || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #ffcc00;">
+            <span>💬 In Discussion</span><span style="font-weight:700;">${Math.max(0, (oracle.clicked || 0) - (oracle.authorized || 0))}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00bfff;">
+            <span>✅ Won</span><span style="font-weight:700;">${oracle.authorized || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #9966ff;">
+            <span>🚀 In Progress</span><span style="font-weight:700;">${oracle.delivered || 0}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:10px; background:#0a0a0a; border-radius:6px; border-left:3px solid #00ffcc;">
+            <span>✓ Completed</span><span style="font-weight:700;">${oracle.paid || 0}</span>
+          </div>
+        </div>
+      `);
+    }
+  };
+})();
+  
+const gxFab = document.getElementById("gxFab");
+const gxDrawer = document.getElementById("gxDrawer");
+const gxClose = document.getElementById("gxClose");
+
+if (gxFab) { gxFab.onclick = () => gxDrawer.classList.toggle("open"); }
+if (gxClose) { gxClose.onclick = () => gxDrawer.classList.remove("open"); }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    gxDrawer.classList.remove("open");
+    GXA.closeModal();
+    closeProposalModal();
+    closeProposalInboxModal();
+  }
+});
+
+(function startSSE() {
+  try {
+    const es = new EventSource(window.BACKEND_BASE + "/stream/activity");
+    es.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        const item = document.createElement("div");
+        item.className = "gx-live-item";
+        const label = ev.type || "event";
+        const txt = ev.title || ev.brief || ev.event?.type || ev.intent_id || "";
+        item.textContent = `[${label}] ${txt}`.trim();
+        const list = document.getElementById("gxLiveList");
+        if (list) list.prepend(item);
+      } catch(_) {}
+    };
+    es.onerror = () => { console.warn("SSE connection error"); es.close(); };
+  } catch(e) { console.warn("SSE not available", e); }
+})();
+
+// ============================================================
+// 💎 AIGX DASHBOARD API INTEGRATION
+// ============================================================
+
+async function fetchAIGxDashboardData(username) {
+  try {
+    const response = await fetch(`${window.BACKEND_BASE}/dashboard/${username}`);
+    if (!response.ok) throw new Error(`Dashboard API error: ${response.status}`);
+    const data = await response.json();
+    
+    if (data.ok) {
+      window.aigxDashboardData = data;
+      // ✅ REMOVED: updateAIGxAchievements(data) - causes conflict with renderDynamicAchievements
+      updateAIGxWallet(data);
+      updateLiveActivityFeed(data);
+      
+      // ✅ NOW render achievements with complete AIGx data (this handles everything)
+      const user = window.aigentsyUser;
+      if (user) {
+        console.log("🏆 Rendering achievements with AIGx data");
+        renderDynamicAchievements(user);
+      }
+      
+      return data;
+    }
+  } catch (error) {
+    console.warn("AIGx Dashboard API not available:", error);
+    
+    // ✅ If AIGx API fails, render achievements with fallback user data
+    const user = window.aigentsyUser;
+    if (user) {
+      console.log("🏆 Rendering achievements with fallback data");
+      renderDynamicAchievements(user);
+    }
+    
+    return null;
+  }
+}
+
+function updateAIGxAchievements(data) {
+  const achievementBox = document.getElementById("achievementList");
+  if (!achievementBox) return;
+  
+  const achievements = [];
+  const aigx = data.aigx_equity.aigx_balance;
+  
+  // ✨ FIXED: Remove AIGo reference, show only AIGx
+  achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
+  
+  if (data.early_adopter.badge) {
+    achievements.push(`🎖️ ${data.early_adopter.badge} #${data.user.user_number} — ${data.early_adopter.multiplier}x permanent multiplier`);
+  }
+  
+  const tier = data.tier_progression.current_tier.toUpperCase();
+  const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
+  achievements.push(`${tierEmoji} ${tier} Tier — ${data.tier_progression.tier_multiplier}x earning rate`);
+  
+  if (data.tier_progression.lifetime_revenue > 0) {
+    achievements.push(`💵 Revenue Generated — $${data.tier_progression.lifetime_revenue.toLocaleString()}`);
+  }
+  
+  if (data.activity_streaks.current_streak > 0) {
+    achievements.push(`🔥 ${data.activity_streaks.current_streak}-day activity streak`);
+  }
+  
+  if (data.referrals.total_referrals > 0) {
+    achievements.push(`🤝 ${data.referrals.total_referrals} referrals made`);
+  }
+  
+  if (data.apex_ultra.activated) {
+    const rate = data.apex_ultra.success_rate;
+    achievements.push(`🌟 APEX ULTRA — ${data.apex_ultra.systems_operational}/${data.apex_ultra.total_systems} systems (${rate}%)`);
+  }
+  
+  if (data.tier_progression.next_tier) {
+    const needed = data.tier_progression.revenue_needed.toLocaleString();
+    const nextTier = data.tier_progression.next_tier.toUpperCase();
+    achievements.push(`🎯 $${needed} to unlock ${nextTier} tier`);
+  }
+  
+  if (achievements.length > 0) {
+    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
+  }
+}
+
+function updateAIGxWallet(data) {
+  const totalEarningsEl = document.getElementById("totalEarnings");
+  if (totalEarningsEl) {
+    // Use actual revenue, not equity value
+    const actualRevenue = data.tier_progression?.lifetime_revenue || 0;
+    totalEarningsEl.textContent = actualRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  
+  // Add AIGx breakdown to the dropdown
+  const breakdownEl = document.getElementById("earningsBreakdown");
+  if (breakdownEl) {
+    // Remove old AIGx breakdown if it exists
+    let aigxBreakdownDiv = document.getElementById("aigxBreakdownSection");
+    if (aigxBreakdownDiv) {
+      aigxBreakdownDiv.remove();
+    }
+    
+    const sources = data.revenue_stats.aigx_by_source;
+    const totalAigx = data.aigx_equity.aigx_balance;
+    
+    const aigxBreakdown = `
+      <div id="aigxBreakdownSection" style="background:#0a0a0a; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #00bfff;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span class="tooltip-container" style="font-size:0.9rem; font-weight:600; color:#00bfff;">
+            💎 AIGx Balance
+            <span class="tooltip-text">
+              AIGx is your internal currency earned through activity. Total AIGx determines your AIGo (ownership stake).
+            </span>
+          </span>
+          <span style="font-size:1.4rem; font-weight:700; color:#00bfff;">${totalAigx.toLocaleString()} AIGx</span>
+        </div>
+      </div>
+    `;
+    
+    // Add AIGx breakdown at the top of the earnings breakdown
+    breakdownEl.insertAdjacentHTML('afterbegin', aigxBreakdown);
+  }
+}
+
+function updateLiveActivityFeed(data) {
+  const list = document.getElementById("gxLiveList");
+  if (!list) return;
+  
+  list.innerHTML = '';
+  const recentActivity = data.recent_activity || [];
+  
+  recentActivity.forEach(activity => {
+    const item = document.createElement("div");
+    item.className = "gx-live-item";
+    
+    const date = new Date(activity.timestamp);
+    const timeAgo = getTimeAgo(date);
+    
+    const emoji = getActivityEmoji(activity.basis);
+    const amountText = activity.currency === "AIGx" 
+      ? `+${activity.amount.toLocaleString()} AIGx`
+      : "";
+    
+    item.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span>${emoji} ${activity.description}</span>
+        <span style="color:#00bfff; font-weight:600; font-size:0.75rem;">${amountText}</span>
+      </div>
+      <div style="font-size:0.65rem; color:#666; margin-top:2px;">${timeAgo}</div>
+    `;
+    
+    list.appendChild(item);
+  });
+  
+  if (recentActivity.length === 0) {
+    const placeholder = document.createElement("div");
+    placeholder.className = "gx-live-item";
+    placeholder.style.color = "#666";
+    placeholder.textContent = "Activity will appear here as you earn AIGx";
+    list.appendChild(placeholder);
+  }
+}
+
+function getActivityEmoji(basis) {
+  const emojiMap = {
+    // Platform milestones
+    "apex_ultra_activation": "🌟",
+    "amg_revenue_brain_activation": "🧠",
+    "early_adopter_signup_bonus": "🎁",
+    
+    // Revenue & transactions
+    "transaction_revenue": "💳",
+    "ame_auto_sale": "🤖",
+    "intent_exchange_win": "💼",
+    "jv_partnership_split": "🤝",
+    "shopify_sale": "🛍️",
+    "affiliate_commission": "📱",
+    
+    // Milestones
+    "milestone_first_sale": "🎊",
+    "milestone_reward": "🏆",
+    "reputation_milestone": "⭐",
+    
+    // Activity rewards
+    "daily_activity_reward": "📅",
+    "weekly_streak_reward": "🔥",
+    "monthly_power_user_reward": "⭐",
+    "referral_milestone": "🤝",
+    "tier_upgrade": "🚀",
+    
+    // Reputation gains
+    "deal_completed": "✅",
+    "positive_review": "⭐",
+    "client_milestone": "🎯"
+  };
+  
+  return emojiMap[basis] || "💎";
+}
+
+function getTimeAgo(date) {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+  return date.toLocaleDateString();
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (username) fetchAIGxDashboardData(username);
+}, 30000);
+  
+async function initializeDashboard() {
+  console.log("═══════════════════════════════════════════════════");
+  console.log("🚀 AIGENTSY DASHBOARD v999 - ULTRA DEBUG VERSION");
+  console.log("📅 Build: December 12, 2024 - 9:30 AM");
+  console.log("✅ All fixes applied + comprehensive debug logging");
+  console.log("═══════════════════════════════════════════════════");
+  console.log("🚀 Initializing dashboard with AIGx...");
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) {
+    console.warn("No username - redirecting");
+    window.location.href = "/";
+    return;
+  }
+  console.log("👤 Loading for:", username);
+  
+  // Call existing initialization
+  await injectUserDashboard();
+  
+  // Fetch and display AIGx dashboard data
+  await fetchAIGxDashboardData(username);
+  
+  // Load tier and reputation
+  await loadTierAndReputation();
+  
+  // ✨ NEW: Initialize Week 1 features
+  await initializeWeek1Features();
+  
+  // ✨ NEW: Kit-aware welcome message
+  if (chatLog && chatLog.children.length === 0) {
+    const user = window.aigentsyUser || {};
+    const kit = user.companyType || 'general';
+    
+    const kitWelcomes = {
+      social: `Hey ${username}! Your Social Media C-Suite is ready. We've got content templates, Reel frameworks, and franchise licensing loaded. What content do you want to create today?`,
+      saas: `Hey ${username}! Your SaaS C-Suite is online. We've got API templates, deployment guides, and subscription systems ready. What do you want to build?`,
+      marketing: `Hey ${username}! Your Marketing C-Suite is standing by. We've got SEO templates, campaign frameworks, and growth tools loaded. What campaigns should we launch?`,
+      legal: `Hey ${username}! Your Legal C-Suite is ready. We've got contract templates, IP frameworks, and compliance tools loaded. What legal work can we handle?`,
+      general: `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`
+    };
+    
+    const preload = document.createElement("div");
+    preload.className = "chat-agent";
+    preload.innerHTML = kitWelcomes[kit] || kitWelcomes.general;
+    chatLog.appendChild(preload);
+  }
+}
+
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const chart = document.getElementById("walletChart");
+    if (chart && !chart.chartInstance) {
+      console.log("🔄 Fallback init");
+      initializeDashboard();
+    }
+  }, 500);
+});
+
+setTimeout(() => {
+  const chart = document.getElementById("walletChart");
+  if (chart && !chart.chartInstance) {
+    console.log("🔄 Final fallback");
+    initializeDashboard();
+  }
+}, 3000);
+
+console.log("✅ Script loaded");
+
+  // ============================================================
+// 🎖️ TIER & REPUTATION SYSTEM
+// ============================================================
+
+async function loadTierAndReputation() {
+  try {
+    const userData = window.aigentsyUser || {};
+    const username = userData.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Fetch tier info
+    const tierResponse = await fetch(`${window.BACKEND_BASE}/user/${username}/tier`);
+    const tierData = await tierResponse.json();
+    
+    if (tierData.ok && tierData.has_tier) {
+      const tier = tierData.tier;
+      
+      // Update main tier card
+      document.getElementById('user-tier-badge').textContent = tier.badge;
+      document.getElementById('user-tier-name').textContent = tier.name;
+      document.getElementById('user-tier-description').textContent = 
+        `User #${tierData.user_number} • ${tier.description.split(' - ')[0]}`;
+      document.getElementById('user-multiplier').textContent = `${tier.multiplier}x`;
+      
+      // Update wallet tier indicator
+      document.getElementById('wallet-tier-badge').textContent = tier.badge;
+      document.getElementById('wallet-multiplier').textContent = `${tier.multiplier}x`;
+      document.getElementById('wallet-tier-badge').title = `${tier.name} - ${tier.multiplier}x earnings`;
+    }
+    
+    // Fetch reputation info
+    const repResponse = await fetch(`${window.BACKEND_BASE}/reputation/${username}`);
+    const repData = await repResponse.json();
+    
+    if (repData.ok) {
+      // ✨ STORE REPUTATION GLOBALLY
+      if (!window.aigxDashboardData) window.aigxDashboardData = {};
+      if (!window.aigxDashboardData.user) window.aigxDashboardData.user = {};
+      window.aigxDashboardData.user.reputation_score = repData.reputation_score;
+      
+      // Update reputation score
+      document.getElementById('reputation-score').textContent = repData.reputation_score;
+      
+      // Update breakdown
+      const breakdown = repData.reputation_breakdown;
+      document.getElementById('rep-deals').textContent = breakdown.deals_completed || 0;
+      document.getElementById('rep-reviews').textContent = breakdown.positive_reviews || 0;
+      document.getElementById('rep-revenue').textContent = 
+        Math.floor(breakdown.revenue_generated || 0).toLocaleString();
+      
+      // Calculate months (rough estimate from reputation)
+      const months = Math.floor((repData.reputation_score - 10 - 
+        (breakdown.deals_completed * 5) - 
+        (breakdown.positive_reviews * 3) - 
+        Math.floor(breakdown.revenue_generated / 100)) / 2);
+      document.getElementById('rep-months').textContent = Math.max(0, months);
+      
+      // Update next unlock progress
+      if (repData.next_unlock) {
+        const progress = ((repData.reputation_score / repData.next_unlock.required_reputation) * 100).toFixed(1);
+        document.getElementById('reputation-progress').style.width = `${progress}%`;
+        document.getElementById('next-unlock-name').textContent = repData.next_unlock.feature.replace(/_/g, ' ');
+        document.getElementById('next-unlock-required').textContent = repData.next_unlock.required_reputation;
+        document.getElementById('points-needed').textContent = repData.next_unlock.points_needed;
+      } else {
+        // All unlocked
+        document.getElementById('reputation-progress').style.width = '100%';
+        document.getElementById('next-unlock-name').textContent = 'All Features';
+        document.getElementById('next-unlock-required').textContent = '✓';
+        document.getElementById('points-needed').textContent = '0';
+      }
+      
+      // Update premium services grid
+      updatePremiumServicesGrid(repData.reputation_score);
+      
+      // ✨ RE-RENDER CHART WITH REPUTATION DATA
+      if (window.aigentsyUser) {
+        renderWalletChart(window.aigentsyUser);
+      }
+    }
+    
+  } catch (error) {
+    console.error('Failed to load tier/reputation:', error);
+  }
+}
+
+function updatePremiumServicesGrid(repScore) {
+  const services = [
+    { name: 'Dark Pool', icon: '🎭', fee: '+5%', repRequired: 50 },
+    { name: 'JV Admin', icon: '🤝', fee: '+2%', repRequired: 75 },
+    { name: 'Insurance', icon: '🛡️', fee: '1-2%', repRequired: 100 },
+    { name: 'Factoring', icon: '💸', fee: '1-3%', repRequired: 25 }
+  ];
+  
+  const grid = document.getElementById('premium-services-grid');
+  if (!grid) return;
+  
+  grid.innerHTML = services.map(service => {
+    const unlocked = repScore >= service.repRequired;
+    const bgColor = unlocked ? 'rgba(59, 130, 246, 0.08)' : 'rgba(100, 116, 139, 0.05)';
+    const borderColor = unlocked ? 'rgba(59, 130, 246, 0.3)' : 'rgba(100, 116, 139, 0.2)';
+    const opacity = unlocked ? '1' : '0.6';
+    const status = unlocked ? '✅' : `🔒 Rep ${service.repRequired}`;
+    
+    return `
+      <div style="background: ${bgColor}; border: 1px solid ${borderColor}; border-radius: 6px; padding: 8px; text-align: center; opacity: ${opacity};">
+        <div style="font-size: 18px; margin-bottom: 4px;">${service.icon}</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">${service.name}</div>
+        <div style="color: #64748b; font-size: 10px;">${service.fee}</div>
+        <div style="color: ${unlocked ? '#3b82f6' : '#64748b'}; font-size: 9px; margin-top: 4px;">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Add to initializeDashboard function - find the function and add this line at the end:
+// await loadTierAndReputation();
+
+// ============================================================
+// 🚀 WEEK 1 FEATURES INTEGRATION
+// ============================================================
+
+// API Base URL for Week 1 features
+const WEEK1_API_BASE = "https://aigentsy-ame-runtime.onrender.com/week1";
+
+// ============================================================
+// ⚡ BOOSTERS
+// ============================================================
+
+async function loadBoosterData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+    const data = await response.json();
+    
+    if (data && data.total_multiplier) {
+      // Update tier badge multiplier
+      const baseTier = window.aigentsyUser?.tier?.multiplier || 3.0;
+      const totalMultiplier = data.total_multiplier;
+      const boosterBonus = (totalMultiplier - baseTier).toFixed(1);
+      
+      document.getElementById('user-multiplier').textContent = `${totalMultiplier}x`;
+      document.getElementById('multiplier-label').innerHTML = 
+        `Base ${baseTier}x + Boosters ${boosterBonus}x`;
+      
+      // Update wallet boosted earnings
+      const totalEarnings = parseFloat(document.getElementById('totalEarnings').textContent || 0);
+      const boosterBonusAmount = totalEarnings * (totalMultiplier - baseTier) / baseTier;
+      document.getElementById('boosterBonus').textContent = boosterBonusAmount.toFixed(2);
+      
+      // Update booster breakdown
+      const breakdown = data.active_boosters.map(b => 
+        `${b.icon} ${b.name}: ${b.multiplier}x ${b.expires_at ? '(expires ' + new Date(b.expires_at).toLocaleDateString() + ')' : '(permanent)'}`
+      ).join('<br>');
+      document.getElementById('booster-breakdown').innerHTML = breakdown || 'No active boosters';
+      
+      // Update mini tile
+      document.getElementById('boosterMultiplierMini').textContent = `${totalMultiplier}x Active`;
+      document.getElementById('boosterCountMini').textContent = `${data.booster_count} boosters`;
+    }
+  } catch (error) {
+    console.warn('Boosters API not available:', error);
+  }
+}
+
+function toggleBoosterBreakdown() {
+  const breakdown = document.getElementById('booster-breakdown');
+  breakdown.style.display = breakdown.style.display === 'none' ? 'block' : 'none';
+}
+
+function viewBoosters() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '⚡ Your Active Boosters';
+  body.innerHTML = `
+    <div style="margin-bottom:16px;">
+      <div id="boosterListModal" style="font-size:0.9rem;">Loading...</div>
+    </div>
+    <button class="btn-glow" onclick="GXA.closeModal(); purchasePowerUp()">⚡ Buy Power-Up</button>
+  `;
+  modal.style.display = 'flex';
+  
+  // Load booster details
+  loadBoosterDetailsForModal();
+}
+
+async function loadBoosterDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+    const data = await response.json();
+    
+    if (data && data.active_boosters) {
+      const html = data.active_boosters.map(b => `
+        <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #222;">
+          <div style="display:flex; justify-content:space-between;">
+            <div><strong>${b.icon} ${b.name}</strong></div>
+            <div style="color:#a78bfa;">${b.multiplier}x</div>
+          </div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px;">${b.description}</div>
+          <div style="font-size:0.75rem; color:#666; margin-top:4px;">
+            ${b.expires_at ? 'Expires: ' + new Date(b.expires_at).toLocaleDateString() : 'Permanent'}
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('boosterListModal').innerHTML = html + `
+        <div style="margin-top:16px; padding:12px; background:#111; border-radius:6px; border:1px solid #00bfff;">
+          <div style="font-size:1.2rem; font-weight:700; color:#a78bfa;">Total Multiplier: ${data.total_multiplier}x</div>
+          <div style="font-size:0.85rem; color:#888; margin-top:4px;">
+            Your $1,000 earnings → $${(1000 * data.total_multiplier).toFixed(0)} with boosters
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load booster details:', error);
+    document.getElementById('boosterListModal').innerHTML = 'Failed to load boosters.';
+  }
+}
+
+function purchasePowerUp() {
+  showToast('Power-Up purchase coming soon! Connect Stripe to enable.');
+}
+
+// ============================================================
+// 📦 SUBSCRIPTIONS
+// ============================================================
+
+async function loadSubscriptionData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
+    const data = await response.json();
+    
+    if (data && data.subscription) {
+      const sub = data.subscription;
+      
+      // Update wallet breakdown
+      document.getElementById('subCredits').textContent = 
+        `${sub.credits_remaining} / ${sub.monthly_allocation}`;
+      
+      // Update mini tile
+      document.getElementById('subStatusMini').textContent = `${sub.tier} Active`;
+      document.getElementById('subCreditsMini').textContent = `${sub.credits_remaining}/${sub.monthly_allocation} credits`;
+      
+      // Update revenue sources
+      document.getElementById('revSubscription').textContent = `$${sub.cost}/mo`;
+    } else {
+      document.getElementById('subStatusMini').textContent = 'No subscription';
+      document.getElementById('subCreditsMini').textContent = 'Upgrade now';
+    }
+  } catch (error) {
+    console.warn('Subscriptions API not available:', error);
+  }
+}
+
+function viewSubscriptions() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '📦 Subscription Management';
+  body.innerHTML = `
+    <div id="subscriptionDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="upgradeSubscription()" style="margin-top:12px;">⬆️ Upgrade Plan</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadSubscriptionDetailsForModal();
+}
+
+async function loadSubscriptionDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/subscriptions/status/${username}`);
+    const data = await response.json();
+    
+    if (data && data.subscription) {
+      const sub = data.subscription;
+      document.getElementById('subscriptionDetails').innerHTML = `
+        <div style="background:#0a0a0a; padding:12px; border-radius:6px; border:1px solid #00bfff;">
+          <h4 style="color:#00bfff; margin-top:0;">Current Plan: ${sub.tier}</h4>
+          <div style="margin:8px 0;">💰 Cost: $${sub.cost}/month</div>
+          <div style="margin:8px 0;">📦 Credits: ${sub.credits_remaining} / ${sub.monthly_allocation}</div>
+          <div style="margin:8px 0;">📅 Renews: ${new Date(sub.next_billing_date).toLocaleDateString()}</div>
+          <div style="margin:8px 0;">🔄 Rollover: ${sub.rollover_credits} credits banked</div>
+        </div>
+      `;
+    } else {
+      document.getElementById('subscriptionDetails').innerHTML = `
+        <div style="background:#0a0a0a; padding:12px; border-radius:6px;">
+          <p>You don't have an active subscription.</p>
+          <p style="font-size:0.85rem; color:#888;">Subscribe to get monthly outcome credits and priority queue access!</p>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error('Failed to load subscription:', error);
+    document.getElementById('subscriptionDetails').innerHTML = 'Failed to load subscription details.';
+  }
+}
+
+function upgradeSubscription() {
+  showToast('Subscription upgrade coming soon! Connect Stripe to enable.');
+}
+
+// ============================================================
+// 💰 PWP (PAY-WITH-PERFORMANCE)
+// ============================================================
+
+async function loadPWPData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      // Update wallet breakdown
+      document.getElementById('pwpFinanced').textContent = data.summary.total_financed.toFixed(2);
+      
+      // Update mini tile
+      const activeCount = data.summary.active_contracts || 0;
+      document.getElementById('pwpStatusMini').textContent = 
+        activeCount > 0 ? `${activeCount} Active` : 'No contracts';
+      document.getElementById('pwpAmountMini').textContent = 
+        `$${data.summary.total_remaining.toFixed(0)} remaining`;
+    }
+  } catch (error) {
+    console.warn('PWP API not available:', error);
+  }
+}
+
+function viewPWP() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '💰 Pay-With-Performance Dashboard';
+  body.innerHTML = `
+    <div id="pwpDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="GXA.closeModal()" style="margin-top:12px;">Close</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadPWPDetailsForModal();
+}
+
+async function loadPWPDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      let html = `
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:16px;">
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Active Contracts</div>
+            <div style="font-size:1.5rem; font-weight:700;">${data.summary.active_contracts}</div>
+          </div>
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Total Financed</div>
+            <div style="font-size:1.5rem; font-weight:700;">$${data.summary.total_financed.toFixed(0)}</div>
+          </div>
+          <div style="background:#0a0a0a; padding:10px; border-radius:6px; text-align:center;">
+            <div style="font-size:0.75rem; color:#888;">Remaining</div>
+            <div style="font-size:1.5rem; font-weight:700;">$${data.summary.total_remaining.toFixed(0)}</div>
+          </div>
+        </div>
+      `;
+      
+      if (data.active_contracts && data.active_contracts.length > 0) {
+        html += `<h4 style="color:#00bfff;">Active Contracts:</h4>`;
+        data.active_contracts.forEach(contract => {
+          html += `
+            <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid #222;">
+              <div><strong>Outcome:</strong> ${contract.outcome_id}</div>
+              <div style="font-size:0.85rem; margin-top:4px;">
+                <span style="color:#888;">Financed:</span> $${contract.financed.toFixed(2)} • 
+                <span style="color:#00ff88;">Paid:</span> $${contract.paid.toFixed(2)} • 
+                <span style="color:#ff8800;">Remaining:</span> $${contract.remaining.toFixed(2)}
+              </div>
+              <div style="background:#111; border-radius:4px; height:6px; margin-top:6px; overflow:hidden;">
+                <div style="background:#00ff88; height:100%; width:${contract.progress_pct}%;"></div>
+              </div>
+              <div style="font-size:0.75rem; color:#666; margin-top:2px;">${contract.progress_pct.toFixed(1)}% complete</div>
+            </div>
+          `;
+        });
+      } else {
+        html += `<p style="color:#888;">No active PWP contracts.</p>`;
+      }
+      
+      document.getElementById('pwpDetails').innerHTML = html;
+    }
+  } catch (error) {
+    console.error('Failed to load PWP data:', error);
+    document.getElementById('pwpDetails').innerHTML = 'Failed to load PWP contracts.';
+  }
+}
+
+// ============================================================
+// 🛡️ WARRANTIES
+// ============================================================
+
+async function loadWarrantyData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/warranties/agent/${username}`);
+    const data = await response.json();
+    
+    if (data && data.warranties) {
+      const active = data.warranties.filter(w => w.status === 'active');
+      const totalBond = active.reduce((sum, w) => sum + (w.bond_amount || 0), 0);
+      const totalEarned = data.warranties.filter(w => w.status === 'completed' && !w.claimed)
+        .reduce((sum, w) => sum + (w.bond_amount || 0), 0);
+      
+      // Update wallet
+      document.getElementById('warrantyEarnings').textContent = totalEarned.toFixed(2);
+      
+      // Update revenue sources
+      document.getElementById('revWarranties').textContent = totalEarned.toFixed(0);
+      
+      // Update mini tile
+      document.getElementById('warrantyStatusMini').textContent = 
+        active.length > 0 ? `${active.length} Active` : 'No warranties';
+      document.getElementById('warrantyBondMini').textContent = 
+        `$${totalBond.toFixed(0)} bonded`;
+    }
+  } catch (error) {
+    console.warn('Warranties API not available:', error);
+  }
+}
+
+function viewWarranties() {
+  const modal = document.getElementById('gxModal');
+  const title = document.getElementById('gxModalTitle');
+  const body = document.getElementById('gxModalBody');
+  
+  title.textContent = '🛡️ Warranty Dashboard';
+  body.innerHTML = `
+    <div id="warrantyDetails" style="font-size:0.9rem;">Loading...</div>
+    <button class="btn-glow" onclick="GXA.closeModal()" style="margin-top:12px;">Close</button>
+  `;
+  modal.style.display = 'flex';
+  
+  loadWarrantyDetailsForModal();
+}
+
+async function loadWarrantyDetailsForModal() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const response = await fetch(`${WEEK1_API_BASE}/warranties/agent/${username}`);
+    const data = await response.json();
+    
+    if (data && data.warranties && data.warranties.length > 0) {
+      const html = data.warranties.map(w => `
+        <div style="background:#0a0a0a; padding:10px; border-radius:6px; margin-bottom:8px; border:1px solid ${w.status === 'active' ? '#00bfff' : '#222'};">
+          <div><strong>${w.warranty_type}</strong> - ${w.outcome_id}</div>
+          <div style="font-size:0.85rem; margin-top:4px;">
+            <span style="color:#888;">Bond:</span> $${w.bond_amount?.toFixed(2) || 0} • 
+            <span style="color:${w.status === 'active' ? '#00ff88' : '#888'};">${w.status}</span>
+          </div>
+          ${w.expires_at ? `<div style="font-size:0.75rem; color:#666; margin-top:2px;">Expires: ${new Date(w.expires_at).toLocaleDateString()}</div>` : ''}
+        </div>
+      `).join('');
+      
+      document.getElementById('warrantyDetails').innerHTML = html;
+    } else {
+      document.getElementById('warrantyDetails').innerHTML = '<p style="color:#888;">No warranties on record.</p>';
+    }
+  } catch (error) {
+    console.error('Failed to load warranties:', error);
+    document.getElementById('warrantyDetails').innerHTML = 'Failed to load warranty data.';
+  }
+}
+
+// ============================================================
+// ⚡ SLO (SERVICE LEVEL OBJECTIVES)
+// ============================================================
+
+async function loadSLOData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    const response = await fetch(`${WEEK1_API_BASE}/slo/agent_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data) {
+      // Update avg delivery in compact snapshot
+      const avgHours = data.avg_delivery_hours || 0;
+      document.getElementById('csnAvgDelivery').textContent = 
+        avgHours > 0 ? `${avgHours}h` : '—';
+      
+      // Update SLO bonuses in revenue
+      const totalBonuses = data.total_bonuses_earned || 0;
+      document.getElementById('revSLOBonus').textContent = totalBonuses.toFixed(0);
+    }
+  } catch (error) {
+    console.warn('SLO API not available:', error);
+  }
+}
+
+// ============================================================
+// 📋 FRANCHISE TEMPLATES (KIT-AWARE)
+// ============================================================
+
+async function loadFranchiseData() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    const kit = window.aigentsyUser?.companyType || 'general';
+    
+    // Map kit to franchise category
+    const kitToCategoryMap = {
+      'social': 'creative',
+      'saas': 'technical',
+      'marketing': 'marketing',
+      'general': null
+    };
+    
+    const category = kitToCategoryMap[kit];
+    
+    // Load franchisee dashboard for kit-specific metrics
+    const response = await fetch(`${WEEK1_API_BASE}/franchise/franchisee_dashboard/${username}`);
+    const data = await response.json();
+    
+    if (data && data.summary) {
+      // These will be used for kit-specific business growth metrics
+      window.franchiseMetrics = {
+        templates_licensed: data.summary.active_licenses || 0,
+        outcomes_delivered: data.summary.total_outcomes || 0,
+        revenue_generated: data.summary.total_revenue || 0
+      };
+    }
+  } catch (error) {
+    console.warn('Franchise API not available:', error);
+  }
+}
+
+// ============================================================
+// 🔄 LIVE ACTIVITY FEED
+// ============================================================
+
+async function loadLiveActivityFeed() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Aggregate events from multiple Week 1 features
+    const events = [];
+    
+    // Add booster events
+    try {
+      const boosterRes = await fetch(`${WEEK1_API_BASE}/boosters/active/${username}`);
+      const boosterData = await boosterRes.json();
+      if (boosterData && boosterData.active_boosters) {
+        boosterData.active_boosters.slice(0, 2).forEach(b => {
+          events.push({
+            icon: b.icon,
+            text: `${b.name} activated: ${b.multiplier}x earnings`,
+            time: new Date(b.activated_at).toLocaleTimeString(),
+            type: 'booster'
+          });
+        });
+      }
+    } catch (e) {}
+    
+    // Add PWP events
+    try {
+      const pwpRes = await fetch(`${WEEK1_API_BASE}/pwp/buyer_dashboard/${username}`);
+      const pwpData = await pwpRes.json();
+      if (pwpData && pwpData.active_contracts) {
+        pwpData.active_contracts.slice(0, 2).forEach(c => {
+          events.push({
+            icon: '💰',
+            text: `PWP payment: $${c.paid.toFixed(0)} collected (${c.progress_pct.toFixed(0)}% complete)`,
+            time: 'Recent',
+            type: 'pwp'
+          });
+        });
+      }
+    } catch (e) {}
+    
+    // Render to feed
+    const list = document.getElementById('gxLiveList');
+    if (list && events.length > 0) {
+      const html = events.map(e => `
+        <div class="gx-live-item" style="padding:8px; border-bottom:1px solid #222;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">${e.icon}</span>
+            <div style="flex:1;">
+              <div style="font-size:0.85rem;">${e.text}</div>
+              <div style="font-size:0.7rem; color:#666; margin-top:2px;">${e.time}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      list.innerHTML = html;
+    }
+  } catch (error) {
+    console.warn('Live feed API not available:', error);
+  }
+}
+
+// ============================================================
+// 🎯 KIT-SPECIFIC ENHANCEMENTS
+// ============================================================
+
+function enhanceKitSpecificMetrics() {
+  const kit = window.aigentsyUser?.companyType || 'general';
+  
+  // Only enhance for active kits
+  if (!['social', 'saas', 'marketing'].includes(kit)) {
+    return;
+  }
+  
+  // ============================================================
+  // 1. UPDATE WELCOME TIP (KIT-SPECIFIC)
+  // ============================================================
+  const tips = {
+    social: "💡 Tip: Use franchise Reel templates to 10x your content output. Active creators earn 2.5x with viral boosters!",
+    saas: "💡 Tip: License your API templates to other devs. Top franchisees earn $3k+/mo passive from template revenue!",
+    marketing: "💡 Tip: Your SEO templates are in high demand. Franchise your proven campaigns and earn 15% revenue share!"
+  };
+  
+  const tipElement = document.getElementById('welcomeTip');
+  if (tipElement && tips[kit]) {
+    tipElement.innerHTML = `<strong>Tip:</strong> ${tips[kit]}`;
+  }
+  
+  // ============================================================
+  // 2. ADD KIT-SPECIFIC BUSINESS GROWTH METRICS
+  // ============================================================
+  const metricsContainer = document.getElementById('kitSpecificMetrics');
+  
+  if (metricsContainer) {
+    const metrics = {
+      social: `
+        <li style="color:#a78bfa;">🎥 Content Pieces: <span id="socialContentPieces">0</span>/mo</li>
+        <li style="color:#a78bfa;">📈 Avg Engagement: <span id="socialEngagement">0</span>%</li>
+        <li style="color:#a78bfa;">📋 Templates Used: <span id="socialTemplatesUsed">0</span></li>
+      `,
+      saas: `
+        <li style="color:#3b82f6;">💻 Deployments: <span id="saasDeployments">0</span>/mo</li>
+        <li style="color:#3b82f6;">⚡ Avg Setup Time: <span id="saasSetupTime">0</span>h</li>
+        <li style="color:#3b82f6;">📋 Templates Licensed: <span id="saasTemplatesLicensed">0</span></li>
+      `,
+      marketing: `
+        <li style="color:#10b981;">🎯 Campaigns Live: <span id="marketingCampaigns">0</span></li>
+        <li style="color:#10b981;">📊 Avg Campaign ROI: <span id="marketingROI">0</span>%</li>
+        <li style="color:#10b981;">📋 Templates Active: <span id="marketingTemplatesActive">0</span></li>
+      `
+    };
+    
+    metricsContainer.innerHTML = metrics[kit] || '';
+  }
+  
+  // ============================================================
+  // 3. REMOVED: POPULATE KIT-SPECIFIC ACHIEVEMENTS
+  // ============================================================
+  // ✅ This was overwriting the dynamic achievements from renderDynamicAchievements()
+  // Achievements are now handled entirely by renderDynamicAchievements() which uses
+  // real data from window.aigxDashboardData instead of static fake data.
+}
+
+// ============================================================
+// 🎯 LOAD KIT-SPECIFIC METRICS DATA
+// ============================================================
+
+async function loadKitSpecificMetricsData() {
+  const kit = window.aigentsyUser?.companyType || 'general';
+  
+  if (!['social', 'saas', 'marketing'].includes(kit)) {
+    return;
+  }
+  
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || 'demo_user';
+    
+    // Get franchise metrics
+    const franchiseRes = await fetch(`${WEEK1_API_BASE}/franchise/franchisee_dashboard/${username}`);
+    const franchiseData = await franchiseRes.json();
+    
+    if (franchiseData && franchiseData.summary) {
+      const metrics = franchiseData.summary;
+      
+      // ============================================================
+      // SOCIAL KIT METRICS
+      // ============================================================
+      if (kit === 'social') {
+        // Content Pieces: Based on outcomes delivered
+        const contentPieces = metrics.total_outcomes || 0;
+        document.getElementById('socialContentPieces').textContent = contentPieces;
+        
+        // Avg Engagement: Calculate from revenue (proxy metric)
+        const avgEngagement = metrics.total_revenue > 0 
+          ? ((metrics.total_revenue / 1000) * 0.5).toFixed(1) 
+          : 0;
+        document.getElementById('socialEngagement').textContent = avgEngagement;
+        
+        // Templates Used: Active licenses
+        const templatesUsed = metrics.active_licenses || 0;
+        document.getElementById('socialTemplatesUsed').textContent = templatesUsed;
+      }
+      
+      // ============================================================
+      // SAAS KIT METRICS
+      // ============================================================
+      if (kit === 'saas') {
+        // Deployments: Based on outcomes delivered
+        const deployments = metrics.total_outcomes || 0;
+        document.getElementById('saasDeployments').textContent = deployments;
+        
+        // Avg Setup Time: Calculate from delivery metrics
+        // Get from SLO data
+        const sloRes = await fetch(`${WEEK1_API_BASE}/slo/agent_dashboard/${username}`);
+        const sloData = await sloRes.json();
+        const avgSetupTime = sloData?.avg_delivery_hours 
+          ? (sloData.avg_delivery_hours / 24).toFixed(1) 
+          : 0;
+        document.getElementById('saasSetupTime').textContent = avgSetupTime;
+        
+        // Templates Licensed: Active licenses
+        const templatesLicensed = metrics.active_licenses || 0;
+        document.getElementById('saasTemplatesLicensed').textContent = templatesLicensed;
+      }
+      
+      // ============================================================
+      // MARKETING KIT METRICS
+      // ============================================================
+      if (kit === 'marketing') {
+        // Campaigns Live: Based on active licenses
+        const campaignsLive = metrics.active_licenses || 0;
+        document.getElementById('marketingCampaigns').textContent = campaignsLive;
+        
+        // Avg Campaign ROI: Calculate from revenue vs cost
+        const avgROI = metrics.total_revenue > 0 && metrics.active_licenses > 0
+          ? ((metrics.total_revenue / (metrics.active_licenses * 299)) * 100).toFixed(0)
+          : 0;
+        document.getElementById('marketingROI').textContent = avgROI;
+        
+        // Templates Active: Active licenses
+        const templatesActive = metrics.active_licenses || 0;
+        document.getElementById('marketingTemplatesActive').textContent = templatesActive;
+      }
+    }
+    
+    // ============================================================
+    // REMOVED: ENHANCE ACHIEVEMENTS WITH REAL DATA
+    // ============================================================
+    // ✅ This was the THIRD place overwriting achievements!
+    // All achievements are handled by renderDynamicAchievements() which already
+    // pulls in AIGx data, early adopter bonuses, tier info, AND can integrate
+    // Week 1 franchise data if needed.
+    //
+    // Having multiple functions write to the same DOM element causes race conditions.
+    
+  } catch (error) {
+    console.warn('Kit-specific metrics API not available:', error);
+  }
+}
+
+// ============================================================
+// 🚀 INITIALIZATION
+// ============================================================
+
+async function initializeWeek1Features() {
+  console.log('🚀 Initializing Week 1 features...');
+  
+  // Wait for user data to be loaded
+  if (!window.aigentsyUser) {
+    setTimeout(initializeWeek1Features, 500);
+    return;
+  }
+  
+  // Load all Week 1 features in parallel
+  await Promise.all([
+    loadBoosterData(),
+    loadSubscriptionData(),
+    loadPWPData(),
+    loadWarrantyData(),
+    loadSLOData(),
+    loadFranchiseData(),
+    loadLiveActivityFeed()
+  ]);
+  
+  // Apply kit-specific enhancements (static content)
+  enhanceKitSpecificMetrics();
+  
+  // Load kit-specific metrics data (dynamic data)
+  await loadKitSpecificMetricsData();
+  
+  console.log('✅ Week 1 features loaded!');
+}
+
+// ✅ REMOVED: Auto-initialization code
+// This was causing initializeWeek1Features() to be called multiple times:
+// 1. From initializeDashboard() (line 2426) - CORRECT
+// 2. From here on page load - DUPLICATE
+// 3. From setInterval every 30 seconds - SPAM
+//
+// Now it's ONLY called from initializeDashboard() which ensures proper sequencing.
+
+// ✅ REMOVED: setInterval for refreshing
+// The 30-second refresh was causing the achievements to flicker every 30 seconds
+// because loadKitSpecificMetricsData() was being called repeatedly.
+// If you need auto-refresh, implement it without touching achievements.
+
+</script>
+</body>
+</html>
