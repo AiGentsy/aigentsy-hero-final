@@ -2426,17 +2426,18 @@ function getTimeAgo(date) {
   return date.toLocaleDateString();
 }
 
-// Auto-refresh every 30 seconds
-setInterval(() => {
-  const username = localStorage.getItem("aigentsyUsername");
-  if (username) fetchAIGxDashboardData(username);
-}, 30000);
+// ✅ REMOVED: Auto-refresh was causing achievements to re-render every 30 seconds
+// If you need auto-refresh, implement it without touching achievements
+// setInterval(() => {
+//   const username = localStorage.getItem("aigentsyUsername");
+//   if (username) fetchAIGxDashboardData(username);
+// }, 30000);
   
 async function initializeDashboard() {
   console.log("═══════════════════════════════════════════════════");
-  console.log("🚀 AIGENTSY DASHBOARD v1000 - REMOVED 3s FALLBACK");
-  console.log("📅 Build: December 15, 2024 - 9:50 AM");
-  console.log("✅ Fixed: Removed 3-second re-init that caused flickering");
+  console.log("🚀 AIGENTSY DASHBOARD v1001 - TRULY FINAL");
+  console.log("📅 Build: December 15, 2024 - 10:10 AM");
+  console.log("✅ Fixed: Removed 30s auto-refresh that caused flickering");
   console.log("═══════════════════════════════════════════════════");
   console.log("🚀 Initializing dashboard with AIGx...");
   const username = localStorage.getItem("aigentsyUsername");
