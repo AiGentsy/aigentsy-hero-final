@@ -866,9 +866,15 @@ function downloadKitDocument(docId) {
 }
 
 function renderDynamicAchievements(user) {
-  console.log("🏆 Rendering achievements");
+  console.log("🏆 [CALL] renderDynamicAchievements called at", new Date().toISOString());
+  console.log("🏆 [DATA] window.aigxDashboardData exists?", !!window.aigxDashboardData);
+  console.log("🏆 [STACK]", new Error().stack.split('\n').slice(2, 5).join('\n'));
+  
   const achievementBox = document.getElementById("achievementList");
-  if (!achievementBox) return;
+  if (!achievementBox) {
+    console.log("🏆 [ERROR] achievementList element not found!");
+    return;
+  }
   
   const achievements = [];
   
@@ -876,6 +882,7 @@ function renderDynamicAchievements(user) {
   const dashboardData = window.aigxDashboardData;
   
   if (dashboardData) {
+    console.log("🏆 [PATH] Using AIGx dashboard data");
     // Use AIGx Dashboard data
     const aigx = dashboardData.aigx_equity.aigx_balance;
     const revenue = dashboardData.tier_progression.lifetime_revenue;
@@ -910,6 +917,8 @@ function renderDynamicAchievements(user) {
     }
     
   } else {
+    console.log("🏆 [PATH] Using fallback user object data");
+    console.log("🏆 [USER] companyType:", user?.companyType);
     // Fallback to user object
     const config = getBusinessConfig(user.companyType);
     
@@ -938,11 +947,15 @@ function renderDynamicAchievements(user) {
     }
   }
   
+  console.log("🏆 [RENDER]", achievements.length, "achievements:", achievements.slice(0, 2));
+  
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
     achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
   }
+  
+  console.log("🏆 [DONE] Achievements rendered to DOM");
 }
 
 function renderWalletChart(user) {
