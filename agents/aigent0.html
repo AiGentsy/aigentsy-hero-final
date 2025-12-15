@@ -2191,7 +2191,10 @@ async function fetchAIGxDashboardData(username) {
     
     if (data.ok) {
       window.aigxDashboardData = data;
-      updateAIGxAchievements(data);
+      // ✅ Re-render achievements now that data is available
+      if (window.aigentsyUser) {
+        renderDynamicAchievements(window.aigentsyUser);
+      }
       updateAIGxWallet(data);
       updateLiveActivityFeed(data);
       return data;
@@ -2199,52 +2202,6 @@ async function fetchAIGxDashboardData(username) {
   } catch (error) {
     console.warn("AIGx Dashboard API not available:", error);
     return null;
-  }
-}
-
-function updateAIGxAchievements(data) {
-  const achievementBox = document.getElementById("achievementList");
-  if (!achievementBox) return;
-  
-  const achievements = [];
-  const aigx = data.aigx_equity.aigx_balance;
-  
-  // ✨ FIXED: Remove AIGo reference, show only AIGx
-  achievements.push(`💎 ${aigx.toLocaleString()} AIGx earned`);
-  
-  if (data.early_adopter.badge) {
-    achievements.push(`🎖️ ${data.early_adopter.badge} #${data.user.user_number} — ${data.early_adopter.multiplier}x permanent multiplier`);
-  }
-  
-  const tier = data.tier_progression.current_tier.toUpperCase();
-  const tierEmoji = tier === "FREE" ? "🆓" : tier === "PRO" ? "⭐" : "🚀";
-  achievements.push(`${tierEmoji} ${tier} Tier — ${data.tier_progression.tier_multiplier}x earning rate`);
-  
-  if (data.tier_progression.lifetime_revenue > 0) {
-    achievements.push(`💵 Revenue Generated — $${data.tier_progression.lifetime_revenue.toLocaleString()}`);
-  }
-  
-  if (data.activity_streaks.current_streak > 0) {
-    achievements.push(`🔥 ${data.activity_streaks.current_streak}-day activity streak`);
-  }
-  
-  if (data.referrals.total_referrals > 0) {
-    achievements.push(`🤝 ${data.referrals.total_referrals} referrals made`);
-  }
-  
-  if (data.apex_ultra.activated) {
-    const rate = data.apex_ultra.success_rate;
-    achievements.push(`🌟 APEX ULTRA — ${data.apex_ultra.systems_operational}/${data.apex_ultra.total_systems} systems (${rate}%)`);
-  }
-  
-  if (data.tier_progression.next_tier) {
-    const needed = data.tier_progression.revenue_needed.toLocaleString();
-    const nextTier = data.tier_progression.next_tier.toUpperCase();
-    achievements.push(`🎯 $${needed} to unlock ${nextTier} tier`);
-  }
-  
-  if (achievements.length > 0) {
-    achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   }
 }
 
