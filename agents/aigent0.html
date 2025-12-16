@@ -720,17 +720,65 @@ async function renderDynamicKit(user) {
   const kitDocBox = document.getElementById("dynamicKitDoc");
   if (kitDocBox) {
     try {
-      // ✅ NEW: Fetch kit documents from backend
-      const kitItems = await loadKitDocumentsFromBackend(user.username, user.companyType);
+      // ✅ Fetch kit documents from backend
+      const response = await fetch(`${window.BACKEND_BASE}/kit/documents/${user.username}`);
+      const data = await response.json();
       
-      kitDocBox.innerHTML = kitItems.map(item => `
-        <div onclick="openKitDocument('${item.id}')" 
-             style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
-             onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
-             onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-          📄 ${item.name}
-        </div>
-      `).join('');
+      if (!data.ok) throw new Error('API returned error');
+      
+      console.log(`✅ Kit loaded: ${data.kit_name} - ${data.template_count} templates worth $${data.kit_value}`);
+      
+      // Render documents with different handlers based on type
+      kitDocBox.innerHTML = data.documents.map(item => {
+        // DOWNLOADABLE FILES (.docx, .md, etc)
+        if (item.type === 'download' || item.type === 'preview') {
+          return `
+            <div onclick="downloadKitFile('${item.download_url}', '${item.name}')" 
+                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; transition: all 0.2s; display:flex; justify-content:space-between; align-items:center;"
+                 onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+              <div>
+                <div style="color:#00bfff;">${item.icon || '📄'} ${item.name}</div>
+                <div style="font-size:0.7rem; color:#666; margin-top:2px;">
+                  ${item.file_type?.toUpperCase() || ''} • ${item.file_size || ''}
+                  ${item.retail_value > 0 ? ` • Worth $${item.retail_value.toLocaleString()}` : ''}
+                </div>
+              </div>
+              <div style="color:#00bfff;">📥</div>
+            </div>
+          `;
+        }
+        // EDITABLE TEMPLATES (open in modal)
+        else if (item.type === 'editable') {
+          return `
+            <div onclick="openKitDocument('${item.id}')" 
+                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; transition: all 0.2s; display:flex; justify-content:space-between; align-items:center;"
+                 onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#a78bfa';"
+                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+              <div>
+                <div style="color:#a78bfa;">${item.icon || '📄'} ${item.name}</div>
+                <div style="font-size:0.7rem; color:#666; margin-top:2px;">
+                  ✏️ Editable • ${item.estimated_time || '5 min'}
+                  ${item.retail_value > 0 ? ` • Worth $${item.retail_value.toLocaleString()}` : ''}
+                </div>
+              </div>
+              <div style="color:#a78bfa;">📝</div>
+            </div>
+          `;
+        }
+        // FALLBACK (treat as editable)
+        else {
+          return `
+            <div onclick="openKitDocument('${item.id}')" 
+                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+                 onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+              📄 ${item.name}
+            </div>
+          `;
+        }
+      }).join('');
+      
     } catch (error) {
       console.warn('Kit documents backend error, using fallback:', error);
       // Fallback to hardcoded if backend unavailable
@@ -758,27 +806,28 @@ async function renderDynamicKit(user) {
     ];
     summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
   }
-}
-
-// ✅ NEW: Load kit documents from backend
-async function loadKitDocumentsFromBackend(username, companyType) {
-  try {
-    const response = await fetch(`${window.BACKEND_BASE}/kit/documents/${username}`);
-    const data = await response.json();
-    
-    if (data.ok && data.documents) {
-      console.log('✅ Kit documents loaded from backend:', data.documents.length);
-      return data.documents;
-    }
-  } catch (error) {
-    console.warn('Kit documents API not available:', error);
-  }
   
-  // Fallback to hardcoded list if backend unavailable
-  return getKitItemsForType(companyType);
+  // Render unlocked modules (ALL UNLOCKED)
+
+// Download kit file (for .docx, .md files)
+function downloadKitFile(url, filename) {
+  try {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    showToast(`📥 Downloading ${filename}...`, "success");
+  } catch (error) {
+    console.error('Download error:', error);
+    showToast("⚠️ Download failed. Opening in new tab...", "error");
+    window.open(url, '_blank');
+  }
 }
 
-// Helper: Get kit items based on business type (FALLBACK ONLY)
 function getKitItemsForType(companyType) {
   const kitTemplates = {
     legal: [
@@ -865,6 +914,11 @@ async function openKitDocument(docId) {
 
 // Helper: Format document title
 function formatDocTitle(docId) {
+  // If docId already contains company prefix (e.g., "saas_api_docs"), extract template name
+  const cleanId = docId.includes('_') && docId.split('_').length > 2 
+    ? docId.split('_').slice(1).join('_') 
+    : docId;
+  
   const titles = {
     'nda_template': '📄 NDA Template',
     'ip_assignment': '📄 IP Assignment Agreement',
@@ -893,7 +947,7 @@ function formatDocTitle(docId) {
     'operations_playbook': '📚 Operations Playbook'
   };
   
-  return titles[docId] || '📄 Document Template';
+  return titles[cleanId] || titles[docId] || `📄 ${docId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
 }
 
 // Get document content (stub - would load from backend)
