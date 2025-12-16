@@ -712,22 +712,38 @@ function renderDynamicCSuite(user) {
   }
 }
 
-function renderDynamicKit(user) {
+async function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
   const config = getBusinessConfig(user.companyType);
   
-  // Render clickable kit items
+  // Render clickable kit items - FETCH FROM BACKEND
   const kitDocBox = document.getElementById("dynamicKitDoc");
   if (kitDocBox) {
-    const kitItems = getKitItemsForType(user.companyType);
-    kitDocBox.innerHTML = kitItems.map(item => `
-      <div onclick="openKitDocument('${item.id}')" 
-           style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
-           onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
-           onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-        📄 ${item.name}
-      </div>
-    `).join('');
+    try {
+      // ✅ NEW: Fetch kit documents from backend
+      const kitItems = await loadKitDocumentsFromBackend(user.username, user.companyType);
+      
+      kitDocBox.innerHTML = kitItems.map(item => `
+        <div onclick="openKitDocument('${item.id}')" 
+             style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+             onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+             onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+          📄 ${item.name}
+        </div>
+      `).join('');
+    } catch (error) {
+      console.warn('Kit documents backend error, using fallback:', error);
+      // Fallback to hardcoded if backend unavailable
+      const kitItems = getKitItemsForType(user.companyType);
+      kitDocBox.innerHTML = kitItems.map(item => `
+        <div onclick="openKitDocument('${item.id}')" 
+             style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
+             onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
+             onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
+          📄 ${item.name}
+        </div>
+      `).join('');
+    }
   }
   
   // Render unlocked modules (ALL UNLOCKED)
@@ -744,7 +760,25 @@ function renderDynamicKit(user) {
   }
 }
 
-// Helper: Get kit items based on business type
+// ✅ NEW: Load kit documents from backend
+async function loadKitDocumentsFromBackend(username, companyType) {
+  try {
+    const response = await fetch(`${window.BACKEND_BASE}/kit/documents/${username}`);
+    const data = await response.json();
+    
+    if (data.ok && data.documents) {
+      console.log('✅ Kit documents loaded from backend:', data.documents.length);
+      return data.documents;
+    }
+  } catch (error) {
+    console.warn('Kit documents API not available:', error);
+  }
+  
+  // Fallback to hardcoded list if backend unavailable
+  return getKitItemsForType(companyType);
+}
+
+// Helper: Get kit items based on business type (FALLBACK ONLY)
 function getKitItemsForType(companyType) {
   const kitTemplates = {
     legal: [
@@ -787,9 +821,31 @@ function getKitItemsForType(companyType) {
   return kitTemplates[companyType] || kitTemplates.general;
 }
 
-// Open kit document in modal
-function openKitDocument(docId) {
-  const docContent = getKitDocumentContent(docId);
+// Open kit document in modal - FETCH FROM BACKEND
+async function openKitDocument(docId) {
+  const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername");
+  
+  let docContent;
+  
+  try {
+    // ✅ NEW: Fetch document content from backend
+    const response = await fetch(`${window.BACKEND_BASE}/kit/document/${username}/${docId}`);
+    const data = await response.json();
+    
+    if (data.ok) {
+      docContent = {
+        title: formatDocTitle(docId),
+        content: data.content
+      };
+      console.log('✅ Kit document loaded from backend:', docId);
+    } else {
+      throw new Error('Backend returned error');
+    }
+  } catch (error) {
+    console.warn('Kit document backend error, using fallback:', error);
+    // Fallback to hardcoded template
+    docContent = getKitDocumentContent(docId);
+  }
   
   const modalBody = document.getElementById('gxModalBody');
   document.getElementById('gxModalTitle').textContent = docContent.title;
@@ -805,6 +861,39 @@ function openKitDocument(docId) {
   `;
   
   document.getElementById('gxModal').classList.add('open');
+}
+
+// Helper: Format document title
+function formatDocTitle(docId) {
+  const titles = {
+    'nda_template': '📄 NDA Template',
+    'ip_assignment': '📄 IP Assignment Agreement',
+    'licensing_agreement': '📄 Licensing Agreement',
+    'compliance_checklist': '📋 Compliance Checklist',
+    'contract_template': '📄 Service Contract Template',
+    'content_calendar': '📱 Content Calendar Template',
+    'brand_kit': '🎨 Brand Voice Guidelines',
+    'hashtag_strategy': '#️⃣ Hashtag Strategy',
+    'creator_pitch': '🎬 Creator Pitch Deck',
+    'media_kit': '📊 Media Kit Template',
+    'api_docs': '💻 API Documentation',
+    'database_schema': '🗄️ Database Schema Guide',
+    'auth_flow': '🔐 Auth & Subscription Flow',
+    'deployment_guide': '🚀 Deployment Checklist',
+    'stripe_integration': '💳 Stripe Integration Guide',
+    'seo_audit': '🎯 SEO Audit Framework',
+    'ad_campaign': '📢 Ad Campaign Template',
+    'email_sequence': '📧 Email Sequence Builder',
+    'analytics_dashboard': '📊 Analytics Dashboard',
+    'outreach_scripts': '📬 Outreach Scripts',
+    'business_plan': '📄 Business Plan Template',
+    'proposal_template': '📋 Proposal Template',
+    'contract_basics': '📄 Basic Contract Template',
+    'financial_planning': '💰 Financial Planning Guide',
+    'operations_playbook': '📚 Operations Playbook'
+  };
+  
+  return titles[docId] || '📄 Document Template';
 }
 
 // Get document content (stub - would load from backend)
@@ -828,18 +917,36 @@ function getKitDocumentContent(docId) {
   return templates[docId] || templates.default;
 }
 
-// Save document (stub - would save to backend)
-function saveKitDocument(docId) {
+// Save document - POST TO BACKEND
+async function saveKitDocument(docId) {
   const content = document.getElementById('kitDocEditor').value;
+  const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername");
   
-  // TODO: Send to backend
-  // await fetch(`${window.BACKEND_BASE}/kit/save`, {
-  //   method: 'POST',
-  //   body: JSON.stringify({ docId, content, username })
-  // });
-  
-  showToast(`✅ ${docId} saved!`, "success");
-  GXA.closeModal();
+  try {
+    // ✅ NEW: Save to backend
+    const response = await fetch(`${window.BACKEND_BASE}/kit/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        docId: docId,
+        content: content
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.ok) {
+      showToast(`✅ ${docId} saved!`, "success");
+      GXA.closeModal();
+      console.log('✅ Kit document saved to backend');
+    } else {
+      showToast(`❌ Failed to save: ${result.error || 'Unknown error'}`, "error");
+    }
+  } catch (error) {
+    console.error('Save error:', error);
+    showToast("⚠️ Connection error - document not saved", "error");
+  }
 }
 
 // Download document
@@ -1031,7 +1138,7 @@ async function injectUserDashboard() {
     console.log("✅ User loaded:", user.username, "Business:", user.companyType);
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
-    renderDynamicKit(user);
+    await renderDynamicKit(user);  // ✅ AWAIT kit loading
     renderDynamicAchievements(user);
     renderWalletChart(user);
     renderOfferingsWithData(user);
@@ -1043,7 +1150,7 @@ async function injectUserDashboard() {
     window.aigentsyUser = user;
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
-    renderDynamicKit(user);
+    await renderDynamicKit(user);  // ✅ AWAIT kit loading
     renderDynamicAchievements(user);
     renderWalletChart(user);
     renderOfferingsWithData(user);
