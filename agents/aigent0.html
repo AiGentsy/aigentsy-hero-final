@@ -119,10 +119,6 @@
   .gx-live-item { font-size: 0.8rem; color: #cfe; padding: 6px 0; border-bottom: 1px dashed #24354c; }
   .gx-live-item:last-child { border-bottom: 0; }
 </style>
-<!-- Add this INSIDE the <head> tag of aigent0.html: -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 </head>
 <body>
 <div id="gxLive" class="gx-live">
@@ -2462,10 +2458,9 @@ async function loadTierAndReputation() {
       // Update premium services grid
       updatePremiumServicesGrid(repData.reputation_score);
       
-      // ✨ RE-RENDER CHART WITH REPUTATION DATA
-      if (window.aigentsyUser) {
-        renderWalletChart(window.aigentsyUser);
-      }
+      // ✅ FIX: Don't re-render chart here - reputation is already in aigxDashboardData
+      // The chart was already rendered in injectUserDashboard() with correct reputation
+      // Re-rendering here causes reputation to revert to old value
     }
     
   } catch (error) {
