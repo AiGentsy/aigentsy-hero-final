@@ -2347,14 +2347,13 @@ async function initializeDashboard() {
   }
   console.log("👤 Loading for:", username);
   
-  // Call existing initialization
-  injectUserDashboard();
-  
-  // Fetch and display AIGx dashboard data
+  // ✅ FIX: Load ALL data FIRST, then render dashboard
+  // This ensures reputation is available when the chart renders
   await fetchAIGxDashboardData(username);
-  
-  // ✨ ADD THIS LINE:
   await loadTierAndReputation();
+  
+  // NOW render the dashboard with complete data
+  injectUserDashboard();
   
   if (chatLog && chatLog.children.length === 0) {
     const preload = document.createElement("div");
@@ -2458,9 +2457,10 @@ async function loadTierAndReputation() {
       // Update premium services grid
       updatePremiumServicesGrid(repData.reputation_score);
       
-      // ✅ FIX: Don't re-render chart here - reputation is already in aigxDashboardData
-      // The chart was already rendered in injectUserDashboard() with correct reputation
-      // Re-rendering here causes reputation to revert to old value
+      // ✨ RE-RENDER CHART WITH REPUTATION DATA
+      if (window.aigentsyUser) {
+        renderWalletChart(window.aigentsyUser);
+      }
     }
     
   } catch (error) {
