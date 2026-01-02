@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Autonomous AiGentsy Launchpad</title>
+<title>Your AiGentsy Dashboard</title>
 <script defer src="/access-check.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="stylesheet" href="/vaults.css"/>
@@ -122,7 +122,17 @@
 </head>
 <body>
 <div id="gxLive" class="gx-live">
-  <h4>Live Activity</h4>
+  <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; border-bottom:1px solid #1f2a3a;">
+    <h4 style="margin:0; font-size:0.8rem; color:#9ed;">Live Activity</h4>
+    <div id="controlLevelBadge" class="tooltip-container" style="background:rgba(0,191,255,0.15); padding:4px 10px; border-radius:12px; font-size:0.7rem; cursor:pointer;" onclick="showControlLevelInfo()">
+      <span style="color:#00bfff;">🎛️ You Approve</span>
+      <span class="tooltip-text" style="width:220px; margin-left:-110px;">
+        <strong style="color:#00bfff;">Control Level: You Approve</strong><br><br>
+        Your AiGentsy finds opportunities and drafts proposals. You review and approve before anything goes out.<br><br>
+        <em style="color:#888;">Build trust to unlock more automation.</em>
+      </span>
+    </div>
+  </div>
   <div id="gxLiveList" class="gx-live-list"></div>
 </div>
 <div class="sidebar">
@@ -138,31 +148,26 @@
     <p id="csuiteNote" style="font-size: 0.85rem; color: #888;"></p>
   </div>
   <div class="chart-sidebar-box" id="businessSummarySidebarBox">
-  <h4 style="color:#00bfff;margin-bottom:6px;">📦 Your AiGentsy Kit & Unlocks</h4>
+  <h4 style="color:#00bfff;margin-bottom:6px;">📂 Your Kit Documents</h4>
   
   <!-- Kit Items (Clickable) -->
-  <div style="margin-bottom:12px;">
-    <strong style="color:#fff; font-size:0.9rem;">📂 Kit Documents:</strong>
-    <div id="dynamicKitDoc" style="margin-top:6px;">
-      <!-- Populated by JavaScript with clickable items -->
-    </div>
+  <div id="dynamicKitDoc" style="margin-top:6px;">
+    <!-- Populated by JavaScript with clickable items -->
   </div>
-  
-  <!-- Unlocks (All Unlocked) -->
-  <strong style="color:#fff; font-size:0.9rem;">✅ Modules Unlocked:</strong>
-  <ul id="businessSummaryList" style="padding-left:18px; font-size:0.85rem; line-height:1.8;"></ul>
 </div>
 </div>
 <div class="main">
   <div class="metric-box full-width">
     <h2 id="welcomeTitle">Loading your AiGentsy...</h2>
-    <p id="welcomeDescription">Setting up your autonomous business unit...</p>
-    <p style="color:#ccc; font-size:0.9rem;">Traits: <span id="traitsDisplay" style="color:#00bfff;">Loading...</span></p>
-    <p style="color:#aaa; font-size:0.85rem;" id="welcomeTip"><strong>Tip:</strong> Loading...</p>
-    <div style="margin-top:16px;" id="selfExpandingBox">
-      <p style="color:#00bfff"><strong>Self-Expanding</strong></p>
-      <p style="font-size:0.9rem; color:#ccc;" id="selfExpandingText">Loading...</p>
+    <p id="welcomeDescription">Getting your AiGentsy ready...</p>
+    
+    <!-- What Your AiGentsy Can Do - Front and Center -->
+    <div style="margin: 16px 0; padding: 12px 16px; background: rgba(0, 191, 255, 0.05); border: 1px solid rgba(0, 191, 255, 0.2); border-radius: 8px;">
+      <strong style="color:#00bfff; font-size:0.9rem;">✅ What Your AiGentsy Can Do:</strong>
+      <ul id="businessSummaryList" style="padding-left:18px; font-size:0.85rem; line-height:1.8; margin: 8px 0 0 0; color:#ccc;"></ul>
     </div>
+    
+    <p style="color:#aaa; font-size:0.85rem;" id="welcomeTip"><strong>Tip:</strong> Loading...</p>
   </div>
   <div class="col-left">
     <div class="metric-box">
@@ -226,8 +231,8 @@
     </div>
   </div>
   
-  <!-- Premium Services (Week 1 Features) -->
-  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+  <!-- Financial Tools (shown after first revenue) -->
+  <div id="financialToolsSection" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: none;">
     <div style="font-size: 11px; font-weight: 600; color: #888; margin-bottom: 10px; text-transform: uppercase;">💼 Financial Tools</div>
     <div id="premium-services-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11px;">
       
@@ -239,12 +244,12 @@
         <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="subCreditsMini">— credits</div>
       </div>
       
-      <!-- PWP Finance -->
+      <!-- Advances (was PWP Finance) -->
       <div style="background: rgba(100, 116, 139, 0.05); border: 1px solid rgba(0, 191, 255, 0.3); border-radius: 6px; padding: 8px; text-align: center; cursor: pointer;" onclick="viewPWP()">
         <div style="font-size: 18px; margin-bottom: 4px;">💰</div>
-        <div style="font-weight: 600; margin-bottom: 2px;">PWP Finance</div>
+        <div style="font-weight: 600; margin-bottom: 2px;">Advances</div>
         <div style="color: #00ff88; font-size: 10px;" id="pwpStatusMini">—</div>
-        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="pwpAmountMini">—</div>
+        <div style="color: #64748b; font-size: 9px; margin-top: 4px;" id="pwpAmountMini">Get paid early</div>
       </div>
       
       <!-- Warranties -->
@@ -277,22 +282,14 @@
 
   </div>
   <div class="metric-box">
-    <h3>
-  <span class="tooltip-container">
-    💰 Wallet & Off-Ramp
-    <span class="tooltip-text">
-      <strong style="color:#00bfff;">💎 AIGx:</strong> Your internal currency earned through platform activity, transactions, and milestones. AIGx can be converted to AIGo at conversion events.<br><br>
-      <strong style="color:#00ff88;">💼 AIGo:</strong> AiGentsy Ownership Interest - your profit participation rights in the 20% equity pool. AIGo value increases as AiGentsy grows.
-    </span>
-  </span>
-</h3>
+    <h3>💰 Your Earnings</h3>
 <div style="margin-bottom:12px; background:#0a0a0a; padding:10px; border-radius:8px; border:1px solid #222;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
   <div>
     <span style="font-size:0.85rem; color:#888;">Total Earnings</span>
     <div style="display: inline-flex; align-items: center; gap: 6px; margin-left: 8px;">
-      <span id="wallet-tier-badge" style="font-size: 16px;" title="Early Adopter Tier">🏆</span>
-      <span id="wallet-multiplier" style="font-size: 11px; color: #a78bfa; font-weight: 600;" title="Earnings Multiplier">3.0x</span>
+      <span id="wallet-tier-badge" style="font-size: 16px;" title="Your Tier">🏆</span>
+      <span id="wallet-multiplier" style="font-size: 11px; color: #a78bfa; font-weight: 600;" title="Earnings Boost">3.0x</span>
     </div>
   </div>
   <span style="font-size:1.4rem; font-weight:700; color:#00ff88;">$<span id="totalEarnings">0.00</span></span>
@@ -305,7 +302,7 @@
     <span style="color:#00ff88;">$<span id="ameEarnings">0.00</span></span>
   </div>
   <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>💼 Claimed Deals</span>
+    <span>💼 Your Deals</span>
     <span style="color:#00ff88;">$<span id="intentEarnings">0.00</span></span>
   </div>
   <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
@@ -313,81 +310,34 @@
     <span style="color:#00ff88;">$<span id="partnershipEarnings">0.00</span></span>
   </div>
   <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>💼 Service Payments</span>
-    <span style="color:#00ff88;">$<span id="serviceEarnings">0.00</span></span>
-  </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>🛍️ Shopify Sales</span>
+    <span>🛍️ Integrations</span>
     <span style="color:#00ff88;">$<span id="shopifyEarnings">0.00</span></span>
   </div>
   <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>📱 Affiliate Commissions</span>
-    <span style="color:#00ff88;">$<span id="affiliateEarnings">0.00</span></span>
-  </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>🎥 Content CPM</span>
-    <span style="color:#00ff88;">$<span id="contentEarnings">0.00</span></span>
-  </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>🤝 JV Splits</span>
-    <span style="color:#00ff88;">$<span id="jvEarnings">0.00</span></span>
-  </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>📦 Subscription Credits</span>
-    <span style="color:#888;" id="subCredits">— / —</span>
-  </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>⚡ Booster Bonus</span>
+    <span>⚡ Bonuses</span>
     <span style="color:#00ff88;">+$<span id="boosterBonus">0.00</span></span>
   </div>
-  <div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #222;">
-    <span>💰 PWP Financed</span>
-    <span style="color:#888;">$<span id="pwpFinanced">0.00</span></span>
-  </div>
   <div style="display:flex; justify-content:space-between; padding:4px 0;">
-    <span>🛡️ Warranty Earnings</span>
+    <span>🛡️ Other</span>
     <span style="color:#00ff88;">$<span id="warrantyEarnings">0.00</span></span>
   </div>
 </div>
 </div>
 
 <div id="compactSnapshot" class="metric-box">
-  <h3>🧭 Compact Snapshot</h3>
+  <h3>📊 Your Pipeline</h3>
   <div class="csn-grid">
-    <div class="csn-tile"><div class="csn-label">Proposals</div><div id="csnProposals" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Leads</div><div id="csnLeads" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Won</div><div id="csnWon" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">In Progress</div><div id="csnInProgress" class="csn-value">0</div></div>
-    <div class="csn-tile"><div class="csn-label">Completed</div><div id="csnCompleted" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Found</div><div id="csnProposals" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Pitched</div><div id="csnLeads" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Approved</div><div id="csnWon" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Delivering</div><div id="csnInProgress" class="csn-value">0</div></div>
+    <div class="csn-tile"><div class="csn-label">Paid</div><div id="csnCompleted" class="csn-value">0</div></div>
     <div class="csn-tile"><div class="csn-label">Revenue</div><div id="csnRevenue" class="csn-value">$0</div></div>
-    <div class="csn-tile"><div class="csn-label">Avg Delivery</div><div id="csnAvgDelivery" class="csn-value">—</div></div>
+    <div class="csn-tile"><div class="csn-label">Avg Time</div><div id="csnAvgDelivery" class="csn-value">—</div></div>
   </div>
   <button id="toggleSnapshotDetails" class="btn-glow" style="margin-top:10px;">Show details</button>
   <div id="snapshotDetails" style="display:none; margin-top:12px;">
-    <div class="csn-details">
-      <div class="csn-detail">
-        <h4 style="color:#00bfff;margin-bottom:6px;">📊 Deal Pipeline</h4>
-        <ul style="padding-left:18px;margin:0;">
-          <li>🔍 Leads: <span id="pipelineLeads">0</span></li>
-          <li>💬 In Discussion: <span id="pipelineDiscussing">0</span></li>
-          <li>✅ Won: <span id="pipelineWon">0</span></li>
-          <li>🚀 In Progress: <span id="pipelineInProgress">0</span></li>
-          <li>✓ Completed: <span id="pipelineCompleted">0</span></li>
-        </ul>
-      </div>
-      <div class="csn-detail">
-        <h4 style="color:#00bfff;margin-bottom:6px;">💰 Revenue Sources</h4>
-        <ul style="padding-left:18px;margin:0;">
-          <li>🤖 Auto-Sales: $<span id="revAutoSales">0</span></li>
-          <li>💼 Claimed Deals: $<span id="revClaimedDeals">0</span></li>
-          <li>👥 Partnerships: $<span id="revPartnerships">0</span></li>
-          <li>📦 Products: $<span id="revProducts">0</span></li>
-          <li>🎯 Services: $<span id="revServices">0</span></li>
-          <li>⚡ SLO Bonuses: $<span id="revSLOBonus">0</span></li>
-          <li>🛡️ Warranties: $<span id="revWarranties">0</span></li>
-          <li>📦 Subscription: <span id="revSubscription">—</span></li>
-        </ul>
-      </div>
+    <div class="csn-details" style="grid-template-columns: 1fr;">
       <div class="csn-detail">
         <h4 style="color:#00bfff;margin-bottom:6px;">📈 Business Growth</h4>
         <ul style="padding-left:18px;margin:0;">
@@ -399,26 +349,12 @@
         </ul>
       </div>
     </div>
-    
-    <!-- ✨ PATCH F: Expand Your Business Circle (Moved from standalone box) -->
-    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #222;">
-      <h4 style="color:#00bfff; margin-bottom: 10px;">🌐 Expand Your Business Circle</h4>
-      <p style="font-size: 0.85rem; color:#999; margin-bottom: 10px;">
-        Invite collaborators, partners, or clients to join your AiGentsy business.
-      </p>
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="inviteInput" placeholder="Enter email or handle..." style="flex: 1; padding:8px; border-radius:4px; border:1px solid #444; background:#000; color:#fff;">
-        <button class="btn-glow" onclick="sendInvite()" style="white-space: nowrap;">📨 Send</button>
-      </div>
-      <p id="inviteFeedback" style="font-size: 0.75rem; color:#00ffcc; margin-top:6px;"></p>
-    </div>
-    
   </div>
 </div>
 
 <div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
-  <h4 style="color:#00bfff; margin-bottom:6px;">📩 Proposal Viewer</h4>
-  <div style="font-size:0.85rem;">Click to view incoming or sent proposals.</div>
+  <h4 style="color:#00bfff; margin-bottom:6px;">📬 Proposals & Approvals <span id="pendingApprovalsCount" style="background:#00bfff; color:#000; padding:2px 8px; border-radius:10px; font-size:0.75rem; margin-left:8px; display:none;">0</span></h4>
+  <div style="font-size:0.85rem;">Review opportunities your AiGentsy found for you.</div>
 </div>
   </div>
 </div>
@@ -438,10 +374,9 @@
   </div>
   <div class="grp">
     <h4>Sell</h4>
-    <button onclick="GXA.viewAutoSales()">🤖 View Auto-Sales</button>
-    <button onclick="GXA.browseDeals()">💼 Browse Deals</button>
-    <button onclick="viewIntentExchange()">💼 Contracts</button>
-    <button onclick="GXA.instantQuote()">💳 Instant Quote / Escrow</button>
+    <button onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>
+    <button onclick="GXA.instantQuote()">📝 Contracts & Quotes</button>
+    <button onclick="GXA.openMarket()">🏬 Browse Marketplace</button>
   </div>
   <div class="grp">
     <h4>Earnings & Payouts</h4>
@@ -453,7 +388,6 @@
     <h4>Grow</h4>
     <button onclick="GXA.findPartners()">👥 Find Partners</button>
     <button onclick="GXA.viewPipeline()">📊 View Pipeline</button>
-    <button onclick="GXA.openMarket()">🏬 Marketplace Top 20</button>
   </div>
 </aside>
 <div id="gxModal" class="gx-modal" role="dialog" aria-modal="true">
@@ -487,6 +421,102 @@
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ONBOARDING MODAL (First-time users) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="onboardingModal" class="gx-modal">
+  <div class="panel" style="max-width:500px;">
+    <div style="text-align:center; margin-bottom:20px;">
+      <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" style="width:120px; margin-bottom:16px;">
+      <h2 style="color:#00bfff; margin:0;">Welcome to Your AiGentsy! 🚀</h2>
+      <p style="color:#888; margin-top:8px;">Let's get you set up in 60 seconds</p>
+    </div>
+    
+    <!-- Step indicators -->
+    <div style="display:flex; justify-content:center; gap:8px; margin-bottom:24px;">
+      <div id="onboardStep1" class="onboard-step active" style="width:10px; height:10px; border-radius:50%; background:#00bfff;"></div>
+      <div id="onboardStep2" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
+      <div id="onboardStep3" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
+    </div>
+    
+    <!-- Step 1: Connect Payments -->
+    <div id="onboardingStep1" class="onboarding-content">
+      <h3 style="color:#fff; margin-bottom:12px;">💳 Get Paid Directly</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
+        Connect your Stripe account so payments go straight to you.<br>
+        <span style="color:#888;">AiGentsy takes 2.8% + 28¢ per transaction. You keep the rest.</span>
+      </p>
+      <button class="btn-glow" style="width:100%; margin-top:16px;" onclick="connectStripeOnboarding()">
+        🔗 Connect Stripe Account
+      </button>
+      <button style="width:100%; margin-top:10px; padding:10px; background:transparent; border:1px solid #444; color:#888; border-radius:6px; cursor:pointer;" onclick="nextOnboardingStep()">
+        I'll do this later →
+      </button>
+    </div>
+    
+    <!-- Step 2: Control Level -->
+    <div id="onboardingStep2" class="onboarding-content" style="display:none;">
+      <h3 style="color:#fff; margin-bottom:12px;">🎛️ You're In Control</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
+        Your AiGentsy works for you, not the other way around:
+      </p>
+      <ul style="color:#ccc; font-size:0.9rem; line-height:2; padding-left:20px; margin:16px 0;">
+        <li>✅ We find opportunities for your business</li>
+        <li>✅ We draft proposals and suggest pricing</li>
+        <li>✅ <strong style="color:#00bfff;">You approve</strong> before anything goes out</li>
+      </ul>
+      <div style="background:rgba(0,191,255,0.1); padding:12px; border-radius:8px; text-align:center; margin:16px 0;">
+        <span style="color:#00bfff; font-weight:600;">Current: You Approve Everything</span>
+        <div style="background:#222; height:6px; border-radius:3px; margin-top:8px;">
+          <div style="background:#00bfff; height:100%; width:20%; border-radius:3px;"></div>
+        </div>
+        <span style="color:#666; font-size:0.75rem;">Build trust to unlock more automation</span>
+      </div>
+      <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="nextOnboardingStep()">
+        Got it →
+      </button>
+    </div>
+    
+    <!-- Step 3: First Opportunity -->
+    <div id="onboardingStep3" class="onboarding-content" style="display:none;">
+      <h3 style="color:#fff; margin-bottom:12px;">🎯 Your AiGentsy is Ready</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
+        Your C-Suite team is now searching for opportunities that match your expertise.
+      </p>
+      <div style="background:#0a0a0a; border:1px solid #222; border-radius:8px; padding:16px; margin:16px 0;">
+        <div style="color:#888; font-size:0.8rem; margin-bottom:8px;">WHAT HAPPENS NEXT</div>
+        <ul style="color:#ccc; font-size:0.9rem; line-height:2; padding-left:20px; margin:0;">
+          <li>📡 We scan for clients who need your services</li>
+          <li>📝 We draft proposals for the best matches</li>
+          <li>🔔 You'll see them in "Proposals & Approvals"</li>
+          <li>💰 Approve the ones you like, we handle the rest</li>
+        </ul>
+      </div>
+      <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="closeOnboarding()">
+        🚀 Go to Dashboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- TRACK RECORD FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="trackRecordFooter" style="position:fixed; bottom:0; left:320px; right:0; background:rgba(10,10,10,0.95); border-top:1px solid #222; padding:10px 20px; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; z-index:100;">
+  <div style="color:#666;">
+    🔒 Your verified track record is building with every completed deal
+  </div>
+  <div style="display:flex; gap:12px;">
+    <button onclick="downloadTrackRecord()" style="background:transparent; border:1px solid #333; color:#888; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.75rem;">
+      📥 Download Report
+    </button>
+    <button onclick="viewPublicProfile()" style="background:transparent; border:1px solid #333; color:#888; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:0.75rem;">
+      👁️ View Public Profile
+    </button>
+  </div>
+</div>
+
 <script>
 console.log("🚀 Script loading...");
 
@@ -495,10 +525,10 @@ window.aigentsyUser = null;
 
 const BUSINESS_CONFIGS = {
   legal: {
-    title: "Your Legal AiGentsy's Autonomous Launchpad",
-    description: "You've launched an AI-powered legal services business specializing in IP, contracts, licensing, and compliance.",
+    title: "Your Legal AiGentsy",
+    description: "Your AiGentsy specializes in legal services - IP, contracts, licensing, and compliance.",
     traits: "IP-specialist, compliance-ready, contract-automation",
-    tip: "Your Legal AiGentsy can draft NDAs, assign IP, and handle compliance checks autonomously — monetize through document services, legal consulting, and licensing.",
+    tip: "Your Legal AiGentsy drafts NDAs, assigns IP, and handles compliance — earn through document services, legal consulting, and licensing.",
     selfExpanding: "Your Legal AiGentsy spawns specialized contract agents when needed — automatically scaling your legal services capacity.",
     cSuite: [
       { role: "CEO", name: "You" },
@@ -510,8 +540,8 @@ const BUSINESS_CONFIGS = {
     kitDoc: `<div style="margin-bottom: 12px;"><strong>📜 Legal Service Kit:</strong><ul style="padding-left:16px;"><li>NDA & Contract Templates</li><li>IP Assignment Frameworks</li><li>Licensing Agreement Builder</li><li>Compliance Checklists</li><li>Legal Agent Companion</li></ul></div>`
   },
   social: {
-    title: "Your Social Media AiGentsy's Autonomous Launchpad",
-    description: "You've launched an AI-powered social media business creating Reels, TikToks, content launches, and creator kits.",
+    title: "Your Social Media AiGentsy",
+    description: "Your AiGentsy creates Reels, TikToks, content launches, and creator kits.",
     traits: "content-creator, viral-specialist, platform-integrated",
     tip: "Your Social Media AiGentsy can produce content at scale, manage multi-platform posting, and monetize through sponsorships, creator kits, and affiliate links.",
     selfExpanding: "Your Social AiGentsy spawns content production agents for each platform — automatically scaling across Instagram, TikTok, YouTube, and more.",
@@ -525,8 +555,8 @@ const BUSINESS_CONFIGS = {
     kitDoc: `<div style="margin-bottom: 12px;"><strong>📱 Social Media Kit:</strong><ul style="padding-left:16px;"><li>Reel & TikTok Templates</li><li>Content Calendar System</li><li>Brand Voice Guidelines</li><li>Hashtag Strategy Tools</li><li>Creator Collaboration Kits</li></ul></div>`
   },
   saas: {
-    title: "Your SaaS AiGentsy's Autonomous Launchpad",
-    description: "You've launched an AI-powered SaaS business building software tools, web apps, and technical solutions.",
+    title: "Your SaaS AiGentsy",
+    description: "Your AiGentsy builds software tools, web apps, and technical solutions.",
     traits: "developer-ready, api-integrated, tech-stack-complete",
     tip: "Your SaaS AiGentsy can build micro-tools, deploy APIs, and monetize through subscriptions, one-time licenses, and white-label solutions.",
     selfExpanding: "Your SaaS AiGentsy spawns development agents for each feature request — automatically expanding your product capabilities.",
@@ -540,10 +570,10 @@ const BUSINESS_CONFIGS = {
     kitDoc: `<div style="margin-bottom: 12px;"><strong>💻 SaaS Development Kit:</strong><ul style="padding-left:16px;"><li>Auth & Subscription System</li><li>API Framework & Docs</li><li>Stripe Integration Ready</li><li>Database Schema Templates</li><li>Deployment Automation</li></ul></div>`
   },
   marketing: {
-    title: "Your Marketing AiGentsy's Autonomous Launchpad",
-    description: "You've launched an AI-powered marketing business specializing in SEO, ads, outreach, and growth campaigns.",
+    title: "Your Marketing AiGentsy",
+    description: "Your AiGentsy specializes in SEO, ads, outreach, and growth campaigns.",
     traits: "growth-hacker, seo-optimized, campaign-ready",
-    tip: "Your Marketing AiGentsy can run ad campaigns, optimize SEO, and handle outreach autonomously — monetize through consulting, campaign management, and affiliate partnerships.",
+    tip: "Your Marketing AiGentsy runs ad campaigns, optimizes SEO, and handles outreach — earn through consulting, campaign management, and affiliate partnerships.",
     selfExpanding: "Your Marketing AiGentsy spawns campaign agents for each channel — automatically scaling across Google Ads, Facebook, LinkedIn, and email marketing.",
     cSuite: [
       { role: "CEO", name: "You" },
@@ -555,10 +585,10 @@ const BUSINESS_CONFIGS = {
     kitDoc: `<div style="margin-bottom: 12px;"><strong>🎯 Marketing Growth Kit:</strong><ul style="padding-left:16px;"><li>SEO Optimization Tools</li><li>Ad Campaign Templates</li><li>Email Sequence Builder</li><li>Analytics Dashboard</li><li>Outreach Automation Scripts</li></ul></div>`
   },
   general: {
-    title: "Your AiGentsy's Autonomous Launchpad",
-    description: "You've launched your own AI-powered business that can generate income autonomously across real-world industries.",
+    title: "Your AiGentsy",
+    description: "Your AiGentsy can generate income across real-world industries - tell it what you do.",
     traits: "real-world-deployable, solo-hive-founder, multi-vertical",
-    tip: "Your AiGentsy is a fully formed business unit that can generate revenue through real-world deployment, licensing, and partnerships that we sync for you autonomously.",
+    tip: "Your AiGentsy finds opportunities, delivers services, and handles payments — tell it what you do and it takes care of the rest.",
     selfExpanding: "Your AiGentsy automatically builds new agents when needed — your business grows itself.",
     cSuite: [
       { role: "CEO", name: "You" },
@@ -601,32 +631,32 @@ function getStarterData(username, companyType) {
   return {
     username: username,
     companyType: companyType || "general",
-    remix: {
-      remixCount: 1,
-      remixCredits: 500,
-      remixUnlockedForks: 1
+    activity: {
+      servicesDelivered: 1,
+      clientsServed: 1,
+      proposalsSent: 1
     },
-    yield: {
-      vaultYield: 50,
-      remixYield: 25,
+    earnings: {
+      totalRevenue: 50,
+      pendingPayouts: 25,
       aigxEarned: 100
     },
     wallet: {
-      staked: 250
+      balance: 250
     },
     traits: [companyType || "general"],
-    vaultAccess: true,
-    cloneLineage: [],
+    accessLevel: "full",
+    partnerships: [],
     contacts: [],
     proposals: [],
     orders: [],
     invoices: [],
     offerings: { products: [] },
     runtimeFlags: {
-      vaultAccess: true,
-      sdkAccess_eligible: false,
-      remixUnlocked: false,
-      cloneLicenseUnlocked: false
+      fullAccess: true,
+      advancedFeatures: false,
+      partnershipTools: false,
+      enterpriseMode: false
     }
   };
 }
@@ -691,30 +721,30 @@ function getBusinessConfig(companyType) {
 
 function renderDynamicWelcome(user) {
   console.log("📝 Rendering welcome");
-  const config = getBusinessConfig(user.companyType);
+  const config = getBusinessConfig(user.companyType || 'general');
   document.getElementById("welcomeTitle").textContent = config.title;
   document.getElementById("welcomeDescription").textContent = config.description;
-  document.getElementById("traitsDisplay").textContent = config.traits;
   document.getElementById("welcomeTip").innerHTML = `<strong>Tip:</strong> ${config.tip}`;
-  document.getElementById("selfExpandingText").textContent = config.selfExpanding;
 }
 
 function renderDynamicCSuite(user) {
   console.log("👔 Rendering C-Suite");
-  const config = getBusinessConfig(user.companyType);
+  const companyType = user.companyType || 'general';
+  const config = getBusinessConfig(companyType);
   const csuiteList = document.getElementById("csuiteList");
   if (csuiteList) {
     csuiteList.innerHTML = config.cSuite.map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`).join("");
   }
   const note = document.getElementById("csuiteNote");
   if (note) {
-    note.textContent = `Each agent handles specialized ${user.companyType} functions for your business.`;
+    note.textContent = `Your team handles all aspects of your ${companyType} business.`;
   }
 }
 
 async function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
-  const config = getBusinessConfig(user.companyType);
+  const companyType = user.companyType || 'general';
+  const config = getBusinessConfig(companyType);
   
   // Render clickable kit items - FETCH FROM BACKEND
   const kitDocBox = document.getElementById("dynamicKitDoc");
@@ -782,7 +812,7 @@ async function renderDynamicKit(user) {
     } catch (error) {
       console.warn('Kit documents backend error, using fallback:', error);
       // Fallback to hardcoded if backend unavailable
-      const kitItems = getKitItemsForType(user.companyType);
+      const kitItems = getKitItemsForType(user.companyType || 'general');
       kitDocBox.innerHTML = kitItems.map(item => `
         <div onclick="openKitDocument('${item.id}')" 
              style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
@@ -797,12 +827,13 @@ async function renderDynamicKit(user) {
   // Render unlocked modules (ALL UNLOCKED)
   const summaryBox = document.getElementById("businessSummaryList");
   if (summaryBox) {
+    const companyType = user.companyType || 'general';
     const summaryItems = [
-      { label: "SDK Toolkit" },
-      { label: "Vault Access" },
-      { label: "Remix License" },
-      { label: "Clone License" },
-      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit` }
+      { label: "Unlimited Services" },
+      { label: "Client Outreach" },
+      { label: "Storefront & Proposals" },
+      { label: "Revenue Tracking" },
+      { label: `${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit` }
     ];
     summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
   }
@@ -1066,26 +1097,27 @@ function renderDynamicAchievements(user) {
     
   } else {
     // Fallback to user object
-    const config = getBusinessConfig(user.companyType);
+    const companyType = user.companyType || 'general';
+    const config = getBusinessConfig(companyType);
     
-    if ((user.remix?.remixCount || user.remixUnlockedForks || 0) > 0) {
-      achievements.push(`🔁 ${config.description.includes("Legal") ? "Legal Templates" : config.description.includes("Social") ? "Content Pieces" : config.description.includes("SaaS") ? "Features" : "Agents"} Created`);
+    if ((user.activity?.servicesDelivered || 0) > 0) {
+      achievements.push(`🎯 ${user.activity.servicesDelivered} Services Delivered`);
     }
     
-    if ((user.cloneLineage || []).length > 0) {
-      achievements.push(`🧬 Business Lineage Extended — ${user.cloneLineage.length} Clones`);
+    if ((user.partnerships || []).length > 0) {
+      achievements.push(`🤝 ${user.partnerships.length} Active Partnerships`);
     }
     
-    if ((user.yield?.aigxEarned || 0) > 0) {
-      achievements.push(`💰 Revenue Generated — ${user.yield.aigxEarned} AIGx`);
+    if ((user.earnings?.totalRevenue || 0) > 0) {
+      achievements.push(`💰 $${user.earnings.totalRevenue} Revenue Earned`);
     }
     
-    if ((user.traits || []).includes(user.companyType)) {
-      achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+    if ((user.traits || []).includes(companyType)) {
+      achievements.push(`📦 ${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit Active`);
     }
     
     if ((user.contacts || []).length > 0) {
-      achievements.push(`🤝 ${user.contacts.length} Business Connections Made`);
+      achievements.push(`👥 ${user.contacts.length} Clients Connected`);
     }
     
     if ((user.proposals || []).length > 0) {
@@ -1096,7 +1128,8 @@ function renderDynamicAchievements(user) {
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
-    achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
+    const companyType = user.companyType || 'general';
+    achievementBox.innerHTML = `<li>🚧 Your first ${companyType} milestone awaits. Start building!</li>`;
   }
 }
 
@@ -1257,20 +1290,17 @@ function renderOfferingsWithData(user) {
   const list = document.getElementById("autoMatchOfferings");
   if (!list) return;
   list.innerHTML = "";
+  const companyType = user.companyType || 'general';
   const offerings = [
-    { id: "sdk", label: "SDK Toolkit", condition: !(user.sdkAccess_eligible || user.runtimeFlags?.sdkAccess_eligible), stripe: "https://buy.stripe.com/3cs14m3Nhaor5Xfg1k6AM0a" },
-    { id: "vault", label: "Vault Access", condition: !(user.vaultAccess || user.runtimeFlags?.vaultAccess), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" },
-    { id: "remix", label: "Remix License", condition: !(user.remixUnlocked || user.runtimeFlags?.remixUnlocked), stripe: "https://buy.stripe.com/8x24gydnRfILdpH02m6AM07" },
-    { id: "clone", label: "Clone License", condition: !(user.cloneLicenseUnlocked || user.runtimeFlags?.cloneLicenseUnlocked), stripe: "https://buy.stripe.com/eVq3cu6ZteEHadv8yS6AM09" },
-    { id: user.companyType, label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, condition: !(user.traits || []).includes(user.companyType), stripe: "https://buy.stripe.com/cNi14m3Nhaor5Xfg1k6AM08" }
+    { id: "outreach", label: "Client Outreach", condition: true, stripe: null },
+    { id: "proposals", label: "Proposals & Contracts", condition: true, stripe: null },
+    { id: "delivery", label: "Service Delivery", condition: true, stripe: null },
+    { id: "payments", label: "Payment Collection", condition: true, stripe: null },
+    { id: companyType, label: `${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit`, condition: true, stripe: null }
   ];
   offerings.forEach(({ id, label, condition, stripe }) => {
     const li = document.createElement("li");
-    if (!condition) {
-      li.innerHTML = `✅ ${label} Unlocked`;
-    } else {
-      li.innerHTML = `<button class="btn-glow" onclick="unlockOffering('${user.username}', '${id}', '${stripe}')">🔓 Unlock ${label}</button>`;
-    }
+    li.innerHTML = `✅ ${label}`;
     list.appendChild(li);
   });
 }
@@ -1316,6 +1346,14 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
+    const businessType = user.companyType || 'general';
+    
+    // Debug: Log what we're sending
+    console.log("📤 Sending to Growth agent:", { 
+      businessType, 
+      username: user.username,
+      inputPreview: input.substring(0, 50) 
+    });
     
     // ALL chat goes to Growth agent (the communicator)
     const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
@@ -1326,8 +1364,9 @@ async function runAgent() {
       body: JSON.stringify({ 
         input: input, 
         memory, 
-        businessType: user.companyType, 
-        username: user.username 
+        businessType: businessType,
+        username: user.username,
+        kit: businessType  // Also send as 'kit' in case backend expects this
       }) 
     }, 2, 15000);
     
@@ -1583,7 +1622,7 @@ async function viewIntentExchange() {
                     <div style="font-size: 3rem; margin-bottom: 10px;">📭</div>
                     <div style="font-size: 1.1rem;">No contracts yet</div>
                     <div style="font-size: 0.9rem; margin-top: 5px;">
-                        Your autonomous agents will bid on relevant opportunities
+                        Your AiGentsy will find and pitch relevant opportunities
                     </div>
                 </div>
             ` : ''}
@@ -2515,12 +2554,39 @@ async function initializeDashboard() {
   // NOW render the dashboard with complete data
   injectUserDashboard();
   
-  if (chatLog && chatLog.children.length === 0) {
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! Your C-Suite team is on standby. How can we help you build your business today?`;
-    chatLog.appendChild(preload);
-  }
+  // Wait a moment for user data to be set, then show kit-aware greeting
+  setTimeout(() => {
+    if (chatLog && chatLog.children.length === 0) {
+      const user = window.aigentsyUser || {};
+      const kit = user.companyType || 'general';
+      const preload = document.createElement("div");
+      preload.className = "chat-agent";
+      
+      // Kit-specific proactive greetings
+      const greetings = {
+        saas: `Hey ${username}! Your SaaS AiGentsy is ready.
+
+I recommend starting with **micro-tools ($50-500)**—they're the fastest path to first revenue. What problem do you want to solve? I'll help you build and find buyers.`,
+        
+        legal: `Hey ${username}! Your Legal AiGentsy is ready.
+
+I recommend starting with **NDAs ($200 each)**—they're high-demand and I can draft them automatically. Should I start finding startups and contractors who need them?`,
+        
+        marketing: `Hey ${username}! Your Marketing AiGentsy is ready.
+
+I recommend starting with **SEO audits ($500 each)**—quick wins, businesses always need them. Want me to start pitching local businesses tonight?`,
+        
+        social: `Hey ${username}! Your Social Media AiGentsy is ready.
+
+I recommend starting with **brand partnerships ($500-5k)**—highest payout for your content. What's your niche? I'll start finding brands that match.`,
+        
+        general: `Hey ${username}! Your AiGentsy is ready. What should we focus on first?`
+      };
+      
+      preload.innerHTML = greetings[kit] || greetings.general;
+      chatLog.appendChild(preload);
+    }
+  }, 500);
 }
 
 window.addEventListener("load", () => {
@@ -3202,8 +3268,195 @@ async function initializeWeek1Features() {
   // Apply kit-specific enhancements
   enhanceKitSpecificMetrics();
   
+  // Check if financial tools should be shown (after first revenue)
+  checkFinancialToolsVisibility();
+  
+  // Check for first-time user onboarding
+  checkOnboarding();
+  
   console.log('✅ Week 1 features loaded!');
 }
+
+// ============================================================
+// 🎛️ CONTROL LEVEL & ONBOARDING
+// ============================================================
+
+function showControlLevelInfo() {
+  // Could expand to a modal with upgrade criteria
+  showToast('You approve all proposals before they go out. Build trust to unlock more automation.', 'info');
+}
+
+function checkOnboarding() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  const hasSeenOnboarding = localStorage.getItem(`aigentsy_onboarding_${username}`);
+  
+  if (!hasSeenOnboarding) {
+    document.getElementById('onboardingModal').classList.add('open');
+  }
+}
+
+let currentOnboardingStep = 1;
+
+function nextOnboardingStep() {
+  currentOnboardingStep++;
+  
+  // Hide all steps
+  document.getElementById('onboardingStep1').style.display = 'none';
+  document.getElementById('onboardingStep2').style.display = 'none';
+  document.getElementById('onboardingStep3').style.display = 'none';
+  
+  // Update indicators
+  document.getElementById('onboardStep1').style.background = '#333';
+  document.getElementById('onboardStep2').style.background = '#333';
+  document.getElementById('onboardStep3').style.background = '#333';
+  
+  // Show current step
+  if (currentOnboardingStep === 2) {
+    document.getElementById('onboardingStep2').style.display = 'block';
+    document.getElementById('onboardStep2').style.background = '#00bfff';
+  } else if (currentOnboardingStep === 3) {
+    document.getElementById('onboardingStep3').style.display = 'block';
+    document.getElementById('onboardStep3').style.background = '#00bfff';
+  }
+}
+
+function connectStripeOnboarding() {
+  // Open Stripe Connect flow
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  window.open(`${window.BACKEND_BASE}/stripe/connect?user=${encodeURIComponent(username)}`, '_blank');
+  nextOnboardingStep();
+}
+
+function closeOnboarding() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  localStorage.setItem(`aigentsy_onboarding_${username}`, 'true');
+  document.getElementById('onboardingModal').classList.remove('open');
+}
+
+// ============================================================
+// 💼 FINANCIAL TOOLS VISIBILITY
+// ============================================================
+
+function checkFinancialToolsVisibility() {
+  const user = window.aigentsyUser;
+  if (!user) return;
+  
+  // Show financial tools if user has any revenue or completed deals
+  const hasRevenue = (user.revenue?.total || 0) > 0;
+  const hasCompletedDeals = (user.outcomeOracle?.paid || 0) > 0;
+  
+  if (hasRevenue || hasCompletedDeals) {
+    const financialSection = document.getElementById('financialToolsSection');
+    if (financialSection) {
+      financialSection.style.display = 'block';
+    }
+  }
+}
+
+// ============================================================
+// 📊 TRACK RECORD & EXPORT
+// ============================================================
+
+async function downloadTrackRecord() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  
+  try {
+    showToast('Generating your track record...', 'info');
+    
+    const response = await fetch(`${window.BACKEND_BASE}/apex/investor/reconciliation/export?user_id=${encodeURIComponent(username)}&days=90`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Create CSV content
+      let csv = 'Date,Type,Client,Amount,Status,Verification\n';
+      (data.transactions || []).forEach(tx => {
+        csv += `${tx.date},${tx.type},${tx.client || 'N/A'},${tx.amount},${tx.status},${tx.hash || 'N/A'}\n`;
+      });
+      
+      // Download
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `aigentsy-track-record-${username}-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      showToast('Track record downloaded!', 'success');
+    } else {
+      // Fallback: generate from local data
+      downloadLocalTrackRecord();
+    }
+  } catch (error) {
+    console.warn('Track record API error, using local data:', error);
+    downloadLocalTrackRecord();
+  }
+}
+
+function downloadLocalTrackRecord() {
+  const user = window.aigentsyUser;
+  const username = user?.username || 'user';
+  
+  let csv = 'Metric,Value\n';
+  csv += `Username,${username}\n`;
+  csv += `Total Revenue,$${user?.revenue?.total || 0}\n`;
+  csv += `Deals Found,${user?.outcomeOracle?.clicked || 0}\n`;
+  csv += `Deals Pitched,${user?.outcomeOracle?.authorized || 0}\n`;
+  csv += `Deals Delivered,${user?.outcomeOracle?.delivered || 0}\n`;
+  csv += `Deals Paid,${user?.outcomeOracle?.paid || 0}\n`;
+  csv += `Reputation Score,${user?.reputation?.score || 0}\n`;
+  csv += `Generated,${new Date().toISOString()}\n`;
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `aigentsy-summary-${username}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  showToast('Summary downloaded!', 'success');
+}
+
+function viewPublicProfile() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  window.open(`/storefront/${encodeURIComponent(username)}`, '_blank');
+}
+
+// ============================================================
+// 📬 PENDING APPROVALS COUNT
+// ============================================================
+
+async function updatePendingApprovalsCount() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  if (!username) return;
+  
+  try {
+    const response = await fetch(`${window.BACKEND_BASE}/get_proposals`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      const pendingCount = (data.proposals || []).filter(p => p.status === 'pending').length;
+      
+      const badge = document.getElementById('pendingApprovalsCount');
+      if (badge && pendingCount > 0) {
+        badge.textContent = pendingCount;
+        badge.style.display = 'inline';
+      }
+    }
+  } catch (error) {
+    console.warn('Could not fetch pending approvals:', error);
+  }
+}
+
+// Update pending count periodically
+setInterval(updatePendingApprovalsCount, 30000);
+setTimeout(updatePendingApprovalsCount, 2000);
 
 // Auto-initialize when user data is ready
 if (window.aigentsyUser) {
