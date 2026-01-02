@@ -1346,6 +1346,14 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
+    const businessType = user.companyType || 'general';
+    
+    // Debug: Log what we're sending
+    console.log("📤 Sending to Growth agent:", { 
+      businessType, 
+      username: user.username,
+      inputPreview: input.substring(0, 50) 
+    });
     
     // ALL chat goes to Growth agent (the communicator)
     const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
@@ -1356,8 +1364,9 @@ async function runAgent() {
       body: JSON.stringify({ 
         input: input, 
         memory, 
-        businessType: user.companyType || 'general', 
-        username: user.username 
+        businessType: businessType,
+        username: user.username,
+        kit: businessType  // Also send as 'kit' in case backend expects this
       }) 
     }, 2, 15000);
     
@@ -2545,12 +2554,39 @@ async function initializeDashboard() {
   // NOW render the dashboard with complete data
   injectUserDashboard();
   
-  if (chatLog && chatLog.children.length === 0) {
-    const preload = document.createElement("div");
-    preload.className = "chat-agent";
-    preload.innerHTML = `Hey ${username}! Your AiGentsy is ready. What should we focus on first?`;
-    chatLog.appendChild(preload);
-  }
+  // Wait a moment for user data to be set, then show kit-aware greeting
+  setTimeout(() => {
+    if (chatLog && chatLog.children.length === 0) {
+      const user = window.aigentsyUser || {};
+      const kit = user.companyType || 'general';
+      const preload = document.createElement("div");
+      preload.className = "chat-agent";
+      
+      // Kit-specific proactive greetings
+      const greetings = {
+        saas: `Hey ${username}! Your SaaS AiGentsy is ready.
+
+I recommend starting with **micro-tools ($50-500)**—they're the fastest path to first revenue. What problem do you want to solve? I'll help you build and find buyers.`,
+        
+        legal: `Hey ${username}! Your Legal AiGentsy is ready.
+
+I recommend starting with **NDAs ($200 each)**—they're high-demand and I can draft them automatically. Should I start finding startups and contractors who need them?`,
+        
+        marketing: `Hey ${username}! Your Marketing AiGentsy is ready.
+
+I recommend starting with **SEO audits ($500 each)**—quick wins, businesses always need them. Want me to start pitching local businesses tonight?`,
+        
+        social: `Hey ${username}! Your Social Media AiGentsy is ready.
+
+I recommend starting with **brand partnerships ($500-5k)**—highest payout for your content. What's your niche? I'll start finding brands that match.`,
+        
+        general: `Hey ${username}! Your AiGentsy is ready. What should we focus on first?`
+      };
+      
+      preload.innerHTML = greetings[kit] || greetings.general;
+      chatLog.appendChild(preload);
+    }
+  }, 500);
 }
 
 window.addEventListener("load", () => {
