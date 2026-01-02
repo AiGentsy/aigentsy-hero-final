@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <title>AiGentsy — The Sovereign Engine of AI Commerce</title>
+  <title>AiGentsy — Launch Your AI Business Empire Now</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
@@ -141,32 +141,33 @@
   <div class="bg-animation"></div>
   <div class="hero">
     <img src="aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" class="logo" />
-    <p>Launch your fully staffed AI business - choose your AiGentsy, auto-match partners, deploy real-world services, and earn autonomously.</p>
+    <h1>Launch Your AI Business Empire Now</h1>
+    <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Username" />
-      <input type="password" id="passwordInput" placeholder="Password" />
+      <input type="password" id="passwordInput" placeholder="Password (optional)" />
       <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
-  <div class="toggle-auth">Don't have an account? Sign up</div>
+      <div class="toggle-auth">Don't have an account? Sign up</div>
 
-  <div class="aigent-options">
-    <div class="aigent-card" data-agent="legal">Legal AiGentsy<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
-    <div class="aigent-card" data-agent="social">Social Media AiGentsy<br><span style="font-size: 0.85rem;">Reels, TikToks, content launch, creator kits</span></div>
-    <div class="aigent-card" data-agent="saas">SaaS AiGentsy<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
-    <div class="aigent-card" data-agent="marketing">Marketing AiGentsy<br><span style="font-size: 0.85rem;">SEO, ads, outreach — fully autonomous</span></div>
-  </div>
+      <div class="aigent-options">
+        <div class="aigent-card" data-agent="legal">Legal AI<br><span style="font-size: 0.85rem;">IP, contracts, licensing, compliance</span></div>
+        <div class="aigent-card" data-agent="social">Social Media AI<br><span style="font-size: 0.85rem;">Reels, TikToks, content, creator kits</span></div>
+        <div class="aigent-card" data-agent="saas">SaaS AI<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+        <div class="aigent-card" data-agent="marketing">Marketing AI<br><span style="font-size: 0.85rem;">SEO, ads, outreach — autonomous</span></div>
+      </div>
 
-  <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
-    <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Tell us what type of AiGentsy to build you</label><br>
-    <input type="text" id="aigentsySearch" placeholder="e.g. podcast business, saas app, coaching brand" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
-    <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
-  </div>
+      <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
+        <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Or describe your custom AI business idea:</label><br>
+        <input type="text" id="aigentsySearch" placeholder="e.g. podcast production, real estate agency, health coaching" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
+        <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
+      </div>
 
-  <button id="enterBtn" disabled>🚀 Launch Your AiGentsy</button>
-</div>
+      <button id="enterBtn" disabled>🚀 Launch Your AI Business Now</button>
+    </div>
 
-<div class="footer-note">
-  Autonomous income. Real-world monetization. No gatekeepers.
-</div>
+    <div class="footer-note">
+      Autonomous income. Real-world monetization. No gatekeepers.
+    </div>
   </div>
   <script>
   (() => {
@@ -175,8 +176,8 @@
 
     // Config
     const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
-    const JSONBIN_URL = window.JSONBIN_URL || null;
-    const JSONBIN_SECRET = window.JSONBIN_SECRET || null;
+    const JSONBIN_URL = window.JSONBIN_URL || "https://api.jsonbin.io/v3/b/YOUR_BIN_ID";
+    const JSONBIN_SECRET = window.JSONBIN_SECRET || "$2a$10$YOUR_SECRET_KEY";
 
     // Elements
     const usernameInput = document.getElementById('usernameInput');
@@ -187,127 +188,68 @@
     const suggestionBox = document.getElementById('aigentsySuggestion');
 
     // State
-    let authMode = "login";
+    let authMode = "signup";
     let selectedAgent = null;
+    let customBusinessIdea = "";
 
     // Referral
     const params = new URLSearchParams(location.search);
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
-    // Helpers
+    // Business Type Mapping
     const companyTypeMap = (agent) => {
-      const map = { legal: "legal", social: "social", saas: "saas", marketing: "marketing", custom: "custom" };
+      const map = { 
+        legal: "legal", 
+        social: "social", 
+        saas: "saas", 
+        marketing: "marketing", 
+        custom: "custom" 
+      };
       return map[agent] || "general";
     };
 
+    // Enhanced suggestion system
     function showSuggestion(value) {
       if (!suggestionBox) return;
       const v = (value || "").toLowerCase();
-      let msg = "We'll build you a custom AiGentsy based on your input.";
-      if (v.includes("legal")) msg = "Try the Legal AiGentsy — IP, licensing, and contracts.";
-      else if (v.includes("podcast")) msg = "Try a Podcast AiGentsy — auto-produce & distribute.";
-      else if (v.includes("saas")) msg = "Try the SaaS AiGentsy — agent-powered web tools.";
-      else if (v.includes("ads") || v.includes("marketing")) msg = "Try the Marketing AiGentsy — SEO, ads, outreach.";
-      suggestionBox.textContent = msg;
-    }
-
-    async function registerUserToJSONBin(username, selectedAgent, customDescription, referralCode) {
-      if (!JSONBIN_URL || !JSONBIN_SECRET) {
-        console.warn("⚠️ JSONBin not configured");
-        return;
+      let msg = "We'll build you a custom AI business based on your input.";
+      let detectedType = "custom";
+      
+      if (v.includes("legal") || v.includes("law") || v.includes("attorney") || v.includes("contract")) {
+        msg = "💼 Legal AI detected — Your C-Suite will handle contracts, IP protection, and compliance automation.";
+        detectedType = "legal";
+      } else if (v.includes("saas") || v.includes("software") || v.includes("app") || v.includes("tool")) {
+        msg = "💻 SaaS AI detected — Your C-Suite will build, deploy, and scale AI-powered tools.";
+        detectedType = "saas";
+      } else if (v.includes("marketing") || v.includes("seo") || v.includes("ads") || v.includes("growth")) {
+        msg = "📈 Marketing AI detected — SEO, ad campaigns, content strategy, and growth automation.";
+        detectedType = "marketing";
+      } else if (v.includes("social") || v.includes("content") || v.includes("creator") || v.includes("influencer")) {
+        msg = "📱 Social Media AI detected — Content creation, posting schedules, and creator monetization.";
+        detectedType = "social";
       }
       
-      const now = new Date().toISOString();
-      const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+      suggestionBox.textContent = msg;
       
-      const entry = {
-        schemaVersion: 3,
-        id: `user_${Date.now()}`,
-        username: username,
-        consent: { agreed: true, username: username, timestamp: now },
-        companyType: companyTypeMap(selectedAgent),
-        created: now,
-        mintTime: now,
-        customInput: customDescription || "",
-        meta_role: roleMap[selectedAgent || "general"],
-        role: roleMap[selectedAgent || "general"],
-        trait: selectedAgent || "founder",
-        traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
-        runtimeFlags: { vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false, sdkAccess_eligible: selectedAgent === "saas" },
-        wallet: { address: "0x0", staked: 0 },
-        staked: 0,
-        yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0, aigxAttributedTo: [], aigxEarnedEnabled: false },
-        remixUnlocked: false,
-        remixUnlockedForks: 0,
-        remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0, royaltyTerms: "Standard 30%" },
-        cloneLineage: [],
-        cloneLicenseUnlocked: false,
-        proposals: [], orders: [], invoices: [], payments: [], contacts: [], meetings: [], kpi_snapshots: [], docs: [],
-        ownership: { ledger: [] },
-        kits: {
-          universal: { unlocked: true },
-          growth: { unlocked: false },
-          legal: { unlocked: selectedAgent === "legal" },
-          sdk: { unlocked: false },
-          branding: { unlocked: false },
-          marketing: { unlocked: selectedAgent === "marketing" },
-          social: { unlocked: selectedAgent === "social" }
-        },
-        metaloop: { enabled: true, lastMatchCheck: null, proposalHistory: [] },
-        metabridge: { active: true, lastBridge: null, bridgeCount: 0 },
-        automatch: { status: "pending", lastMatchResult: null, matchReady: true },
-        referral: referralCode || "origin/hero",
-        runtimeURL: "https://aigentsy.com/agents/aigent0.html",
-        protocol: "MetaUpgrade25+26",
-        realm: { name: "Realm 101 — Strategic Expansion", joinedAt: now },
-        metaVenture: { ventureHive: "Autonomous Launch", ventureRole: roleMap[selectedAgent || "general"], ventureStatus: "Pending", ventureID: `MV-${Date.now()}` },
-        mirror: { mirroredInRealms: ["Realm 101 — Strategic Expansion"], mirrorIntegrity: "Verified", sentinelAlert: false },
-        earningsEnabled: true,
-        listingStatus: "active",
-        protocolStatus: "Bound",
-        tethered: true,
-        sdkAccess_eligible: selectedAgent === "saas",
-        sdkAccess: false,
-        vaultAccess: true,
-        licenses: { sdk: false, vault: false, remix: false, clone: false, aigx: false },
-        transactions: { unlocks: [], yieldEvents: [], referralEvents: [] },
-        packaging: { kits_sent: [], proposals: [], custom_files: [], active: false },
-        offerings: { products: [], services: [], pricing: [], description: "" }
-      };
-      
-      try {
-        console.log("📡 Fetching JSONBin...");
-        const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-        if (!getRes.ok) throw new Error(`GET failed: ${getRes.status}`);
-        
-        const currentData = await getRes.json();
-        let currentArray = Array.isArray(currentData.record) ? currentData.record : (Array.isArray(currentData) ? currentData : []);
-        
-        console.log(`📝 Current users: ${currentArray.length}`);
-        
-        const existingIndex = currentArray.findIndex(u => u.username === username || u.consent?.username === username);
-        if (existingIndex >= 0) {
-          console.log("⚠️ Updating existing user");
-          currentArray[existingIndex] = entry;
-        } else {
-          console.log("✅ Adding new user");
-          currentArray.push(entry);
+      if (detectedType !== "custom" && !selectedAgent) {
+        const matchingCard = document.querySelector(`.aigent-card[data-agent="${detectedType}"]`);
+        if (matchingCard) {
+          setTimeout(() => {
+            document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
+            matchingCard.classList.add('selected');
+            selectedAgent = detectedType;
+            updateButtonState();
+          }, 300);
         }
-        
-        console.log(`💾 Saving ${currentArray.length} users...`);
-        const putRes = await fetch(JSONBIN_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-          body: JSON.stringify(currentArray)
-        });
-        
-        if (!putRes.ok) throw new Error(`PUT failed: ${putRes.status}`);
-        console.log("✅ Registered successfully!");
-        
-      } catch (err) {
-        console.error("❌ JSONBin error:", err);
-        throw err;
+      }
+      
+      if (value && value.length > 10) {
+        customBusinessIdea = value;
+        if (!selectedAgent) {
+          selectedAgent = "custom";
+          updateButtonState();
+        }
       }
     }
 
@@ -329,6 +271,7 @@
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
+        customBusinessIdea = "";
         showSuggestion(selectedAgent);
         updateButtonState();
       });
@@ -337,31 +280,130 @@
     document.querySelector('.toggle-auth').addEventListener('click', window.toggleAuthMode);
     usernameInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
-    if (searchInput) searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+    }
 
+    // MAIN SIGNUP LOGIC
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
+      
       const username = usernameInput.value.trim();
-      if (!username) { alert("Enter a username"); return; }
+      const password = passwordInput.value.trim();
+      
+      if (!username) { 
+        alert("Enter a username"); 
+        return; 
+      }
       
       const idea = searchInput ? searchInput.value.trim() : "";
       
+      // Store in localStorage
       try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
       try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+      try { localStorage.setItem("aigentsyBusinessIdea", customBusinessIdea); } catch(e){}
 
       enterBtn.disabled = true;
-      enterBtn.textContent = "Creating...";
+      enterBtn.textContent = "🚀 Building your AI business...";
       
       try {
-        console.log("📝 Registering:", username);
-        await registerUserToJSONBin(username, selectedAgent, idea, referral);
-        console.log("🚀 Redirecting...");
-        window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        console.log("📝 Attempting backend mint:", username, "Type:", selectedAgent);
+        
+        // TRY BACKEND FIRST
+        try {
+          const response = await fetch(`${API_BASE}/mint`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: username,
+              password: password || "default_password",
+              companyType: companyTypeMap(selectedAgent),
+              template: selectedAgent,
+              customInput: customBusinessIdea || idea,
+              referral: referral
+            })
+          });
+          
+          console.log("📡 Backend response status:", response.status);
+          
+          if (response.ok) {
+            const text = await response.text();
+            console.log("📡 Backend raw response:", text.substring(0, 200));
+            
+            const result = JSON.parse(text);
+            console.log("✅ Backend parsed:", result.ok ? "SUCCESS" : "FAIL");
+            
+            if (result.ok) {
+              if (result.apex_ultra && result.apex_ultra.activated) {
+                console.log(`🌟 APEX ULTRA: ${result.apex_ultra.systems_operational} systems`);
+              }
+              
+              console.log("🚀 Redirecting...");
+              window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+              return; // SUCCESS - exit here
+            } else {
+              console.warn("⚠️ Backend returned ok:false:", result.error);
+              throw new Error(result.error || "Backend failed");
+            }
+          } else {
+            throw new Error(`Backend HTTP ${response.status}`);
+          }
+        } catch (backendError) {
+          console.warn("⚠️ Backend failed:", backendError.message);
+          console.log("📦 Falling back to direct JSONBin...");
+          
+          // FALLBACK TO JSONBIN
+          const now = new Date().toISOString();
+          const roleMap = { legal: "CLO", social: "CMO", saas: "CTO", marketing: "CMO", custom: "CEO", general: "CEO" };
+          
+          const newUser = {
+            schemaVersion: 3,
+            id: `user_${Date.now()}`,
+            username: username,
+            consent: { agreed: true, username: username, timestamp: now },
+            companyType: companyTypeMap(selectedAgent),
+            created: now,
+            mintTime: now,
+            customInput: customBusinessIdea || idea,
+            meta_role: roleMap[selectedAgent || "general"],
+            role: roleMap[selectedAgent || "general"],
+            traits: [selectedAgent || "general", "founder", "autonomous", "aigentsy"],
+            runtimeFlags: { vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false, sdkAccess_eligible: selectedAgent === "saas" },
+            wallet: { address: "0x0", staked: 0 },
+            yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
+            remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0 },
+            kits: { universal: { unlocked: true }, legal: { unlocked: selectedAgent === "legal" } },
+            referral: referral,
+            runtimeURL: "https://aigentsy.com/agents/aigent0.html"
+          };
+          
+          const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
+          const currentData = await getRes.json();
+          let currentArray = Array.isArray(currentData.record) ? currentData.record : [];
+          
+          const existingIndex = currentArray.findIndex(u => u.username === username);
+          if (existingIndex >= 0) {
+            currentArray[existingIndex] = newUser;
+          } else {
+            currentArray.push(newUser);
+          }
+          
+          await fetch(JSONBIN_URL, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
+            body: JSON.stringify(currentArray)
+          });
+          
+          console.log("✅ JSONBin fallback successful");
+          console.warn("⚠️ Note: APEX ULTRA did not activate (backend unavailable)");
+          window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        }
+        
       } catch (e) {
-        console.error("❌ Error:", e);
-        alert("Could not create your AiGentsy. Please try again.");
+        console.error("❌ Total failure:", e);
+        alert(`Could not create your AiGentsy: ${e.message}`);
         enterBtn.disabled = false;
-        enterBtn.textContent = "🚀 Launch Your AiGentsy";
+        enterBtn.textContent = "🚀 Launch Your AI Business Now";
       }
     });
 
