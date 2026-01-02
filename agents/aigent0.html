@@ -721,30 +721,30 @@ function getBusinessConfig(companyType) {
 
 function renderDynamicWelcome(user) {
   console.log("📝 Rendering welcome");
-  const config = getBusinessConfig(user.companyType);
+  const config = getBusinessConfig(user.companyType || 'general');
   document.getElementById("welcomeTitle").textContent = config.title;
   document.getElementById("welcomeDescription").textContent = config.description;
-  document.getElementById("traitsDisplay").textContent = config.traits;
   document.getElementById("welcomeTip").innerHTML = `<strong>Tip:</strong> ${config.tip}`;
-  document.getElementById("selfExpandingText").textContent = config.selfExpanding;
 }
 
 function renderDynamicCSuite(user) {
   console.log("👔 Rendering C-Suite");
-  const config = getBusinessConfig(user.companyType);
+  const companyType = user.companyType || 'general';
+  const config = getBusinessConfig(companyType);
   const csuiteList = document.getElementById("csuiteList");
   if (csuiteList) {
     csuiteList.innerHTML = config.cSuite.map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`).join("");
   }
   const note = document.getElementById("csuiteNote");
   if (note) {
-    note.textContent = `Each agent handles specialized ${user.companyType} functions for your business.`;
+    note.textContent = `Your team handles all aspects of your ${companyType} business.`;
   }
 }
 
 async function renderDynamicKit(user) {
   console.log("📦 Rendering kit");
-  const config = getBusinessConfig(user.companyType);
+  const companyType = user.companyType || 'general';
+  const config = getBusinessConfig(companyType);
   
   // Render clickable kit items - FETCH FROM BACKEND
   const kitDocBox = document.getElementById("dynamicKitDoc");
@@ -812,7 +812,7 @@ async function renderDynamicKit(user) {
     } catch (error) {
       console.warn('Kit documents backend error, using fallback:', error);
       // Fallback to hardcoded if backend unavailable
-      const kitItems = getKitItemsForType(user.companyType);
+      const kitItems = getKitItemsForType(user.companyType || 'general');
       kitDocBox.innerHTML = kitItems.map(item => `
         <div onclick="openKitDocument('${item.id}')" 
              style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
@@ -827,12 +827,13 @@ async function renderDynamicKit(user) {
   // Render unlocked modules (ALL UNLOCKED)
   const summaryBox = document.getElementById("businessSummaryList");
   if (summaryBox) {
+    const companyType = user.companyType || 'general';
     const summaryItems = [
       { label: "Unlimited Services" },
       { label: "Client Outreach" },
       { label: "Storefront & Proposals" },
       { label: "Revenue Tracking" },
-      { label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit` }
+      { label: `${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit` }
     ];
     summaryBox.innerHTML = summaryItems.map(({ label }) => `<li>✅ ${label}</li>`).join("");
   }
@@ -1096,7 +1097,8 @@ function renderDynamicAchievements(user) {
     
   } else {
     // Fallback to user object
-    const config = getBusinessConfig(user.companyType);
+    const companyType = user.companyType || 'general';
+    const config = getBusinessConfig(companyType);
     
     if ((user.activity?.servicesDelivered || 0) > 0) {
       achievements.push(`🎯 ${user.activity.servicesDelivered} Services Delivered`);
@@ -1110,8 +1112,8 @@ function renderDynamicAchievements(user) {
       achievements.push(`💰 $${user.earnings.totalRevenue} Revenue Earned`);
     }
     
-    if ((user.traits || []).includes(user.companyType)) {
-      achievements.push(`📦 ${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit Active`);
+    if ((user.traits || []).includes(companyType)) {
+      achievements.push(`📦 ${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit Active`);
     }
     
     if ((user.contacts || []).length > 0) {
@@ -1126,7 +1128,8 @@ function renderDynamicAchievements(user) {
   if (achievements.length > 0) {
     achievementBox.innerHTML = achievements.map(a => `<li>${a}</li>`).join('');
   } else {
-    achievementBox.innerHTML = `<li>🚧 Your first ${user.companyType} milestone awaits. Start building!</li>`;
+    const companyType = user.companyType || 'general';
+    achievementBox.innerHTML = `<li>🚧 Your first ${companyType} milestone awaits. Start building!</li>`;
   }
 }
 
@@ -1287,12 +1290,13 @@ function renderOfferingsWithData(user) {
   const list = document.getElementById("autoMatchOfferings");
   if (!list) return;
   list.innerHTML = "";
+  const companyType = user.companyType || 'general';
   const offerings = [
     { id: "outreach", label: "Client Outreach", condition: true, stripe: null },
     { id: "proposals", label: "Proposals & Contracts", condition: true, stripe: null },
     { id: "delivery", label: "Service Delivery", condition: true, stripe: null },
     { id: "payments", label: "Payment Collection", condition: true, stripe: null },
-    { id: user.companyType, label: `${user.companyType.charAt(0).toUpperCase() + user.companyType.slice(1)} Kit`, condition: true, stripe: null }
+    { id: companyType, label: `${companyType.charAt(0).toUpperCase() + companyType.slice(1)} Kit`, condition: true, stripe: null }
   ];
   offerings.forEach(({ id, label, condition, stripe }) => {
     const li = document.createElement("li");
@@ -1352,7 +1356,7 @@ async function runAgent() {
       body: JSON.stringify({ 
         input: input, 
         memory, 
-        businessType: user.companyType, 
+        businessType: user.companyType || 'general', 
         username: user.username 
       }) 
     }, 2, 15000);
