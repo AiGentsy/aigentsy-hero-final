@@ -628,9 +628,18 @@ const FINANCIAL_TOOLS = {
 // Use this reference in chat responses to ensure P2P language
   
 function getStarterData(username, companyType) {
+  // ✅ FIX: Get kit from multiple sources (priority order)
+  const savedKit = localStorage.getItem("aigentsyKit") || 
+                   localStorage.getItem("aigentsyCompanyType") ||
+                   companyType || 
+                   "saas";  // Default to saas, not general
+  
+  console.log("📦 getStarterData using kit:", savedKit);
+  
   return {
     username: username,
-    companyType: companyType || "general",
+    companyType: savedKit,
+    customInput: localStorage.getItem("aigentsyBusinessIdea") || "",
     activity: {
       servicesDelivered: 1,
       clientsServed: 1,
@@ -644,7 +653,7 @@ function getStarterData(username, companyType) {
     wallet: {
       balance: 250
     },
-    traits: [companyType || "general"],
+    traits: [savedKit],
     accessLevel: "full",
     partnerships: [],
     contacts: [],
@@ -1217,9 +1226,23 @@ async function injectUserDashboard() {
     const data = await res.json();
     let user = data.record || data.user || null;
     if (!user || !user.remix || !user.yield) {
-      console.log("📦 User has no data, using starter data");
-      user = getStarterData(username, user?.companyType || "general");
+      console.log("📦 User has incomplete data, using starter data");
+      // ✅ FIX: Preserve kit even if data is incomplete
+      const preservedKit = user?.companyType || localStorage.getItem("aigentsyKit") || "saas";
+      user = getStarterData(username, preservedKit);
     }
+    
+    // ✅ FIX: Save kit to localStorage for persistence
+    if (user.companyType && user.companyType !== "general") {
+      localStorage.setItem("aigentsyKit", user.companyType);
+      console.log("💾 Saved kit to localStorage:", user.companyType);
+    }
+    
+    // ✅ FIX: Also save customInput if present
+    if (user.customInput) {
+      localStorage.setItem("aigentsyBusinessIdea", user.customInput);
+    }
+    
     window.aigentsyUser = user;
     console.log("✅ User loaded:", user.username, "Business:", user.companyType);
     renderDynamicWelcome(user);
@@ -1231,8 +1254,10 @@ async function injectUserDashboard() {
     updateSnapshotData(user);
   } catch (e) {
     console.error("⚠️ Backend unreachable:", e);
-    console.log("📦 Backend error, using starter data");
-    const user = getStarterData(username, "general");
+    // ✅ FIX: Preserve kit from localStorage even on error
+    const preservedKit = localStorage.getItem("aigentsyKit") || "saas";
+    console.log("📦 Backend error, using starter data with preserved kit:", preservedKit);
+    const user = getStarterData(username, preservedKit);
     window.aigentsyUser = user;
     renderDynamicWelcome(user);
     renderDynamicCSuite(user);
@@ -1346,12 +1371,22 @@ async function runAgent() {
   chatLog.scrollTop = chatLog.scrollHeight;
   try {
     const user = window.aigentsyUser || {};
-    const businessType = user.companyType || 'general';
+    
+    // ✅ FIX: Get kit from multiple sources (priority order)
+    const businessType = user.companyType || 
+                         localStorage.getItem("aigentsyKit") || 
+                         'saas';
+    
+    // ✅ FIX: Get custom business idea for personalized responses
+    const customInput = user.customInput || 
+                        localStorage.getItem("aigentsyBusinessIdea") || 
+                        "";
     
     // Debug: Log what we're sending
     console.log("📤 Sending to Growth agent:", { 
       businessType, 
       username: user.username,
+      hasCustomInput: customInput.length > 0,
       inputPreview: input.substring(0, 50) 
     });
     
@@ -1365,13 +1400,24 @@ async function runAgent() {
         input: input, 
         memory, 
         businessType: businessType,
+        companyType: businessType,  // ✅ Send both field names
         username: user.username,
-        kit: businessType  // Also send as 'kit' in case backend expects this
+        kit: businessType,
+        customInput: customInput  // ✅ Send custom business idea
       }) 
     }, 2, 15000);
     
     const data = await res.json();
     let reply = data.output || "No response.";
+    
+    // ✅ FIX: Update local state from backend response
+    if (data.business_type && data.business_type !== "general") {
+      if (window.aigentsyUser) {
+        window.aigentsyUser.companyType = data.business_type;
+      }
+      localStorage.setItem("aigentsyKit", data.business_type);
+      console.log("📦 Updated kit from backend:", data.business_type);
+    }
     
     // Parse markdown-style bold for C-Suite labels
     const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
@@ -3478,6 +3524,43 @@ setInterval(() => {
     loadLiveActivityFeed();
   }
 }, 30000);
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DEBUG HELPERS - Kit Persistence
+// ═══════════════════════════════════════════════════════════════════════════════
+
+window.debugKit = function() {
+  console.log("═══════════════════════════════════════════");
+  console.log("🔧 KIT DEBUG");
+  console.log("═══════════════════════════════════════════");
+  console.log("localStorage.aigentsyKit:", localStorage.getItem("aigentsyKit"));
+  console.log("localStorage.aigentsyBusinessIdea:", localStorage.getItem("aigentsyBusinessIdea")?.substring(0, 50) || "(none)");
+  console.log("window.aigentsyUser?.companyType:", window.aigentsyUser?.companyType);
+  console.log("window.aigentsyUser?.customInput:", window.aigentsyUser?.customInput?.substring(0, 50) || "(none)");
+  console.log("═══════════════════════════════════════════");
+  return {
+    localStorage_kit: localStorage.getItem("aigentsyKit"),
+    localStorage_idea: localStorage.getItem("aigentsyBusinessIdea"),
+    user_companyType: window.aigentsyUser?.companyType,
+    user_customInput: window.aigentsyUser?.customInput
+  };
+};
+
+window.forceKit = function(kit) {
+  const validKits = ['saas', 'social', 'marketing'];
+  if (!validKits.includes(kit)) {
+    console.error("❌ Invalid kit. Use: saas, social, or marketing");
+    return;
+  }
+  localStorage.setItem("aigentsyKit", kit);
+  if (window.aigentsyUser) {
+    window.aigentsyUser.companyType = kit;
+  }
+  console.log("✅ Kit forced to:", kit);
+  console.log("🔄 Reload page to see changes");
+};
+
+console.log("🔧 Kit debug tools loaded. Run debugKit() or forceKit('saas'|'social'|'marketing')");
 
 </script>
 </body>
