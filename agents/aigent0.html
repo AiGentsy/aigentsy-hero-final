@@ -1682,8 +1682,11 @@ async function runAgent() {
       inputPreview: input.substring(0, 50) 
     });
     
-    // ALL chat goes to Growth agent (the communicator)
-    const endpoint = "https://aigent-growth-runtime.onrender.com/agent";
+    // ═══════════════════════════════════════════════════════════════
+    // AGENT ENDPOINT SELECTION
+    // Use main backend for kit-aware responses
+    // ═══════════════════════════════════════════════════════════════
+    const endpoint = `${window.BACKEND_BASE}/agent`;
     
     const res = await fetchWithRetry(endpoint, { 
       method: "POST", 
