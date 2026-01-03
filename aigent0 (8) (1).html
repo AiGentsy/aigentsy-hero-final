@@ -74,7 +74,64 @@
   .btn-glow:hover { background: #009cd8; }
   .btn-sm { padding: 4px 8px !important; font-size: 0.8rem !important; line-height: 1.1 !important; }
   .chat-user { color: #00B3FF; font-weight: 500; margin: 8px 0; }
-  .chat-agent { color: #FFFFFF; font-weight: 500; white-space: pre-line; margin: 8px 0; }
+  .chat-agent { color: #FFFFFF; font-weight: 500; white-space: pre-line; margin: 8px 0; line-height: 1.6; }
+  
+  /* ═══════════════════════════════════════════════════════════════════════════════ */
+  /* CHAT FORMATTING STYLES */
+  /* ═══════════════════════════════════════════════════════════════════════════════ */
+  .csuite-label { color: #2563eb; font-weight: 700; }
+  .chat-heading { display: block; color: #00bfff; font-size: 1rem; margin: 12px 0 6px 0; }
+  .chat-list-item { display: block; padding: 4px 0 4px 12px; color: #e0e0e0; }
+  .chat-code { display: block; background: #1a1a2e; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 0.85rem; margin: 8px 0; overflow-x: auto; }
+  .chat-inline-code { background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.9em; }
+  
+  /* ACTION BUTTONS */
+  .chat-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #333; }
+  .chat-action-btn { 
+    background: linear-gradient(135deg, #131722 0%, #1a2030 100%); 
+    color: #00bfff; 
+    border: 1px solid #00bfff; 
+    padding: 8px 14px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 0.85rem; 
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .chat-action-btn:hover { 
+    background: linear-gradient(135deg, #00bfff 0%, #009cd8 100%); 
+    color: #000; 
+    transform: translateY(-1px);
+  }
+  .chat-action-btn.primary { 
+    background: linear-gradient(135deg, #00bfff 0%, #00d4aa 100%); 
+    color: #000; 
+    border-color: #00ffcc;
+    font-weight: 700;
+  }
+  .chat-action-btn.primary:hover { 
+    background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); 
+    box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+  }
+  
+  /* STOREFRONT PICKER */
+  .storefront-options { display: flex; flex-direction: column; gap: 12px; }
+  .storefront-option {
+    background: linear-gradient(135deg, #131722 0%, #1a2030 100%);
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .storefront-option:hover {
+    border-color: #00bfff;
+    background: linear-gradient(135deg, #1a2030 0%, #252d40 100%);
+    transform: translateX(4px);
+  }
+  .storefront-option-name { color: #fff; font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+  .storefront-option-desc { color: #888; font-size: 0.85rem; }
+  /* ═══════════════════════════════════════════════════════════════════════════════ */
   .csn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   @media (max-width: 1024px) { .csn-grid { grid-template-columns: repeat(2, 1fr); } }
   .csn-tile { background: #0b0b0b; border: 1px solid #222; border-radius: 10px; padding: 12px 14px; box-shadow: 0 0 10px rgba(0,255,255,0.06); }
@@ -1252,6 +1309,9 @@ async function injectUserDashboard() {
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
+    
+    // ✅ SHOW STOREFRONT PICKER if not already selected
+    showStorefrontPickerIfNeeded(user);
   } catch (e) {
     console.error("⚠️ Backend unreachable:", e);
     // ✅ FIX: Preserve kit from localStorage even on error
@@ -1266,7 +1326,239 @@ async function injectUserDashboard() {
     renderWalletChart(user);
     renderOfferingsWithData(user);
     updateSnapshotData(user);
+    
+    // ✅ SHOW STOREFRONT PICKER if not already selected
+    showStorefrontPickerIfNeeded(user);
     showToast("Using demo data - backend unavailable", "info");
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STOREFRONT PICKER - Let user choose their storefront template
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const STOREFRONT_TEMPLATES = {
+  saas: {
+    technical: { name: 'Technical/Developer-First', best_for: 'Developer tools, APIs, technical products', file: 'saas-technical.html' },
+    modern: { name: 'Modern SaaS', best_for: 'B2B SaaS, productivity tools', file: 'saas-modern.html' },
+    enterprise: { name: 'Enterprise/Professional', best_for: 'Enterprise SaaS, large organizations', file: 'saas-enterprise.html' }
+  },
+  social: {
+    influencer: { name: 'Influencer/Lifestyle', best_for: 'Lifestyle influencers, personal brands', file: 'social-influencer.html' },
+    creator: { name: 'Creator/Artist', best_for: 'Content creators, artists, musicians', file: 'social-creator.html' },
+    entertainer: { name: 'Entertainer/Personality', best_for: 'Comedians, entertainers, personalities', file: 'social-entertainer.html' }
+  },
+  marketing: {
+    professional: { name: 'Professional/Direct', best_for: 'B2B, SaaS, agencies', file: 'variation-1-professional.html' },
+    boutique: { name: 'Boutique/Aspirational', best_for: 'Coaching, consulting, premium services', file: 'variation-2-boutique.html' },
+    disruptive: { name: 'Disruptive/Bold', best_for: 'Startups, tech companies', file: 'variation-3-disruptive.html' }
+  }
+};
+
+function showStorefrontPickerIfNeeded(user) {
+  const username = user?.username || localStorage.getItem("aigentsyUsername");
+  const storefrontKey = `aigentsyStorefront_${username}`;
+  
+  // Check if already picked
+  if (localStorage.getItem(storefrontKey)) {
+    console.log("🏪 Storefront already selected:", localStorage.getItem(storefrontKey));
+    // Auto-publish if not published yet
+    autoPublishStorefront(user);
+    return;
+  }
+  
+  // Show picker after a short delay (let dashboard render first)
+  setTimeout(() => {
+    showStorefrontPicker(user);
+  }, 1500);
+}
+
+function showStorefrontPicker(user) {
+  const kit = user?.companyType || localStorage.getItem("aigentsyKit") || "saas";
+  const templates = STOREFRONT_TEMPLATES[kit] || STOREFRONT_TEMPLATES.saas;
+  
+  const kitNames = { saas: 'SaaS', social: 'Social', marketing: 'Marketing' };
+  const kitName = kitNames[kit] || 'SaaS';
+  
+  let optionsHTML = '';
+  for (const [key, template] of Object.entries(templates)) {
+    optionsHTML += `
+      <div class="storefront-option" onclick="selectStorefront('${key}')" data-template="${key}">
+        <div class="storefront-option-name">${template.name}</div>
+        <div class="storefront-option-desc">${template.best_for}</div>
+      </div>
+    `;
+  }
+  
+  const modalContent = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3 style="color: #00bfff; margin: 0 0 8px 0;">🏪 Choose Your Storefront</h3>
+      <p style="color: #aaa; font-size: 0.9rem; margin: 0;">Pick the template that best fits your ${kitName} business. You can change this later.</p>
+    </div>
+    <div class="storefront-options">
+      ${optionsHTML}
+    </div>
+    <div style="margin-top: 16px; text-align: center;">
+      <button class="btn-glow btn-sm" onclick="skipStorefrontPicker()" style="background: #333; color: #888;">Decide Later</button>
+    </div>
+  `;
+  
+  openModal("Set Up Your Storefront", modalContent);
+}
+
+window.selectStorefront = async function(templateKey) {
+  const user = window.aigentsyUser || {};
+  const username = user.username || localStorage.getItem("aigentsyUsername");
+  const kit = user.companyType || localStorage.getItem("aigentsyKit") || "saas";
+  const templates = STOREFRONT_TEMPLATES[kit] || STOREFRONT_TEMPLATES.saas;
+  const template = templates[templateKey];
+  
+  if (!template) {
+    showToast("Invalid template selection", "error");
+    return;
+  }
+  
+  // Save selection
+  const storefrontKey = `aigentsyStorefront_${username}`;
+  localStorage.setItem(storefrontKey, templateKey);
+  localStorage.setItem("aigentsyStorefrontFile", template.file);
+  
+  // Update user object
+  if (window.aigentsyUser) {
+    window.aigentsyUser.storefrontTemplate = templateKey;
+    window.aigentsyUser.storefrontFile = template.file;
+  }
+  
+  showToast(`✅ ${template.name} storefront selected!`, "success");
+  GXA.closeModal();
+  
+  // Now auto-publish with the selected template
+  await publishStorefrontWithTemplate(user, templateKey, template.file);
+};
+
+window.skipStorefrontPicker = function() {
+  GXA.closeModal();
+  showToast("You can set up your storefront anytime from Actions → Publish Storefront", "info");
+};
+
+async function publishStorefrontWithTemplate(user, templateKey, templateFile) {
+  const username = user?.username || localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+  
+  try {
+    console.log("🏪 Publishing storefront:", templateKey, templateFile);
+    showToast("Publishing your storefront...", "info");
+    
+    const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+    const BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+    
+    const res = await fetch(`${BASE}/storefront/publish`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json", 
+        ...(apiKey && { "X-API-Key": apiKey }) 
+      },
+      body: JSON.stringify({ 
+        username: username,
+        companyType: user?.companyType || localStorage.getItem("aigentsyKit") || "saas",
+        storefrontTemplate: templateKey,
+        storefrontFile: templateFile
+      })
+    });
+    
+    const result = await res.json();
+    if (result.ok) {
+      console.log("✅ Storefront published:", result.link);
+      if (result.link) {
+        localStorage.setItem("aigentsyStorefrontLink", result.link);
+      }
+      showToast("🎉 Your storefront is live!", "success");
+      
+      // Show the link
+      setTimeout(() => {
+        openModal("🎉 Storefront Published!", `
+          <p style="color: #aaa;">Your storefront is now live and ready for customers!</p>
+          <p><a href="${result.link || `/storefront/${username}`}" target="_blank" style="color: #00bfff; font-size: 1.1rem;">${result.link || `aigentsy.com/storefront/${username}`}</a></p>
+          <div style="margin-top: 16px;">
+            <button class="btn-glow" onclick="copyStorefrontLink()">📋 Copy Link</button>
+            <button class="btn-glow" onclick="window.open('${result.link || `/storefront/${username}`}', '_blank')" style="background: #333;">👁️ View Storefront</button>
+          </div>
+        `);
+      }, 500);
+    } else {
+      console.warn("⚠️ Storefront publish failed:", result.error);
+      showToast(result.error || "Failed to publish storefront", "error");
+    }
+  } catch (err) {
+    console.warn("⚠️ Storefront publish error:", err.message);
+    showToast("Connection error - try again from Actions menu", "error");
+  }
+}
+
+window.copyStorefrontLink = function() {
+  const link = localStorage.getItem("aigentsyStorefrontLink") || 
+               `https://aigentsy.com/storefront/${localStorage.getItem("aigentsyUsername")}`;
+  navigator.clipboard.writeText(link).then(() => {
+    showToast("📋 Link copied!", "success");
+  }).catch(() => {
+    showToast("Couldn't copy - check console", "error");
+    console.log("Storefront link:", link);
+  });
+};
+
+// Legacy auto-publish (used after storefront is selected)
+async function autoPublishStorefront(user) {
+  const username = user?.username || localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+  
+  // Check if already published this session
+  const publishedKey = `aigentsyStorefrontPublished_${username}`;
+  if (sessionStorage.getItem(publishedKey)) {
+    console.log("🏪 Storefront already published this session");
+    return;
+  }
+  
+  const storefrontKey = `aigentsyStorefront_${username}`;
+  const templateKey = localStorage.getItem(storefrontKey);
+  const templateFile = localStorage.getItem("aigentsyStorefrontFile");
+  
+  if (!templateKey) {
+    console.log("🏪 No storefront template selected yet");
+    return;
+  }
+  
+  try {
+    console.log("🏪 Auto-publishing storefront for:", username);
+    const apiKey = localStorage.getItem("aigentsyApiKey") || "";
+    const BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+    
+    const res = await fetch(`${BASE}/storefront/publish`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json", 
+        ...(apiKey && { "X-API-Key": apiKey }) 
+      },
+      body: JSON.stringify({ 
+        username: username,
+        companyType: user?.companyType || localStorage.getItem("aigentsyKit") || "saas",
+        storefrontTemplate: templateKey,
+        storefrontFile: templateFile,
+        autoPublish: true
+      })
+    });
+    
+    const result = await res.json();
+    if (result.ok) {
+      sessionStorage.setItem(publishedKey, "true");
+      console.log("✅ Storefront auto-published:", result.link);
+      if (result.link) {
+        localStorage.setItem("aigentsyStorefrontLink", result.link);
+      }
+    } else {
+      console.warn("⚠️ Storefront auto-publish failed:", result.error);
+    }
+  } catch (err) {
+    console.warn("⚠️ Storefront auto-publish error:", err.message);
   }
 }
 
@@ -1407,6 +1699,108 @@ async function runAgent() {
       }) 
     }, 2, 15000);
     
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MARKDOWN PARSER - Convert markdown to clean HTML
+    // ═══════════════════════════════════════════════════════════════════════════════
+    function parseMarkdown(text) {
+      let html = text;
+      
+      // Remove C-Suite prefix markdown (we'll add it back styled)
+      html = html.replace(/^\*\*(CFO|CTO|CMO|CEO|COO):\*\*\s*/i, '<strong class="csuite-label">$1:</strong> ');
+      
+      // Headers → Bold text (no ### symbols)
+      html = html.replace(/^### (.*?)$/gm, '<strong class="chat-heading">$1</strong>');
+      html = html.replace(/^## (.*?)$/gm, '<strong class="chat-heading">$1</strong>');
+      html = html.replace(/^# (.*?)$/gm, '<strong class="chat-heading">$1</strong>');
+      
+      // Bold **text** → <strong>
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+      // Italic *text* → <em>
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+      // Numbered lists (1. item) → clean list
+      html = html.replace(/^\d+\.\s+(.*?)$/gm, '<div class="chat-list-item">• $1</div>');
+      
+      // Bullet points (- item) → clean list  
+      html = html.replace(/^[-•]\s+(.*?)$/gm, '<div class="chat-list-item">• $1</div>');
+      
+      // Code blocks ```code``` → styled code
+      html = html.replace(/```([\s\S]*?)```/g, '<code class="chat-code">$1</code>');
+      
+      // Inline code `code` → styled
+      html = html.replace(/`(.*?)`/g, '<code class="chat-inline-code">$1</code>');
+      
+      // Line breaks
+      html = html.replace(/\n\n/g, '<br><br>');
+      html = html.replace(/\n/g, '<br>');
+      
+      return html;
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // ACTION BUTTONS - Add clickable actions based on response content
+    // ═══════════════════════════════════════════════════════════════════════════════
+    function addActionButtons(reply, businessType) {
+      let buttons = '';
+      const replyLower = reply.toLowerCase();
+      
+      // Detect actionable suggestions and add relevant buttons
+      if (replyLower.includes('build') || replyLower.includes('tool') || replyLower.includes('create')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('build')">🛠️ Start Building</button>`;
+      }
+      
+      if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>`;
+      }
+      
+      if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('pricing')">💰 Set Pricing</button>`;
+      }
+      
+      if (replyLower.includes('proposal') || replyLower.includes('pitch')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('proposal')">📝 Draft Proposal</button>`;
+      }
+      
+      if (replyLower.includes('content') || replyLower.includes('post') || replyLower.includes('social')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('content')">📱 Create Content</button>`;
+      }
+      
+      if (replyLower.includes('seo') || replyLower.includes('traffic') || replyLower.includes('marketing')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('marketing')">📈 Launch Marketing</button>`;
+      }
+      
+      // Always show a "Let's do it" button if there's a recommendation
+      if (replyLower.includes('recommend') || replyLower.includes('start with') || replyLower.includes('my pick')) {
+        buttons += `<button class="chat-action-btn primary" onclick="quickAction('approve')">✓ Let's Do It</button>`;
+      }
+      
+      if (buttons) {
+        return `<div class="chat-actions">${buttons}</div>`;
+      }
+      return '';
+    }
+    
+    // Quick action handler
+    window.quickAction = function(action) {
+      const actions = {
+        'build': "Let's start building. What's the first feature I should create?",
+        'find_clients': "Help me find my first 3 clients for this.",
+        'pricing': "What should I charge for this? Give me specific pricing.",
+        'proposal': "Draft a proposal I can send to prospects.",
+        'content': "Create some content I can post to attract customers.",
+        'marketing': "Set up a marketing plan to get traffic and leads.",
+        'approve': "I'm in. Let's execute on your recommendation. What's step 1?"
+      };
+      
+      const message = actions[action] || "Let's move forward with this.";
+      const textarea = document.getElementById("agentInput");
+      if (textarea) {
+        textarea.value = message;
+        runAgent();
+      }
+    };
+    
     const data = await res.json();
     let reply = data.output || "No response.";
     
@@ -1419,9 +1813,10 @@ async function runAgent() {
       console.log("📦 Updated kit from backend:", data.business_type);
     }
     
-    // Parse markdown-style bold for C-Suite labels
-    const formattedReply = reply.replace(/\*\*(.*?):\*\*/g, '<strong style="color: #2563eb;">$1:</strong>');
-    loader.innerHTML = formattedReply;
+    // ✅ Parse markdown and add action buttons
+    const formattedReply = parseMarkdown(reply);
+    const actionButtons = addActionButtons(reply, businessType);
+    loader.innerHTML = formattedReply + actionButtons;
     
     memory.push(`🤖 ${reply}`);
     chatLog.scrollTop = chatLog.scrollHeight;
