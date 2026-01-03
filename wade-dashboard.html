@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wade Command Center | AiGentsy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .gradient-bg { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
+        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .glow { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .activity-item { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    
+    <!-- Header -->
+    <header class="border-b border-white/10 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="text-2xl font-bold">🎯 Wade Command Center</div>
+                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-400 rounded-full pulse"></span>
+                    System Active
+                </span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="initiatePayout()" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition">
+                    💰 Payout to Bank
+                </button>
+                <button onclick="runFullCycle()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition">
+                    ▶️ Run Full Cycle
+                </button>
+                <button onclick="refreshAll()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-6">
+        
+        <!-- Revenue Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="card rounded-xl p-6">
+                <div class="text-gray-400 text-sm mb-1">💳 Stripe Balance</div>
+                <div class="text-3xl font-bold text-green-400 mono" id="stripe-balance">$0.00</div>
+                <div class="text-xs text-gray-500 mt-1">Available in your account</div>
+            </div>
+            <div class="card rounded-xl p-6">
+                <div class="text-gray-400 text-sm mb-1">⏳ Pending</div>
+                <div class="text-3xl font-bold text-yellow-400 mono" id="stripe-pending">$0.00</div>
+                <div class="text-xs text-gray-500 mt-1">Processing payments</div>
+            </div>
+            <div class="card rounded-xl p-6">
+                <div class="text-gray-400 text-sm mb-1">Path A (Fees)</div>
+                <div class="text-3xl font-bold text-blue-400 mono" id="fees-collected">$0.00</div>
+                <div class="text-xs text-gray-500 mt-1">2.8% + 28¢ per transaction</div>
+            </div>
+            <div class="card rounded-xl p-6">
+                <div class="text-gray-400 text-sm mb-1">Path B (Wade)</div>
+                <div class="text-3xl font-bold text-purple-400 mono" id="wade-balance">$0.00</div>
+                <div class="text-xs text-gray-500 mt-1">Direct fulfillment earnings</div>
+            </div>
+            <div class="card rounded-xl p-6">
+                <div class="text-gray-400 text-sm mb-1">Pending Approval</div>
+                <div class="text-3xl font-bold text-orange-400 mono" id="pending-count">0</div>
+                <div class="text-xs text-gray-500 mt-1">Opportunities to review</div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Wade Approval Queue -->
+            <div class="lg:col-span-2 card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">📋 Wade Approval Queue</h2>
+                    <span class="text-sm text-gray-400" id="queue-count">0 items</span>
+                </div>
+                <div id="approval-queue" class="space-y-3 max-h-96 overflow-y-auto">
+                    <div class="text-gray-500 text-center py-8">Loading opportunities...</div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">⚡ System Status</h2>
+                <div id="system-status" class="space-y-3">
+                    <div class="text-gray-500">Loading...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Activity & Workflows -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Live Activity Feed -->
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">📡 Live Activity</h2>
+                    <span class="text-xs text-gray-400">Auto-updates every 10s</span>
+                </div>
+                <div id="activity-feed" class="space-y-2 max-h-80 overflow-y-auto">
+                    <div class="text-gray-500 text-center py-4">Waiting for activity...</div>
+                </div>
+            </div>
+
+            <!-- Active Workflows -->
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">🔄 Active Workflows</h2>
+                    <span class="text-sm text-gray-400" id="workflow-count">0 active</span>
+                </div>
+                <div id="active-workflows" class="space-y-3 max-h-80 overflow-y-auto">
+                    <div class="text-gray-500 text-center py-4">No active workflows</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Learning & Patterns -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Yield Memory -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">🧠 Yield Memory (Learning)</h2>
+                <div id="yield-stats" class="space-y-3">
+                    <div class="text-gray-500">Loading patterns...</div>
+                </div>
+            </div>
+
+            <!-- MetaHive -->
+            <div class="card rounded-xl p-6">
+                <h2 class="text-xl font-semibold mb-4">🌐 MetaHive (Cross-User Learning)</h2>
+                <div id="hive-stats" class="space-y-3">
+                    <div class="text-gray-500">Loading hive data...</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Last Cycle Results -->
+        <div class="card rounded-xl p-6">
+            <h2 class="text-xl font-semibold mb-4">📊 Last Orchestrator Cycle</h2>
+            <div id="last-cycle" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                <div class="text-gray-500 col-span-full text-center py-4">No cycle data yet</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 px-6 py-4 mt-8">
+        <div class="max-w-7xl mx-auto flex items-center justify-between text-sm text-gray-400">
+            <div>AiGentsy v91 • Fully Wired • No Stubs</div>
+            <div id="last-updated">Last updated: Never</div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = 'https://aigentsy-ame-runtime.onrender.com';
+        // const API_BASE = 'http://localhost:8000'; // For local testing
+        
+        let activities = [];
+
+        // Fetch wrapper with error handling
+        async function fetchAPI(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                console.error(`API Error (${endpoint}):`, error);
+                return { ok: false, error: error.message };
+            }
+        }
+
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount || 0);
+        }
+
+        // Format time ago
+        function timeAgo(date) {
+            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+            if (seconds < 60) return `${seconds}s ago`;
+            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+            return `${Math.floor(seconds / 86400)}d ago`;
+        }
+
+        // Load Stripe Balance (Real money in your account)
+        async function loadStripeBalance() {
+            const data = await fetchAPI('/admin/balance');
+            
+            if (data.ok) {
+                document.getElementById('stripe-balance').textContent = formatCurrency(data.available);
+                document.getElementById('stripe-pending').textContent = formatCurrency(data.pending);
+            }
+        }
+
+        // Load Revenue by Path
+        async function loadRevenueByPath() {
+            const data = await fetchAPI('/admin/revenue?days=30');
+            
+            if (data.ok) {
+                document.getElementById('fees-collected').textContent = formatCurrency(data.path_a_fees);
+                document.getElementById('wade-balance').textContent = formatCurrency(data.path_b_wade);
+            }
+        }
+
+        // Load Wade Dashboard
+        async function loadWadeDashboard() {
+            const data = await fetchAPI('/wade/dashboard');
+            
+            if (data.ok) {
+                document.getElementById('pending-count').textContent = data.pending_approval || 0;
+            }
+        }
+
+        // Load Reconciliation Dashboard
+        async function loadReconciliation() {
+            const data = await fetchAPI('/reconciliation/dashboard');
+            
+            if (data.ok && data.balances) {
+                document.getElementById('wade-balance').textContent = formatCurrency(data.balances.wade_balance);
+                document.getElementById('fees-collected').textContent = formatCurrency(data.balances.fees_collected);
+                document.getElementById('total-earnings').textContent = formatCurrency(data.balances.total_aigentsy_earnings);
+            }
+        }
+
+        // Load Approval Queue
+        async function loadApprovalQueue() {
+            const data = await fetchAPI('/wade/dashboard');
+            const container = document.getElementById('approval-queue');
+            
+            if (data.ok && data.workflows) {
+                const pending = Object.values(data.workflows).filter(w => 
+                    w.stage === 'pending_wade_approval' || w.stage === 'discovered'
+                );
+                
+                document.getElementById('queue-count').textContent = `${pending.length} items`;
+                
+                if (pending.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-gray-500 text-center py-8">
+                            <div class="text-4xl mb-2">✨</div>
+                            <div>No pending approvals</div>
+                            <div class="text-sm">System will auto-discover opportunities</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = pending.map(w => `
+                    <div class="bg-white/5 rounded-lg p-4 border border-white/10">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="font-medium">${w.opportunity?.title || 'Untitled Opportunity'}</div>
+                                <div class="text-sm text-gray-400 mt-1">
+                                    ${w.opportunity?.platform || 'Unknown'} • ${formatCurrency(w.opportunity?.value)}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    ${w.opportunity?.description?.substring(0, 100) || 'No description'}...
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="approveWorkflow('${w.id}')" 
+                                    class="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm transition">
+                                    ✓ Approve
+                                </button>
+                                <button onclick="rejectWorkflow('${w.id}')"
+                                    class="px-3 py-1 bg-red-600/50 hover:bg-red-600 rounded text-sm transition">
+                                    ✗
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = `
+                    <div class="text-gray-500 text-center py-8">
+                        <div>Could not load queue</div>
+                        <div class="text-sm">Check API connection</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Load System Status
+        async function loadSystemStatus() {
+            const data = await fetchAPI('/orchestrator/status');
+            const container = document.getElementById('system-status');
+            
+            if (data.ok && data.systems) {
+                container.innerHTML = Object.entries(data.systems).map(([name, available]) => `
+                    <div class="flex items-center justify-between py-2 border-b border-white/5">
+                        <span class="text-sm">${name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                        <span class="${available ? 'text-green-400' : 'text-red-400'} text-sm">
+                            ${available ? '✓ Live' : '✗ Offline'}
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Load Active Workflows
+        async function loadActiveWorkflows() {
+            const data = await fetchAPI('/wade/dashboard');
+            const container = document.getElementById('active-workflows');
+            
+            if (data.ok && data.workflows) {
+                const active = Object.values(data.workflows).filter(w => 
+                    ['wade_approved', 'in_progress', 'bid_submitted', 'client_approved'].includes(w.stage)
+                );
+                
+                document.getElementById('workflow-count').textContent = `${active.length} active`;
+                
+                if (active.length === 0) {
+                    container.innerHTML = `<div class="text-gray-500 text-center py-4">No active workflows</div>`;
+                    return;
+                }
+
+                container.innerHTML = active.map(w => `
+                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-sm">${w.opportunity?.title?.substring(0, 40) || 'Workflow'}...</div>
+                                <div class="text-xs text-gray-400">${formatCurrency(w.opportunity?.value)}</div>
+                            </div>
+                            <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">
+                                ${w.stage?.replace(/_/g, ' ')}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Load Yield Memory Stats
+        async function loadYieldStats() {
+            const data = await fetchAPI('/yield/stats/system');
+            const container = document.getElementById('yield-stats');
+            
+            if (data.ok) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-indigo-400">${data.total_patterns || 0}</div>
+                            <div class="text-xs text-gray-400">Total Patterns</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-green-400">${data.success_patterns || 0}</div>
+                            <div class="text-xs text-gray-400">Successful</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">
+                        Learning from every action to improve future decisions
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="text-gray-500">Yield Memory not available</div>`;
+            }
+        }
+
+        // Load MetaHive Stats
+        async function loadHiveStats() {
+            const data = await fetchAPI('/hive/stats');
+            const container = document.getElementById('hive-stats');
+            
+            if (data.ok) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-purple-400">${data.total_patterns || 0}</div>
+                            <div class="text-xs text-gray-400">Hive Patterns</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-yellow-400">${data.contributors || 0}</div>
+                            <div class="text-xs text-gray-400">Contributors</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">
+                        Cross-user learning: patterns shared anonymously
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="text-gray-500">MetaHive not available</div>`;
+            }
+        }
+
+        // Add activity to feed
+        function addActivity(message, type = 'info') {
+            const colors = {
+                info: 'text-blue-400',
+                success: 'text-green-400',
+                warning: 'text-yellow-400',
+                error: 'text-red-400'
+            };
+            
+            activities.unshift({
+                message,
+                type,
+                time: new Date()
+            });
+            
+            // Keep only last 50
+            activities = activities.slice(0, 50);
+            
+            const container = document.getElementById('activity-feed');
+            container.innerHTML = activities.map(a => `
+                <div class="activity-item flex items-start gap-2 py-2 border-b border-white/5">
+                    <span class="${colors[a.type]} text-xs">${timeAgo(a.time)}</span>
+                    <span class="text-sm text-gray-300">${a.message}</span>
+                </div>
+            `).join('');
+        }
+
+        // Initiate payout to bank
+        async function initiatePayout() {
+            if (!confirm('Transfer available balance to your bank account?')) return;
+            
+            addActivity('💰 Initiating payout to bank...', 'info');
+            
+            const data = await fetchAPI('/admin/payout', { method: 'POST' });
+            
+            if (data.ok) {
+                addActivity(`✓ Payout initiated: ${formatCurrency(data.amount)}`, 'success');
+                loadStripeBalance();
+            } else {
+                addActivity(`✗ Payout failed: ${data.error}`, 'error');
+            }
+        }
+
+        // Create payment link for workflow
+        async function createPaymentLink(workflowId, amount, description) {
+            addActivity(`Creating payment link for ${workflowId}...`, 'info');
+            
+            const data = await fetchAPI('/wade/payment-link', {
+                method: 'POST',
+                body: JSON.stringify({
+                    workflow_id: workflowId,
+                    amount: amount,
+                    description: description
+                })
+            });
+            
+            if (data.ok) {
+                addActivity(`✓ Payment link created: ${data.payment_link}`, 'success');
+                // Copy to clipboard
+                navigator.clipboard.writeText(data.payment_link);
+                alert(`Payment link copied to clipboard!\n\n${data.payment_link}`);
+            } else {
+                addActivity(`✗ Failed: ${data.error}`, 'error');
+            }
+        }
+
+        // Approve workflow
+        async function approveWorkflow(id) {
+            addActivity(`Approving workflow ${id}...`, 'info');
+            const data = await fetchAPI(`/wade/workflow/${id}/approve`, { method: 'POST' });
+            
+            if (data.ok) {
+                addActivity(`✓ Workflow ${id} approved!`, 'success');
+                loadApprovalQueue();
+                loadActiveWorkflows();
+            } else {
+                addActivity(`✗ Failed to approve: ${data.error}`, 'error');
+            }
+        }
+
+        // Reject workflow
+        async function rejectWorkflow(id) {
+            addActivity(`Rejecting workflow ${id}...`, 'warning');
+            const data = await fetchAPI(`/wade/workflow/${id}/reject`, { method: 'POST' });
+            
+            if (data.ok) {
+                addActivity(`Workflow ${id} rejected`, 'warning');
+                loadApprovalQueue();
+            } else {
+                addActivity(`✗ Failed to reject: ${data.error}`, 'error');
+            }
+        }
+
+        // Run full orchestrator cycle
+        async function runFullCycle() {
+            addActivity('🚀 Starting full orchestrator cycle...', 'info');
+            
+            const data = await fetchAPI('/orchestrator/full-cycle', { method: 'POST' });
+            
+            if (data.ok) {
+                addActivity('✓ Cycle complete!', 'success');
+                
+                // Update last cycle display
+                const container = document.getElementById('last-cycle');
+                const steps = data.steps || {};
+                
+                container.innerHTML = Object.entries(steps).map(([name, result]) => `
+                    <div class="bg-white/5 rounded-lg p-3 text-center">
+                        <div class="text-lg font-bold text-indigo-400">
+                            ${typeof result === 'object' ? Object.values(result)[0] || '✓' : result}
+                        </div>
+                        <div class="text-xs text-gray-400">${name.replace(/_/g, ' ')}</div>
+                    </div>
+                `).join('');
+                
+                // Add detailed activities
+                if (steps.discovery) addActivity(`Found ${steps.discovery.opportunities_found} opportunities`, 'success');
+                if (steps.ame) addActivity(`Sent ${steps.ame.sent} pitches`, 'success');
+                if (steps.social) addActivity(`Posted ${steps.social.posted} content`, 'success');
+                
+                refreshAll();
+            } else {
+                addActivity(`✗ Cycle failed: ${data.error}`, 'error');
+            }
+        }
+
+        // Refresh all data
+        async function refreshAll() {
+            await Promise.all([
+                loadStripeBalance(),
+                loadRevenueByPath(),
+                loadWadeDashboard(),
+                loadReconciliation(),
+                loadApprovalQueue(),
+                loadSystemStatus(),
+                loadActiveWorkflows(),
+                loadYieldStats(),
+                loadHiveStats()
+            ]);
+            
+            document.getElementById('last-updated').textContent = 
+                `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Initial load
+        refreshAll();
+        addActivity('Dashboard loaded', 'info');
+
+        // Auto-refresh every 30 seconds
+        setInterval(refreshAll, 30000);
+        
+        // Heartbeat activity every 10 seconds
+        setInterval(() => {
+            addActivity('System heartbeat ♥', 'info');
+        }, 60000);
+    </script>
+</body>
+</html>
