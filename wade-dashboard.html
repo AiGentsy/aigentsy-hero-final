@@ -251,19 +251,19 @@
             const data = await fetchAPI('/wade/dashboard');
             const container = document.getElementById('approval-queue');
             
-            if (data.ok && data.workflows) {
-                const pending = Object.values(data.workflows).filter(w => 
-                    w.stage === 'pending_wade_approval' || w.stage === 'discovered'
-                );
+            if (data.ok) {
+                // API returns 'queue' for pending items
+                const pending = data.queue || [];
                 
                 document.getElementById('queue-count').textContent = `${pending.length} items`;
+                document.getElementById('pending-count').textContent = data.pending_approval || 0;
                 
                 if (pending.length === 0) {
                     container.innerHTML = `
                         <div class="text-gray-500 text-center py-8">
                             <div class="text-4xl mb-2">✨</div>
                             <div>No pending approvals</div>
-                            <div class="text-sm">System will auto-discover opportunities</div>
+                            <div class="text-sm">Click "Run Full Cycle" to discover opportunities</div>
                         </div>
                     `;
                     return;
@@ -273,12 +273,12 @@
                     <div class="bg-white/5 rounded-lg p-4 border border-white/10">
                         <div class="flex items-start justify-between">
                             <div class="flex-1">
-                                <div class="font-medium">${w.opportunity?.title || 'Untitled Opportunity'}</div>
+                                <div class="font-medium">${w.opportunity?.title || w.title || 'Untitled Opportunity'}</div>
                                 <div class="text-sm text-gray-400 mt-1">
-                                    ${w.opportunity?.platform || 'Unknown'} • ${formatCurrency(w.opportunity?.value)}
+                                    ${w.opportunity?.platform || w.platform || 'Unknown'} • ${formatCurrency(w.opportunity?.value || w.estimated_value || 0)}
                                 </div>
                                 <div class="text-xs text-gray-500 mt-1">
-                                    ${w.opportunity?.description?.substring(0, 100) || 'No description'}...
+                                    ${(w.opportunity?.description || w.description || 'No description')?.substring(0, 100)}...
                                 </div>
                             </div>
                             <div class="flex gap-2 ml-4">
@@ -298,7 +298,7 @@
                 container.innerHTML = `
                     <div class="text-gray-500 text-center py-8">
                         <div>Could not load queue</div>
-                        <div class="text-sm">Check API connection</div>
+                        <div class="text-sm">${data.error || 'Check API connection'}</div>
                     </div>
                 `;
             }
@@ -326,10 +326,9 @@
             const data = await fetchAPI('/wade/dashboard');
             const container = document.getElementById('active-workflows');
             
-            if (data.ok && data.workflows) {
-                const active = Object.values(data.workflows).filter(w => 
-                    ['wade_approved', 'in_progress', 'bid_submitted', 'client_approved'].includes(w.stage)
-                );
+            if (data.ok) {
+                // API returns 'active' for active workflows
+                const active = data.active || [];
                 
                 document.getElementById('workflow-count').textContent = `${active.length} active`;
                 
@@ -342,11 +341,11 @@
                     <div class="bg-white/5 rounded-lg p-3 border border-white/10">
                         <div class="flex items-center justify-between">
                             <div>
-                                <div class="font-medium text-sm">${w.opportunity?.title?.substring(0, 40) || 'Workflow'}...</div>
-                                <div class="text-xs text-gray-400">${formatCurrency(w.opportunity?.value)}</div>
+                                <div class="font-medium text-sm">${(w.opportunity?.title || w.title || 'Workflow')?.substring(0, 40)}...</div>
+                                <div class="text-xs text-gray-400">${formatCurrency(w.opportunity?.value || w.estimated_value || 0)}</div>
                             </div>
                             <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">
-                                ${w.stage?.replace(/_/g, ' ')}
+                                ${(w.stage || 'pending')?.replace(/_/g, ' ')}
                             </span>
                         </div>
                     </div>
