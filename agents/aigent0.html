@@ -1745,52 +1745,84 @@ async function runAgent() {
       let buttons = '';
       const replyLower = reply.toLowerCase();
       
-      // Detect actionable suggestions and add relevant buttons
-      if (replyLower.includes('build') || replyLower.includes('tool') || replyLower.includes('create')) {
+      // ═══════════════════════════════════════════════════════════════
+      // MONETIZATION-FOCUSED ACTION BUTTONS
+      // Always surface ways to make money
+      // ═══════════════════════════════════════════════════════════════
+      
+      // Building/Creating products to sell
+      if (replyLower.includes('build') || replyLower.includes('tool') || replyLower.includes('create') || replyLower.includes('launch')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('build')">🛠️ Start Building</button>`;
       }
       
-      if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find')) {
+      // Finding clients (MONEY)
+      if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find') || replyLower.includes('lead')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>`;
       }
       
-      if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue')) {
+      // Pricing (MONEY)
+      if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue') || replyLower.includes('charge') || replyLower.includes('rate')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('pricing')">💰 Set Pricing</button>`;
       }
       
-      if (replyLower.includes('proposal') || replyLower.includes('pitch')) {
+      // Proposals (MONEY - closing deals)
+      if (replyLower.includes('proposal') || replyLower.includes('pitch') || replyLower.includes('deal') || replyLower.includes('contract')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('proposal')">📝 Draft Proposal</button>`;
       }
       
-      if (replyLower.includes('content') || replyLower.includes('post') || replyLower.includes('social')) {
+      // Content (MONETIZABLE)
+      if (replyLower.includes('content') || replyLower.includes('post') || replyLower.includes('social') || replyLower.includes('video') || replyLower.includes('reel')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('content')">📱 Create Content</button>`;
       }
       
-      if (replyLower.includes('seo') || replyLower.includes('traffic') || replyLower.includes('marketing')) {
+      // Marketing (DRIVES MONEY)
+      if (replyLower.includes('seo') || replyLower.includes('traffic') || replyLower.includes('marketing') || replyLower.includes('ad') || replyLower.includes('campaign')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('marketing')">📈 Launch Marketing</button>`;
       }
       
+      // Partnership (MONEY - JV deals)
+      if (replyLower.includes('partner') || replyLower.includes('collab') || replyLower.includes('affiliate') || replyLower.includes('referral')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('partnership')">🤝 Find Partners</button>`;
+      }
+      
+      // Sponsorship (MONEY)
+      if (replyLower.includes('sponsor') || replyLower.includes('brand deal') || replyLower.includes('influencer')) {
+        buttons += `<button class="chat-action-btn" onclick="quickAction('sponsorship')">💎 Get Sponsorship</button>`;
+      }
+      
+      // Opportunity detection (MONEY)
+      if (replyLower.includes('opportunit') || replyLower.includes('gig') || replyLower.includes('job') || replyLower.includes('project')) {
+        buttons += `<button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>`;
+      }
+      
       // Always show a "Let's do it" button if there's a recommendation
-      if (replyLower.includes('recommend') || replyLower.includes('start with') || replyLower.includes('my pick')) {
+      if (replyLower.includes('recommend') || replyLower.includes('start with') || replyLower.includes('my pick') || replyLower.includes('i suggest') || replyLower.includes("here's the deal")) {
         buttons += `<button class="chat-action-btn primary" onclick="quickAction('approve')">✓ Let's Do It</button>`;
       }
       
-      if (buttons) {
-        return `<div class="chat-actions">${buttons}</div>`;
+      // If no specific buttons triggered, show generic monetization actions
+      if (!buttons) {
+        buttons = `
+          <button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>
+          <button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 Opportunities</button>
+        `;
       }
-      return '';
+      
+      return `<div class="chat-actions">${buttons}</div>`;
     }
     
-    // Quick action handler
+    // Quick action handler - expanded for monetization
     window.quickAction = function(action) {
       const actions = {
         'build': "Let's start building. What's the first feature I should create?",
-        'find_clients': "Help me find my first 3 clients for this.",
-        'pricing': "What should I charge for this? Give me specific pricing.",
-        'proposal': "Draft a proposal I can send to prospects.",
-        'content': "Create some content I can post to attract customers.",
-        'marketing': "Set up a marketing plan to get traffic and leads.",
-        'approve': "I'm in. Let's execute on your recommendation. What's step 1?"
+        'find_clients': "Help me find my first 3 paying clients for this. Where are they and how do I reach them?",
+        'pricing': "What should I charge for this? Give me specific pricing tiers.",
+        'proposal': "Draft a proposal I can send to prospects today.",
+        'content': "Create some content I can post right now to attract customers.",
+        'marketing': "Set up a marketing plan to get traffic and leads this week.",
+        'approve': "I'm in. Let's execute on your recommendation. What's step 1?",
+        'partnership': "Find potential partners I could collaborate with for mutual revenue.",
+        'sponsorship': "Help me land a brand sponsorship. What companies should I pitch?"
       };
       
       const message = actions[action] || "Let's move forward with this.";
@@ -1911,21 +1943,50 @@ function openProposalInboxModal() {
     .then(data => {
       const proposals = data.proposals || [];
       if (proposals.length === 0) {
-        inboxBox.innerHTML = "<p>No incoming proposals yet.</p>";
+        inboxBox.innerHTML = `
+          <div style="text-align:center; padding:20px;">
+            <div style="font-size:32px; margin-bottom:8px;">📭</div>
+            <p style="color:#888;">No proposals or opportunities yet.</p>
+            <p style="color:#666; font-size:0.85rem;">Your AiGentsy is searching for opportunities...</p>
+          </div>
+        `;
       } else {
-        inboxBox.innerHTML = proposals.map((p, idx) => `
-  <div style="border:1px solid #333; padding:10px; margin-bottom:10px; border-radius:8px;">
-    <strong>From:</strong> ${p.sender}<br>
-    <strong>Title:</strong> ${p.title}<br>
-    <p>${p.details}</p>
-    <div style="font-size:0.75rem; color:#aaa;">${new Date(p.timestamp).toLocaleString()}</div>
-    ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
-    <div style="margin-top:8px; display:flex; gap:8px;">
-      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'accept', ${idx})" style="background:#00cc88;">✅ Accept</button>
-      <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'decline', ${idx})" style="background:#666;">❌ Decline</button>
-    </div>
-  </div>
-`).join("");
+        inboxBox.innerHTML = proposals.map((p, idx) => {
+          const isOpportunity = p.type === 'opportunity';
+          const borderColor = isOpportunity ? '#00ff88' : '#333';
+          const badge = isOpportunity 
+            ? '<span style="background:#00ff88; color:#000; padding:2px 6px; border-radius:4px; font-size:0.7rem; margin-left:6px;">OPPORTUNITY</span>'
+            : '';
+          
+          return `
+            <div style="border:1px solid ${borderColor}; padding:12px; margin-bottom:10px; border-radius:8px; ${isOpportunity ? 'background:rgba(0,255,136,0.05);' : ''}">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <strong style="color:${isOpportunity ? '#00ff88' : '#00bfff'};">From:</strong> ${p.sender}${badge}<br>
+                  <strong>Title:</strong> ${p.title}
+                </div>
+                ${p.status === 'pending' ? '<span style="background:#ffcc00; color:#000; padding:2px 8px; border-radius:4px; font-size:0.7rem;">PENDING</span>' : ''}
+              </div>
+              <p style="margin:8px 0; color:#ccc;">${p.details || ''}</p>
+              <div style="font-size:0.75rem; color:#888;">${p.created_at ? new Date(p.created_at).toLocaleString() : ''}</div>
+              ${p.link ? `<div style="margin-top:6px;"><a href="${p.link}" target="_blank" class="btn-glow btn-sm">🔗 View Link</a></div>` : ""}
+              ${p.status === 'pending' ? `
+                <div style="margin-top:10px; display:flex; gap:8px;">
+                  <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'accept', ${idx}, '${p.id}')" style="background:#00cc88;">✅ ${isOpportunity ? 'Approve' : 'Accept'}</button>
+                  <button class="btn-glow btn-sm" onclick="respondToProposal('${p.sender}', 'decline', ${idx}, '${p.id}')" style="background:#666;">❌ ${isOpportunity ? 'Skip' : 'Decline'}</button>
+                </div>
+              ` : `<div style="margin-top:6px; color:${p.status === 'accepted' ? '#00ff88' : '#888'}; font-size:0.85rem;">Status: ${p.status}</div>`}
+            </div>
+          `;
+        }).join("");
+      }
+      
+      // Update pending count badge
+      const pendingCount = proposals.filter(p => p.status === 'pending').length;
+      const badge = document.getElementById('pendingApprovalsCount');
+      if (badge) {
+        badge.textContent = pendingCount;
+        badge.style.display = pendingCount > 0 ? 'inline' : 'none';
       }
     })
     .catch(err => {
@@ -1934,23 +1995,37 @@ function openProposalInboxModal() {
     });
 }
 
-  async function respondToProposal(sender, action, index) {
+  async function respondToProposal(sender, action, index, proposalId) {
   const username = localStorage.getItem("aigentsyUsername");
   
   try {
-    // For now, just show feedback (can wire to backend later)
-    if (action === 'accept') {
-      showToast(`✅ Accepted proposal from ${sender}!`, "success");
-      // TODO: Send acceptance notification to sender
-      // Could create a reverse proposal or update JSONBin status
+    // Call backend to record response
+    const res = await fetch(`${window.BACKEND_BASE}/respond_proposal`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: username,
+        proposal_id: proposalId,
+        action: action
+      })
+    });
+    
+    const data = await res.json();
+    
+    if (data.ok) {
+      if (action === 'accept') {
+        showToast(`✅ Accepted proposal from ${sender}!`, "success");
+      } else {
+        showToast(`Declined proposal from ${sender}`, "info");
+      }
     } else {
-      showToast(`Declined proposal from ${sender}`, "info");
+      showToast(`⚠️ ${data.error || "Failed to respond"}`, "error");
     }
     
-    // Optionally refresh the proposal list
+    // Refresh the proposal list
     setTimeout(() => {
       openProposalInboxModal();
-    }, 1000);
+    }, 500);
     
   } catch (err) {
     console.error("Proposal response error:", err);
@@ -2995,6 +3070,12 @@ async function initializeDashboard() {
   // NOW render the dashboard with complete data
   injectUserDashboard();
   
+  // ═══════════════════════════════════════════════════════════════
+  // PROACTIVE OPPORTUNITY & MONETIZATION CHECK
+  // Surface pending opportunities and actions to the user
+  // ═══════════════════════════════════════════════════════════════
+  await checkPendingOpportunities(username);
+  
   // Wait a moment for user data to be set, then show kit-aware greeting
   setTimeout(() => {
     if (chatLog && chatLog.children.length === 0) {
@@ -3028,6 +3109,61 @@ I recommend starting with **brand partnerships ($500-5k)**—highest payout for 
       chatLog.appendChild(preload);
     }
   }, 500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROACTIVE OPPORTUNITY CHECKER
+// Notifies user of pending opportunities on dashboard load
+// ═══════════════════════════════════════════════════════════════
+async function checkPendingOpportunities(username) {
+  try {
+    const res = await fetch(`${window.BACKEND_BASE}/get_proposals`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+    
+    const data = await res.json();
+    
+    if (data.ok && data.proposals && data.proposals.length > 0) {
+      const pendingCount = data.proposals.filter(p => p.status === 'pending').length;
+      const opportunityCount = data.proposals.filter(p => p.type === 'opportunity').length;
+      
+      // Update badge
+      const badge = document.getElementById('pendingApprovalsCount');
+      if (badge && pendingCount > 0) {
+        badge.textContent = pendingCount;
+        badge.style.display = 'inline';
+      }
+      
+      // Show toast notification for opportunities
+      if (opportunityCount > 0) {
+        setTimeout(() => {
+          showToast(`🎯 ${opportunityCount} new opportunity${opportunityCount > 1 ? 's' : ''} waiting for your approval!`, "success");
+        }, 2000);
+      }
+      
+      // Add notification to Live Activity if there are pending items
+      if (pendingCount > 0) {
+        const liveList = document.getElementById("gxLiveList");
+        if (liveList) {
+          const notif = document.createElement("div");
+          notif.className = "gx-live-item";
+          notif.style.cursor = "pointer";
+          notif.onclick = () => openProposalInboxModal();
+          notif.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span>📬 ${pendingCount} pending approval${pendingCount > 1 ? 's' : ''}</span>
+              <span style="color:#00ff88; font-weight:600; font-size:0.75rem;">Review →</span>
+            </div>
+          `;
+          liveList.insertBefore(notif, liveList.firstChild);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Could not check pending opportunities:", err);
+  }
 }
 
 window.addEventListener("load", () => {
