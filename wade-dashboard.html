@@ -1,631 +1,857 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wade Command Center | AiGentsy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .gradient-bg { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); }
-        .card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .glow { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .activity-item { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-    </style>
+<meta charset="utf-8"/>
+<title>Wade Command Center - AiGentsy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="stylesheet" href="/theme.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body { 
+    font-family: 'Inter', sans-serif; 
+    margin: 0; 
+    background: radial-gradient(circle at center, #0e101a, #000); 
+    color: #fff; 
+    display: flex; 
+  }
+  
+  .sidebar { 
+    width: 280px; 
+    background: #0a0a0a; 
+    padding: 30px 20px; 
+    min-height: 100vh;
+    border-right: 1px solid #222;
+  }
+  
+  .sidebar img { width: 140px; display: block; margin-bottom: 30px; }
+  
+  .sidebar-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  
+  .sidebar-box h4 {
+    color: #00bfff;
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+  }
+  
+  .main { 
+    flex: 1;
+    padding: 30px; 
+    overflow-y: auto;
+  }
+  
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .header-row h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .status-badge {
+    background: rgba(0, 255, 136, 0.15);
+    color: #00ff88;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-glow {
+    background: #00bfff;
+    color: #000;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-glow:hover {
+    background: #009cd8;
+  }
+  
+  .btn-glow.danger {
+    background: #ff4444;
+  }
+  
+  .btn-glow.success {
+    background: #00ff88;
+  }
+  
+  .btn-glow.secondary {
+    background: linear-gradient(135deg, #131722 0%, #1a2030 100%);
+    color: #00bfff;
+    border: 1px solid #00bfff;
+  }
+  
+  .btn-glow.secondary:hover {
+    background: linear-gradient(135deg, #00bfff 0%, #009cd8 100%);
+    color: #000;
+  }
+  
+  /* Metric Cards Row */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .metric-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.05);
+  }
+  
+  .metric-card .label {
+    color: #888;
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .metric-card .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #00ff88;
+  }
+  
+  .metric-card .value.blue { color: #00bfff; }
+  .metric-card .value.purple { color: #a78bfa; }
+  .metric-card .value.yellow { color: #fbbf24; }
+  
+  .metric-card .sub {
+    color: #666;
+    font-size: 0.75rem;
+    margin-top: 4px;
+  }
+  
+  /* Grid Layout */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .grid-2-equal {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  
+  /* Boxes */
+  .metric-box {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 12px rgba(0,240,255,0.05);
+  }
+  
+  .metric-box h3 {
+    color: #00bfff;
+    margin: 0 0 16px 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .metric-box h3 span {
+    color: #666;
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+  
+  /* Approval Queue Items */
+  .queue-item {
+    background: #0a0a0a;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .queue-item:hover {
+    border-color: #333;
+  }
+  
+  .queue-item-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 0.95rem;
+    color: #fff;
+  }
+  
+  .queue-item-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #888;
+  }
+  
+  .queue-item-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .queue-item-actions button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+  }
+  
+  /* System Status Grid */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  
+  .status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #0a0a0a;
+    border-radius: 6px;
+    font-size: 0.85rem;
+  }
+  
+  .status-item .status-live {
+    color: #00ff88;
+    font-weight: 600;
+  }
+  
+  .status-item .status-offline {
+    color: #ff4444;
+    font-weight: 600;
+  }
+  
+  /* Live Activity Feed */
+  .activity-feed {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  
+  .activity-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-time {
+    color: #00bfff;
+    font-size: 0.75rem;
+    min-width: 50px;
+  }
+  
+  .activity-text {
+    color: #ccc;
+  }
+  
+  /* Deals Pipeline */
+  .deals-pipeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .deal-stage {
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  
+  .deal-stage .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  
+  .deal-stage .label {
+    font-size: 0.75rem;
+    color: #888;
+  }
+  
+  .deal-stage.pending .value { color: #fbbf24; }
+  .deal-stage.progress .value { color: #00bfff; }
+  .deal-stage.delivered .value { color: #a78bfa; }
+  .deal-stage.completed .value { color: #00ff88; }
+  
+  /* Learning Cards */
+  .learning-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .learning-card {
+    background: #0a0a0a;
+    border-radius: 8px;
+    padding: 14px;
+  }
+  
+  .learning-card .stat {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #00bfff;
+  }
+  
+  .learning-card .label {
+    font-size: 0.75rem;
+    color: #888;
+  }
+  
+  /* Empty States */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+  }
+  
+  .empty-state .icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  
+  .empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  
+  .empty-state .hint {
+    font-size: 0.8rem;
+    margin-top: 6px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .metrics-row { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .status-grid { grid-template-columns: 1fr; }
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 20px; }
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    .deals-pipeline { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
-<body class="gradient-bg min-h-screen text-white">
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <img alt="AiGentsy Logo" src="/aigentsy-logo-ultraclean.png"/>
+  
+  <!-- Stripe Balance -->
+  <div class="sidebar-box">
+    <h4>💰 Stripe Balance</h4>
+    <div style="font-size:1.75rem; font-weight:700; color:#00ff88;" id="stripe-balance">$0.00</div>
+    <div style="font-size:0.75rem; color:#888; margin-top:4px;">Available for payout</div>
+    <button class="btn-glow success" style="width:100%; margin-top:12px; padding:8px;" onclick="requestPayout()">
+      💸 Payout to Bank
+    </button>
+  </div>
+  
+  <!-- Quick Actions -->
+  <div class="sidebar-box">
+    <h4>⚡ Quick Actions</h4>
+    <button class="btn-glow secondary" style="width:100%; margin-bottom:8px;" onclick="runFullCycle()">
+      ▶️ Run Full Cycle
+    </button>
+    <button class="btn-glow secondary" style="width:100%; margin-bottom:8px;" onclick="refreshDashboard()">
+      🔄 Refresh
+    </button>
+    <button class="btn-glow secondary" style="width:100%;" onclick="viewServices()">
+      📋 Service Catalog
+    </button>
+  </div>
+  
+  <!-- Last Updated -->
+  <div style="font-size:0.75rem; color:#666; text-align:center; margin-top:20px;" id="last-updated">
+    Last updated: --
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  
+  <!-- Header -->
+  <div class="header-row">
+    <h1>
+      🎛️ Wade Command Center
+      <span class="status-badge" id="system-status-badge">● System Active</span>
+    </h1>
+  </div>
+  
+  <!-- Revenue Metrics -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="label">💳 Stripe Balance</div>
+      <div class="value" id="metric-balance">$0.00</div>
+      <div class="sub">Available in account</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">⏳ Pending</div>
+      <div class="value blue" id="metric-pending">$0.00</div>
+      <div class="sub">Processing payments</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">📊 Path A (Fees)</div>
+      <div class="value" id="metric-path-a">$0.00</div>
+      <div class="sub">2.8% + 28¢ per tx</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">👤 Path B (Wade)</div>
+      <div class="value" id="metric-path-b">$0.00</div>
+      <div class="sub">Direct fulfillment</div>
+    </div>
+    <div class="metric-card">
+      <div class="label">📋 Pending Approval</div>
+      <div class="value yellow" id="metric-pending-approval">0</div>
+      <div class="sub">Opportunities to review</div>
+    </div>
+  </div>
+  
+  <!-- Main Grid -->
+  <div class="grid-2">
     
-    <!-- Header -->
-    <header class="border-b border-white/10 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="text-2xl font-bold">🎯 Wade Command Center</div>
-                <span class="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-2">
-                    <span class="w-2 h-2 bg-green-400 rounded-full pulse"></span>
-                    System Active
-                </span>
-            </div>
-            <div class="flex items-center gap-4">
-                <button onclick="initiatePayout()" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg font-medium transition">
-                    💰 Payout to Bank
-                </button>
-                <button onclick="runFullCycle()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition">
-                    ▶️ Run Full Cycle
-                </button>
-                <button onclick="refreshAll()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition">
-                    🔄 Refresh
-                </button>
-            </div>
+    <!-- Left Column -->
+    <div>
+      
+      <!-- Wade Approval Queue -->
+      <div class="metric-box" style="margin-bottom:20px;">
+        <h3>📋 Wade Approval Queue <span id="queue-count">0 items</span></h3>
+        <div id="approval-queue">
+          <div class="empty-state">
+            <div class="icon">✨</div>
+            <p>No pending approvals</p>
+            <p class="hint">Click "Run Full Cycle" to discover opportunities</p>
+          </div>
         </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto p-6 space-y-6">
-        
-        <!-- Revenue Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div class="card rounded-xl p-6">
-                <div class="text-gray-400 text-sm mb-1">💳 Stripe Balance</div>
-                <div class="text-3xl font-bold text-green-400 mono" id="stripe-balance">$0.00</div>
-                <div class="text-xs text-gray-500 mt-1">Available in your account</div>
-            </div>
-            <div class="card rounded-xl p-6">
-                <div class="text-gray-400 text-sm mb-1">⏳ Pending</div>
-                <div class="text-3xl font-bold text-yellow-400 mono" id="stripe-pending">$0.00</div>
-                <div class="text-xs text-gray-500 mt-1">Processing payments</div>
-            </div>
-            <div class="card rounded-xl p-6">
-                <div class="text-gray-400 text-sm mb-1">Path A (Fees)</div>
-                <div class="text-3xl font-bold text-blue-400 mono" id="fees-collected">$0.00</div>
-                <div class="text-xs text-gray-500 mt-1">2.8% + 28¢ per transaction</div>
-            </div>
-            <div class="card rounded-xl p-6">
-                <div class="text-gray-400 text-sm mb-1">Path B (Wade)</div>
-                <div class="text-3xl font-bold text-purple-400 mono" id="wade-balance">$0.00</div>
-                <div class="text-xs text-gray-500 mt-1">Direct fulfillment earnings</div>
-            </div>
-            <div class="card rounded-xl p-6">
-                <div class="text-gray-400 text-sm mb-1">Pending Approval</div>
-                <div class="text-3xl font-bold text-orange-400 mono" id="pending-count">0</div>
-                <div class="text-xs text-gray-500 mt-1">Opportunities to review</div>
-            </div>
+      </div>
+      
+      <!-- Client Deals Pipeline -->
+      <div class="metric-box" style="margin-bottom:20px;">
+        <h3>🤝 Client Deals <span id="deals-total">0 total</span></h3>
+        <div class="deals-pipeline">
+          <div class="deal-stage pending">
+            <div class="value" id="deals-pending">0</div>
+            <div class="label">Pending</div>
+          </div>
+          <div class="deal-stage progress">
+            <div class="value" id="deals-in-progress">0</div>
+            <div class="label">In Progress</div>
+          </div>
+          <div class="deal-stage delivered">
+            <div class="value" id="deals-delivered">0</div>
+            <div class="label">Delivered</div>
+          </div>
+          <div class="deal-stage completed">
+            <div class="value" id="deals-completed">0</div>
+            <div class="label">Completed</div>
+          </div>
         </div>
-
-        <!-- Main Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <!-- Wade Approval Queue -->
-            <div class="lg:col-span-2 card rounded-xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">📋 Wade Approval Queue</h2>
-                    <span class="text-sm text-gray-400" id="queue-count">0 items</span>
-                </div>
-                <div id="approval-queue" class="space-y-3 max-h-96 overflow-y-auto">
-                    <div class="text-gray-500 text-center py-8">Loading opportunities...</div>
-                </div>
-            </div>
-
-            <!-- System Status -->
-            <div class="card rounded-xl p-6">
-                <h2 class="text-xl font-semibold mb-4">⚡ System Status</h2>
-                <div id="system-status" class="space-y-3">
-                    <div class="text-gray-500">Loading...</div>
-                </div>
-            </div>
-
+        <div style="display:flex; justify-content:space-between; padding-top:12px; border-top:1px solid #222;">
+          <span style="color:#888; font-size:0.85rem;">Deal Revenue</span>
+          <span style="color:#00ff88; font-weight:700;" id="deals-revenue">$0.00</span>
         </div>
-
-        <!-- Activity & Workflows -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <!-- Live Activity Feed -->
-            <div class="card rounded-xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">📡 Live Activity</h2>
-                    <span class="text-xs text-gray-400">Auto-updates every 10s</span>
-                </div>
-                <div id="activity-feed" class="space-y-2 max-h-80 overflow-y-auto">
-                    <div class="text-gray-500 text-center py-4">Waiting for activity...</div>
-                </div>
-            </div>
-
-            <!-- Client Deals Pipeline -->
-            <div class="card rounded-xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">🤝 Client Deals</h2>
-                    <span class="text-sm text-gray-400" id="deals-count">0 total</span>
-                </div>
-                <div class="grid grid-cols-4 gap-4 mb-4">
-                    <div class="bg-yellow-500/10 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-yellow-400" id="deals-pending">0</div>
-                        <div class="text-xs text-gray-400">Pending</div>
-                    </div>
-                    <div class="bg-blue-500/10 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-blue-400" id="deals-in-progress">0</div>
-                        <div class="text-xs text-gray-400">In Progress</div>
-                    </div>
-                    <div class="bg-purple-500/10 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-purple-400" id="deals-delivered">0</div>
-                        <div class="text-xs text-gray-400">Delivered</div>
-                    </div>
-                    <div class="bg-green-500/10 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-green-400" id="deals-completed">0</div>
-                        <div class="text-xs text-gray-400">Completed</div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between text-sm border-t border-white/10 pt-3">
-                    <span class="text-gray-400">Deal Revenue</span>
-                    <span class="text-green-400 font-bold" id="deals-revenue">$0.00</span>
-                </div>
-                <div id="deals-list" class="mt-4 space-y-2 max-h-40 overflow-y-auto">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-            <!-- Active Workflows -->
-            <div class="card rounded-xl p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold">🔄 Active Workflows</h2>
-                    <span class="text-sm text-gray-400" id="workflow-count">0 active</span>
-                </div>
-                <div id="active-workflows" class="space-y-3 max-h-80 overflow-y-auto">
-                    <div class="text-gray-500 text-center py-4">No active workflows</div>
-                </div>
-            </div>
-
+        <div id="deals-list" style="margin-top:12px;">
+          <!-- Active deals listed here -->
         </div>
-
-        <!-- Learning & Patterns -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <!-- Yield Memory -->
-            <div class="card rounded-xl p-6">
-                <h2 class="text-xl font-semibold mb-4">🧠 Yield Memory (Learning)</h2>
-                <div id="yield-stats" class="space-y-3">
-                    <div class="text-gray-500">Loading patterns...</div>
-                </div>
-            </div>
-
-            <!-- MetaHive -->
-            <div class="card rounded-xl p-6">
-                <h2 class="text-xl font-semibold mb-4">🌐 MetaHive (Cross-User Learning)</h2>
-                <div id="hive-stats" class="space-y-3">
-                    <div class="text-gray-500">Loading hive data...</div>
-                </div>
-            </div>
-
+      </div>
+      
+      <!-- Live Activity Feed -->
+      <div class="metric-box">
+        <h3>📡 Live Activity <span style="font-size:0.75rem;">Auto-updates every 10s</span></h3>
+        <div class="activity-feed" id="activity-feed">
+          <div class="activity-item">
+            <span class="activity-time">0s ago</span>
+            <span class="activity-text">Dashboard loaded</span>
+          </div>
         </div>
+      </div>
+      
+    </div>
+    
+    <!-- Right Column -->
+    <div>
+      
+      <!-- System Status -->
+      <div class="metric-box" style="margin-bottom:20px;">
+        <h3>⚡ System Status</h3>
+        <div class="status-grid" id="system-status">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      
+      <!-- Active Workflows -->
+      <div class="metric-box" style="margin-bottom:20px;">
+        <h3>🔄 Active Workflows <span id="workflow-count">0 active</span></h3>
+        <div id="active-workflows">
+          <div class="empty-state">
+            <p>No active workflows</p>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <!-- Learning Section -->
+  <div class="grid-2-equal">
+    
+    <!-- Yield Memory -->
+    <div class="metric-box">
+      <h3>🧠 Yield Memory (Learning)</h3>
+      <div class="learning-grid" id="yield-stats">
+        <div class="learning-card">
+          <div class="stat" id="yield-patterns">0</div>
+          <div class="label">Total Patterns</div>
+        </div>
+        <div class="learning-card">
+          <div class="stat" style="color:#00ff88;" id="yield-successful">0</div>
+          <div class="label">Successful</div>
+        </div>
+      </div>
+      <div style="font-size:0.75rem; color:#666; margin-top:12px;">
+        Learning from every action to improve future decisions
+      </div>
+    </div>
+    
+    <!-- MetaHive -->
+    <div class="metric-box">
+      <h3>🌐 MetaHive (Cross-User Learning)</h3>
+      <div class="learning-grid" id="hive-stats">
+        <div class="learning-card">
+          <div class="stat" id="hive-patterns">0</div>
+          <div class="label">Hive Patterns</div>
+        </div>
+        <div class="learning-card">
+          <div class="stat" style="color:#a78bfa;" id="hive-contributors">0</div>
+          <div class="label">Contributors</div>
+        </div>
+      </div>
+      <div style="font-size:0.75rem; color:#666; margin-top:12px;">
+        Cross-user learning: patterns shared anonymously
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- Last Orchestrator Cycle -->
+  <div class="metric-box">
+    <h3>🔄 Last Orchestrator Cycle</h3>
+    <div id="orchestrator-status">
+      <div style="color:#888; font-size:0.9rem;">No cycle data yet. Click "Run Full Cycle" to start.</div>
+    </div>
+  </div>
+  
+</div>
 
-        <!-- Last Cycle Results -->
-        <div class="card rounded-xl p-6">
-            <h2 class="text-xl font-semibold mb-4">📊 Last Orchestrator Cycle</h2>
-            <div id="last-cycle" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                <div class="text-gray-500 col-span-full text-center py-4">No cycle data yet</div>
+<script>
+  const API_BASE = 'https://aigentsy-ame-runtime.onrender.com';
+  let activityLog = [];
+  
+  // Utility Functions
+  function formatCurrency(amount) {
+    return '$' + (amount || 0).toFixed(2);
+  }
+  
+  function formatTime(seconds) {
+    if (seconds < 60) return seconds + 's ago';
+    if (seconds < 3600) return Math.floor(seconds/60) + 'm ago';
+    return Math.floor(seconds/3600) + 'h ago';
+  }
+  
+  function addActivity(text, type = 'info') {
+    const now = new Date();
+    activityLog.unshift({ text, time: now, type });
+    if (activityLog.length > 50) activityLog.pop();
+    renderActivityFeed();
+  }
+  
+  function renderActivityFeed() {
+    const feed = document.getElementById('activity-feed');
+    const now = new Date();
+    feed.innerHTML = activityLog.slice(0, 15).map(a => `
+      <div class="activity-item">
+        <span class="activity-time">${formatTime(Math.floor((now - a.time)/1000))}</span>
+        <span class="activity-text">${a.text}</span>
+      </div>
+    `).join('');
+  }
+  
+  async function fetchAPI(endpoint) {
+    try {
+      const res = await fetch(API_BASE + endpoint);
+      return await res.json();
+    } catch (e) {
+      console.error('API Error:', endpoint, e);
+      return { ok: false, error: e.message };
+    }
+  }
+  
+  async function postAPI(endpoint, body = {}) {
+    try {
+      const res = await fetch(API_BASE + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      return await res.json();
+    } catch (e) {
+      console.error('API Error:', endpoint, e);
+      return { ok: false, error: e.message };
+    }
+  }
+  
+  // Load Functions
+  async function loadBalance() {
+    const data = await fetchAPI('/admin/balance');
+    if (data.ok) {
+      const available = data.available || 0;
+      const pending = data.pending || 0;
+      document.getElementById('stripe-balance').textContent = formatCurrency(available);
+      document.getElementById('metric-balance').textContent = formatCurrency(available);
+      document.getElementById('metric-pending').textContent = formatCurrency(pending);
+    }
+  }
+  
+  async function loadRevenue() {
+    const data = await fetchAPI('/admin/revenue?days=30');
+    if (data.ok) {
+      document.getElementById('metric-path-a').textContent = formatCurrency(data.path_a_fees || 0);
+      document.getElementById('metric-path-b').textContent = formatCurrency(data.path_b_wade || 0);
+    }
+  }
+  
+  async function loadWadeDashboard() {
+    const data = await fetchAPI('/wade/dashboard');
+    if (data.ok) {
+      document.getElementById('metric-pending-approval').textContent = data.pending_approval || 0;
+      document.getElementById('queue-count').textContent = `${data.pending_approval || 0} items`;
+      
+      // Render queue
+      const queue = data.queue || [];
+      const container = document.getElementById('approval-queue');
+      
+      if (queue.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">✨</div>
+            <p>No pending approvals</p>
+            <p class="hint">Click "Run Full Cycle" to discover opportunities</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = queue.slice(0, 10).map(w => `
+          <div class="queue-item">
+            <div class="queue-item-info">
+              <h4>${w.opportunity?.title || w.title || 'Opportunity'}</h4>
+              <p>${w.opportunity?.platform || 'Unknown'} • ${formatCurrency(w.opportunity?.value || w.estimated_value || 0)}</p>
             </div>
+            <div class="queue-item-actions">
+              <button class="btn-glow success" onclick="approveWorkflow('${w.id}')">✓</button>
+              <button class="btn-glow danger" onclick="rejectWorkflow('${w.id}')">✗</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Render active workflows
+      const active = data.active || [];
+      document.getElementById('workflow-count').textContent = `${active.length} active`;
+      const wfContainer = document.getElementById('active-workflows');
+      
+      if (active.length === 0) {
+        wfContainer.innerHTML = `<div class="empty-state"><p>No active workflows</p></div>`;
+      } else {
+        wfContainer.innerHTML = active.slice(0, 5).map(w => `
+          <div class="queue-item" style="margin-bottom:8px;">
+            <div class="queue-item-info">
+              <h4>${(w.opportunity?.title || w.title || 'Workflow').substring(0, 35)}...</h4>
+              <p>${formatCurrency(w.estimated_value || 0)}</p>
+            </div>
+            <span style="color:#00bfff; font-size:0.75rem;">${(w.stage || 'pending').replace(/_/g, ' ')}</span>
+          </div>
+        `).join('');
+      }
+    }
+  }
+  
+  async function loadDeals() {
+    const stats = await fetchAPI('/deals/stats');
+    if (stats.ok) {
+      document.getElementById('deals-total').textContent = `${stats.total_deals || 0} total`;
+      document.getElementById('deals-pending').textContent = stats.pending || 0;
+      document.getElementById('deals-in-progress').textContent = stats.in_progress || 0;
+      document.getElementById('deals-delivered').textContent = stats.delivered || 0;
+      document.getElementById('deals-completed').textContent = stats.completed || 0;
+      document.getElementById('deals-revenue').textContent = formatCurrency(stats.total_revenue || 0);
+    }
+    
+    // Load active deals
+    const inProgress = await fetchAPI('/deals/in-progress');
+    const container = document.getElementById('deals-list');
+    if (inProgress.ok && inProgress.deals && inProgress.deals.length > 0) {
+      container.innerHTML = inProgress.deals.slice(0, 3).map(d => `
+        <div class="queue-item" style="margin-bottom:8px;">
+          <div class="queue-item-info">
+            <h4>${d.service_name || 'Deal'}</h4>
+            <p>${d.client_name || 'Client'} • ${formatCurrency(d.price || 0)}</p>
+          </div>
+          <span style="background:#00bfff22; color:#00bfff; padding:4px 8px; border-radius:4px; font-size:0.7rem;">${d.status}</span>
         </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-white/10 px-6 py-4 mt-8">
-        <div class="max-w-7xl mx-auto flex items-center justify-between text-sm text-gray-400">
-            <div>AiGentsy v91 • Fully Wired • No Stubs</div>
-            <div id="last-updated">Last updated: Never</div>
+      `).join('');
+    } else {
+      container.innerHTML = '';
+    }
+  }
+  
+  async function loadSystemStatus() {
+    const data = await fetchAPI('/orchestrator/status');
+    const container = document.getElementById('system-status');
+    
+    if (data.ok && data.systems) {
+      container.innerHTML = Object.entries(data.systems).map(([name, available]) => `
+        <div class="status-item">
+          <span>${name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+          <span class="${available ? 'status-live' : 'status-offline'}">
+            ${available ? '✓ Live' : '✗ Offline'}
+          </span>
         </div>
-    </footer>
-
-    <script>
-        // Configuration
-        const API_BASE = 'https://aigentsy-ame-runtime.onrender.com';
-        // const API_BASE = 'http://localhost:8000'; // For local testing
-        
-        let activities = [];
-
-        // Fetch wrapper with error handling
-        async function fetchAPI(endpoint, options = {}) {
-            try {
-                const response = await fetch(`${API_BASE}${endpoint}`, {
-                    ...options,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...options.headers
-                    }
-                });
-                return await response.json();
-            } catch (error) {
-                console.error(`API Error (${endpoint}):`, error);
-                return { ok: false, error: error.message };
-            }
-        }
-
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD'
-            }).format(amount || 0);
-        }
-
-        // Format time ago
-        function timeAgo(date) {
-            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-            if (seconds < 60) return `${seconds}s ago`;
-            if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-            if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-            return `${Math.floor(seconds / 86400)}d ago`;
-        }
-
-        // Load Stripe Balance (Real money in your account)
-        async function loadStripeBalance() {
-            const data = await fetchAPI('/admin/balance');
-            
-            if (data.ok) {
-                document.getElementById('stripe-balance').textContent = formatCurrency(data.available);
-                document.getElementById('stripe-pending').textContent = formatCurrency(data.pending);
-            }
-        }
-
-        // Load Revenue by Path
-        async function loadRevenueByPath() {
-            const data = await fetchAPI('/admin/revenue?days=30');
-            
-            if (data.ok) {
-                document.getElementById('fees-collected').textContent = formatCurrency(data.path_a_fees);
-                document.getElementById('wade-balance').textContent = formatCurrency(data.path_b_wade);
-            }
-        }
-
-        // Load Wade Dashboard
-        async function loadWadeDashboard() {
-            const data = await fetchAPI('/wade/dashboard');
-            
-            if (data.ok) {
-                document.getElementById('pending-count').textContent = data.pending_approval || 0;
-            }
-        }
-
-        // Load Reconciliation Dashboard
-        async function loadReconciliation() {
-            const data = await fetchAPI('/reconciliation/dashboard');
-            
-            if (data.ok && data.balances) {
-                document.getElementById('wade-balance').textContent = formatCurrency(data.balances.wade_balance);
-                document.getElementById('fees-collected').textContent = formatCurrency(data.balances.fees_collected);
-                document.getElementById('total-earnings').textContent = formatCurrency(data.balances.total_aigentsy_earnings);
-            }
-        }
-
-        // Load Approval Queue
-        async function loadApprovalQueue() {
-            const data = await fetchAPI('/wade/dashboard');
-            const container = document.getElementById('approval-queue');
-            
-            if (data.ok) {
-                // API returns 'queue' for pending items
-                const pending = data.queue || [];
-                
-                document.getElementById('queue-count').textContent = `${pending.length} items`;
-                document.getElementById('pending-count').textContent = data.pending_approval || 0;
-                
-                if (pending.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-gray-500 text-center py-8">
-                            <div class="text-4xl mb-2">✨</div>
-                            <div>No pending approvals</div>
-                            <div class="text-sm">Click "Run Full Cycle" to discover opportunities</div>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = pending.map(w => `
-                    <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="font-medium">${w.opportunity?.title || w.title || 'Untitled Opportunity'}</div>
-                                <div class="text-sm text-gray-400 mt-1">
-                                    ${w.opportunity?.platform || w.platform || 'Unknown'} • ${formatCurrency(w.opportunity?.value || w.estimated_value || 0)}
-                                </div>
-                                <div class="text-xs text-gray-500 mt-1">
-                                    ${(w.opportunity?.description || w.description || 'No description')?.substring(0, 100)}...
-                                </div>
-                            </div>
-                            <div class="flex gap-2 ml-4">
-                                <button onclick="approveWorkflow('${w.id}')" 
-                                    class="px-3 py-1 bg-green-600 hover:bg-green-700 rounded text-sm transition">
-                                    ✓ Approve
-                                </button>
-                                <button onclick="rejectWorkflow('${w.id}')"
-                                    class="px-3 py-1 bg-red-600/50 hover:bg-red-600 rounded text-sm transition">
-                                    ✗
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = `
-                    <div class="text-gray-500 text-center py-8">
-                        <div>Could not load queue</div>
-                        <div class="text-sm">${data.error || 'Check API connection'}</div>
-                    </div>
-                `;
-            }
-        }
-
-        // Load System Status
-        async function loadSystemStatus() {
-            const data = await fetchAPI('/orchestrator/status');
-            const container = document.getElementById('system-status');
-            
-            if (data.ok && data.systems) {
-                container.innerHTML = Object.entries(data.systems).map(([name, available]) => `
-                    <div class="flex items-center justify-between py-2 border-b border-white/5">
-                        <span class="text-sm">${name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                        <span class="${available ? 'text-green-400' : 'text-red-400'} text-sm">
-                            ${available ? '✓ Live' : '✗ Offline'}
-                        </span>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Load Active Workflows
-        async function loadActiveWorkflows() {
-            const data = await fetchAPI('/wade/dashboard');
-            const container = document.getElementById('active-workflows');
-            
-            if (data.ok) {
-                // API returns 'active' for active workflows
-                const active = data.active || [];
-                
-                document.getElementById('workflow-count').textContent = `${active.length} active`;
-                
-                if (active.length === 0) {
-                    container.innerHTML = `<div class="text-gray-500 text-center py-4">No active workflows</div>`;
-                    return;
-                }
-
-                container.innerHTML = active.map(w => `
-                    <div class="bg-white/5 rounded-lg p-3 border border-white/10">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <div class="font-medium text-sm">${(w.opportunity?.title || w.title || 'Workflow')?.substring(0, 40)}...</div>
-                                <div class="text-xs text-gray-400">${formatCurrency(w.opportunity?.value || w.estimated_value || 0)}</div>
-                            </div>
-                            <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">
-                                ${(w.stage || 'pending')?.replace(/_/g, ' ')}
-                            </span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        // Load Yield Memory Stats
-        // Load Client Deals
-        async function loadDeals() {
-            const data = await fetchAPI('/deals/stats');
-            
-            if (data.ok) {
-                document.getElementById('deals-count').textContent = `${data.total_deals || 0} total`;
-                document.getElementById('deals-pending').textContent = data.pending || 0;
-                document.getElementById('deals-in-progress').textContent = data.in_progress || 0;
-                document.getElementById('deals-delivered').textContent = data.delivered || 0;
-                document.getElementById('deals-completed').textContent = data.completed || 0;
-                document.getElementById('deals-revenue').textContent = formatCurrency(data.total_revenue || 0);
-            }
-            
-            // Load in-progress deals list
-            const inProgress = await fetchAPI('/deals/in-progress');
-            const dealsList = document.getElementById('deals-list');
-            
-            if (inProgress.ok && inProgress.deals && inProgress.deals.length > 0) {
-                dealsList.innerHTML = inProgress.deals.slice(0, 5).map(d => `
-                    <div class="bg-white/5 rounded-lg p-2 flex items-center justify-between">
-                        <div>
-                            <div class="text-sm font-medium">${d.service_name || 'Deal'}</div>
-                            <div class="text-xs text-gray-400">${d.client_name || 'Client'} • ${formatCurrency(d.price || 0)}</div>
-                        </div>
-                        <span class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">${d.status}</span>
-                    </div>
-                `).join('');
-            } else {
-                dealsList.innerHTML = `<div class="text-xs text-gray-500 text-center">No active deals</div>`;
-            }
-        }
-
-        async function loadYieldStats() {
-            const data = await fetchAPI('/yield/stats/system');
-            const container = document.getElementById('yield-stats');
-            
-            if (data.ok) {
-                container.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <div class="text-2xl font-bold text-indigo-400">${data.total_patterns || 0}</div>
-                            <div class="text-xs text-gray-400">Total Patterns</div>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <div class="text-2xl font-bold text-green-400">${data.success_patterns || 0}</div>
-                            <div class="text-xs text-gray-400">Successful</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-2">
-                        Learning from every action to improve future decisions
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `<div class="text-gray-500">Yield Memory not available</div>`;
-            }
-        }
-
-        // Load MetaHive Stats
-        async function loadHiveStats() {
-            const data = await fetchAPI('/hive/stats');
-            const container = document.getElementById('hive-stats');
-            
-            if (data.ok) {
-                container.innerHTML = `
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <div class="text-2xl font-bold text-purple-400">${data.total_patterns || 0}</div>
-                            <div class="text-xs text-gray-400">Hive Patterns</div>
-                        </div>
-                        <div class="bg-white/5 rounded-lg p-3">
-                            <div class="text-2xl font-bold text-yellow-400">${data.contributors || 0}</div>
-                            <div class="text-xs text-gray-400">Contributors</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-gray-500 mt-2">
-                        Cross-user learning: patterns shared anonymously
-                    </div>
-                `;
-            } else {
-                container.innerHTML = `<div class="text-gray-500">MetaHive not available</div>`;
-            }
-        }
-
-        // Add activity to feed
-        function addActivity(message, type = 'info') {
-            const colors = {
-                info: 'text-blue-400',
-                success: 'text-green-400',
-                warning: 'text-yellow-400',
-                error: 'text-red-400'
-            };
-            
-            activities.unshift({
-                message,
-                type,
-                time: new Date()
-            });
-            
-            // Keep only last 50
-            activities = activities.slice(0, 50);
-            
-            const container = document.getElementById('activity-feed');
-            container.innerHTML = activities.map(a => `
-                <div class="activity-item flex items-start gap-2 py-2 border-b border-white/5">
-                    <span class="${colors[a.type]} text-xs">${timeAgo(a.time)}</span>
-                    <span class="text-sm text-gray-300">${a.message}</span>
-                </div>
-            `).join('');
-        }
-
-        // Initiate payout to bank
-        async function initiatePayout() {
-            if (!confirm('Transfer available balance to your bank account?')) return;
-            
-            addActivity('💰 Initiating payout to bank...', 'info');
-            
-            const data = await fetchAPI('/admin/payout', { method: 'POST' });
-            
-            if (data.ok) {
-                addActivity(`✓ Payout initiated: ${formatCurrency(data.amount)}`, 'success');
-                loadStripeBalance();
-            } else {
-                addActivity(`✗ Payout failed: ${data.error}`, 'error');
-            }
-        }
-
-        // Create payment link for workflow
-        async function createPaymentLink(workflowId, amount, description) {
-            addActivity(`Creating payment link for ${workflowId}...`, 'info');
-            
-            const data = await fetchAPI('/wade/payment-link', {
-                method: 'POST',
-                body: JSON.stringify({
-                    workflow_id: workflowId,
-                    amount: amount,
-                    description: description
-                })
-            });
-            
-            if (data.ok) {
-                addActivity(`✓ Payment link created: ${data.payment_link}`, 'success');
-                // Copy to clipboard
-                navigator.clipboard.writeText(data.payment_link);
-                alert(`Payment link copied to clipboard!\n\n${data.payment_link}`);
-            } else {
-                addActivity(`✗ Failed: ${data.error}`, 'error');
-            }
-        }
-
-        // Approve workflow
-        async function approveWorkflow(id) {
-            addActivity(`Approving workflow ${id}...`, 'info');
-            const data = await fetchAPI(`/wade/workflow/${id}/approve`, { method: 'POST' });
-            
-            if (data.ok) {
-                addActivity(`✓ Workflow ${id} approved!`, 'success');
-                loadApprovalQueue();
-                loadActiveWorkflows();
-            } else {
-                addActivity(`✗ Failed to approve: ${data.error}`, 'error');
-            }
-        }
-
-        // Reject workflow
-        async function rejectWorkflow(id) {
-            addActivity(`Rejecting workflow ${id}...`, 'warning');
-            const data = await fetchAPI(`/wade/workflow/${id}/reject`, { method: 'POST' });
-            
-            if (data.ok) {
-                addActivity(`Workflow ${id} rejected`, 'warning');
-                loadApprovalQueue();
-            } else {
-                addActivity(`✗ Failed to reject: ${data.error}`, 'error');
-            }
-        }
-
-        // Run full orchestrator cycle
-        async function runFullCycle() {
-            addActivity('🚀 Starting full orchestrator cycle...', 'info');
-            
-            const data = await fetchAPI('/orchestrator/full-cycle', { method: 'POST' });
-            
-            if (data.ok) {
-                addActivity('✓ Cycle complete!', 'success');
-                
-                // Update last cycle display
-                const container = document.getElementById('last-cycle');
-                const steps = data.steps || {};
-                
-                container.innerHTML = Object.entries(steps).map(([name, result]) => `
-                    <div class="bg-white/5 rounded-lg p-3 text-center">
-                        <div class="text-lg font-bold text-indigo-400">
-                            ${typeof result === 'object' ? Object.values(result)[0] || '✓' : result}
-                        </div>
-                        <div class="text-xs text-gray-400">${name.replace(/_/g, ' ')}</div>
-                    </div>
-                `).join('');
-                
-                // Add detailed activities
-                if (steps.discovery) addActivity(`Found ${steps.discovery.opportunities_found} opportunities`, 'success');
-                if (steps.ame) addActivity(`Sent ${steps.ame.sent} pitches`, 'success');
-                if (steps.social) addActivity(`Posted ${steps.social.posted} content`, 'success');
-                
-                refreshAll();
-            } else {
-                addActivity(`✗ Cycle failed: ${data.error}`, 'error');
-            }
-        }
-
-        // Refresh all data
-        async function refreshAll() {
-            await Promise.all([
-                loadStripeBalance(),
-                loadRevenueByPath(),
-                loadWadeDashboard(),
-                loadReconciliation(),
-                loadApprovalQueue(),
-                loadSystemStatus(),
-                loadActiveWorkflows(),
-                loadDeals(),
-                loadYieldStats(),
-                loadHiveStats()
-            ]);
-            
-            document.getElementById('last-updated').textContent = 
-                `Last updated: ${new Date().toLocaleTimeString()}`;
-        }
-
-        // Initial load
-        refreshAll();
-        addActivity('Dashboard loaded', 'info');
-
-        // Auto-refresh every 30 seconds
-        setInterval(refreshAll, 30000);
-        
-        // Heartbeat activity every 10 seconds
-        setInterval(() => {
-            addActivity('System heartbeat ♥', 'info');
-        }, 60000);
-    </script>
+      `).join('');
+    }
+  }
+  
+  async function loadYieldStats() {
+    const data = await fetchAPI('/yield/stats/system');
+    if (data.ok) {
+      document.getElementById('yield-patterns').textContent = data.total_patterns || 0;
+      document.getElementById('yield-successful').textContent = data.success_patterns || 0;
+    }
+  }
+  
+  async function loadHiveStats() {
+    const data = await fetchAPI('/hive/stats');
+    if (data.ok) {
+      document.getElementById('hive-patterns').textContent = data.total_patterns || 0;
+      document.getElementById('hive-contributors').textContent = data.contributors || 0;
+    }
+  }
+  
+  // Action Functions
+  async function runFullCycle() {
+    addActivity('🚀 Starting full cycle...', 'info');
+    const data = await postAPI('/orchestrator/full-cycle');
+    if (data.ok) {
+      addActivity('✅ Full cycle completed!', 'success');
+      refreshDashboard();
+    } else {
+      addActivity('❌ Full cycle failed: ' + (data.error || 'Unknown'), 'error');
+    }
+  }
+  
+  async function requestPayout() {
+    if (!confirm('Transfer available balance to your bank account?')) return;
+    addActivity('💸 Requesting payout...', 'info');
+    const data = await postAPI('/admin/payout');
+    if (data.ok) {
+      addActivity('✅ Payout initiated: ' + formatCurrency(data.amount), 'success');
+      loadBalance();
+    } else {
+      addActivity('❌ Payout failed: ' + (data.error || 'Unknown'), 'error');
+    }
+  }
+  
+  async function approveWorkflow(id) {
+    addActivity('✓ Approving workflow...', 'info');
+    const data = await postAPI(`/wade/workflow/${id}/approve`);
+    if (data.ok) {
+      addActivity('✅ Workflow approved!', 'success');
+      loadWadeDashboard();
+    } else {
+      addActivity('❌ Approval failed: ' + (data.error || 'Unknown'), 'error');
+    }
+  }
+  
+  async function rejectWorkflow(id) {
+    if (!confirm('Reject this workflow?')) return;
+    const data = await postAPI(`/wade/workflow/${id}/reject`);
+    if (data.ok) {
+      addActivity('✗ Workflow rejected', 'info');
+      loadWadeDashboard();
+    }
+  }
+  
+  function viewServices() {
+    window.open(API_BASE + '/services/catalog', '_blank');
+  }
+  
+  async function refreshDashboard() {
+    addActivity('🔄 Refreshing...', 'info');
+    await Promise.all([
+      loadBalance(),
+      loadRevenue(),
+      loadWadeDashboard(),
+      loadDeals(),
+      loadSystemStatus(),
+      loadYieldStats(),
+      loadHiveStats()
+    ]);
+    document.getElementById('last-updated').textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+    addActivity('✅ Dashboard refreshed', 'success');
+  }
+  
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshDashboard();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(() => {
+      addActivity('♥️ System heartbeat', 'info');
+      refreshDashboard();
+    }, 30000);
+  });
+</script>
 </body>
 </html>
