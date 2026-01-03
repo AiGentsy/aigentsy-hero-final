@@ -113,6 +113,39 @@
                 </div>
             </div>
 
+            <!-- Client Deals Pipeline -->
+            <div class="card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold">🤝 Client Deals</h2>
+                    <span class="text-sm text-gray-400" id="deals-count">0 total</span>
+                </div>
+                <div class="grid grid-cols-4 gap-4 mb-4">
+                    <div class="bg-yellow-500/10 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-yellow-400" id="deals-pending">0</div>
+                        <div class="text-xs text-gray-400">Pending</div>
+                    </div>
+                    <div class="bg-blue-500/10 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-blue-400" id="deals-in-progress">0</div>
+                        <div class="text-xs text-gray-400">In Progress</div>
+                    </div>
+                    <div class="bg-purple-500/10 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-purple-400" id="deals-delivered">0</div>
+                        <div class="text-xs text-gray-400">Delivered</div>
+                    </div>
+                    <div class="bg-green-500/10 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-green-400" id="deals-completed">0</div>
+                        <div class="text-xs text-gray-400">Completed</div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-sm border-t border-white/10 pt-3">
+                    <span class="text-gray-400">Deal Revenue</span>
+                    <span class="text-green-400 font-bold" id="deals-revenue">$0.00</span>
+                </div>
+                <div id="deals-list" class="mt-4 space-y-2 max-h-40 overflow-y-auto">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
             <!-- Active Workflows -->
             <div class="card rounded-xl p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -354,6 +387,38 @@
         }
 
         // Load Yield Memory Stats
+        // Load Client Deals
+        async function loadDeals() {
+            const data = await fetchAPI('/deals/stats');
+            
+            if (data.ok) {
+                document.getElementById('deals-count').textContent = `${data.total_deals || 0} total`;
+                document.getElementById('deals-pending').textContent = data.pending || 0;
+                document.getElementById('deals-in-progress').textContent = data.in_progress || 0;
+                document.getElementById('deals-delivered').textContent = data.delivered || 0;
+                document.getElementById('deals-completed').textContent = data.completed || 0;
+                document.getElementById('deals-revenue').textContent = formatCurrency(data.total_revenue || 0);
+            }
+            
+            // Load in-progress deals list
+            const inProgress = await fetchAPI('/deals/in-progress');
+            const dealsList = document.getElementById('deals-list');
+            
+            if (inProgress.ok && inProgress.deals && inProgress.deals.length > 0) {
+                dealsList.innerHTML = inProgress.deals.slice(0, 5).map(d => `
+                    <div class="bg-white/5 rounded-lg p-2 flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-medium">${d.service_name || 'Deal'}</div>
+                            <div class="text-xs text-gray-400">${d.client_name || 'Client'} • ${formatCurrency(d.price || 0)}</div>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded bg-blue-500/20 text-blue-400">${d.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                dealsList.innerHTML = `<div class="text-xs text-gray-500 text-center">No active deals</div>`;
+            }
+        }
+
         async function loadYieldStats() {
             const data = await fetchAPI('/yield/stats/system');
             const container = document.getElementById('yield-stats');
@@ -541,6 +606,7 @@
                 loadApprovalQueue(),
                 loadSystemStatus(),
                 loadActiveWorkflows(),
+                loadDeals(),
                 loadYieldStats(),
                 loadHiveStats()
             ]);
