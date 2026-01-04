@@ -591,7 +591,12 @@
       
       <!-- Wade Approval Queue -->
       <div class="metric-box" style="margin-bottom:20px;">
-        <h3>📋 Wade Approval Queue <span id="queue-count">0 items</span></h3>
+        <h3>
+          📋 Wade Approval Queue <span id="queue-count">0 items</span>
+          <button class="btn-glow success" style="padding:5px 12px; font-size:0.75rem;" onclick="approveAll()" id="btn-approve-all">
+            ✓ Approve All
+          </button>
+        </h3>
         <div id="approval-queue" style="max-height:200px; overflow-y:auto;">
           <div class="empty-state">
             <div class="icon">✨</div>
@@ -1037,6 +1042,29 @@
       loadWadeDashboard();
     } else {
       addActivity('❌ Approval failed', 'error');
+    }
+  }
+  
+  async function approveAll() {
+    const count = document.getElementById('queue-count').textContent;
+    if (!confirm(`Approve all ${count}?`)) return;
+    
+    addActivity('✓ Approving ALL workflows...', 'info');
+    const data = await postAPI('/wade/approve-all');
+    if (data.ok) {
+      addActivity(`✅ Approved ${data.approved_count} workflows!`, 'success');
+      loadWadeDashboard();
+    } else {
+      addActivity('❌ Bulk approval failed: ' + (data.error || 'Unknown'), 'error');
+    }
+  }
+  
+  async function loadExecutionStatus() {
+    const data = await fetchAPI('/wade/execution-status');
+    if (data.ok) {
+      // Update automation status indicators
+      const autos = data.active_automations || {};
+      console.log('Execution status:', data);
     }
   }
   
