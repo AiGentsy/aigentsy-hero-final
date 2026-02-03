@@ -947,19 +947,22 @@ async function renderDynamicKit(user) {
 // Download kit file (for .docx, .md files)
 function downloadKitFile(url, filename) {
   try {
+    // Prefix with backend base if URL is relative
+    const fullUrl = url.startsWith('http') ? url : `${window.BACKEND_BASE}${url}`;
     const a = document.createElement('a');
-    a.href = url;
+    a.href = fullUrl;
     a.download = filename;
     a.target = '_blank';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    
+
     showToast(`📥 Downloading ${filename}...`, "success");
   } catch (error) {
     console.error('Download error:', error);
     showToast("⚠️ Download failed. Opening in new tab...", "error");
-    window.open(url, '_blank');
+    const fullUrl = url.startsWith('http') ? url : `${window.BACKEND_BASE}${url}`;
+    window.open(fullUrl, '_blank');
   }
 }
 
@@ -4106,7 +4109,15 @@ function saveOnboardingData() {
 
 function connectStripeOnboarding() {
   const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
-  window.open(`${window.BACKEND_BASE}/stripe/connect?user=${encodeURIComponent(username)}`, '_blank');
+  if (!username) {
+    showToast('Please log in first', 'error');
+    return;
+  }
+  showToast('Opening Stripe setup...', 'info');
+  const stripeWindow = window.open(`${window.BACKEND_BASE}/stripe/connect?user=${encodeURIComponent(username)}`, '_blank');
+  if (!stripeWindow) {
+    showToast('Pop-up blocked — check your browser settings', 'error');
+  }
   nextOnboardingStep();
 }
 
