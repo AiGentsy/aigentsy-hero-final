@@ -23,11 +23,19 @@
     }
     .topbar img { height: 32px; }
     .topbar .project-id { color: #555; font-size: 0.8rem; }
-    .room-container {
-      max-width: 720px;
+    .room-layout {
+      display: flex;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 40px 24px;
+      padding: 24px;
+      gap: 24px;
       animation: fadeIn 0.8s ease-out;
+    }
+    .room-main { flex: 1; min-width: 0; }
+    .room-sidebar { width: 340px; flex-shrink: 0; }
+    @media (max-width: 900px) {
+      .room-layout { flex-direction: column; }
+      .room-sidebar { width: 100%; }
     }
     .room-header h1 {
       font-size: 1.8rem;
@@ -143,6 +151,101 @@
       color: #444;
     }
     .footer-link a { color: #00bfff; text-decoration: none; }
+    /* Sidebar cards */
+    .sidebar-card {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .sidebar-card h3 {
+      color: #00bfff;
+      font-size: 0.95rem;
+      margin: 0 0 10px;
+    }
+    .reco-service {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .reco-service .svc-name { color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .reco-service .svc-pricing {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .reco-service .svc-price { color: #00ff88; font-weight: 700; }
+    .reco-service .svc-market { color: #666; text-decoration: line-through; font-size: 0.8rem; }
+    .reco-service .svc-savings {
+      background: rgba(0,255,136,0.1);
+      color: #00ff88;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .reco-service .svc-time { color: #888; font-size: 0.75rem; margin-top: 4px; }
+    .reco-service .svc-ask {
+      display: block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #00bfff;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+    }
+    .reco-service .svc-ask:hover { background: #009cd8; }
+    .strategy-item {
+      background: #111;
+      border-left: 3px solid #00bfff;
+      border-radius: 0 6px 6px 0;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: #ccc;
+      line-height: 1.4;
+    }
+    .strategy-item .strat-title { color: #00bfff; font-weight: 600; font-size: 0.8rem; margin-bottom: 4px; }
+    .seasonal-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+      margin-right: 4px;
+    }
+    .seasonal-now { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; }
+    .seasonal-later { background: rgba(255,165,0,0.1); color: #888; border: 1px solid #333; }
+    .industry-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: rgba(0,191,255,0.1);
+      color: #00bfff;
+      border: 1px solid #00bfff;
+      margin-bottom: 12px;
+    }
+    .template-kit {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .template-kit .kit-name { color: #fff; font-weight: 600; font-size: 0.85rem; }
+    .template-kit .kit-value { color: #00ff88; font-size: 0.75rem; }
+    .template-kit .kit-items { color: #888; font-size: 0.75rem; margin-top: 2px; }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -155,53 +258,86 @@
     <span class="project-id" id="projectIdDisplay"></span>
   </div>
 
-  <div class="room-container">
-    <div id="loadingState" class="loading-state">Loading project details...</div>
-    <div id="errorState" class="error-state" style="display:none;"></div>
+  <div class="room-layout">
+    <!-- Main Content -->
+    <div class="room-main">
+      <div id="loadingState" class="loading-state">Loading project details...</div>
+      <div id="errorState" class="error-state" style="display:none;"></div>
 
-    <div id="projectContent" style="display:none;">
-      <div class="room-header">
-        <h1 id="projectTitle"></h1>
-        <span id="projectStatus" class="status-badge"></span>
-      </div>
-
-      <div class="room-section">
-        <h2>Project Description</h2>
-        <p id="projectDescription"></p>
-      </div>
-
-      <div class="room-section" id="deliverablesSection" style="display:none;">
-        <h2>Deliverables</h2>
-        <div id="deliverablesList"></div>
-      </div>
-
-      <div id="priceSection" class="price-display" style="display:none;">
-        <div class="label">Project Total</div>
-        <div class="amount" id="projectPrice"></div>
-      </div>
-
-      <div class="action-row">
-        <button class="btn-approve" id="approveBtn" onclick="approveProject()">Approve Deliverable</button>
-        <button class="btn-pay" id="payBtn" onclick="payForProject()">Pay & Start</button>
-      </div>
-      <div class="status-msg" id="actionStatus"></div>
-
-      <!-- Chat with AI C-Suite -->
-      <div class="room-section" style="margin-top:32px;">
-        <h2>Talk to Your AI Team</h2>
-        <div id="chatMessages" style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;max-height:300px;overflow-y:auto;margin-bottom:12px;min-height:80px;">
-          <p style="color:#555;font-size:0.85rem;" id="chatPlaceholder">Ask questions, request updates, or discuss changes with your AI project team.</p>
+      <div id="projectContent" style="display:none;">
+        <div class="room-header">
+          <h1 id="projectTitle"></h1>
+          <span id="projectStatus" class="status-badge"></span>
         </div>
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="chatInput" placeholder="Type your message..." style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid #333;background:#111;color:#fff;font-size:0.95rem;" onkeydown="if(event.key==='Enter')sendMessage()" />
-          <button onclick="sendMessage()" style="padding:10px 20px;background:#00bfff;color:#000;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Send</button>
+
+        <div class="room-section">
+          <h2>Project Description</h2>
+          <p id="projectDescription"></p>
+        </div>
+
+        <div class="room-section" id="deliverablesSection" style="display:none;">
+          <h2>Deliverables</h2>
+          <div id="deliverablesList"></div>
+        </div>
+
+        <div id="priceSection" class="price-display" style="display:none;">
+          <div class="label">Project Total</div>
+          <div class="amount" id="projectPrice"></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn-approve" id="approveBtn" onclick="approveProject()">Approve Deliverable</button>
+          <button class="btn-pay" id="payBtn" onclick="payForProject()">Pay & Start</button>
+        </div>
+        <div class="status-msg" id="actionStatus"></div>
+
+        <!-- Chat with AI C-Suite -->
+        <div class="room-section" style="margin-top:32px;">
+          <h2>Talk to Your AI C-Suite</h2>
+          <p style="color:#666;font-size:0.8rem;margin-bottom:12px;">Your CTO, CMO, COO & CFO are here. Ask about strategy, marketing, pricing, or request services.</p>
+          <div id="chatMessages" style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;max-height:400px;overflow-y:auto;margin-bottom:12px;min-height:80px;">
+            <p style="color:#555;font-size:0.85rem;" id="chatPlaceholder">Your AI executive team knows your industry, has real pricing, and can recommend strategies. Try: "What marketing channels should I focus on?" or "What services do you recommend for my business?"</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="chatInput" placeholder="Ask your AI C-Suite anything..." style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid #333;background:#111;color:#fff;font-size:0.95rem;" onkeydown="if(event.key==='Enter')sendMessage()" />
+            <button onclick="sendMessage()" style="padding:10px 20px;background:#00bfff;color:#000;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Send</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="footer-link">
-      Powered by <a href="https://aigentsy.com">AiGentsy</a>
+    <!-- Strategy Sidebar -->
+    <div class="room-sidebar" id="strategySidebar" style="display:none;">
+      <div class="sidebar-card" id="industryCard">
+        <h3>Your Industry</h3>
+        <div id="industryBadge"></div>
+        <div id="industryPlatforms" style="color:#aaa;font-size:0.8rem;"></div>
+      </div>
+
+      <div class="sidebar-card" id="recoServicesCard" style="display:none;">
+        <h3>Recommended Services</h3>
+        <div id="recoServicesList"></div>
+      </div>
+
+      <div class="sidebar-card" id="strategiesCard" style="display:none;">
+        <h3>Strategy Recommendations</h3>
+        <div id="strategiesList"></div>
+      </div>
+
+      <div class="sidebar-card" id="seasonalCard" style="display:none;">
+        <h3>Seasonal Opportunities</h3>
+        <div id="seasonalList"></div>
+      </div>
+
+      <div class="sidebar-card" id="templatesCard" style="display:none;">
+        <h3>Available Template Kits</h3>
+        <div id="templatesList"></div>
+      </div>
     </div>
+  </div>
+
+  <div class="footer-link">
+    Powered by <a href="https://aigentsy.com">AiGentsy</a>
   </div>
 
   <script>
@@ -220,6 +356,12 @@
       }, 500);
     }
 
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
+    }
+
     async function sendMessage() {
       const input = document.getElementById("chatInput");
       const msg = input.value.trim();
@@ -230,8 +372,8 @@
       const placeholder = document.getElementById("chatPlaceholder");
       if (placeholder) placeholder.remove();
 
-      chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00bfff;font-weight:600;">You:</span> <span style="color:#ccc;">${msg}</span></div>`;
-      chatDiv.innerHTML += `<div style="margin-bottom:12px;color:#555;" id="typingIndicator">AI Team is typing...</div>`;
+      chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00bfff;font-weight:600;">You:</span> <span style="color:#ccc;">${escapeHtml(msg)}</span></div>`;
+      chatDiv.innerHTML += `<div style="margin-bottom:12px;color:#555;" id="typingIndicator">AI C-Suite is thinking...</div>`;
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
       try {
@@ -244,7 +386,7 @@
         const typing = document.getElementById("typingIndicator");
         if (typing) typing.remove();
         if (data.ok && data.response) {
-          chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00ff88;font-weight:600;">AI Team:</span> <span style="color:#ccc;">${data.response}</span></div>`;
+          chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00ff88;font-weight:600;">AI C-Suite:</span> <span style="color:#ccc;">${escapeHtml(data.response)}</span></div>`;
         }
       } catch(e) {
         const typing = document.getElementById("typingIndicator");
@@ -252,6 +394,13 @@
         chatDiv.innerHTML += `<div style="margin-bottom:12px;color:#ff6b6b;">Could not send message. Try again.</div>`;
       }
       chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    // Ask C-Suite about a specific service (from sidebar button)
+    function askAboutService(serviceName) {
+      const input = document.getElementById("chatInput");
+      input.value = `Tell me more about ${serviceName} — what's included, pricing, and how it would help my business?`;
+      sendMessage();
     }
 
     async function loadChatHistory() {
@@ -265,11 +414,81 @@
           if (placeholder) placeholder.remove();
           data.messages.forEach(m => {
             const isClient = m.from === "client";
-            chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:${isClient ? '#00bfff' : '#00ff88'};font-weight:600;">${isClient ? 'You' : 'AI Team'}:</span> <span style="color:#ccc;">${m.message}</span></div>`;
+            chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:${isClient ? '#00bfff' : '#00ff88'};font-weight:600;">${isClient ? 'You' : 'AI C-Suite'}:</span> <span style="color:#ccc;">${escapeHtml(m.message)}</span></div>`;
           });
           chatDiv.scrollTop = chatDiv.scrollHeight;
         }
       } catch(e) {}
+    }
+
+    async function loadRecommendations() {
+      if (!oppId) return;
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}/recommendations`);
+        const data = await resp.json();
+        if (!data.ok) return;
+
+        document.getElementById("strategySidebar").style.display = "block";
+
+        // Industry badge
+        if (data.industry) {
+          document.getElementById("industryBadge").innerHTML = `<span class="industry-badge">${data.industry.name}</span>`;
+          if (data.season) {
+            document.getElementById("industryPlatforms").innerHTML = `Current: ${data.season}`;
+          }
+        }
+
+        // Recommended services
+        if (data.recommended_services && data.recommended_services.length > 0) {
+          document.getElementById("recoServicesCard").style.display = "block";
+          document.getElementById("recoServicesList").innerHTML = data.recommended_services.slice(0, 4).map(s => `
+            <div class="reco-service">
+              <div class="svc-name">${s.name}</div>
+              <div class="svc-pricing">
+                <span class="svc-price">$${s.ai_price.toLocaleString()}</span>
+                <span class="svc-market">$${s.market_price.toLocaleString()}</span>
+                <span class="svc-savings">${s.savings_percent}% off</span>
+              </div>
+              <div class="svc-time">Delivered in ~${s.delivery_hours}h</div>
+              <button class="svc-ask" onclick="askAboutService('${s.name.replace(/'/g, "\\'")}')">Ask C-Suite About This</button>
+            </div>
+          `).join('');
+        }
+
+        // Strategies
+        if (data.strategies && data.strategies.length > 0) {
+          document.getElementById("strategiesCard").style.display = "block";
+          document.getElementById("strategiesList").innerHTML = data.strategies.map(s => `
+            <div class="strategy-item">
+              <div class="strat-title">${s.title}</div>
+              ${s.description}
+            </div>
+          `).join('');
+        }
+
+        // Seasonal opportunities
+        if (data.seasonal_opportunities && data.seasonal_opportunities.length > 0) {
+          document.getElementById("seasonalCard").style.display = "block";
+          document.getElementById("seasonalList").innerHTML = data.seasonal_opportunities.map(s => `
+            <span class="seasonal-badge ${s.is_now ? 'seasonal-now' : 'seasonal-later'}">${s.is_now ? 'NOW' : s.season}</span>
+            <span style="color:#ccc;font-size:0.8rem;">${s.opportunity}</span><br/>
+          `).join('');
+        }
+
+        // Template kits
+        if (data.template_kits && data.template_kits.length > 0) {
+          document.getElementById("templatesCard").style.display = "block";
+          document.getElementById("templatesList").innerHTML = data.template_kits.map(k => `
+            <div class="template-kit">
+              <div class="kit-name">${k.name}</div>
+              <div class="kit-value">$${k.total_retail_value.toLocaleString()} retail value</div>
+              <div class="kit-items">${k.template_count} templates: ${k.key_deliverables.join(', ')}</div>
+            </div>
+          `).join('');
+        }
+      } catch(e) {
+        console.warn("Recommendations load error:", e);
+      }
     }
 
     async function loadProject() {
@@ -387,6 +606,7 @@
 
     loadProject();
     loadChatHistory();
+    loadRecommendations();
   </script>
 </body>
 </html>
