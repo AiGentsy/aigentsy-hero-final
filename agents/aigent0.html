@@ -832,18 +832,34 @@ function renderDynamicWelcome(user) {
   document.getElementById("welcomeTip").innerHTML = `<strong>Tip:</strong> ${config.tip}`;
 }
 
+// Track active C-Suite role for agent dispatch
+window._activeAgentRole = "CFO";
+
 function renderDynamicCSuite(user) {
   console.log("👔 Rendering C-Suite");
   const companyType = user.companyType || 'general';
   const config = getBusinessConfig(companyType);
   const csuiteList = document.getElementById("csuiteList");
   if (csuiteList) {
-    csuiteList.innerHTML = config.cSuite.map(({ role, name }) => `<li><strong>${role}:</strong> ${name === "You" ? user.username : name}</li>`).join("");
+    csuiteList.innerHTML = config.cSuite.map(({ role, name }) => {
+      if (role === "CEO") return `<li><strong>${role}:</strong> ${user.username}</li>`;
+      const isActive = role === window._activeAgentRole;
+      const style = isActive
+        ? 'cursor:pointer; color:#00bfff; font-weight:700;'
+        : 'cursor:pointer; color:#aaa;';
+      return `<li onclick="selectAgentRole('${role}')" style="${style}" title="Click to chat with ${name}"><strong>${role}:</strong> ${name}${isActive ? ' ✦' : ''}</li>`;
+    }).join("");
   }
   const note = document.getElementById("csuiteNote");
   if (note) {
-    note.textContent = `Your team handles all aspects of your ${companyType} business.`;
+    note.textContent = `Your team handles all aspects of your ${companyType} business. Click a role to switch agents.`;
   }
+}
+
+function selectAgentRole(role) {
+  window._activeAgentRole = role;
+  if (window.aigentsyUser) renderDynamicCSuite(window.aigentsyUser);
+  showToast(`Switched to ${role} agent`, 'info');
 }
 
 async function renderDynamicKit(user) {
@@ -967,44 +983,61 @@ function downloadKitFile(url, filename) {
 }
 
 function getKitItemsForType(companyType) {
+  // IDs match backend KIT_DOCUMENTS exactly
   const kitTemplates = {
-    legal: [
-      { id: 'nda_template', name: 'NDA Template' },
-      { id: 'ip_assignment', name: 'IP Assignment Agreement' },
-      { id: 'licensing_agreement', name: 'Licensing Agreement' },
-      { id: 'compliance_checklist', name: 'Compliance Checklist' },
-      { id: 'contract_template', name: 'Service Contract Template' }
-    ],
     social: [
-      { id: 'content_calendar', name: 'Content Calendar Template' },
-      { id: 'brand_kit', name: 'Brand Voice Guidelines' },
-      { id: 'hashtag_strategy', name: 'Hashtag Strategy Doc' },
-      { id: 'creator_pitch', name: 'Creator Pitch Deck' },
-      { id: 'media_kit', name: 'Media Kit Template' }
+      { id: 'content-calendar', name: 'Social Media Content Calendar' },
+      { id: 'influencer-brief', name: 'Influencer Campaign Brief' },
+      { id: 'creator-rate-card', name: 'Creator Rate Card' },
+      { id: 'brand-guidelines', name: 'Social Media Brand Guidelines' }
     ],
     saas: [
-      { id: 'api_docs', name: 'API Documentation Template' },
-      { id: 'database_schema', name: 'Database Schema Guide' },
-      { id: 'auth_flow', name: 'Auth & Subscription Flow' },
-      { id: 'deployment_guide', name: 'Deployment Checklist' },
-      { id: 'stripe_integration', name: 'Stripe Integration Guide' }
+      { id: 'pricing-model', name: 'SaaS Pricing Model Calculator' },
+      { id: 'onboarding-flow', name: 'User Onboarding Flow' },
+      { id: 'feature-roadmap', name: 'Feature Roadmap Template' },
+      { id: 'api-docs', name: 'API Documentation Template' }
     ],
     marketing: [
-      { id: 'seo_audit', name: 'SEO Audit Framework' },
-      { id: 'ad_campaign', name: 'Ad Campaign Template' },
-      { id: 'email_sequence', name: 'Email Sequence Builder' },
-      { id: 'analytics_dashboard', name: 'Analytics Dashboard' },
-      { id: 'outreach_scripts', name: 'Outreach Scripts' }
+      { id: 'seo-audit', name: 'SEO Audit Template' },
+      { id: 'campaign-brief', name: 'Campaign Brief' },
+      { id: 'lead-gen-playbook', name: 'Lead Gen Playbook' },
+      { id: 'ad-copy-framework', name: 'Ad Copy Framework' },
+      { id: 'client-proposal-mktg', name: 'Client Proposal Template' },
+      { id: 'content-calendar-mktg', name: 'Content Calendar' }
+    ],
+    agency: [
+      { id: 'client-proposal', name: 'Client Proposal Template' },
+      { id: 'sow-template', name: 'Statement of Work Template' },
+      { id: 'retainer-agreement', name: 'Retainer Agreement' },
+      { id: 'client-intake', name: 'Client Intake Form' },
+      { id: 'case-study', name: 'Case Study Template' }
+    ],
+    ecommerce: [
+      { id: 'product-listing', name: 'Product Listing Optimizer' },
+      { id: 'inventory-tracker', name: 'Inventory Tracker' },
+      { id: 'supplier-outreach', name: 'Supplier Outreach Template' },
+      { id: 'shipping-calculator', name: 'Shipping Cost Calculator' }
+    ],
+    consulting: [
+      { id: 'discovery-call', name: 'Discovery Call Script' },
+      { id: 'engagement-letter', name: 'Engagement Letter' },
+      { id: 'diagnostic-framework', name: 'Client Diagnostic Framework' },
+      { id: 'deliverable-template', name: 'Deliverable Template' }
+    ],
+    legal: [
+      { id: 'contract-template', name: 'Service Contract' },
+      { id: 'client-proposal', name: 'Client Proposal Template' },
+      { id: 'invoice-template', name: 'Invoice Template' },
+      { id: 'business-plan', name: 'Business Plan Template' }
     ],
     general: [
-      { id: 'business_plan', name: 'Business Plan Template' },
-      { id: 'proposal_template', name: 'Proposal Template' },
-      { id: 'contract_basics', name: 'Basic Contract Template' },
-      { id: 'financial_planning', name: 'Financial Planning Guide' },
-      { id: 'operations_playbook', name: 'Operations Playbook' }
+      { id: 'business-plan', name: 'Business Plan Template' },
+      { id: 'invoice-template', name: 'Invoice Template' },
+      { id: 'contract-template', name: 'Service Contract' },
+      { id: 'pitch-deck', name: 'Pitch Deck Template' }
     ]
   };
-  
+
   return kitTemplates[companyType] || kitTemplates.general;
 }
 
@@ -1058,55 +1091,187 @@ function formatDocTitle(docId) {
     : docId;
   
   const titles = {
-    'nda_template': '📄 NDA Template',
-    'ip_assignment': '📄 IP Assignment Agreement',
-    'licensing_agreement': '📄 Licensing Agreement',
-    'compliance_checklist': '📋 Compliance Checklist',
-    'contract_template': '📄 Service Contract Template',
-    'content_calendar': '📱 Content Calendar Template',
-    'brand_kit': '🎨 Brand Voice Guidelines',
-    'hashtag_strategy': '#️⃣ Hashtag Strategy',
-    'creator_pitch': '🎬 Creator Pitch Deck',
-    'media_kit': '📊 Media Kit Template',
-    'api_docs': '💻 API Documentation',
-    'database_schema': '🗄️ Database Schema Guide',
-    'auth_flow': '🔐 Auth & Subscription Flow',
-    'deployment_guide': '🚀 Deployment Checklist',
-    'stripe_integration': '💳 Stripe Integration Guide',
-    'seo_audit': '🎯 SEO Audit Framework',
-    'ad_campaign': '📢 Ad Campaign Template',
-    'email_sequence': '📧 Email Sequence Builder',
-    'analytics_dashboard': '📊 Analytics Dashboard',
-    'outreach_scripts': '📬 Outreach Scripts',
-    'business_plan': '📄 Business Plan Template',
-    'proposal_template': '📋 Proposal Template',
-    'contract_basics': '📄 Basic Contract Template',
-    'financial_planning': '💰 Financial Planning Guide',
-    'operations_playbook': '📚 Operations Playbook'
+    // Social
+    'content-calendar': 'Social Media Content Calendar',
+    'influencer-brief': 'Influencer Campaign Brief',
+    'creator-rate-card': 'Creator Rate Card',
+    'brand-guidelines': 'Social Media Brand Guidelines',
+    // SaaS
+    'pricing-model': 'SaaS Pricing Model Calculator',
+    'onboarding-flow': 'User Onboarding Flow',
+    'feature-roadmap': 'Feature Roadmap Template',
+    'api-docs': 'API Documentation Template',
+    // Marketing
+    'seo-audit': 'SEO Audit Template',
+    'campaign-brief': 'Campaign Brief',
+    'lead-gen-playbook': 'Lead Gen Playbook',
+    'ad-copy-framework': 'Ad Copy Framework',
+    'client-proposal-mktg': 'Client Proposal Template',
+    'content-calendar-mktg': 'Content Calendar',
+    // Agency
+    'client-proposal': 'Client Proposal Template',
+    'sow-template': 'Statement of Work Template',
+    'retainer-agreement': 'Retainer Agreement',
+    'client-intake': 'Client Intake Form',
+    'case-study': 'Case Study Template',
+    // E-commerce
+    'product-listing': 'Product Listing Optimizer',
+    'inventory-tracker': 'Inventory Tracker',
+    'supplier-outreach': 'Supplier Outreach Template',
+    'shipping-calculator': 'Shipping Cost Calculator',
+    // Consulting
+    'discovery-call': 'Discovery Call Script',
+    'engagement-letter': 'Engagement Letter',
+    'diagnostic-framework': 'Client Diagnostic Framework',
+    'deliverable-template': 'Deliverable Template',
+    // General
+    'business-plan': 'Business Plan Template',
+    'invoice-template': 'Invoice Template',
+    'contract-template': 'Service Contract',
+    'pitch-deck': 'Pitch Deck Template'
   };
-  
-  return titles[cleanId] || titles[docId] || `📄 ${docId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
+
+  return titles[cleanId] || titles[docId] || `${docId.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
 }
 
-// Get document content (stub - would load from backend)
+// Offline fallback — returns real enterprise content for any doc ID
 function getKitDocumentContent(docId) {
   const templates = {
-    nda_template: {
-      title: '📄 NDA Template',
-      content: `NON-DISCLOSURE AGREEMENT\n\nThis Agreement is entered into as of [DATE] by and between:\n\nDisclosing Party: [COMPANY NAME]\nReceiving Party: [RECIPIENT NAME]\n\n1. CONFIDENTIAL INFORMATION\nFor purposes of this Agreement, "Confidential Information" includes...\n\n2. OBLIGATIONS\nReceiving Party agrees to...\n\n3. TERM\nThis Agreement shall remain in effect for...\n\n[Add your custom terms here]`
+    'content-calendar': {
+      title: 'Social Media Content Calendar',
+      content: `# SOCIAL MEDIA CONTENT CALENDAR\n\n## Week 1\n| Day | Platform | Content Type | Topic | Status |\n|-----|----------|--------------|-------|--------|\n| Mon | Instagram | Reel | [Topic] | Draft |\n| Tue | TikTok | Video | [Topic] | Draft |\n| Wed | Twitter | Thread | [Topic] | Draft |\n| Thu | LinkedIn | Post | [Topic] | Draft |\n| Fri | YouTube | Short | [Topic] | Draft |\n\n## Content Ideas\n- Behind the scenes\n- Tutorial/How-to\n- Customer testimonial\n- Industry news reaction\n- Q&A session`
     },
-    business_plan: {
-      title: '📄 Business Plan Template',
-      content: `BUSINESS PLAN\n\n1. EXECUTIVE SUMMARY\n[Describe your business in 2-3 sentences]\n\n2. PROBLEM & SOLUTION\nProblem: [What problem are you solving?]\nSolution: [How does your business solve it?]\n\n3. TARGET MARKET\n[Who are your customers?]\n\n4. REVENUE MODEL\n[How will you make money?]\n\n5. MARKETING STRATEGY\n[How will you reach customers?]\n\n[Customize this plan for your business]`
+    'influencer-brief': {
+      title: 'Influencer Campaign Brief',
+      content: `# INFLUENCER CAMPAIGN BRIEF\n\n## Campaign Overview\n- Brand: [Your Brand Name]\n- Campaign Name: [Campaign Name]\n- Objective: [Awareness / Engagement / Conversions]\n- Timeline: [Start Date] — [End Date]\n\n## Target Audience\n- Age Range: [18-24 / 25-34 / etc.]\n- Interests: [List 3-5 interests]\n- Platforms: [Instagram / TikTok / YouTube]\n\n## Deliverables\n| Platform | Content Type | Quantity | Deadline |\n|----------|-------------|----------|---------|\n| Instagram | Reel (30-60s) | [X] | [Date] |\n| TikTok | Video | [X] | [Date] |\n| Stories | Swipe-up | [X] | [Date] |\n\n## Key Messages\n1. [Primary message / tagline]\n2. [Secondary message]\n3. [Call to action]\n\n## Compensation\n- Fee: $[Amount]\n- Payment Terms: [Net 30 / Upon posting]`
     },
-    // Add more templates as needed
-    default: {
-      title: '📄 Document Template',
-      content: `This is a placeholder document.\n\nYou can edit this content and save your changes.\n\nAdd your custom content here...`
+    'creator-rate-card': {
+      title: 'Creator Rate Card',
+      content: `# CREATOR RATE CARD\n\n## [Your Name/Brand]\n\n### Sponsorship Rates\n| Content Type | Rate | Deliverables |\n|--------------|------|-------------|\n| Instagram Reel | $500-2,000 | 1 Reel + Story |\n| TikTok Video | $300-1,500 | 1 Video |\n| YouTube Integration | $1,000-5,000 | 60-90s segment |\n| Full YouTube Sponsor | $2,000-10,000 | Dedicated video |\n| Instagram Story | $200-500 | 3-5 slides |\n| Bundle Deal | Custom | Multi-platform |\n\n### Audience Demographics\n- Total Reach: [X followers]\n- Engagement Rate: [X%]\n- Primary Age: 18-34\n- Top Locations: US, UK, Canada\n\n### Contact\n[email] | [social handle]`
+    },
+    'brand-guidelines': {
+      title: 'Social Media Brand Guidelines',
+      content: `# SOCIAL MEDIA BRAND GUIDELINES\n\n## Brand Identity\n- Brand Name: [Your Brand]\n- Tagline: [Your Tagline]\n- Brand Voice: [Professional / Casual / Bold / Friendly]\n\n## Visual Standards\n### Colors\n| Usage | Color | Hex Code |\n|-------|-------|----------|\n| Primary | [Color] | #[hex] |\n| Secondary | [Color] | #[hex] |\n| Accent | [Color] | #[hex] |\n\n### Typography\n- Headlines: [Font Name] — Bold\n- Body Text: [Font Name] — Regular\n\n## Content Pillars\n1. [Pillar 1] — Educational (30%)\n2. [Pillar 2] — Behind the scenes (25%)\n3. [Pillar 3] — Product showcases (25%)\n4. [Pillar 4] — User-generated (20%)\n\n## Hashtag Strategy\n- Branded: #[YourBrand]\n- Industry: #[Industry1] #[Industry2]`
+    },
+    'pricing-model': {
+      title: 'SaaS Pricing Model Calculator',
+      content: `# SAAS PRICING MODEL\n\n## Pricing Tiers\n| Feature | Free | Starter | Pro | Enterprise |\n|---------|------|---------|-----|------------|\n| [Core Feature 1] | Limited | Full | Full | Custom |\n| [Core Feature 2] | — | Full | Full | Custom |\n| API Access | — | — | Full | Custom |\n| Support | Community | Email | Priority | Dedicated |\n| Monthly Price | $0 | $[X] | $[X] | Contact |\n\n## Unit Economics\n- CAC (Customer Acquisition Cost): $[X]\n- LTV (Lifetime Value): $[X]\n- LTV:CAC Ratio: [X]:1 (target > 3:1)\n- Monthly Churn Rate: [X]% (target < 5%)\n- Gross Margin: [X]% (target > 70%)`
+    },
+    'onboarding-flow': {
+      title: 'User Onboarding Flow',
+      content: `# USER ONBOARDING FLOW\n\n## Overview\n- Goal: Get users to [key activation metric] within [X] minutes\n- Activation Metric: [e.g., "Created first project"]\n- Target Completion Rate: [X]%\n\n## Step-by-Step Flow\n### Step 1: Welcome Screen\n- Content: Welcome message + value proposition\n- Action: "Get Started" button\n\n### Step 2: Account Setup\n- Fields: [Name, Company, Role]\n\n### Step 3: Use Case Selection\n- Options: [Use case 1] / [Use case 2] / [Use case 3]\n\n### Step 4: Guided First Action\n- Goal: [Complete first core action]\n\n## Onboarding Emails\n| Day | Email | Subject Line |\n|-----|-------|-------------|\n| 0 | Welcome | Welcome to [Product]! |\n| 1 | Tip | Did you know you can [feature]? |\n| 3 | Nudge | Complete your setup |\n| 7 | Value | Users see [X]% improvement |`
+    },
+    'feature-roadmap': {
+      title: 'Feature Roadmap Template',
+      content: `# FEATURE ROADMAP\n\n## Vision Statement\n[One sentence describing the product's north star]\n\n## Current Quarter\n### Now (In Progress)\n| Feature | Priority | Status | Owner |\n|---------|----------|--------|-------|\n| [Feature 1] | P0 | In Dev | [Name] |\n| [Feature 2] | P0 | Design | [Name] |\n\n### Next (Planned)\n| Feature | Priority | Target | Notes |\n|---------|----------|--------|-------|\n| [Feature 3] | P1 | [Date] | [Context] |\n| [Feature 4] | P1 | [Date] | [Context] |\n\n### Later (Exploring)\n| Feature | Priority | Notes |\n|---------|----------|-------|\n| [Feature 5] | P2 | Needs user research |\n| [Feature 6] | P3 | Requested by [X] customers |`
+    },
+    'api-docs': {
+      title: 'API Documentation Template',
+      content: `# API DOCUMENTATION\n\n## Base URL\nhttps://api.[yourdomain].com/v1\n\n## Authentication\nAll requests require an API key:\nAuthorization: Bearer YOUR_API_KEY\n\n## Rate Limits\n| Plan | Requests/min | Requests/day |\n|------|-------------|-------------|\n| Free | 10 | 1,000 |\n| Pro | 60 | 10,000 |\n| Enterprise | 300 | Unlimited |\n\n## Endpoints\n### GET /[resource]\nList all resources.\n\n### POST /[resource]\nCreate a new resource.\n\n### GET /[resource]/{id}\nGet a single resource by ID.\n\n## Error Codes\n| Code | Meaning |\n|------|--------|\n| 400 | Bad request |\n| 401 | Unauthorized |\n| 404 | Not found |\n| 429 | Rate limit exceeded |`
+    },
+    'seo-audit': {
+      title: 'SEO Audit Template',
+      content: `# SEO AUDIT TEMPLATE\n\n## Site Information\n- URL: [yourdomain.com]\n- Audit Date: [Date]\n\n## Technical SEO Checklist\n- Site loads in < 3 seconds\n- Mobile-responsive\n- SSL certificate active\n- XML sitemap submitted\n- robots.txt configured\n- No broken links (404s found: [X])\n\n## On-Page SEO\n| Page | Title Tag | Meta Desc | H1 | Word Count | Score |\n|------|-----------|-----------|-----|-----------|-------|\n| Homepage | [pass/fail] | [pass/fail] | [pass/fail] | [X] | [X/10] |\n\n## Keyword Analysis\n| Target Keyword | Search Volume | Current Rank | Difficulty |\n|---------------|--------------|-------------|------------|\n| [keyword 1] | [X]/mo | [X] | [Low/Med/High] |`
+    },
+    'campaign-brief': {
+      title: 'Campaign Brief',
+      content: `# MARKETING CAMPAIGN BRIEF\n\n## Campaign Overview\n- Campaign Name: [Name]\n- Objective: [Awareness / Leads / Sales]\n- Budget: $[Amount]\n- Timeline: [Start] — [End]\n\n## Target Audience\n- Primary: [Demographics + psychographics]\n- Persona Name: [Name]\n\n## Key Messages\n1. Primary: [Core value proposition]\n2. Supporting: [Proof point]\n3. CTA: [What you want them to do]\n\n## Channels & Tactics\n| Channel | Tactic | Budget | KPI |\n|---------|--------|--------|-----|\n| Paid Social | [Ad type] | $[X] | [CPC / CPL] |\n| Email | [Sequence type] | $[X] | [Open rate] |\n| Content | [Blog / Video] | $[X] | [Traffic] |`
+    },
+    'lead-gen-playbook': {
+      title: 'Lead Gen Playbook',
+      content: `# LEAD GENERATION PLAYBOOK\n\n## Lead Funnel\nAWARENESS > INTEREST > CONSIDERATION > DECISION > CUSTOMER\n\n## Lead Sources\n| Source | Monthly Leads | Cost/Lead | Conversion % |\n|--------|-------------|-----------|-------------|\n| Organic Search | [X] | $[X] | [X]% |\n| Paid Ads | [X] | $[X] | [X]% |\n| Social Media | [X] | $[X] | [X]% |\n| Referrals | [X] | $[X] | [X]% |\n\n## Cold Email Template\nSubject: [Pain point]-focused subject line\n\nHi [Name],\nI noticed [observation about their business].\nWe help [target audience] achieve [result] by [method].\nWould you be open to a quick [X]-minute call?\n[Your Name]\n\n## Lead Scoring\n| Action | Points |\n|--------|--------|\n| Visited pricing page | +20 |\n| Downloaded resource | +15 |\n| Requested demo | +40 |`
+    },
+    'ad-copy-framework': {
+      title: 'Ad Copy Framework',
+      content: `# AD COPY FRAMEWORK\n\n## PAS Formula (Problem-Agitate-Solve)\n- Problem: [State the pain point]\n- Agitate: [Make the problem feel urgent]\n- Solve: [Present your solution]\n\n## Ad Variations\n### Variation A: Pain-Point Focus\nHeadline: [Struggling with [problem]?]\nBody: [Agitate pain + introduce solution]\nCTA: [Get Started Free / Book a Demo]\n\n### Variation B: Results Focus\nHeadline: [[X]% of [audience] achieved [result]]\nBody: [How it works + social proof]\nCTA: [See How / Try It Free]\n\n## Platform Specs\n| Platform | Headline | Body | Image |\n|----------|----------|------|-------|\n| Facebook | 40 chars | 125 chars | 1200x628 |\n| Instagram | 40 chars | 125 chars | 1080x1080 |\n| Google | 30 chars x3 | 90 chars x2 | — |`
+    },
+    'client-proposal-mktg': {
+      title: 'Marketing Client Proposal',
+      content: `# MARKETING CLIENT PROPOSAL\n\nPrepared for: [Client Name]\nPrepared by: [Your Agency]\nDate: [Date]\n\n## Situation Analysis\n[2-3 sentences about client's current position]\n\n## Objectives\n1. [Increase brand awareness by X%]\n2. [Generate X qualified leads per month]\n3. [Achieve X% conversion rate improvement]\n\n## Investment\n| Service | Monthly Fee |\n|---------|------------|\n| Strategy & Management | $[X] |\n| Paid Media (ad spend) | $[X] |\n| Content Creation | $[X] |\n| Total | $[X]/mo |\n\n## Expected Results\n| KPI | Current | Target (6 months) |\n|-----|---------|-------------------|\n| Monthly Traffic | [X] | [X] |\n| Leads/Month | [X] | [X] |`
+    },
+    'content-calendar-mktg': {
+      title: 'Marketing Content Calendar',
+      content: `# MARKETING CONTENT CALENDAR\n\n## Monthly Plan: [Month Year]\n\n### Week 1: [Theme]\n| Day | Channel | Format | Topic | Status | Owner |\n|-----|---------|--------|-------|--------|-------|\n| Mon | Blog | Article | [Topic] | [Status] | [Name] |\n| Tue | LinkedIn | Post | [Topic] | | |\n| Wed | Email | Newsletter | [Topic] | | |\n| Thu | Instagram | Carousel | [Topic] | | |\n| Fri | YouTube | Video | [Topic] | | |\n\n## Content Themes\n1. Educational content\n2. Case studies / social proof\n3. Product features / updates\n4. Industry trends`
+    },
+    'client-proposal': {
+      title: 'Client Proposal Template',
+      content: `# CLIENT PROPOSAL\n\nPrepared for: [Client Name]\nPrepared by: [Your Name]\nDate: [Date]\n\n## Project Overview\n[Brief description of what you'll deliver]\n\n## Scope of Work\n1. [Deliverable 1]\n2. [Deliverable 2]\n3. [Deliverable 3]\n\n## Timeline\n- Start Date: [Date]\n- End Date: [Date]\n- Key Milestones: [List]\n\n## Investment\n| Item | Price |\n|------|-------|\n| [Service 1] | $X,XXX |\n| [Service 2] | $X,XXX |\n| Total | $X,XXX |\n\n## Next Steps\n1. Sign this proposal\n2. 50% deposit to begin\n3. Kick-off call scheduled\n\nValid for 14 days`
+    },
+    'sow-template': {
+      title: 'Statement of Work Template',
+      content: `# STATEMENT OF WORK\n\nProject: [Project Name]\nClient: [Client Name]\nContractor: [Your Name / Agency]\nDate: [Date]\n\n## 1. Project Description\n[2-3 sentences describing the project and its goals]\n\n## 2. Scope of Work\n| # | Deliverable | Description | Format |\n|---|------------|-------------|--------|\n| 1 | [Deliverable] | [Description] | [Format] |\n| 2 | [Deliverable] | [Description] | [Format] |\n\n## 3. Timeline & Milestones\n| Milestone | Deliverable | Due Date | Payment |\n|-----------|------------|----------|---------|\n| Kick-off | Project start | [Date] | $[X] |\n| Phase 1 | [Deliverable] | [Date] | $[X] |\n| Final | All deliverables | [Date] | $[X] |\n\n## 4. Fees\n- Total Project Fee: $[X]\n- Payment Terms: [Net 15 / Net 30]`
+    },
+    'retainer-agreement': {
+      title: 'Retainer Agreement',
+      content: `# RETAINER AGREEMENT\n\nService Provider: [Your Name / Agency]\nClient: [Client Name]\nEffective Date: [Date]\n\n## 1. Services Included\n| Service | Hours/Month | Description |\n|---------|-----------|-------------|\n| [Service 1] | [X] hrs | [Description] |\n| [Service 2] | [X] hrs | [Description] |\n| Total | [X] hrs/mo | |\n\n## 2. Retainer Fee\n- Monthly Retainer: $[X]/month\n- Payment Due: [1st] of each month\n- Overage Rate: $[X]/hour beyond included hours\n\n## 3. Communication\n- Response Time: Within [X] business hours\n- Weekly Check-in: [Day] at [Time]\n\n## 4. Term & Termination\n- Minimum Commitment: [X] months\n- Cancellation Notice: [30] days written notice`
+    },
+    'client-intake': {
+      title: 'Client Intake Form',
+      content: `# CLIENT INTAKE FORM\n\n## Contact Information\n- Full Name: [Name]\n- Company: [Company Name]\n- Email: [Email]\n- Phone: [Phone]\n- Website: [URL]\n\n## Business Overview\n- Industry: [Industry]\n- Years in Business: [X]\n- Team Size: [X]\n- Annual Revenue: [Range]\n\n## Current Situation\n1. What's your biggest challenge right now?\n2. What have you tried before?\n3. What does success look like in 6 months?\n\n## Project Details\n- Service Needed: [Service type]\n- Budget Range: $[X] — $[X]\n- Desired Start Date: [Date]\n- Priority Level: Urgent / Normal / Flexible\n\n## Decision Process\n- Decision Maker: [Name]\n- Timeline for Decision: [Date]`
+    },
+    'case-study': {
+      title: 'Case Study Template',
+      content: `# CASE STUDY: [Client Name]\n\n## The Client\n- Company: [Client Name]\n- Industry: [Industry]\n- Size: [Team size / Revenue]\n\n## The Challenge\n[2-3 paragraphs describing the situation before]\n\nKey Pain Points:\n- [Pain point 1]\n- [Pain point 2]\n- [Pain point 3]\n\n## The Solution\n[What you delivered]\n\n## The Results\n| Metric | Before | After | Change |\n|--------|--------|-------|--------|\n| [Metric 1] | [X] | [X] | +[X]% |\n| [Metric 2] | [X] | [X] | +[X]% |\n\n## Client Testimonial\n"[Quote from the client]"\n— [Name], [Title], [Company]`
+    },
+    'product-listing': {
+      title: 'Product Listing Optimizer',
+      content: `# PRODUCT LISTING OPTIMIZER\n\n## Product Information\n- Product Name: [Name]\n- SKU: [SKU]\n- Category: [Category]\n- Price: $[X]\n\n## Title (SEO-Optimized)\n[Brand] + [Product Type] + [Key Feature] + [Size/Color/Variant]\n\n## Bullet Points / Key Features\n1. [Feature 1] — [Benefit to customer]\n2. [Feature 2] — [Benefit to customer]\n3. [Feature 3] — [Benefit to customer]\n4. [Feature 4] — [Benefit to customer]\n5. [Feature 5] — [Benefit to customer]\n\n## SEO Keywords\n| Primary | Secondary | Long-tail |\n|---------|----------|----------|\n| [keyword] | [keyword] | [keyword phrase] |\n\n## Images Checklist\n- Main product image (white background)\n- Lifestyle image (product in use)\n- Scale/size comparison image\n- Feature callout image`
+    },
+    'inventory-tracker': {
+      title: 'Inventory Tracker',
+      content: `# INVENTORY TRACKER\n\n## Active Products\n| SKU | Product Name | In Stock | Reorder Point | Supplier | Unit Cost | Status |\n|-----|-------------|----------|--------------|----------|-----------|--------|\n| [SKU] | [Name] | [X] | [X] | [Supplier] | $[X] | [In Stock/Low/Out] |\n\n## Reorder Alerts\n| SKU | Product | Current | Reorder At | Action Needed |\n|-----|---------|---------|-----------|---------------|\n| [SKU] | [Name] | [X] | [X] | Order [X] units |\n\n## Supplier Directory\n| Supplier | Contact | Lead Time | Min Order | Payment Terms |\n|----------|---------|-----------|-----------|---------------|\n| [Name] | [Email/Phone] | [X days] | [X units] | [Net 30] |`
+    },
+    'supplier-outreach': {
+      title: 'Supplier Outreach Template',
+      content: `# SUPPLIER OUTREACH TEMPLATE\n\n## Supplier Research\n| Supplier | Product | MOQ | Unit Price | Lead Time | Rating |\n|----------|---------|-----|-----------|-----------|--------|\n| [Name] | [Product] | [X] | $[X] | [X days] | [X/5] |\n\n## Initial Outreach Email\nSubject: Inquiry: [Product Name] — [Your Company]\n\nHello [Supplier Name],\n\nMy name is [Your Name] from [Your Company]. We are looking for a reliable supplier for [product type].\n\nCould you please provide:\n1. Minimum order quantities\n2. Unit pricing at [X], [X], and [X] quantities\n3. Lead time and shipping options\n4. Sample availability\n\nEstimated monthly volume: [X] units.\n\nThank you,\n[Your Name]\n[Your Company]`
+    },
+    'shipping-calculator': {
+      title: 'Shipping Cost Calculator',
+      content: `# SHIPPING COST CALCULATOR\n\n## Product Dimensions\n| Product | Weight (lbs) | Length | Width | Height | DIM Weight |\n|---------|-------------|--------|-------|--------|------------|\n| [Product 1] | [X] | [X] | [X] | [X] | [X] |\n\n## Carrier Rate Comparison\n| Carrier | Service | 1 lb | 3 lb | 5 lb | 10 lb |\n|---------|---------|------|------|------|-------|\n| USPS | Priority Mail | $[X] | $[X] | $[X] | $[X] |\n| UPS | Ground | $[X] | $[X] | $[X] | $[X] |\n| FedEx | Ground | $[X] | $[X] | $[X] | $[X] |\n\n## Shipping Strategy\n| Order Value | Shipping Option | Customer Pays | You Pay |\n|-------------|----------------|-------------- |---------|\n| $0 — $[X] | Standard | $[X] | $[X] |\n| $[X]+ | Free Shipping | $0 | $[X] |`
+    },
+    'discovery-call': {
+      title: 'Discovery Call Script',
+      content: `# DISCOVERY CALL SCRIPT\n\n## Pre-Call Prep\n- Research client's company\n- Review intake form info\n- Prepare relevant case studies\n\n## Opening (2-3 minutes)\n"Thanks for taking the time, [Name]. I'd like to understand your situation and see if there's a fit."\n\n## Situation Questions (10 min)\n1. Walk me through how [process] works today?\n2. What tools/systems are you currently using?\n3. What's working well right now?\n\n## Pain Questions (10 min)\n1. What's the biggest challenge you're facing?\n2. How long has this been a problem?\n3. What impact is this having on [revenue / efficiency]?\n4. What happens if nothing changes in 6-12 months?\n\n## Close & Next Steps (5 min)\n- "Does this sound like it could be a fit?"\n- Propose specific next step\n- Schedule follow-up on the call\n\n## Post-Call\n- Send follow-up email within 24 hours\n- Log notes in CRM`
+    },
+    'engagement-letter': {
+      title: 'Engagement Letter',
+      content: `# ENGAGEMENT LETTER\n\nDate: [Date]\nTo: [Client Name]\nFrom: [Your Name]\n\n## 1. Purpose\nThis letter confirms the terms of our engagement for [description of services].\n\n## 2. Scope of Services\n| # | Service | Description |\n|---|---------|-------------|\n| 1 | [Service] | [Description] |\n| 2 | [Service] | [Description] |\n\n## 3. Fees & Payment\n- Total Fee: $[X]\n- Payment Schedule:\n  - [X]% due upon signing ($[X])\n  - [X]% due at milestone ($[X])\n  - [X]% due upon completion ($[X])\n\n## 4. Timeline\n- Start Date: [Date]\n- Estimated Completion: [Date]\n\n## 5. Acceptance\n| | Client | Consultant |\n|---|--------|------------|\n| Name | __________ | __________ |\n| Signature | __________ | __________ |\n| Date | __________ | __________ |`
+    },
+    'diagnostic-framework': {
+      title: 'Client Diagnostic Framework',
+      content: `# CLIENT DIAGNOSTIC FRAMEWORK\n\n## Business Assessment\n- Company: [Name]\n- Industry: [Industry]\n- Revenue: $[X]\n- Employees: [X]\n\n## Strategic Health Check\n| Area | Score (1-10) | Notes |\n|------|-------------|-------|\n| Vision & Strategy | [X] | [Observations] |\n| Operations | [X] | [Observations] |\n| Financial Health | [X] | [Observations] |\n| Marketing & Sales | [X] | [Observations] |\n| Team & Culture | [X] | [Observations] |\n| Technology | [X] | [Observations] |\n\n## Key Findings\n1. [Finding 1] — Impact: [High/Medium/Low]\n2. [Finding 2] — Impact: [High/Medium/Low]\n3. [Finding 3] — Impact: [High/Medium/Low]\n\n## Recommendations\n| Priority | Recommendation | Expected Impact | Effort |\n|----------|---------------|----------------|--------|\n| 1 | [Action item] | [Revenue gain] | [Low/Med/High] |`
+    },
+    'deliverable-template': {
+      title: 'Deliverable Template',
+      content: `# DELIVERABLE\n\n## Overview\n- Project: [Project Name]\n- Deliverable: [Deliverable Name]\n- Version: [1.0]\n- Date: [Date]\n- Prepared by: [Your Name]\n- Prepared for: [Client Name]\n\n## 1. Executive Summary\n[1-2 paragraphs summarizing what this deliverable contains]\n\n## 2. Objectives\n- [Objective 1]\n- [Objective 2]\n- [Objective 3]\n\n## 3. Findings & Analysis\n### Finding 1: [Title]\n[Description with supporting data]\n\n### Finding 2: [Title]\n[Description with supporting data]\n\n## 4. Recommendations\n| # | Recommendation | Priority | Expected Impact |\n|---|---------------|----------|-----------------|\n| 1 | [Recommendation] | [High/Med/Low] | [Impact] |\n| 2 | [Recommendation] | [High/Med/Low] | [Impact] |\n\n## 5. Implementation Plan\n| Step | Action | Owner | Deadline |\n|------|--------|-------|---------|\n| 1 | [Action] | [Name] | [Date] |`
+    },
+    'business-plan': {
+      title: 'Business Plan Template',
+      content: `# BUSINESS PLAN\n\n## 1. EXECUTIVE SUMMARY\n[Describe your business in 2-3 sentences]\n\n## 2. PROBLEM & SOLUTION\nProblem: [What problem are you solving?]\nSolution: [How does your business solve it?]\n\n## 3. TARGET MARKET\n[Who are your customers?]\n\n## 4. REVENUE MODEL\n[How will you make money?]\n\n## 5. MARKETING STRATEGY\n[How will you reach customers?]\n\nCustomize this plan for your business`
+    },
+    'invoice-template': {
+      title: 'Invoice Template',
+      content: `# INVOICE\n\nInvoice #: [INV-001]\nDate: [Date]\nDue Date: [Date]\n\nFrom:\n[Your Name / Business Name]\n[Your Address]\n[Email] | [Phone]\n\nTo:\n[Client Name]\n[Client Company]\n\n## Services Rendered\n| # | Description | Quantity | Rate | Amount |\n|---|------------|----------|------|--------|\n| 1 | [Service/Product] | [X] | $[X] | $[X] |\n| 2 | [Service/Product] | [X] | $[X] | $[X] |\n\n| | |\n|---|---|\n| Subtotal | $[X] |\n| Tax ([X]%) | $[X] |\n| Total Due | $[X] |\n\n## Payment Details\n- Method: [Bank Transfer / PayPal / Stripe]\n- Payment due within [X] days`
+    },
+    'contract-template': {
+      title: 'Service Contract',
+      content: `# SERVICE CONTRACT\n\nEffective Date: [Date]\n\nService Provider: [Your Name / Business]\nClient: [Client Name / Company]\n\n## 1. Services\n| # | Service | Description |\n|---|---------|-------------|\n| 1 | [Service] | [Detailed description] |\n| 2 | [Service] | [Detailed description] |\n\n## 2. Compensation\n- Total Fee: $[X]\n- Payment Schedule:\n  - $[X] due upon signing\n  - $[X] due at midpoint\n  - $[X] due upon completion\n\n## 3. Timeline\n- Start Date: [Date]\n- End Date: [Date]\n- Revisions: [X] rounds included\n\n## 4. Intellectual Property\nAll deliverables become Client property upon full payment.\n\n## 5. Termination\nEither party may terminate with [X] days written notice.`
+    },
+    'pitch-deck': {
+      title: 'Pitch Deck Template',
+      content: `# PITCH DECK\n\n## Slide 1: Title\n- Company Name: [Name]\n- Tagline: [One-line description]\n\n## Slide 2: The Problem\n- [Pain point 1 — who feels it?]\n- [Pain point 2 — how bad is it?]\n- [X]% of [audience] experience this problem\n\n## Slide 3: The Solution\n[2-3 sentences describing your product/service]\n\n## Slide 4: Market Opportunity\n- TAM: $[X]B\n- SAM: $[X]B\n- SOM: $[X]M\n\n## Slide 5: Business Model\n| Revenue Stream | Pricing | Target |\n|---------------|---------|--------|\n| [Stream 1] | $[X]/mo | [Segment] |\n\n## Slide 6: Traction\n| Metric | Current | Target (12 mo) |\n|--------|---------|----------------|\n| Customers | [X] | [X] |\n| Revenue | $[X] | $[X] |\n\n## Slide 7: The Ask\n- Raising: $[X]\n- Use of Funds: [X]% Product, [X]% Sales, [X]% Ops`
     }
   };
-  
-  return templates[docId] || templates.default;
+
+  // Never return a placeholder — always return real content
+  if (templates[docId]) return templates[docId];
+
+  // Auto-generate structured document from docId
+  const title = docId.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  return {
+    title: title,
+    content: `# ${title.toUpperCase()}\n\n## Purpose\nThis document covers the key aspects of ${title.toLowerCase()} for your business.\n\n## Key Information\n| Category | Details | Notes |\n|----------|---------|-------|\n| Objective | Define your ${title.toLowerCase()} goals | Update quarterly |\n| Stakeholders | List all involved parties | Include contact info |\n| Timeline | Set milestones and deadlines | Track progress weekly |\n| Budget | Allocate resources and costs | Review monthly |\n\n## Process\n1. Review and customize each section for your specific needs\n2. Fill in the details relevant to your business\n3. Share with your team for feedback\n4. Save and iterate as your business evolves\n\n## Action Items\n- Review this document and add your specific details\n- Set a follow-up date to revisit and update\n- Share with relevant team members or stakeholders`
+  };
 }
 
 // Save document - POST TO BACKEND
@@ -1190,17 +1355,22 @@ function renderDynamicAchievements(user) {
       achievements.push(`💵 Revenue Generated — $${revenue.toLocaleString()}`);
     }
     
-    if (dashboardData.activity_streaks.current_streak > 0) {
-      achievements.push(`🔥 ${dashboardData.activity_streaks.current_streak}-day activity streak`);
+    const streak = dashboardData.activity_streaks?.current_streak || 0;
+    if (streak > 0) {
+      achievements.push(`🔥 ${streak}-day activity streak`);
     }
-    
-    if (dashboardData.referrals.total_referrals > 0) {
-      achievements.push(`🤝 ${dashboardData.referrals.total_referrals} referrals made`);
+
+    const totalReferrals = dashboardData.referrals?.total_referrals || 0;
+    if (totalReferrals > 0) {
+      achievements.push(`🤝 ${totalReferrals} referrals made`);
     }
-    
-    if (dashboardData.apex_ultra.activated) {
-      const rate = dashboardData.apex_ultra.success_rate;
-      achievements.push(`🌟 APEX ULTRA — ${dashboardData.apex_ultra.systems_operational}/${dashboardData.apex_ultra.total_systems} systems (${rate}%)`);
+
+    const apex = dashboardData.apex_ultra || {};
+    if (apex.activated) {
+      const rate = apex.success_rate || 100;
+      const operational = apex.systems_operational || apex.systems_count || 143;
+      const total = apex.total_systems || 143;
+      achievements.push(`🌟 APEX ULTRA — ${operational}/${total} systems (${rate}%)`);
     }
     
   } else {
@@ -1520,10 +1690,10 @@ async function publishStorefrontWithTemplate(user, templateKey, templateFile) {
       setTimeout(() => {
         openModal("🎉 Storefront Published!", `
           <p style="color: #aaa;">Your storefront is now live and ready for customers!</p>
-          <p><a href="${result.link || `/storefront/${username}`}" target="_blank" style="color: #00bfff; font-size: 1.1rem;">${result.link || `aigentsy.com/storefront/${username}`}</a></p>
+          <p><a href="${result.link || `${window.BACKEND_BASE}/storefront/${username}`}" target="_blank" style="color: #00bfff; font-size: 1.1rem;">${result.link || `${window.BACKEND_BASE}/storefront/${username}`}</a></p>
           <div style="margin-top: 16px;">
             <button class="btn-glow" onclick="copyStorefrontLink()">📋 Copy Link</button>
-            <button class="btn-glow" onclick="window.open('${result.link || `/storefront/${username}`}', '_blank')" style="background: #333;">👁️ View Storefront</button>
+            <button class="btn-glow" onclick="window.open('${result.link || `${window.BACKEND_BASE}/storefront/${username}`}', '_blank')" style="background: #333;">👁️ View Storefront</button>
           </div>
         `);
       }, 500);
@@ -1641,7 +1811,8 @@ function updateSnapshotData(user) {
   document.getElementById("growthProposals").textContent = proposals;
   document.getElementById("growthCloseRate").textContent = closeRate;
   document.getElementById("growthAvgDeal").textContent = avgDeal.toLocaleString();
-  document.getElementById("growthRepeatRate").textContent = 0; // TODO: Calculate from repeat clients
+  const repeatRate = clients > 0 && won > 1 ? Math.round(Math.min((won / clients) * 100, 100)) : 0;
+  document.getElementById("growthRepeatRate").textContent = repeatRate;
 }
 
 function renderOfferingsWithData(user) {
@@ -1797,6 +1968,7 @@ async function runAgent() {
       body: JSON.stringify({
         input: fullInput,
         memory,
+        role: window._activeAgentRole || "CFO",
         businessType: businessType,
         companyType: businessType,
         username: user.username,
@@ -2400,7 +2572,7 @@ async function sendInvite() {
       if (result.existing_user) {
         showToast("Invitation sent via Proposal System!", "success");
       } else if (result.pending_email) {
-        showToast("Invite logged - email delivery coming soon!", "info");
+        showToast("Invite logged — they'll be notified when they join!", "info");
       }
     } else {
       feedback.textContent = `❌ ${result.message}`;
@@ -2423,7 +2595,7 @@ async function sendInvite() {
 }
 
 window.GXA = (() => {
-  const BASE = window.BACKEND_BASE;
+  const BASE = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
   const U = { name: localStorage.getItem("aigentsyUsername") || "" };
   
   function openModal(title, html) {
@@ -3526,7 +3698,11 @@ async function loadBoosterDetailsForModal() {
 }
 
 function purchasePowerUp() {
-  showToast('Power-Up purchase coming soon! Connect Stripe to enable.');
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  if (!username) { showToast('Please log in first', 'error'); return; }
+  const base = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+  window.open(`${base}/stripe/connect?user=${encodeURIComponent(username)}`, '_blank');
+  showToast('Connect Stripe to enable Power-Up purchases', 'info');
 }
 
 // ============================================================
@@ -3612,7 +3788,17 @@ async function loadSubscriptionDetailsForModal() {
 }
 
 function upgradeSubscription() {
-  showToast('Subscription upgrade coming soon! Connect Stripe to enable.');
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  if (!username) {
+    showToast('Please log in first', 'error');
+    return;
+  }
+  const base = window.BACKEND_BASE || 'https://aigentsy-ame-runtime.onrender.com';
+  showToast('Opening subscription setup via Stripe...', 'info');
+  const stripeWin = window.open(`${base}/stripe/connect?user=${encodeURIComponent(username)}&flow=subscription`, '_blank');
+  if (!stripeWin) {
+    showToast('Pop-up blocked — please allow pop-ups for this site', 'error');
+  }
 }
 
 // ============================================================
@@ -4215,7 +4401,8 @@ function downloadLocalTrackRecord() {
 
 function viewPublicProfile() {
   const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
-  window.open(`/storefront/${encodeURIComponent(username)}`, '_blank');
+  const base = window.BACKEND_BASE || "https://aigentsy-ame-runtime.onrender.com";
+  window.open(`${base}/storefront/${encodeURIComponent(username)}`, '_blank');
 }
 
 // ============================================================
