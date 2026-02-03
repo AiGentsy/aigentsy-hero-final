@@ -1,24 +1,31 @@
-// access-check.js — AiGentsy Protocol Gatekeeper (Enhanced v2.1)
-
-(function enforceConsent() {
-  const consent = localStorage.getItem("aigentsyUserConsent") === "true";
-  const username = localStorage.getItem("aigentsyUsername") || "";
-  const entrySource = localStorage.getItem("aigentsyEntrySource") || "";
+// access-check.js — AiGentsy Token-Based Auth Gatekeeper
+(async function enforceAuth() {
   const currentPath = window.location.pathname;
-  const exemptPaths = ["/", "/learn", "/mint"]; // Minimal public paths
+  const exemptPaths = ["/", "/learn", "/mint", "/intake", "/start"];
 
-  // Enforce restriction on all non-exempt pages
-  if (!consent || !username.trim()) {
-    if (!exemptPaths.includes(currentPath)) {
-      alert("⛔ You must mint and agree to terms before accessing this page.");
-      window.location.href = "/mint";
-      return;
-    }
+  if (exemptPaths.includes(currentPath)) return;
 
-    // Show modal only if it exists and the function is ready
-    const hasModal = typeof showConsentModal === "function" && document.getElementById("mintConsentModal");
-    if (hasModal) {
-      showConsentModal();
+  const token = localStorage.getItem("aigentsyToken");
+  const username = localStorage.getItem("aigentsyUsername");
+
+  if (!token || !username) {
+    window.location.href = "/";
+    return;
+  }
+
+  try {
+    const resp = await fetch("https://aigentsy-ame-runtime.onrender.com/auth/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token })
+    });
+    const result = await resp.json();
+    if (!result.ok) {
+      localStorage.removeItem("aigentsyToken");
+      window.location.href = "/";
     }
+  } catch (err) {
+    // Network error — allow access rather than bricking the page
+    console.warn("Auth verification unavailable:", err.message);
   }
 })();

@@ -52,7 +52,8 @@
       box-shadow: 0 0 12px #ffffff33;
     }
     .consent-box input[type="text"],
-    .consent-box input[type="password"] {
+    .consent-box input[type="password"],
+    .consent-box input[type="email"] {
       width: 90%;
       padding: 10px;
       margin: 10px 0;
@@ -127,6 +128,13 @@
       background: radial-gradient(circle at 50% 50%, #ffffff11, transparent 60%);
       animation: bgPulse 6s ease-in-out infinite;
     }
+    .auth-error {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 20px;
+    }
+    #signupFields { display: block; }
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(20px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -145,24 +153,27 @@
     <p>Build a fully-staffed AI company with a C-Suite team that finds clients, closes deals, and scales itself — while you sleep.</p>
     <div class="consent-box">
       <input type="text" id="usernameInput" placeholder="Username" />
-      <input type="password" id="passwordInput" placeholder="Password (optional)" />
+      <input type="email" id="emailInput" placeholder="Email (for notifications & invoices)" />
+      <input type="password" id="passwordInput" placeholder="Password" />
       <label><input type="checkbox" id="agreeCheckbox"/> I agree to the <a href="/AiGentsy_Terms_of_Use_v2.pdf" style="color:#fff" target="_blank">protocol terms</a>.</label>
-      <div class="toggle-auth">Don't have an account? Sign up</div>
+      <div class="toggle-auth" id="toggleAuth">Already have an account? Log in</div>
+      <div class="auth-error" id="authError"></div>
 
-      <!-- ✅ UPDATED: Only 3 kits - SaaS, Social, Marketing -->
-      <div class="aigent-options">
-        <div class="aigent-card" data-agent="saas">SaaS AI<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
-        <div class="aigent-card" data-agent="social">Social Media AI<br><span style="font-size: 0.85rem;">Reels, TikToks, content, creator kits</span></div>
-        <div class="aigent-card" data-agent="marketing">Marketing AI<br><span style="font-size: 0.85rem;">SEO, ads, outreach — autonomous</span></div>
+      <div id="signupFields">
+        <div class="aigent-options">
+          <div class="aigent-card" data-agent="saas">SaaS AI<br><span style="font-size: 0.85rem;">Build AI-powered software tools</span></div>
+          <div class="aigent-card" data-agent="social">Social Media AI<br><span style="font-size: 0.85rem;">Reels, TikToks, content, creator kits</span></div>
+          <div class="aigent-card" data-agent="marketing">Marketing AI<br><span style="font-size: 0.85rem;">SEO, ads, outreach — autonomous</span></div>
+        </div>
+
+        <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
+          <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Or describe your custom AI business idea:</label><br>
+          <input type="text" id="aigentsySearch" placeholder="e.g. podcast production, fitness coaching, real estate agency" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
+          <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
+        </div>
       </div>
 
-      <div id="aigentsySearchWrapper" style="margin-top: 30px; display:block;">
-        <label for="aigentsySearch" style="font-size: 0.95rem; color: #ccc;">Or describe your custom AI business idea:</label><br>
-        <input type="text" id="aigentsySearch" placeholder="e.g. podcast production, fitness coaching, real estate agency" style="width: 90%; padding: 10px; margin-top: 10px; border-radius: 6px; border: 1px solid #fff; background: #111; color: #fff;" />
-        <div id="aigentsySuggestion" style="margin-top: 10px; font-size: 0.9rem; color: #aaa;"></div>
-      </div>
-
-      <button id="enterBtn" disabled>🚀 Launch Your AI Business Now</button>
+      <button id="enterBtn" disabled>Launch Your AI Business Now</button>
     </div>
 
     <div class="footer-note">
@@ -174,102 +185,64 @@
     if (window.__AIG_HERO_INIT__) return;
     window.__AIG_HERO_INIT__ = true;
 
-    // Config
     const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
-    const JSONBIN_URL = window.JSONBIN_URL || "https://api.jsonbin.io/v3/b/YOUR_BIN_ID";
-    const JSONBIN_SECRET = window.JSONBIN_SECRET || "$2a$10$YOUR_SECRET_KEY";
 
     // Elements
     const usernameInput = document.getElementById('usernameInput');
+    const emailInput = document.getElementById('emailInput');
     const passwordInput = document.getElementById('passwordInput');
     const agreeCheckbox = document.getElementById('agreeCheckbox');
     const enterBtn = document.getElementById('enterBtn');
     const searchInput = document.getElementById('aigentsySearch');
     const suggestionBox = document.getElementById('aigentsySuggestion');
+    const authError = document.getElementById('authError');
+    const signupFields = document.getElementById('signupFields');
 
     // State
     let authMode = "signup";
     let selectedAgent = null;
     let customBusinessIdea = "";
-    let detectedKit = null;  // ✅ Track detected kit from custom input
+    let detectedKit = null;
 
     // Referral
     const params = new URLSearchParams(location.search);
     const referral = params.get("ref") || "origin/hero";
     try { localStorage.setItem("aigentsyReferral", referral); } catch(e){}
 
-    // ✅ UPDATED: Smart kit detection - routes to saas, social, or marketing
     function detectKitFromDescription(text) {
-      if (!text) return "saas";  // Default
-      
+      if (!text) return "saas";
       const t = text.toLowerCase();
-      
-      // Score each kit
       const scores = { saas: 0, marketing: 0, social: 0 };
-      
-      // SaaS keywords
       const saasWords = ["software", "app", "tool", "api", "saas", "platform", "automation", "dashboard", "integration", "plugin", "bot", "script", "code", "developer", "build", "create", "system", "database", "tech", "ai"];
       saasWords.forEach(w => { if (t.includes(w)) scores.saas += 1; });
-      
-      // Marketing keywords
       const marketingWords = ["marketing", "seo", "ads", "advertising", "growth", "traffic", "leads", "funnel", "email", "campaign", "ppc", "conversion", "landing page", "customers", "clients", "sales", "revenue", "b2b", "agency", "consulting", "strategy", "business"];
       marketingWords.forEach(w => { if (t.includes(w)) scores.marketing += 1; });
-      
-      // Social keywords
       const socialWords = ["social media", "content", "creator", "influencer", "youtube", "tiktok", "instagram", "reels", "video", "podcast", "followers", "audience", "community", "brand", "personal brand", "course", "teaching", "coaching", "creative", "design", "art", "music"];
       socialWords.forEach(w => { if (t.includes(w)) scores.social += 1; });
-      
-      // Find winner
       const winner = Object.entries(scores).reduce((a, b) => b[1] > a[1] ? b : a);
-      
-      // If no clear signal, default to saas
       if (winner[1] === 0) return "saas";
-      
       return winner[0];
     }
 
-    // ✅ UPDATED: companyTypeMap always returns saas, social, or marketing
     function getCompanyType(agent, customInput) {
-      // If they selected a card, use that
-      if (agent === "saas" || agent === "social" || agent === "marketing") {
-        return agent;
-      }
-      
-      // If custom/general, detect from their input
-      if (customInput && customInput.length > 10) {
-        return detectKitFromDescription(customInput);
-      }
-      
-      // Default to saas
+      if (agent === "saas" || agent === "social" || agent === "marketing") return agent;
+      if (customInput && customInput.length > 10) return detectKitFromDescription(customInput);
       return "saas";
     }
 
-    // ✅ UPDATED: Enhanced suggestion system with detection feedback
     function showSuggestion(value) {
       if (!suggestionBox) return;
       const v = (value || "").toLowerCase();
       let msg = "We'll match you with the best kit for your business.";
-      
-      if (!v || v.length < 5) {
-        suggestionBox.textContent = msg;
-        detectedKit = null;
-        return;
-      }
-      
-      // Detect kit
+      if (!v || v.length < 5) { suggestionBox.textContent = msg; detectedKit = null; return; }
       detectedKit = detectKitFromDescription(v);
-      
-      // Show feedback
       const kitMessages = {
-        saas: "💻 SaaS Kit detected — Build tools, automations, and software that sells.",
-        marketing: "📈 Marketing Kit detected — Help businesses grow with SEO, ads, and outreach.",
-        social: "📱 Social Kit detected — Create content, build audience, monetize attention."
+        saas: "SaaS Kit detected — Build tools, automations, and software that sells.",
+        marketing: "Marketing Kit detected — Help businesses grow with SEO, ads, and outreach.",
+        social: "Social Kit detected — Create content, build audience, monetize attention."
       };
-      
       msg = kitMessages[detectedKit] || kitMessages.saas;
       suggestionBox.textContent = msg;
-      
-      // Auto-select matching card
       const matchingCard = document.querySelector(`.aigent-card[data-agent="${detectedKit}"]`);
       if (matchingCard && !selectedAgent) {
         setTimeout(() => {
@@ -279,28 +252,38 @@
           updateButtonState();
         }, 300);
       }
-      
-      // Save custom idea
       if (value.length > 10) {
         customBusinessIdea = value;
-        if (!selectedAgent) {
-          selectedAgent = detectedKit;
-          updateButtonState();
-        }
+        if (!selectedAgent) { selectedAgent = detectedKit; updateButtonState(); }
       }
     }
 
-    // UI
     function updateButtonState() {
-      const valid = usernameInput.value.trim().length > 0 && agreeCheckbox.checked && !!selectedAgent;
-      enterBtn.disabled = !valid;
+      if (authMode === "login") {
+        enterBtn.disabled = !(usernameInput.value.trim().length > 0 && passwordInput.value.trim().length > 0);
+      } else {
+        const valid = usernameInput.value.trim().length > 0 && agreeCheckbox.checked && !!selectedAgent;
+        enterBtn.disabled = !valid;
+      }
     }
 
-    window.toggleAuthMode = function() {
+    function toggleAuthMode() {
       authMode = (authMode === "login") ? "signup" : "login";
-      const el = document.querySelector('.toggle-auth');
-      if (el) el.textContent = (authMode === "login") ? "Don't have an account? Sign up" : "Already have an account? Log in";
-    };
+      const el = document.getElementById('toggleAuth');
+      if (authMode === "login") {
+        el.textContent = "Don't have an account? Sign up";
+        signupFields.style.display = "none";
+        emailInput.style.display = "none";
+        enterBtn.textContent = "Log In";
+      } else {
+        el.textContent = "Already have an account? Log in";
+        signupFields.style.display = "block";
+        emailInput.style.display = "block";
+        enterBtn.textContent = "Launch Your AI Business Now";
+      }
+      authError.textContent = "";
+      updateButtonState();
+    }
 
     // Events
     document.querySelectorAll('.aigent-card').forEach(card => {
@@ -308,157 +291,120 @@
         document.querySelectorAll('.aigent-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         selectedAgent = card.getAttribute('data-agent');
-        detectedKit = selectedAgent;  // Sync detected kit
+        detectedKit = selectedAgent;
         customBusinessIdea = "";
-        
-        // Clear suggestion when card selected
         if (suggestionBox) {
           const kitMessages = {
-            saas: "💻 SaaS Kit — Build tools, automations, and software that sells.",
-            marketing: "📈 Marketing Kit — Help businesses grow with SEO, ads, and outreach.",
-            social: "📱 Social Kit — Create content, build audience, monetize attention."
+            saas: "SaaS Kit — Build tools, automations, and software that sells.",
+            marketing: "Marketing Kit — Help businesses grow with SEO, ads, and outreach.",
+            social: "Social Kit — Create content, build audience, monetize attention."
           };
           suggestionBox.textContent = kitMessages[selectedAgent] || "";
         }
-        
         updateButtonState();
       });
     });
 
-    document.querySelector('.toggle-auth').addEventListener('click', window.toggleAuthMode);
+    document.getElementById('toggleAuth').addEventListener('click', toggleAuthMode);
     usernameInput.addEventListener('input', updateButtonState);
+    passwordInput.addEventListener('input', updateButtonState);
     agreeCheckbox.addEventListener('change', updateButtonState);
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+    if (searchInput) searchInput.addEventListener('input', (e) => showSuggestion(e.target.value));
+
+    // --- Auth: Login or Signup ---
+    async function doLogin(username, password) {
+      const resp = await fetch(`${API_BASE}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      return await resp.json();
     }
 
-    // ✅ UPDATED: MAIN SIGNUP LOGIC with localStorage persistence
     enterBtn.addEventListener('click', async () => {
       if (enterBtn.disabled) return;
-      
+      authError.textContent = "";
       const username = usernameInput.value.trim();
-      const password = passwordInput.value.trim();
-      
-      if (!username) { 
-        alert("Enter a username"); 
-        return; 
-      }
-      
-      const idea = searchInput ? searchInput.value.trim() : "";
-      
-      // ✅ Determine final kit (always saas, social, or marketing)
-      const finalKit = getCompanyType(selectedAgent, customBusinessIdea || idea);
-      
-      // ✅ Store in localStorage BEFORE redirect
-      try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
-      try { localStorage.setItem("aigentsyKit", finalKit); } catch(e){}  // ✅ KEY: Save kit
-      try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
-      try { localStorage.setItem("aigentsyBusinessIdea", customBusinessIdea || idea); } catch(e){}
-      
-      console.log("💾 Saved to localStorage:", { username, kit: finalKit, idea: (customBusinessIdea || idea).substring(0, 30) });
+      const password = passwordInput.value.trim() || "default_password";
+      const email = emailInput.value.trim();
+
+      if (!username) { authError.textContent = "Enter a username"; return; }
 
       enterBtn.disabled = true;
-      enterBtn.textContent = "🚀 Building your AI business...";
-      
-      try {
-        console.log("📝 Attempting backend mint:", username, "Kit:", finalKit);
-        
-        // TRY BACKEND FIRST
+
+      if (authMode === "login") {
+        // --- LOGIN MODE ---
+        enterBtn.textContent = "Signing in...";
         try {
-          const response = await fetch(`${API_BASE}/mint`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: username,
-              password: password || "default_password",
-              companyType: finalKit,  // ✅ Always saas, social, or marketing
-              template: selectedAgent,
-              customInput: customBusinessIdea || idea,
-              referral: referral
-            })
-          });
-          
-          console.log("📡 Backend response status:", response.status);
-          
-          if (response.ok) {
-            const text = await response.text();
-            console.log("📡 Backend raw response:", text.substring(0, 200));
-            
-            const result = JSON.parse(text);
-            console.log("✅ Backend parsed:", result.ok ? "SUCCESS" : "FAIL");
-            
-            if (result.ok) {
-              if (result.apex_ultra && result.apex_ultra.activated) {
-                console.log(`🌟 APEX ULTRA: ${result.apex_ultra.systems_operational} systems`);
-              }
-              
-              console.log("🚀 Redirecting with kit:", finalKit);
-              window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
-              return; // SUCCESS - exit here
-            } else {
-              console.warn("⚠️ Backend returned ok:false:", result.error);
-              throw new Error(result.error || "Backend failed");
-            }
+          const result = await doLogin(username, password);
+          if (result.ok) {
+            try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
+            try { localStorage.setItem("aigentsyToken", result.token); } catch(e){}
+            window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+            return;
           } else {
-            throw new Error(`Backend HTTP ${response.status}`);
+            authError.textContent = result.error || "Login failed";
           }
-        } catch (backendError) {
-          console.warn("⚠️ Backend failed:", backendError.message);
-          console.log("📦 Falling back to direct JSONBin...");
-          
-          // FALLBACK TO JSONBIN
-          const now = new Date().toISOString();
-          const roleMap = { saas: "CTO", social: "CMO", marketing: "CMO" };
-          
-          const newUser = {
-            schemaVersion: 3,
-            id: `user_${Date.now()}`,
-            username: username,
-            consent: { agreed: true, username: username, timestamp: now },
-            companyType: finalKit,  // ✅ Always saas, social, or marketing
-            customInput: customBusinessIdea || idea,
-            created: now,
-            mintTime: now,
-            meta_role: roleMap[finalKit] || "CTO",
-            role: roleMap[finalKit] || "CTO",
-            traits: [finalKit, "founder", "autonomous", "aigentsy"],
-            runtimeFlags: { vaultAccess: true, remixUnlocked: false, cloneLicenseUnlocked: false, sdkAccess_eligible: finalKit === "saas" },
-            wallet: { address: "0x0", staked: 0 },
-            yield: { autoStake: false, aigxEarned: 0, vaultYield: 0, remixYield: 0 },
-            remix: { remixCount: 0, remixCredits: 1000, lineageDepth: 0 },
-            kits: { [finalKit]: { unlocked: true } },
-            referral: referral,
-            runtimeURL: "https://aigentsy.com/agents/aigent0.html"
-          };
-          
-          const getRes = await fetch(JSONBIN_URL, { headers: { "X-Master-Key": JSONBIN_SECRET } });
-          const currentData = await getRes.json();
-          let currentArray = Array.isArray(currentData.record) ? currentData.record : [];
-          
-          const existingIndex = currentArray.findIndex(u => u.username === username);
-          if (existingIndex >= 0) {
-            currentArray[existingIndex] = newUser;
-          } else {
-            currentArray.push(newUser);
-          }
-          
-          await fetch(JSONBIN_URL, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", "X-Master-Key": JSONBIN_SECRET },
-            body: JSON.stringify(currentArray)
-          });
-          
-          console.log("✅ JSONBin fallback successful with kit:", finalKit);
-          console.warn("⚠️ Note: APEX ULTRA did not activate (backend unavailable)");
-          window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+        } catch(e) {
+          authError.textContent = "Network error — try again";
         }
-        
-      } catch (e) {
-        console.error("❌ Total failure:", e);
-        alert(`Could not create your AiGentsy: ${e.message}`);
         enterBtn.disabled = false;
-        enterBtn.textContent = "🚀 Launch Your AI Business Now";
+        enterBtn.textContent = "Log In";
+        return;
       }
+
+      // --- SIGNUP MODE ---
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        authError.textContent = "Enter a valid email address";
+        enterBtn.disabled = false;
+        return;
+      }
+
+      const idea = searchInput ? searchInput.value.trim() : "";
+      const finalKit = getCompanyType(selectedAgent, customBusinessIdea || idea);
+
+      try { localStorage.setItem("aigentsyUsername", username); } catch(e){}
+      try { localStorage.setItem("aigentsyKit", finalKit); } catch(e){}
+      try { localStorage.setItem("aigentsyUserAgent", selectedAgent); } catch(e){}
+      try { localStorage.setItem("aigentsyBusinessIdea", customBusinessIdea || idea); } catch(e){}
+
+      enterBtn.textContent = "Building your AI empire...";
+
+      try {
+        const response = await fetch(`${API_BASE}/mint`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username, password, email,
+            companyType: finalKit,
+            template: selectedAgent,
+            customInput: customBusinessIdea || idea,
+            referral: referral
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.ok) {
+            // Auto-login after signup
+            const loginResult = await doLogin(username, password);
+            if (loginResult.ok) {
+              try { localStorage.setItem("aigentsyToken", loginResult.token); } catch(e){}
+            }
+            window.location.assign(`/agents/aigent0.html?user=${encodeURIComponent(username)}`);
+            return;
+          } else {
+            authError.textContent = result.error || "Signup failed";
+          }
+        } else {
+          authError.textContent = `Server error (${response.status}) — try again`;
+        }
+      } catch(e) {
+        authError.textContent = "Network error — check connection and try again";
+      }
+
+      enterBtn.disabled = false;
+      enterBtn.textContent = "Launch Your AI Business Now";
     });
 
     updateButtonState();

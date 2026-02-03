@@ -1,53 +1,35 @@
-// consent-modal.js
+// consent-modal.js — Server-side consent check (no client-side keys)
 (async function enforceConsent() {
-  const binUrl = "https://api.jsonbin.io/v3/b/6839b3328960c979a5a317b5/latest";
-  const binKey = "$2a$10$RNYHoP5nCS9wVlj1PizQcOfZTHPM4XA/J4LE/E.p/CuxSnxyySKRe";
+  const username = localStorage.getItem("aigentsyUsername") || "";
+  if (!username) return; // No user — nothing to check
 
   try {
-    const res = await fetch(binUrl, {
-      headers: { "X-Master-Key": binKey }
-    });
+    const res = await fetch(
+      `https://aigentsy-ame-runtime.onrender.com/api/consent-check?username=${encodeURIComponent(username)}`
+    );
 
-    if (!res.ok) throw new Error("Consent fetch failed.");
+    if (!res.ok) {
+      console.warn("Consent check unavailable — allowing access");
+      return;
+    }
 
     const data = await res.json();
-    const users = data.record;
 
-    const currentUserAgent = navigator.userAgent.toLowerCase();
-    const currentIP = await fetch("https://api.ipify.org").then(res => res.text()).catch(() => "unknown");
-
-    const match = users.find(u => {
-      const browserMatch = currentUserAgent.includes((u.browser || "").toLowerCase());
-      const ipMatch = (u.ip || "") === currentIP;
-      return browserMatch || ipMatch;
-    });
-
-    const isCompliant = match?.consent?.agreed === true;
-
-    if (!isCompliant) {
+    // Only block when backend explicitly confirms non-compliance
+    if (data.compliant === false) {
       if (!document.getElementById("consentBanner")) {
         const banner = document.createElement("div");
         banner.id = "consentBanner";
         banner.innerHTML = `
-          <div style="position:fixed;top:0;left:0;width:100%;background:#290000;color:#fff;text-align:center;padding:16px 10px;z-index:9999;font-family:sans-serif;">
-            ⚖️ Terms & Legal Consent Required. Please <a href="/mint" style="color:#00f0ff;text-decoration:underline;">return to Mint</a> and agree to proceed.
+          <div style="position:fixed;top:0;left:0;width:100%;background:#0e101a;color:#fff;text-align:center;padding:16px 10px;z-index:9999;font-family:'Inter',sans-serif;border-bottom:1px solid #222;">
+            Terms & Legal Consent Required. Please <a href="/" style="color:#00bfff;text-decoration:underline;">return to signup</a> and agree to proceed.
           </div>
         `;
         document.body.appendChild(banner);
       }
-
-      // Block all user interaction
-      document.querySelectorAll("a, button, input, select, textarea").forEach(el => {
-        el.disabled = true;
-        el.style.pointerEvents = "none";
-        el.style.opacity = "0.5";
-      });
-
-      // Optional: Block keyboard
-      window.addEventListener("keydown", e => e.preventDefault());
-      window.addEventListener("click", e => e.preventDefault());
     }
   } catch (err) {
-    console.error("Consent enforcement error:", err);
+    // On fetch error, log warning and allow page access (fix bricking)
+    console.warn("Consent check error — allowing access:", err.message);
   }
 })();

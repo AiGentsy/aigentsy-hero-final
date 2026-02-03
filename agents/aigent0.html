@@ -228,7 +228,10 @@
   </div>
   <div class="col-left">
     <div class="metric-box">
-      <h3 id="chatHeader">AiGentsy Chat</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 id="chatHeader" style="margin:0;">AiGentsy Chat</h3>
+        <button onclick="clearChatHistory()" style="background:transparent;border:1px solid #333;color:#666;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:0.75rem;">Clear Chat</button>
+      </div>
       <div id="chatLog" class="chat-log" style="max-height:240px;overflow-y:auto;margin-bottom:10px;"></div>
       <textarea id="agentInput" placeholder="Talk to your AiGentsy... What would you like us to do today?" style="width:100%; padding:10px; margin-top:10px; background:#000; color:#fff; border:1px solid #444; border-radius:6px;" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); runAgent();}"></textarea>
       <div id="chatSendRow" style="margin-top:8px;">
@@ -483,75 +486,103 @@
 <!-- ONBOARDING MODAL (First-time users) -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div id="onboardingModal" class="gx-modal">
-  <div class="panel" style="max-width:500px;">
+  <div class="panel" style="max-width:520px;">
     <div style="text-align:center; margin-bottom:20px;">
       <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" style="width:120px; margin-bottom:16px;">
-      <h2 style="color:#00bfff; margin:0;">Welcome to Your AiGentsy! 🚀</h2>
-      <p style="color:#888; margin-top:8px;">Let's get you set up in 60 seconds</p>
+      <h2 style="color:#00bfff; margin:0;">Welcome to AiGentsy</h2>
+      <p style="color:#888; margin-top:8px;">Your AI-powered business is live. Let's configure it.</p>
     </div>
-    
-    <!-- Step indicators -->
+
+    <!-- Step indicators — 5 steps -->
     <div style="display:flex; justify-content:center; gap:8px; margin-bottom:24px;">
       <div id="onboardStep1" class="onboard-step active" style="width:10px; height:10px; border-radius:50%; background:#00bfff;"></div>
       <div id="onboardStep2" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
       <div id="onboardStep3" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
+      <div id="onboardStep4" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
+      <div id="onboardStep5" class="onboard-step" style="width:10px; height:10px; border-radius:50%; background:#333;"></div>
     </div>
-    
-    <!-- Step 1: Connect Payments -->
+
+    <!-- Step 1: Name Your Business -->
     <div id="onboardingStep1" class="onboarding-content">
-      <h3 style="color:#fff; margin-bottom:12px;">💳 Get Paid Directly</h3>
+      <h3 style="color:#fff; margin-bottom:12px;">Name Your Business</h3>
       <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
-        Connect your Stripe account so payments go straight to you.<br>
-        <span style="color:#888;">AiGentsy takes 2.8% + 28¢ per transaction. You keep the rest.</span>
+        This is how clients see you. Make it count.
       </p>
-      <button class="btn-glow" style="width:100%; margin-top:16px;" onclick="connectStripeOnboarding()">
-        🔗 Connect Stripe Account
-      </button>
-      <button style="width:100%; margin-top:10px; padding:10px; background:transparent; border:1px solid #444; color:#888; border-radius:6px; cursor:pointer;" onclick="nextOnboardingStep()">
-        I'll do this later →
+      <input type="text" id="onboardBusinessName" placeholder="e.g. Apex Digital, Studio Nova, GrowthStack" style="width:92%; padding:12px; margin:16px 0; border-radius:6px; border:1px solid #333; background:#111; color:#fff; font-size:1rem;">
+      <button class="btn-glow" style="width:100%; margin-top:8px;" onclick="nextOnboardingStep()">
+        Continue
       </button>
     </div>
-    
-    <!-- Step 2: Control Level -->
+
+    <!-- Step 2: Stripe Connect -->
     <div id="onboardingStep2" class="onboarding-content" style="display:none;">
-      <h3 style="color:#fff; margin-bottom:12px;">🎛️ You're In Control</h3>
+      <h3 style="color:#fff; margin-bottom:12px;">Get Paid Directly</h3>
       <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
-        Your AiGentsy works for you, not the other way around:
+        Connect Stripe so revenue flows straight to your bank account. AiGentsy takes 2.8% + 28c per transaction — industry-standard, no hidden fees.
+      </p>
+      <div style="background:rgba(0,191,255,0.08); border:1px solid #1a3a4a; border-radius:8px; padding:12px; margin:12px 0; font-size:0.85rem; color:#aaa;">
+        Stripe handles payments for companies like Shopify, Figma, and Notion. Your banking details are never shared with us.
+      </div>
+      <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="connectStripeOnboarding()">
+        Connect Stripe Account
+      </button>
+      <button style="width:100%; margin-top:10px; padding:10px; background:transparent; border:1px solid #333; color:#666; border-radius:6px; cursor:pointer;" onclick="nextOnboardingStep()">
+        Skip for now
+      </button>
+    </div>
+
+    <!-- Step 3: Set Your Pricing -->
+    <div id="onboardingStep3" class="onboarding-content" style="display:none;">
+      <h3 style="color:#fff; margin-bottom:12px;">Set Your Pricing</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
+        Choose a starting tier. You can adjust anytime from your dashboard.
+      </p>
+      <div id="onboardPricingOptions" style="display:flex; flex-direction:column; gap:10px; margin:16px 0;"></div>
+      <button class="btn-glow" style="width:100%; margin-top:8px;" onclick="nextOnboardingStep()">
+        Continue
+      </button>
+    </div>
+
+    <!-- Step 4: Control Level -->
+    <div id="onboardingStep4" class="onboarding-content" style="display:none;">
+      <h3 style="color:#fff; margin-bottom:12px;">You Stay in Control</h3>
+      <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
+        Your AiGentsy works for you — not the other way around.
       </p>
       <ul style="color:#ccc; font-size:0.9rem; line-height:2; padding-left:20px; margin:16px 0;">
-        <li>✅ We find opportunities for your business</li>
-        <li>✅ We draft proposals and suggest pricing</li>
-        <li>✅ <strong style="color:#00bfff;">You approve</strong> before anything goes out</li>
+        <li>We find opportunities that match your expertise</li>
+        <li>We draft proposals and suggest pricing</li>
+        <li><strong style="color:#00bfff;">Nothing goes out without your approval</strong></li>
       </ul>
       <div style="background:rgba(0,191,255,0.1); padding:12px; border-radius:8px; text-align:center; margin:16px 0;">
-        <span style="color:#00bfff; font-weight:600;">Current: You Approve Everything</span>
+        <span style="color:#00bfff; font-weight:600;">Mode: Manual Approval</span>
         <div style="background:#222; height:6px; border-radius:3px; margin-top:8px;">
           <div style="background:#00bfff; height:100%; width:20%; border-radius:3px;"></div>
         </div>
         <span style="color:#666; font-size:0.75rem;">Build trust to unlock more automation</span>
       </div>
       <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="nextOnboardingStep()">
-        Got it →
+        Got it
       </button>
     </div>
-    
-    <!-- Step 3: First Opportunity -->
-    <div id="onboardingStep3" class="onboarding-content" style="display:none;">
-      <h3 style="color:#fff; margin-bottom:12px;">🎯 Your AiGentsy is Ready</h3>
+
+    <!-- Step 5: Review First Pitches -->
+    <div id="onboardingStep5" class="onboarding-content" style="display:none;">
+      <h3 style="color:#fff; margin-bottom:12px;">Your Pipeline is Building</h3>
       <p style="color:#aaa; font-size:0.9rem; line-height:1.6;">
-        Your C-Suite team is now searching for opportunities that match your expertise.
+        Your C-Suite AI team is already scanning for clients.
       </p>
-      <div style="background:#0a0a0a; border:1px solid #222; border-radius:8px; padding:16px; margin:16px 0;">
+      <div id="onboardOpportunities" style="background:#0a0a0a; border:1px solid #222; border-radius:8px; padding:16px; margin:16px 0;">
         <div style="color:#888; font-size:0.8rem; margin-bottom:8px;">WHAT HAPPENS NEXT</div>
         <ul style="color:#ccc; font-size:0.9rem; line-height:2; padding-left:20px; margin:0;">
-          <li>📡 We scan for clients who need your services</li>
-          <li>📝 We draft proposals for the best matches</li>
-          <li>🔔 You'll see them in "Proposals & Approvals"</li>
-          <li>💰 Approve the ones you like, we handle the rest</li>
+          <li>We scan for clients who need your services</li>
+          <li>We draft proposals for the best matches</li>
+          <li>You review and approve from the dashboard</li>
+          <li>Approved deals get executed — you get paid</li>
         </ul>
       </div>
-      <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="closeOnboarding()">
-        🚀 Go to Dashboard
+      <button class="btn-glow" style="width:100%; margin-top:12px;" onclick="saveOnboardingData(); closeOnboarding();">
+        Open Dashboard
       </button>
     </div>
   </div>
@@ -741,6 +772,14 @@ function showToast(message, kind) {
 }
 
 async function fetchWithRetry(url, options = {}, maxRetries = 3, timeout = 10000) {
+  // Inject auth token into all backend requests
+  const token = localStorage.getItem("aigentsyToken");
+  if (token) {
+    options.headers = options.headers || {};
+    if (typeof options.headers === 'object' && !Array.isArray(options.headers)) {
+      options.headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
   for (let i = 0; i < maxRetries; i++) {
     try {
       const controller = new AbortController();
@@ -1642,9 +1681,43 @@ async function unlockOffering(username, offeringId, stripeLink) {
   }, 1500);
 }
 
-const memory = [];
+// Chat history persistence — load from localStorage, cap at 50 messages
+const _chatStorageKey = `aigentsy_chat_${localStorage.getItem("aigentsyUsername") || "default"}`;
+let memory = [];
+try {
+  const saved = localStorage.getItem(_chatStorageKey);
+  if (saved) memory = JSON.parse(saved).slice(-50);
+} catch(e) {}
+
+function _saveChatHistory() {
+  try { localStorage.setItem(_chatStorageKey, JSON.stringify(memory.slice(-50))); } catch(e) {}
+}
+
+function clearChatHistory() {
+  memory = [];
+  try { localStorage.removeItem(_chatStorageKey); } catch(e) {}
+  const cl = document.getElementById("chatLog");
+  if (cl) cl.innerHTML = '<div class="chat-agent" style="color:#888;">Chat cleared. What can I help you build?</div>';
+}
+
 const chatLog = document.getElementById("chatLog");
 const textarea = document.getElementById("agentInput");
+
+// Restore previous chat messages into the UI
+if (memory.length > 0) {
+  memory.forEach(msg => {
+    const div = document.createElement("div");
+    if (msg.startsWith("🤖 ")) {
+      div.className = "chat-agent";
+      div.textContent = msg.slice(2);
+    } else {
+      div.className = "chat-user";
+      div.textContent = `You: ${msg}`;
+    }
+    chatLog.appendChild(div);
+  });
+  chatLog.scrollTop = chatLog.scrollHeight;
+}
 
 async function runAgent() {
   const input = textarea.value.trim();
@@ -1655,6 +1728,7 @@ async function runAgent() {
   chatLog.appendChild(userMsg);
   chatLog.scrollTop = chatLog.scrollHeight;
   memory.push(input);
+  _saveChatHistory();
   textarea.value = "";
   const loader = document.createElement("div");
   loader.className = "chat-agent";
@@ -1687,19 +1761,45 @@ async function runAgent() {
     // Use main backend for kit-aware responses
     // ═══════════════════════════════════════════════════════════════
     const endpoint = `${window.BACKEND_BASE}/agent`;
-    
-    const res = await fetchWithRetry(endpoint, { 
-      method: "POST", 
-      headers: { "Content-Type": "application/json" }, 
-      body: JSON.stringify({ 
-        input: input, 
-        memory, 
+
+    // Read attached files and append content to input
+    let fullInput = input;
+    if (attachedFiles.length > 0) {
+      const fileContents = [];
+      for (const file of attachedFiles) {
+        try {
+          const content = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(reader.error);
+            if (file.type.startsWith("text/") || file.name.match(/\.(txt|csv|json|md|html|css|js|py|ts)$/i)) {
+              reader.readAsText(file);
+            } else {
+              reader.readAsDataURL(file);
+            }
+          });
+          fileContents.push(`\n[Attached: ${file.name}]\n${content.substring(0, 5000)}`);
+        } catch(e) {
+          console.warn("File read failed:", file.name, e);
+        }
+      }
+      if (fileContents.length > 0) fullInput += fileContents.join("\n");
+      attachedFiles = [];
+      renderFilePreview();
+    }
+
+    const res = await fetchWithRetry(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        input: fullInput,
+        memory,
         businessType: businessType,
-        companyType: businessType,  // ✅ Send both field names
+        companyType: businessType,
         username: user.username,
         kit: businessType,
-        customInput: customInput  // ✅ Send custom business idea
-      }) 
+        customInput: customInput
+      })
     }, 2, 15000);
     
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1854,10 +1954,11 @@ async function runAgent() {
     loader.innerHTML = formattedReply + actionButtons;
     
     memory.push(`🤖 ${reply}`);
+    _saveChatHistory();
     chatLog.scrollTop = chatLog.scrollHeight;
     textarea.focus();
   } catch (err) {
-    loader.textContent = "⚠️ Connection error. Please try again.";
+    loader.textContent = "Connection error. Please try again.";
     console.error("Chat error:", err);
   }
 }
@@ -3057,6 +3158,19 @@ setInterval(() => {
   
 async function initializeDashboard() {
   console.log("🚀 Initializing dashboard with AIGx...");
+
+  // Parse ?user= from URL before checking localStorage
+  const _urlParams = new URLSearchParams(location.search);
+  const _userParam = _urlParams.get('user');
+  if (_userParam && !localStorage.getItem('aigentsyUsername')) {
+    localStorage.setItem('aigentsyUsername', _userParam);
+  }
+
+  // Handle ?stripe=success return from Stripe Connect onboarding
+  if (_urlParams.get('stripe') === 'success') {
+    setTimeout(() => showToast && showToast('Stripe connected — you are ready to get paid.', 'success'), 1000);
+  }
+
   const username = localStorage.getItem("aigentsyUsername");
   if (!username) {
     console.warn("No username - redirecting");
@@ -3877,31 +3991,120 @@ function checkOnboarding() {
 
 let currentOnboardingStep = 1;
 
+// Populate pricing options based on kit type
+(function _initOnboardPricing() {
+  const kit = localStorage.getItem("aigentsyKit") || "saas";
+  const tiers = {
+    saas: [
+      { label: "Starter", price: "$497", desc: "Single-feature MVP, basic setup" },
+      { label: "Growth", price: "$1,497", desc: "Full-stack build with integrations" },
+      { label: "Scale", price: "$4,997", desc: "Enterprise solution, custom architecture" }
+    ],
+    social: [
+      { label: "Creator", price: "$297", desc: "Content calendar, templates, brand kit" },
+      { label: "Influencer", price: "$997", desc: "Full campaign strategy + content production" },
+      { label: "Agency", price: "$2,997", desc: "Multi-platform management + analytics" }
+    ],
+    marketing: [
+      { label: "Foundation", price: "$497", desc: "SEO audit, keyword research, site fixes" },
+      { label: "Growth", price: "$1,997", desc: "Full funnel — ads, email, and SEO" },
+      { label: "Domination", price: "$4,997", desc: "Multi-channel acquisition machine" }
+    ]
+  };
+  const options = tiers[kit] || tiers.saas;
+  const container = document.getElementById("onboardPricingOptions");
+  if (!container) return;
+  let selectedTier = "";
+  container.innerHTML = options.map((t, i) => `
+    <div class="onboard-pricing-tier" data-tier="${t.label}" onclick="this.parentElement.querySelectorAll('.onboard-pricing-tier').forEach(el=>el.style.borderColor='#333');this.style.borderColor='#00bfff';window._selectedPricingTier='${t.label}'" style="background:#111;border:1px solid #333;border-radius:8px;padding:14px;cursor:pointer;transition:border-color 0.2s;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong style="color:#fff;">${t.label}</strong>
+        <span style="color:#00bfff;font-weight:600;">${t.price}</span>
+      </div>
+      <div style="color:#888;font-size:0.85rem;margin-top:4px;">${t.desc}</div>
+    </div>
+  `).join("");
+})();
+
+// Populate custom input into business name field
+(function _initOnboardBizName() {
+  const customInput = localStorage.getItem("aigentsyBusinessIdea") || "";
+  const nameField = document.getElementById("onboardBusinessName");
+  if (nameField && customInput) nameField.value = customInput;
+})();
+
 function nextOnboardingStep() {
   currentOnboardingStep++;
-  
-  // Hide all steps
-  document.getElementById('onboardingStep1').style.display = 'none';
-  document.getElementById('onboardingStep2').style.display = 'none';
-  document.getElementById('onboardingStep3').style.display = 'none';
-  
-  // Update indicators
-  document.getElementById('onboardStep1').style.background = '#333';
-  document.getElementById('onboardStep2').style.background = '#333';
-  document.getElementById('onboardStep3').style.background = '#333';
-  
+  const totalSteps = 5;
+
+  // Hide all steps + reset indicators
+  for (let i = 1; i <= totalSteps; i++) {
+    const step = document.getElementById(`onboardingStep${i}`);
+    const dot = document.getElementById(`onboardStep${i}`);
+    if (step) step.style.display = 'none';
+    if (dot) dot.style.background = '#333';
+  }
+
   // Show current step
-  if (currentOnboardingStep === 2) {
-    document.getElementById('onboardingStep2').style.display = 'block';
-    document.getElementById('onboardStep2').style.background = '#00bfff';
-  } else if (currentOnboardingStep === 3) {
-    document.getElementById('onboardingStep3').style.display = 'block';
-    document.getElementById('onboardStep3').style.background = '#00bfff';
+  if (currentOnboardingStep <= totalSteps) {
+    const step = document.getElementById(`onboardingStep${currentOnboardingStep}`);
+    const dot = document.getElementById(`onboardStep${currentOnboardingStep}`);
+    if (step) step.style.display = 'block';
+    if (dot) dot.style.background = '#00bfff';
+  }
+
+  // Mark completed steps
+  for (let i = 1; i < currentOnboardingStep; i++) {
+    const dot = document.getElementById(`onboardStep${i}`);
+    if (dot) dot.style.background = '#00ff88';
+  }
+
+  // On step 5, try to fetch real opportunities
+  if (currentOnboardingStep === 5) {
+    _fetchOnboardOpportunities();
+  }
+}
+
+async function _fetchOnboardOpportunities() {
+  try {
+    const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+    const res = await fetch(`${window.BACKEND_BASE}/ame/queue?username=${encodeURIComponent(username)}&limit=3`);
+    if (res.ok) {
+      const data = await res.json();
+      const opps = data.queue || data.opportunities || [];
+      if (opps.length > 0) {
+        const container = document.getElementById('onboardOpportunities');
+        if (container) {
+          container.innerHTML = '<div style="color:#888;font-size:0.8rem;margin-bottom:8px;">EARLY OPPORTUNITIES</div>' +
+            opps.slice(0, 3).map(o => `
+              <div style="background:#111;border:1px solid #222;border-radius:6px;padding:10px;margin-bottom:8px;">
+                <div style="color:#fff;font-weight:500;">${o.title || o.name || 'Opportunity'}</div>
+                <div style="color:#888;font-size:0.8rem;">${o.description ? o.description.substring(0, 80) + '...' : 'Pending review'}</div>
+              </div>
+            `).join('');
+        }
+      }
+    }
+  } catch(e) {
+    console.log("Could not fetch onboard opportunities:", e);
+  }
+}
+
+function saveOnboardingData() {
+  const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
+  const bizName = document.getElementById('onboardBusinessName')?.value?.trim() || "";
+  const pricingTier = window._selectedPricingTier || "";
+
+  if (bizName || pricingTier) {
+    fetch(`${window.BACKEND_BASE}/user/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, business_name: bizName, pricing_tier: pricingTier })
+    }).catch(e => console.warn("Onboarding save error:", e));
   }
 }
 
 function connectStripeOnboarding() {
-  // Open Stripe Connect flow
   const username = window.aigentsyUser?.username || localStorage.getItem('aigentsyUsername');
   window.open(`${window.BACKEND_BASE}/stripe/connect?user=${encodeURIComponent(username)}`, '_blank');
   nextOnboardingStep();
