@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AiGentsy — Client Project Room</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+      min-height: 100vh;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      border-bottom: 1px solid #1a1a1a;
+      background: #0a0a0a;
+    }
+    .topbar img { height: 32px; }
+    .topbar .project-id { color: #555; font-size: 0.8rem; }
+    .room-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .room-header h1 {
+      font-size: 1.8rem;
+      color: #fff;
+      margin: 0 0 8px;
+    }
+    .room-header .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .status-pending { background: rgba(255,165,0,0.15); color: #ffa500; border: 1px solid #ffa500; }
+    .status-approved { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; }
+    .status-intake { background: rgba(0,191,255,0.15); color: #00bfff; border: 1px solid #00bfff; }
+    .status-completed { background: rgba(0,255,136,0.15); color: #00ff88; border: 1px solid #00ff88; }
+    .room-section {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .room-section h2 {
+      color: #00bfff;
+      font-size: 1.1rem;
+      margin: 0 0 12px;
+    }
+    .room-section p {
+      color: #ccc;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .deliverable-item {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .deliverable-item .name { color: #fff; font-weight: 500; }
+    .deliverable-item .status { color: #888; font-size: 0.85rem; }
+    .action-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-approve {
+      flex: 1;
+      padding: 14px;
+      background: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-approve:hover { background: #00cc6d; }
+    .btn-pay {
+      flex: 1;
+      padding: 14px;
+      background: #00bfff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-pay:hover { background: #009cd8; }
+    .btn-approve:disabled, .btn-pay:disabled { background: #222; color: #555; cursor: not-allowed; }
+    .price-display {
+      text-align: center;
+      margin: 20px 0 0;
+    }
+    .price-display .amount {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00bfff;
+    }
+    .price-display .label {
+      color: #666;
+      font-size: 0.85rem;
+    }
+    .loading-state {
+      text-align: center;
+      padding: 60px 0;
+      color: #555;
+    }
+    .error-state {
+      text-align: center;
+      padding: 60px 0;
+      color: #666;
+    }
+    .status-msg {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.9rem;
+      min-height: 20px;
+    }
+    .footer-link {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: #444;
+    }
+    .footer-link a { color: #00bfff; text-decoration: none; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" />
+    <span class="project-id" id="projectIdDisplay"></span>
+  </div>
+
+  <div class="room-container">
+    <div id="loadingState" class="loading-state">Loading project details...</div>
+    <div id="errorState" class="error-state" style="display:none;"></div>
+
+    <div id="projectContent" style="display:none;">
+      <div class="room-header">
+        <h1 id="projectTitle"></h1>
+        <span id="projectStatus" class="status-badge"></span>
+      </div>
+
+      <div class="room-section">
+        <h2>Project Description</h2>
+        <p id="projectDescription"></p>
+      </div>
+
+      <div class="room-section" id="deliverablesSection" style="display:none;">
+        <h2>Deliverables</h2>
+        <div id="deliverablesList"></div>
+      </div>
+
+      <div id="priceSection" class="price-display" style="display:none;">
+        <div class="label">Project Total</div>
+        <div class="amount" id="projectPrice"></div>
+      </div>
+
+      <div class="action-row">
+        <button class="btn-approve" id="approveBtn" onclick="approveProject()">Approve Deliverable</button>
+        <button class="btn-pay" id="payBtn" onclick="payForProject()">Pay & Start</button>
+      </div>
+      <div class="status-msg" id="actionStatus"></div>
+
+      <!-- Chat with AI C-Suite -->
+      <div class="room-section" style="margin-top:32px;">
+        <h2>Talk to Your AI Team</h2>
+        <div id="chatMessages" style="background:#0a0a0a;border:1px solid #222;border-radius:8px;padding:16px;max-height:300px;overflow-y:auto;margin-bottom:12px;min-height:80px;">
+          <p style="color:#555;font-size:0.85rem;" id="chatPlaceholder">Ask questions, request updates, or discuss changes with your AI project team.</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="chatInput" placeholder="Type your message..." style="flex:1;padding:10px 14px;border-radius:6px;border:1px solid #333;background:#111;color:#fff;font-size:0.95rem;" onkeydown="if(event.key==='Enter')sendMessage()" />
+          <button onclick="sendMessage()" style="padding:10px 20px;background:#00bfff;color:#000;border:none;border-radius:6px;font-weight:600;cursor:pointer;">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-link">
+      Powered by <a href="https://aigentsy.com">AiGentsy</a>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://aigentsy-ame-runtime.onrender.com";
+    const pathMatch = window.location.pathname.match(/\/client-room\/(.+)/);
+    const urlParams = new URLSearchParams(location.search);
+    const oppId = pathMatch ? pathMatch[1] : urlParams.get("id") || "";
+
+    document.getElementById("projectIdDisplay").textContent = oppId ? `Project: ${oppId}` : "";
+
+    // Handle payment return
+    if (urlParams.get("paid") === "true") {
+      setTimeout(() => {
+        const s = document.getElementById("actionStatus");
+        if (s) { s.style.color = "#00ff88"; s.textContent = "Payment received. Your project is underway."; }
+      }, 500);
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById("chatInput");
+      const msg = input.value.trim();
+      if (!msg || !oppId) return;
+      input.value = "";
+
+      const chatDiv = document.getElementById("chatMessages");
+      const placeholder = document.getElementById("chatPlaceholder");
+      if (placeholder) placeholder.remove();
+
+      chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00bfff;font-weight:600;">You:</span> <span style="color:#ccc;">${msg}</span></div>`;
+      chatDiv.innerHTML += `<div style="margin-bottom:12px;color:#555;" id="typingIndicator">AI Team is typing...</div>`;
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}/message`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: msg })
+        });
+        const data = await resp.json();
+        const typing = document.getElementById("typingIndicator");
+        if (typing) typing.remove();
+        if (data.ok && data.response) {
+          chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:#00ff88;font-weight:600;">AI Team:</span> <span style="color:#ccc;">${data.response}</span></div>`;
+        }
+      } catch(e) {
+        const typing = document.getElementById("typingIndicator");
+        if (typing) typing.remove();
+        chatDiv.innerHTML += `<div style="margin-bottom:12px;color:#ff6b6b;">Could not send message. Try again.</div>`;
+      }
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+
+    async function loadChatHistory() {
+      if (!oppId) return;
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}/messages`);
+        const data = await resp.json();
+        if (data.ok && data.messages && data.messages.length > 0) {
+          const chatDiv = document.getElementById("chatMessages");
+          const placeholder = document.getElementById("chatPlaceholder");
+          if (placeholder) placeholder.remove();
+          data.messages.forEach(m => {
+            const isClient = m.from === "client";
+            chatDiv.innerHTML += `<div style="margin-bottom:12px;"><span style="color:${isClient ? '#00bfff' : '#00ff88'};font-weight:600;">${isClient ? 'You' : 'AI Team'}:</span> <span style="color:#ccc;">${m.message}</span></div>`;
+          });
+          chatDiv.scrollTop = chatDiv.scrollHeight;
+        }
+      } catch(e) {}
+    }
+
+    async function loadProject() {
+      if (!oppId) {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("errorState").style.display = "block";
+        document.getElementById("errorState").textContent = "No project ID specified.";
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}`);
+        const data = await resp.json();
+
+        document.getElementById("loadingState").style.display = "none";
+
+        if (!data.ok) {
+          document.getElementById("errorState").style.display = "block";
+          document.getElementById("errorState").textContent = "Project not found. Check the link and try again.";
+          return;
+        }
+
+        const project = data.project;
+        document.getElementById("projectContent").style.display = "block";
+        document.getElementById("projectTitle").textContent = project.title;
+        document.getElementById("projectDescription").textContent = project.description || "Details pending — our team is scoping your project.";
+
+        // Status badge
+        const statusEl = document.getElementById("projectStatus");
+        const statusMap = { pending: "In Progress", approved: "Approved", intake: "Scoping", completed: "Completed" };
+        statusEl.textContent = statusMap[project.status] || project.status;
+        statusEl.className = `status-badge status-${project.status || 'pending'}`;
+
+        // Deliverables
+        if (project.deliverables && project.deliverables.length > 0) {
+          document.getElementById("deliverablesSection").style.display = "block";
+          document.getElementById("deliverablesList").innerHTML = project.deliverables.map(d => `
+            <div class="deliverable-item">
+              <span class="name">${d.name || d.title || 'Deliverable'}</span>
+              <span class="status">${d.status || 'pending'}</span>
+            </div>
+          `).join('');
+        }
+
+        // Price
+        if (project.price > 0) {
+          document.getElementById("priceSection").style.display = "block";
+          document.getElementById("projectPrice").textContent = `$${Number(project.price).toLocaleString()}`;
+        }
+
+        // Disable buttons based on status
+        if (project.status === "approved" || project.status === "completed") {
+          document.getElementById("approveBtn").disabled = true;
+        }
+      } catch(e) {
+        document.getElementById("loadingState").style.display = "none";
+        document.getElementById("errorState").style.display = "block";
+        document.getElementById("errorState").textContent = "Could not load project. Check your connection.";
+      }
+    }
+
+    async function approveProject() {
+      const btn = document.getElementById("approveBtn");
+      const status = document.getElementById("actionStatus");
+      btn.disabled = true;
+      btn.textContent = "Approving...";
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}/approve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          status.style.color = "#00ff88";
+          status.textContent = "Approved. Proceeding to payment.";
+          btn.textContent = "Approved";
+          document.getElementById("projectStatus").textContent = "Approved";
+          document.getElementById("projectStatus").className = "status-badge status-approved";
+        } else {
+          throw new Error(data.error);
+        }
+      } catch(e) {
+        status.style.color = "#ff6b6b";
+        status.textContent = "Could not approve. Try again.";
+        btn.disabled = false;
+        btn.textContent = "Approve Deliverable";
+      }
+    }
+
+    async function payForProject() {
+      const btn = document.getElementById("payBtn");
+      const status = document.getElementById("actionStatus");
+      btn.disabled = true;
+      btn.textContent = "Creating checkout...";
+      try {
+        const resp = await fetch(`${API_BASE}/client-room/${encodeURIComponent(oppId)}/pay`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({})
+        });
+        const data = await resp.json();
+        if (data.ok && data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          throw new Error(data.error || "Payment setup failed");
+        }
+      } catch(e) {
+        status.style.color = "#ff6b6b";
+        status.textContent = "Payment setup failed. Try again or contact support.";
+        btn.disabled = false;
+        btn.textContent = "Pay & Start";
+      }
+    }
+
+    loadProject();
+    loadChatHistory();
+  </script>
+</body>
+</html>

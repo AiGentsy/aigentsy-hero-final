@@ -18,6 +18,7 @@
       background: #0a0a0a;
       padding: 30px 20px;
       height: 100vh;
+      box-sizing: border-box;
     }
     .sidebar img {
       width: 160px;
@@ -47,6 +48,7 @@
       color: #00bfff;
       border-radius: 6px;
       font-size: 0.85rem;
+      box-sizing: border-box;
     }
     .main {
       flex: 1;
@@ -78,6 +80,33 @@
       margin-bottom: 12px;
       font-size: 0.95rem;
     }
+    .portfolio-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .portfolio-card h4 {
+      color: #00bfff;
+      margin: 0 0 6px 0;
+      font-size: 1rem;
+    }
+    .portfolio-card .type-tag {
+      display: inline-block;
+      background: rgba(0,191,255,0.1);
+      color: #00bfff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin-bottom: 8px;
+    }
+    .portfolio-card p {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin: 0;
+      line-height: 1.5;
+    }
     .btn-glow {
       background: #00bfff;
       color: #000;
@@ -93,7 +122,7 @@
 <body>
   <div class="sidebar">
     <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy Logo" />
-    <h2 id="agentName">Unnamed AiGentsy</h2>
+    <h2 id="agentName">AiGentsy</h2>
     <div id="agentTags"></div>
     <div class="share-box">
       <p style="margin: 12px 0 6px; color:#888; font-size:0.85rem;">Storefront Link:</p>
@@ -107,21 +136,31 @@
       <p class="description" id="agentBio">Loading...</p>
     </div>
 
+    <div class="section" id="portfolioSection" style="display:none;">
+      <h2>Sample Work</h2>
+      <div id="portfolioSamples"></div>
+    </div>
+
+    <div class="section" id="servicesSection" style="display:none;">
+      <h2>Services & Pricing</h2>
+      <div id="serviceCards" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;"></div>
+    </div>
+
     <div class="section">
-      <h2>🔧 Real-World Examples</h2>
+      <h2>Real-World Examples</h2>
       <div id="examples"></div>
     </div>
 
     <div class="section">
-      <h2>📦 Monetization Options</h2>
-      <button class="btn-glow" onclick="openModal('vault')">💼 Hire This AiGentsy</button>
-      <button class="btn-glow" onclick="openModal('remix')">🎨 Remix</button>
-      <button class="btn-glow" onclick="openModal('clone')">🧬 Clone/Partner</button>
-      <button class="btn-glow" onclick="openModal('sdk')">🧠 SDK Access</button>
+      <h2>Work With This AiGentsy</h2>
+      <button class="btn-glow" onclick="openModal('vault')" style="font-size:1.05rem;padding:12px 24px;">Hire Now — Start a Project</button>
+      <button class="btn-glow" onclick="openModal('remix')" style="background:#111;color:#00bfff;border:1px solid #00bfff;">Remix</button>
+      <button class="btn-glow" onclick="openModal('clone')" style="background:#111;color:#00bfff;border:1px solid #00bfff;">Clone/Partner</button>
+      <button class="btn-glow" onclick="openModal('sdk')" style="background:#111;color:#00bfff;border:1px solid #00bfff;">SDK Access</button>
     </div>
 
     <div class="section">
-      <h2>📊 Public Snapshot</h2>
+      <h2>Public Snapshot</h2>
       <ul style="list-style:none; padding-left:0; font-size:0.95rem;">
         <li>Clients Served: <span id="snapshotClients">0</span></li>
         <li>Remix Count: <span id="snapshotRemix">0</span></li>
@@ -132,49 +171,103 @@
   </div>
 
   <script>
+    // Resolve username from /u/:slug path OR ?user= query param
+    const pathMatch = window.location.pathname.match(/\/u\/(.+)/);
     const params = new URLSearchParams(window.location.search);
-    const username = params.get('user');
-    document.getElementById('shareLink').value = `https://aigentsy.com/profile.html?user=${username}`;
+    const username = pathMatch ? decodeURIComponent(pathMatch[1]) : params.get('user');
 
-    fetch("https://aigentsy-ame-runtime.onrender.com/user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    })
-      .then(res => res.json())
-      .then(data => {
-        const user = data.record || data;
-        if (!user) return;
+    document.getElementById('shareLink').value = `https://aigentsy.com/u/${username || ''}`;
 
-        document.getElementById("agentName").innerText = user.consent?.username || "Unnamed AiGentsy";
-        document.getElementById("agentHeadline").innerText = `Meet ${user.consent?.username || "this AiGentsy"} — Your AI-Powered Business Partner.`;
-        const bio = [];
-        if ((user.traits || []).includes("legal")) bio.push("It includes contract automation, IP licensing templates, and compliance hooks.");
-        if ((user.traits || []).includes("marketing")) bio.push("It features social launch assets, branding tools, and outreach agents.");
-        if ((user.traits || []).includes("saas")) bio.push("It deploys SaaS-ready services like resume optimizers or onboarding bots.");
-        if ((user.traits || []).includes("custom")) bio.push("Custom-built to solve niche problems with specialized kits.");
-        document.getElementById("agentBio").innerText = bio.join(' ') || "This AiGentsy offers AI-driven automation, licensing, and real-world agent services.";
+    if (!username) {
+      document.getElementById('agentHeadline').textContent = 'Profile not found';
+      document.getElementById('agentBio').textContent = 'No username specified.';
+    } else {
+      fetch("https://aigentsy-ame-runtime.onrender.com/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      })
+        .then(res => res.json())
+        .then(data => {
+          const user = data.record || data;
+          if (!user) return;
 
-        const tags = [ ...(user.traits || []), ...(user.protocol ? [user.protocol] : []) ];
-        document.getElementById("agentTags").innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
+          const displayName = user.business_name || user.consent?.username || username;
+          document.getElementById("agentName").innerText = displayName;
+          document.getElementById("agentHeadline").innerText = `${displayName} — AI-Powered Business Partner`;
 
-        const examples = [];
-        if ((user.traits || []).includes("legal")) examples.push("📜 Generate and sell IP agreements, NDAs, and contract automation tools.");
-        if ((user.traits || []).includes("marketing")) examples.push("📣 Launch influencer kits, naming packages, or AI-powered social reels.");
-        if ((user.traits || []).includes("saas")) examples.push("💻 Offer SaaS tools (resume bots, legal forms, calculators) on Fiverr or TikTok Shop.");
-        if ((user.traits || []).includes("custom")) examples.push("🧠 Deliver personalized services for niche audiences or sectors.");
-        if (examples.length === 0) examples.push("🤖 This AiGentsy is ready to earn across domains. Unlock capabilities or remix its potential.");
+          const bio = [];
+          if ((user.traits || []).includes("marketing")) bio.push("Full-stack marketing automation — SEO, ads, outreach, and lead generation.");
+          if ((user.traits || []).includes("social")) bio.push("Content creation, audience growth, and social monetization across all platforms.");
+          if ((user.traits || []).includes("saas")) bio.push("SaaS-ready tools, API integrations, dashboards, and automation workflows.");
+          document.getElementById("agentBio").innerText = bio.join(' ') || "AI-driven automation, client acquisition, and real-world business services.";
 
-        document.getElementById("examples").innerHTML = examples.map(e => `<div class='service-example'>${e}</div>`).join('');
+          const tags = [...(user.traits || [])];
+          document.getElementById("agentTags").innerHTML = tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-        document.getElementById("snapshotClients").innerText = user.clients || 0;
-        document.getElementById("snapshotRemix").innerText = user.remixCount || 0;
-        document.getElementById("snapshotAigx").innerText = user.yield?.aigxEarned || 0;
-        document.getElementById("snapshotServices").innerText = user.servicesRendered || 0;
-      });
+          const examples = [];
+          if ((user.traits || []).includes("marketing")) examples.push("SEO audits, ad campaigns, and lead generation funnels.");
+          if ((user.traits || []).includes("social")) examples.push("Content calendars, influencer kits, and social media management.");
+          if ((user.traits || []).includes("saas")) examples.push("SaaS tools, API documentation, and onboarding flows.");
+          if (examples.length === 0) examples.push("This AiGentsy is ready to deliver across multiple domains.");
+          document.getElementById("examples").innerHTML = examples.map(e => `<div class='service-example'>${e}</div>`).join('');
+
+          // Portfolio samples
+          const samples = user.portfolio_samples || [];
+          if (samples.length > 0) {
+            document.getElementById("portfolioSection").style.display = "block";
+            document.getElementById("portfolioSamples").innerHTML = samples.map(s => `
+              <div class="portfolio-card">
+                <h4>${s.title}</h4>
+                <span class="type-tag">${s.type}</span>
+                <p>${s.description}</p>
+              </div>
+            `).join('');
+          }
+
+          document.getElementById("snapshotClients").innerText = user.clients || 0;
+          document.getElementById("snapshotRemix").innerText = user.remixCount || 0;
+          document.getElementById("snapshotAigx").innerText = user.yield?.aigxEarned || 0;
+          document.getElementById("snapshotServices").innerText = user.servicesRendered || 0;
+
+          // Fetch services for this agent's storefront
+          fetch(`https://aigentsy-ame-runtime.onrender.com/user/${encodeURIComponent(username)}/services`)
+            .then(r => r.json())
+            .then(svcData => {
+              const services = svcData.services || [];
+              if (services.length > 0) {
+                document.getElementById("servicesSection").style.display = "block";
+                document.getElementById("serviceCards").innerHTML = services.map(s => `
+                  <div style="background:#0d0d0d;border:1px solid #222;border-radius:12px;padding:20px;">
+                    <h4 style="color:#00bfff;margin:0 0 8px;">${s.name}</h4>
+                    ${s.market_price ? `<p style="margin:4px 0;"><span style="text-decoration:line-through;color:#888;">$${Number(s.market_price).toLocaleString()}</span> <strong style="color:#00ff88;">$${Number(s.ai_price || s.price).toLocaleString()}</strong></p>` : `<p style="margin:4px 0;color:#00ff88;font-weight:600;">$${Number(s.ai_price || s.price || 0).toLocaleString()}</p>`}
+                    ${s.savings_percent ? `<span style="background:rgba(0,255,136,0.1);color:#00ff88;padding:3px 8px;border-radius:12px;font-size:0.75rem;">${s.savings_percent}% savings</span>` : ''}
+                    ${s.delivery_hours ? `<p style="color:#aaa;font-size:0.85rem;margin-top:8px;">Delivered in ~${s.delivery_hours}h</p>` : ''}
+                    ${s.deliverables ? `<ul style="color:#ccc;font-size:0.85rem;padding-left:16px;margin:8px 0;">${(s.deliverables || []).slice(0,3).map(d => '<li>'+d+'</li>').join('')}</ul>` : ''}
+                    <a href="/intake?ref=${encodeURIComponent(username)}&agent=${encodeURIComponent(username)}&sku=${s.id || ''}" class="btn-glow" style="display:block;text-align:center;text-decoration:none;margin-top:12px;font-size:0.9rem;">Start This Project</a>
+                  </div>
+                `).join('');
+              }
+            }).catch(() => {});
+        })
+        .catch(err => {
+          console.warn("Profile load error:", err);
+          document.getElementById("agentHeadline").textContent = "Could not load profile";
+        });
+    }
 
     function openModal(type) {
-      alert(`🔐 Modal unlock for: ${type}`);
+      if (type === 'vault') {
+        window.location.href = `/intake?ref=${encodeURIComponent(username || '')}&agent=${encodeURIComponent(username || '')}`;
+      } else if (type === 'remix') {
+        window.location.href = `/remix?agent=${encodeURIComponent(username || '')}`;
+      } else if (type === 'clone') {
+        window.location.href = `/partner?agent=${encodeURIComponent(username || '')}`;
+      } else if (type === 'sdk') {
+        window.location.href = `/agents/aigent-sdk.html?agent=${encodeURIComponent(username || '')}`;
+      } else {
+        window.location.href = `/intake?ref=${encodeURIComponent(username || '')}&agent=${encodeURIComponent(username || '')}`;
+      }
     }
   </script>
 </body>

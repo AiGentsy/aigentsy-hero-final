@@ -1,6 +1,9 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
+    { "source": "/u/:path*", "destination": "/profile.html" },
+    { "source": "/intake", "destination": "/intake.html" },
+    { "source": "/client-room/:path*", "destination": "/client-room.html" },
     { "source": "/dashboard", "destination": "/dashboard.html" },
     { "source": "/vaults", "destination": "/vaults.html" },
     { "source": "/metatrade", "destination": "/metatrade.html" },
@@ -25,6 +28,14 @@
     { "source": "/agent", "destination": "/agent-profile.html" },
     { "source": "/remix-lineage", "destination": "/remix-lineage.html" },
     { "source": "/realworld", "destination": "/realworld.html" },
-    { "source": "/start", "destination": "/index.html" }
+    { "source": "/start", "destination": "/hire.html" },
+    { "source": "/hire", "destination": "/hire.html" },
+    { "source": "/services", "destination": "/hire.html" },
+    { "source": "/r/:code", "destination": "/hire.html" },
+    { "source": "/proof/:path*", "destination": "/proof.html" },
+    { "source": "/catalog", "destination": "/catalog.html" },
+    { "source": "/catalog/:path*", "destination": "/catalog.html" },
+    { "source": "/free-audit", "destination": "/free-audit.html" },
+    { "source": "/marketplace", "destination": "/marketplace.html" }
   ]
 }

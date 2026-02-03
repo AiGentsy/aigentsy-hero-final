@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AiGentsy — Get AI-Powered Work Done</title>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="AiGentsy — Get AI-Powered Work Done" />
+  <meta property="og:description" content="Professional services delivered by AI in hours, not weeks. Logo design, SEO content, video editing, and more — up to 85% less than market rate." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://aigentsy.com/hire.html" />
+  <meta property="og:image" content="https://aigentsy.com/aigentsy-logo-ultraclean.png" />
+  <meta property="og:site_name" content="AiGentsy" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AiGentsy — Get AI-Powered Work Done" />
+  <meta name="twitter:description" content="Professional services delivered by AI in hours, not weeks. Up to 85% less than market rate." />
+  <meta name="twitter:image" content="https://aigentsy.com/aigentsy-logo-ultraclean.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: .6; }
+    }
+
+    .fade-in       { animation: fadeIn 0.8s ease-out both; }
+    .fade-in-up    { animation: fadeInUp 0.7s ease-out both; }
+    .fade-delay-1  { animation-delay: 0.15s; }
+    .fade-delay-2  { animation-delay: 0.3s; }
+    .fade-delay-3  { animation-delay: 0.45s; }
+    .fade-delay-4  { animation-delay: 0.6s; }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 72px 0;
+    }
+
+    /* ── Nav / Header ── */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .top-bar img {
+      height: 40px;
+    }
+    .top-bar a {
+      color: #00bfff;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 64px;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #fff 40%, #00bfff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: #ccc;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    /* ── Stats Row ── */
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00bfff;
+    }
+    .stat-value.loading {
+      animation: pulse 1.4s ease-in-out infinite;
+      color: #555;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* ── Section Headings ── */
+    .section-heading {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-heading h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .section-heading p {
+      color: #aaa;
+      font-size: 1rem;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* ── Social Proof Cards ── */
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .proof-card {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .proof-card:hover {
+      border-color: #00bfff44;
+      transform: translateY(-2px);
+    }
+    .proof-card .proof-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .proof-card .proof-desc {
+      font-size: 0.88rem;
+      color: #aaa;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .proof-card .proof-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: #888;
+    }
+    .proof-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #00ff8818;
+      color: #00ff88;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
+    .proof-placeholder {
+      text-align: center;
+      color: #555;
+      padding: 40px;
+      font-size: 0.95rem;
+    }
+
+    /* ── Services Grid ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .service-card:hover {
+      border-color: #00bfff;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 24px rgba(0, 191, 255, 0.08);
+    }
+    .service-card .service-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .service-pricing {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .service-pricing .ai-price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00bfff;
+    }
+    .service-pricing .market-price {
+      font-size: 0.9rem;
+      color: #666;
+      text-decoration: line-through;
+    }
+    .service-pricing .savings {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #00ff88;
+      background: #00ff8818;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .service-deliverables {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex: 1;
+    }
+    .service-deliverables li {
+      font-size: 0.85rem;
+      color: #aaa;
+      padding: 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .service-deliverables li::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: #00bfff;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .service-cta {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #00bfff;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .service-card:hover .service-cta {
+      opacity: 1;
+    }
+    .services-loading, .services-error {
+      text-align: center;
+      padding: 48px;
+      color: #555;
+      font-size: 0.95rem;
+    }
+    .services-error { color: #ff6b6b; }
+
+    /* ── How It Works ── */
+    .steps-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .step-card {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 32px 24px;
+      text-align: center;
+    }
+    .step-number {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #00bfff18;
+      color: #00bfff;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      border: 1px solid #00bfff33;
+    }
+    .step-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .step-card p {
+      font-size: 0.9rem;
+      color: #aaa;
+      line-height: 1.5;
+    }
+
+    /* ── CTA Section ── */
+    .cta-section {
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .cta-section h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .cta-section p {
+      color: #aaa;
+      font-size: 1rem;
+      margin-bottom: 32px;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: #00bfff;
+      color: #000;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .cta-btn:hover {
+      background: #009cd8;
+      transform: translateY(-1px);
+    }
+    .cta-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ── Footer ── */
+    .page-footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.8rem;
+      color: #555;
+      border-top: 1px solid #1a1a1a;
+    }
+    .page-footer a {
+      color: #00bfff;
+      text-decoration: none;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2rem;
+      }
+      .hero .subtitle {
+        font-size: 1rem;
+      }
+      .stats-row {
+        gap: 24px;
+      }
+      .stat-value {
+        font-size: 1.5rem;
+      }
+      section {
+        padding: 48px 0;
+      }
+      .proof-grid {
+        grid-template-columns: 1fr;
+      }
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+      .steps-row {
+        grid-template-columns: 1fr;
+      }
+      .cta-section h2 {
+        font-size: 1.6rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 48px 16px 40px;
+      }
+      .hero h1 {
+        font-size: 1.7rem;
+      }
+      .stats-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Top Bar ── -->
+  <div class="top-bar fade-in">
+    <a href="/"><img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" /></a>
+    <a id="navCta" href="/intake.html">Start a Project</a>
+  </div>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <h1 class="fade-in">Get AI-Powered Work Done</h1>
+    <p class="subtitle fade-in fade-delay-1">
+      Professional services delivered by AI in hours, not weeks.
+      Logo design, SEO content, video editing, pitch decks, and more &mdash; at a fraction of the cost.
+    </p>
+
+    <div class="stats-row fade-in fade-delay-2">
+      <div class="stat-item">
+        <div class="stat-value loading" id="statProofs">&mdash;</div>
+        <div class="stat-label">Verified Deliveries</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value loading" id="statValue">&mdash;</div>
+        <div class="stat-label">Total Value Delivered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value loading" id="statHours">&mdash;</div>
+        <div class="stat-label">Avg Delivery Time</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Social Proof ── -->
+  <section>
+    <div class="container">
+      <div class="section-heading fade-in">
+        <h2>Wall of Wins</h2>
+        <p>Real results, cryptographically verified. Every outcome is backed by Merkle proof.</p>
+      </div>
+      <div class="proof-grid" id="proofGrid">
+        <div class="proof-placeholder" style="grid-column:1/-1;">Loading verified results...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Services ── -->
+  <section>
+    <div class="container">
+      <div class="section-heading fade-in">
+        <h2>Services</h2>
+        <p>AI-powered execution at a fraction of market price. Click any service to get started.</p>
+      </div>
+      <div class="services-grid" id="servicesGrid">
+        <div class="services-loading">Loading catalog...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How It Works ── -->
+  <section>
+    <div class="container">
+      <div class="section-heading fade-in">
+        <h2>How It Works</h2>
+        <p>Three steps. No risk. You only pay when you are satisfied.</p>
+      </div>
+      <div class="steps-row">
+        <div class="step-card fade-in-up fade-delay-1">
+          <div class="step-number">1</div>
+          <h3>Describe Your Project</h3>
+          <p>Tell us what you need built, designed, written, or launched. Be as detailed as you want.</p>
+        </div>
+        <div class="step-card fade-in-up fade-delay-2">
+          <div class="step-number">2</div>
+          <h3>Preview in 30 Minutes</h3>
+          <p>Our AI team scopes, prices, and starts immediately. You receive a preview before any payment.</p>
+        </div>
+        <div class="step-card fade-in-up fade-delay-3">
+          <div class="step-number">3</div>
+          <h3>Pay Only if Satisfied</h3>
+          <p>Approve the deliverable, request revisions, or walk away. Zero risk, zero lock-in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <h2 class="fade-in">Ready to Get Started?</h2>
+    <p class="fade-in fade-delay-1">Describe your project and get a preview within 30 minutes.</p>
+    <a class="cta-btn fade-in fade-delay-2" id="ctaBtn" href="/intake.html">Start Your Project</a>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="page-footer">
+    Powered by <a href="https://aigentsy.com">AiGentsy</a> &mdash; AI-driven business services
+  </footer>
+
+  <script>
+    // ── URL Params ──
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref') || '';
+    const sku = params.get('sku') || '';
+    const src = params.get('src') || '';
+
+    const API = 'https://aigentsy-ame-runtime.onrender.com';
+
+    // Build intake URL with params
+    function intakeUrl(serviceId) {
+      const q = new URLSearchParams();
+      if (ref) q.set('ref', ref);
+      if (serviceId || sku) q.set('sku', serviceId || sku);
+      if (src) q.set('src', src);
+      const qs = q.toString();
+      return '/intake.html' + (qs ? '?' + qs : '');
+    }
+
+    // Update nav + CTA links with params
+    document.getElementById('navCta').href = intakeUrl('');
+    document.getElementById('ctaBtn').href = intakeUrl('');
+
+    // ── Load Stats ──
+    (async function loadStats() {
+      try {
+        const resp = await fetch(API + '/proofs/stats');
+        const data = await resp.json();
+        const stats = data.stats || data;
+
+        const elProofs = document.getElementById('statProofs');
+        const elValue  = document.getElementById('statValue');
+        const elHours  = document.getElementById('statHours');
+
+        const totalProofs = stats.total_proofs || 0;
+        const totalValue  = stats.total_value  || 0;
+        const avgHours    = stats.avg_delivery_hours || 0;
+
+        elProofs.textContent = totalProofs > 0 ? totalProofs.toLocaleString() : '0';
+        elProofs.classList.remove('loading');
+
+        elValue.textContent = totalValue > 0 ? '$' + totalValue.toLocaleString() : '$0';
+        elValue.classList.remove('loading');
+
+        elHours.textContent = avgHours > 0 ? avgHours.toFixed(1) + 'h' : '--';
+        elHours.classList.remove('loading');
+      } catch (e) {
+        console.warn('Stats load error:', e);
+        document.getElementById('statProofs').textContent = '--';
+        document.getElementById('statValue').textContent  = '--';
+        document.getElementById('statHours').textContent   = '--';
+        document.querySelectorAll('.stat-value').forEach(el => el.classList.remove('loading'));
+      }
+    })();
+
+    // ── Load Wall of Wins ──
+    (async function loadWallOfWins() {
+      const grid = document.getElementById('proofGrid');
+      try {
+        const resp = await fetch(API + '/proofs/wall-of-wins?limit=6');
+        const data = await resp.json();
+        const wins = data.wall_of_wins || [];
+
+        if (wins.length === 0) {
+          grid.innerHTML = '<div class="proof-placeholder" style="grid-column:1/-1;">No verified results yet. Check back soon.</div>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        wins.forEach(function(win, i) {
+          const card = document.createElement('div');
+          card.className = 'proof-card fade-in-up';
+          card.style.animationDelay = (i * 0.1) + 's';
+
+          const title = win.title || 'Completed Delivery';
+          const desc  = win.description || '';
+          const date  = win.verified_at ? new Date(win.verified_at).toLocaleDateString() : '';
+
+          card.innerHTML =
+            '<div class="proof-title">' + escHtml(title) + '</div>' +
+            (desc ? '<div class="proof-desc">' + escHtml(desc) + '</div>' : '') +
+            '<div class="proof-meta">' +
+              '<span class="proof-badge">Verified</span>' +
+              (date ? '<span>' + date + '</span>' : '') +
+              (win.artifact_count ? '<span>' + win.artifact_count + ' artifacts</span>' : '') +
+            '</div>';
+
+          grid.appendChild(card);
+        });
+      } catch (e) {
+        console.warn('Wall of Wins load error:', e);
+        grid.innerHTML = '<div class="proof-placeholder" style="grid-column:1/-1;">Could not load results. Please refresh.</div>';
+      }
+    })();
+
+    // ── Load Services Catalog ──
+    (async function loadServices() {
+      const grid = document.getElementById('servicesGrid');
+      try {
+        const resp = await fetch(API + '/services/catalog');
+        const data = await resp.json();
+        const services = data.services || [];
+
+        if (services.length === 0) {
+          grid.innerHTML = '<div class="services-loading">No services available at the moment.</div>';
+          return;
+        }
+
+        grid.innerHTML = '';
+        services.forEach(function(svc, i) {
+          const link = document.createElement('a');
+          link.className = 'service-card fade-in-up';
+          link.style.animationDelay = (i * 0.08) + 's';
+          link.href = intakeUrl(svc.id);
+
+          const deliverables = (svc.deliverables || []).map(function(d) {
+            return '<li>' + escHtml(d) + '</li>';
+          }).join('');
+
+          link.innerHTML =
+            '<div class="service-name">' + escHtml(svc.name) + '</div>' +
+            '<div class="service-pricing">' +
+              '<span class="ai-price">$' + svc.ai_price_standard + '</span>' +
+              '<span class="market-price">$' + svc.market_price + '</span>' +
+              '<span class="savings">-' + svc.savings_percent + '%</span>' +
+            '</div>' +
+            '<ul class="service-deliverables">' + deliverables + '</ul>' +
+            '<div class="service-cta">Get Started &rarr;</div>';
+
+          grid.appendChild(link);
+        });
+      } catch (e) {
+        console.warn('Catalog load error:', e);
+        grid.innerHTML = '<div class="services-error">Could not load services. Please refresh.</div>';
+      }
+    })();
+
+    // ── Helpers ──
+    function escHtml(str) {
+      var div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+
+    // ── Intersection Observer for scroll animations ──
+    (function() {
+      if (!('IntersectionObserver' in window)) return;
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.fade-in-up').forEach(function(el) {
+        el.style.animationPlayState = 'paused';
+        observer.observe(el);
+      });
+    })();
+  </script>
+
+</body>
+</html>

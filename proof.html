@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verified Outcome — AiGentsy Proof</title>
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="Verified AI Work — AiGentsy Proof of Outcome" />
+  <meta property="og:description" content="See verified results delivered by AI-powered teams" />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" id="og-url" content="" />
+  <meta property="og:image" content="/aigentsy-logo-ultraclean.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .proof-wrapper {
+      max-width: 560px;
+      width: 100%;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    /* ---- Logo ---- */
+    .proof-logo {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .proof-logo img {
+      width: 110px;
+      opacity: 0.92;
+    }
+
+    /* ---- Card ---- */
+    .proof-card {
+      background: #0d0d0d;
+      border: 2px solid #00bfff;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,191,255,0.15);
+      overflow: hidden;
+    }
+
+    .proof-header {
+      padding: 28px 28px 20px;
+      text-align: center;
+    }
+    .proof-header .checkmark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(0,191,255,0.12);
+      border: 2px solid #00bfff;
+      font-size: 1.5rem;
+      color: #00bfff;
+      margin-bottom: 12px;
+    }
+    .proof-header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+    .proof-header .subtitle {
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    /* ---- Sections ---- */
+    .proof-section {
+      padding: 18px 28px;
+      border-top: 1px solid #222;
+    }
+    .proof-section .label {
+      color: #666;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 4px;
+    }
+    .proof-section .value {
+      color: #eee;
+      font-size: 0.95rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* ---- Status badge ---- */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .status-badge.success {
+      background: rgba(0,200,83,0.12);
+      color: #00c853;
+      border: 1px solid rgba(0,200,83,0.25);
+    }
+    .status-badge.pending {
+      background: rgba(255,193,7,0.12);
+      color: #ffc107;
+      border: 1px solid rgba(255,193,7,0.25);
+    }
+    .status-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ---- Merkle row ---- */
+    .merkle-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .merkle-hash {
+      font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 0.82rem;
+      color: #00bfff;
+      background: rgba(0,191,255,0.08);
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .merkle-verified {
+      color: #00c853;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* ---- Artifacts ---- */
+    .artifact-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #aaa;
+      font-size: 0.85rem;
+    }
+    .artifact-count span {
+      color: #00bfff;
+      font-weight: 600;
+    }
+
+    /* ---- CTA ---- */
+    .proof-cta {
+      text-align: center;
+      margin-top: 32px;
+    }
+    .proof-cta a {
+      display: inline-block;
+      color: #00bfff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 14px 32px;
+      border: 1px solid rgba(0,191,255,0.3);
+      border-radius: 10px;
+      transition: all 0.25s ease;
+      background: rgba(0,191,255,0.06);
+    }
+    .proof-cta a:hover {
+      background: rgba(0,191,255,0.14);
+      border-color: #00bfff;
+      box-shadow: 0 0 16px rgba(0,191,255,0.15);
+    }
+
+    /* ---- Loading / Error ---- */
+    .loading {
+      text-align: center;
+      padding: 80px 24px;
+    }
+    .loading .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #222;
+      border-top-color: #00bfff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .error-state {
+      text-align: center;
+      padding: 80px 24px;
+      animation: fadeIn 0.6s ease-out;
+    }
+    .error-state .icon {
+      font-size: 2.4rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .error-state h2 {
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .error-state p {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .error-state a {
+      color: #00bfff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .error-state a:hover {
+      text-decoration: underline;
+    }
+
+    /* ---- Verified timestamp ---- */
+    .verified-at {
+      color: #555;
+      font-size: 0.78rem;
+      text-align: center;
+      padding: 14px 28px 20px;
+      border-top: 1px solid #222;
+    }
+
+    /* ---- Footer ---- */
+    .proof-footer {
+      text-align: center;
+      margin-top: 24px;
+      color: #444;
+      font-size: 0.75rem;
+    }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 480px) {
+      .proof-header h1 { font-size: 1.2rem; }
+      .proof-section { padding: 14px 20px; }
+      .proof-header { padding: 24px 20px 16px; }
+      .merkle-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="proof-wrapper" id="proof-wrapper">
+    <!-- Loading state -->
+    <div class="loading" id="loading-state">
+      <div class="spinner"></div>
+      <p>Verifying proof&hellip;</p>
+    </div>
+  </div>
+
+  <script>
+    // Set OG URL dynamically
+    document.getElementById('og-url').setAttribute('content', window.location.href);
+
+    const API_BASE = 'https://aigentsy-ame-runtime.onrender.com';
+
+    // Extract proof_id from URL path
+    const pathMatch = window.location.pathname.match(/\/proof\/(.+)/);
+    const proofId = pathMatch ? pathMatch[1] : null;
+
+    const wrapper = document.getElementById('proof-wrapper');
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      } catch { return iso; }
+    }
+
+    function truncateHash(hash, len) {
+      if (!hash) return '---';
+      len = len || 16;
+      if (hash.length <= len) return hash;
+      return hash.substring(0, len) + '\u2026';
+    }
+
+    function showError() {
+      wrapper.innerHTML = `
+        <div class="proof-logo"><img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" /></div>
+        <div class="error-state">
+          <div class="icon">\u26A0</div>
+          <h2>Proof not found</h2>
+          <p>This proof may have expired or the link may be incorrect.</p>
+          <a href="/intake">Start your project \u2192</a>
+        </div>
+      `;
+    }
+
+    function renderCard(card) {
+      const title = card.title || 'Completed Work';
+      const description = card.description || '';
+      const hashPreview = truncateHash(card.hash_preview || card.hash, 16);
+      const verified = card.verified !== false;
+      const verifiedAt = card.verified_at ? formatDate(card.verified_at) : null;
+      const artifactCount = card.artifact_count || 0;
+      const agentName = card.agent_name || card.agent || null;
+      const deliveryTime = card.delivery_time || card.delivered_in || null;
+      const valueDelivered = card.value_delivered || card.value || null;
+      const serviceType = card.service_type || card.proof_type || null;
+      const success = card.success !== undefined ? card.success : verified;
+
+      let html = '';
+
+      // Logo
+      html += '<div class="proof-logo"><img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" /></div>';
+
+      // Card start
+      html += '<div class="proof-card">';
+
+      // Header
+      html += `
+        <div class="proof-header">
+          <div class="checkmark">\u2713</div>
+          <h1>Verified Outcome</h1>
+          <div class="subtitle">${title}</div>
+        </div>
+      `;
+
+      // Service type / description
+      if (description) {
+        html += `
+          <div class="proof-section">
+            <div class="label">${serviceType ? 'Service' : 'Description'}</div>
+            <div class="value">${serviceType ? serviceType + ' &mdash; ' : ''}${description}</div>
+          </div>
+        `;
+      } else if (serviceType) {
+        html += `
+          <div class="proof-section">
+            <div class="label">Service Type</div>
+            <div class="value">${serviceType}</div>
+          </div>
+        `;
+      }
+
+      // Delivery time
+      if (deliveryTime) {
+        html += `
+          <div class="proof-section">
+            <div class="label">Delivery Time</div>
+            <div class="value">Delivered in ${deliveryTime}</div>
+          </div>
+        `;
+      }
+
+      // Value delivered
+      if (valueDelivered) {
+        html += `
+          <div class="proof-section">
+            <div class="label">Value Delivered</div>
+            <div class="value">${valueDelivered}</div>
+          </div>
+        `;
+      }
+
+      // Merkle verification
+      html += `
+        <div class="proof-section">
+          <div class="label">Merkle Verification</div>
+          <div class="merkle-row">
+            <span class="merkle-hash">${hashPreview}</span>
+            ${verified ? '<span class="merkle-verified">\u2713 Verified on-chain</span>' : ''}
+          </div>
+        </div>
+      `;
+
+      // Status + artifacts row
+      html += `
+        <div class="proof-section" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div class="label">Status</div>
+            <span class="status-badge ${success ? 'success' : 'pending'}">
+              <span class="dot"></span>
+              ${success ? 'Success' : 'Pending'}
+            </span>
+          </div>
+          ${artifactCount > 0 ? `
+            <div>
+              <div class="label">Artifacts</div>
+              <div class="artifact-count"><span>${artifactCount}</span> deliverable${artifactCount !== 1 ? 's' : ''} attached</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      // Agent name
+      if (agentName) {
+        html += `
+          <div class="proof-section">
+            <div class="label">Delivered By</div>
+            <div class="value">${agentName}</div>
+          </div>
+        `;
+      }
+
+      // Verified at timestamp
+      if (verifiedAt) {
+        html += `<div class="verified-at">Verified ${verifiedAt}</div>`;
+      }
+
+      // Card end
+      html += '</div>';
+
+      // CTA
+      html += `
+        <div class="proof-cta">
+          <a href="/intake">Get results like this \u2192 Start your project</a>
+        </div>
+      `;
+
+      // Footer
+      html += `
+        <div class="proof-footer">
+          Cryptographically verified by AiGentsy Proof-of-Outcome Protocol
+        </div>
+      `;
+
+      wrapper.innerHTML = html;
+    }
+
+    async function loadProof() {
+      if (!proofId) {
+        showError();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/proofs/share-card/${encodeURIComponent(proofId)}`);
+        if (!res.ok) {
+          showError();
+          return;
+        }
+
+        const data = await res.json();
+        if (!data.ok || !data.share_card) {
+          showError();
+          return;
+        }
+
+        // Update page title with proof title
+        if (data.share_card.title) {
+          document.title = `${data.share_card.title} — AiGentsy Proof`;
+        }
+
+        renderCard(data.share_card);
+      } catch (err) {
+        console.error('Failed to load proof:', err);
+        showError();
+      }
+    }
+
+    loadProof();
+  </script>
+
+</body>
+</html>

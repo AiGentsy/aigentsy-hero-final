@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AiGentsy — Start Your Project</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at center, #0e101a, #000);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .intake-container {
+      max-width: 560px;
+      width: 100%;
+      padding: 40px 24px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    .intake-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .intake-header img {
+      width: 120px;
+      margin-bottom: 16px;
+    }
+    .intake-header h1 {
+      font-size: 1.8rem;
+      color: #fff;
+      margin: 0 0 8px;
+    }
+    .intake-header p {
+      color: #888;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+    .intake-form {
+      background: #0d0d0d;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 28px;
+    }
+    .field {
+      margin-bottom: 18px;
+    }
+    .field label {
+      display: block;
+      color: #aaa;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .field textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .field select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: #00bfff;
+      color: #000;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { background: #009cd8; }
+    .submit-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .status-msg {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      min-height: 20px;
+    }
+    .footer-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 0.85rem;
+      color: #555;
+    }
+    .footer-link a { color: #00bfff; text-decoration: none; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="intake-container">
+    <div class="intake-header">
+      <img src="/aigentsy-logo-ultraclean.png" alt="AiGentsy" />
+      <h1>Tell Us About Your Project</h1>
+      <p>We scope it. We price it. You approve it. Simple.</p>
+    </div>
+
+    <div id="referralBanner" style="display:none; background:rgba(0,191,255,0.08); border:1px solid #00bfff; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:0.9rem; color:#00bfff; text-align:center;"></div>
+    <div id="skuBanner" style="display:none; background:rgba(0,255,136,0.08); border:1px solid #00ff88; border-radius:8px; padding:12px 16px; margin-bottom:16px; font-size:0.9rem; color:#00ff88; text-align:center;"></div>
+
+    <div class="intake-form">
+      <input type="hidden" id="intakeSkuId" value="" />
+      <input type="hidden" id="intakeAgent" value="" />
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="intakeName" placeholder="Full name" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="intakeEmail" placeholder="you@company.com" />
+      </div>
+      <div class="field">
+        <label>Company</label>
+        <input type="text" id="intakeCompany" placeholder="Company or brand name" />
+      </div>
+      <div class="field">
+        <label>Describe Your Project</label>
+        <textarea id="intakeDescription" placeholder="What do you need built, launched, or fixed? Be as specific as you want."></textarea>
+      </div>
+      <div class="field">
+        <label>Budget Range</label>
+        <select id="intakeBudget">
+          <option value="">Select a range</option>
+          <option value="under-500">Under $500</option>
+          <option value="500-2000">$500 – $2,000</option>
+          <option value="2000-5000">$2,000 – $5,000</option>
+          <option value="5000-15000">$5,000 – $15,000</option>
+          <option value="15000+">$15,000+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Timeline</label>
+        <select id="intakeTimeline">
+          <option value="">Select timeline</option>
+          <option value="asap">ASAP</option>
+          <option value="1-2-weeks">1–2 weeks</option>
+          <option value="1-month">Within a month</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
+
+      <button class="submit-btn" id="intakeSubmitBtn" onclick="submitIntake()">Submit Project Brief</button>
+      <div class="status-msg" id="intakeStatus"></div>
+    </div>
+
+    <div class="footer-link">
+      Powered by <a href="https://aigentsy.com">AiGentsy</a> — AI-driven business services
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const ref = params.get("ref") || "";
+    const skuParam = params.get("sku") || "";
+    const agentParam = params.get("agent") || "";
+    const verticalParam = params.get("vertical") || "";
+
+    // Pre-populate from URL params
+    if (agentParam) {
+      document.getElementById("intakeAgent").value = agentParam;
+      const banner = document.getElementById("referralBanner");
+      banner.style.display = "block";
+      banner.textContent = `Referred by ${agentParam} — you're in good hands.`;
+    }
+    if (skuParam) {
+      document.getElementById("intakeSkuId").value = skuParam;
+      // Fetch SKU details and pre-fill
+      fetch(`https://aigentsy-ame-runtime.onrender.com/services/catalog`)
+        .then(r => r.json())
+        .then(data => {
+          const svc = (data.services || []).find(s => s.id === skuParam);
+          if (svc) {
+            const skuBanner = document.getElementById("skuBanner");
+            skuBanner.style.display = "block";
+            skuBanner.innerHTML = `<strong>${svc.name}</strong> — Starting at $${svc.ai_price_standard.toLocaleString()} (${svc.savings_percent}% below market)`;
+            const desc = document.getElementById("intakeDescription");
+            if (!desc.value) desc.value = `I'm interested in: ${svc.name}`;
+          }
+        }).catch(() => {});
+    }
+    if (verticalParam) {
+      const desc = document.getElementById("intakeDescription");
+      if (!desc.value) desc.value = `Vertical: ${verticalParam}`;
+    }
+
+    async function submitIntake() {
+      const btn = document.getElementById("intakeSubmitBtn");
+      const status = document.getElementById("intakeStatus");
+      const name = document.getElementById("intakeName").value.trim();
+      const email = document.getElementById("intakeEmail").value.trim();
+
+      if (!name || !email) {
+        status.style.color = "#ff6b6b";
+        status.textContent = "Name and email are required.";
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      status.textContent = "";
+
+      try {
+        const resp = await fetch("https://aigentsy-ame-runtime.onrender.com/intake/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name,
+            email,
+            company: document.getElementById("intakeCompany").value.trim(),
+            description: document.getElementById("intakeDescription").value.trim(),
+            budget: document.getElementById("intakeBudget").value,
+            timeline: document.getElementById("intakeTimeline").value,
+            ref,
+            sku_id: document.getElementById("intakeSkuId").value,
+            agent: document.getElementById("intakeAgent").value
+          })
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          status.style.color = "#00ff88";
+          status.textContent = "Received! You'll hear back within 30 minutes.";
+          btn.textContent = "Submitted";
+          // Show confirmation with client room link if available
+          const container = document.querySelector('.intake-form');
+          container.innerHTML = `
+            <div style="text-align:center; padding:40px 20px;">
+              <div style="font-size:3rem; margin-bottom:16px;">&#10003;</div>
+              <h2 style="color:#00ff88; margin-bottom:12px;">Project Brief Received</h2>
+              <p style="color:#ccc; margin-bottom:24px;">You'll hear back within 30 minutes with a preview of your project.</p>
+              ${data.client_room_url ? `<a href="${data.client_room_url}" style="display:inline-block; background:#00bfff; color:#000; padding:12px 24px; border-radius:6px; font-weight:600; text-decoration:none;">View Your Project Room</a>` : ''}
+              <p style="color:#888; font-size:0.85rem; margin-top:16px;">Check your email for updates.</p>
+            </div>`;
+        } else {
+          throw new Error(data.error || "Submission failed");
+        }
+      } catch(e) {
+        status.style.color = "#ff6b6b";
+        status.textContent = "Something went wrong. Try again or email us directly.";
+        btn.disabled = false;
+        btn.textContent = "Submit Project Brief";
+      }
+    }
+  </script>
+</body>
+</html>
