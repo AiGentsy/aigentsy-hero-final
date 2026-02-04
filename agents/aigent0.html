@@ -2419,6 +2419,41 @@ async function runAgent() {
       } else if (type === 'queue' && result) {
         const items = result.queue?.length || result.opportunities?.length || 0;
         html = `<div class="chat-result-card">📋 <strong>${items} opportunities</strong> in your pipeline</div>`;
+      } else if (type === 'partner_discovery' && result) {
+        const found = result.partners?.length || result.matches?.length || result.results?.length || 0;
+        html = `<div class="chat-result-card">🔍 <strong>Found ${found} potential partners</strong>${result.source ? `<br>Source: ${result.source}` : ''}</div>`;
+      } else if (type === 'create_jv' && result) {
+        const jvId = result.jv_id || result.id || '';
+        const partner = result.partner || result.partner_name || '';
+        html = `<div class="chat-result-card">🤝 <strong>Joint Venture created</strong>${partner ? ` with ${partner}` : ''}${jvId ? `<br>JV ID: ${jvId}` : ''}</div>`;
+      } else if (type === 'metabridge' && result) {
+        const matches = result.matches?.length || result.results?.length || 0;
+        const query = result.query || '';
+        html = `<div class="chat-result-card">🌉 <strong>MetaBridge: ${matches} matches</strong>${query ? `<br>Query: ${query}` : ''}</div>`;
+      } else if (type === 'syndication_onboard' && result) {
+        const name = result.creator_name || result.name || '';
+        const rev = result.rev_share_pct || result.rev_share || '';
+        html = `<div class="chat-result-card">📡 <strong>Creator onboarded${name ? `: ${name}` : ''}</strong>${rev ? `<br>Revenue share: ${rev}%` : ''}</div>`;
+      } else if (type === 'intent_bid' && result) {
+        const intentId = result.intent_id || result.id || '';
+        const bidPrice = result.price || result.bid_price || '';
+        html = `<div class="chat-result-card">🎯 <strong>Intent bid placed</strong>${bidPrice ? ` at $${bidPrice}` : ''}${intentId ? `<br>Intent: ${intentId}` : ''}</div>`;
+      } else if (type === 'cross_pollination' && result) {
+        const active = result.active_pollinators || result.active || 0;
+        const rev = result.total_revenue || result.revenue || 0;
+        html = `<div class="chat-result-card">🌸 <strong>Cross-pollination active</strong><br>${active} pollinators${rev ? `, $${rev} revenue` : ''}</div>`;
+      } else if (type === 'submit_proposal' && result) {
+        const proposalId = result.proposal_id || result.id || '';
+        const status = result.status || 'submitted';
+        html = `<div class="chat-result-card">📨 <strong>Proposal ${status}</strong>${proposalId ? `<br>ID: ${proposalId}` : ''}</div>`;
+      } else if (type === 'nurture_start' && result) {
+        const nurtureId = result.nurture_id || '';
+        const totalEmails = result.total_emails || result.sequence?.length || 0;
+        html = `<div class="chat-result-card">📧 <strong>Nurture sequence started</strong>${totalEmails ? `<br>${totalEmails} emails scheduled` : ''}${nurtureId ? `<br>ID: ${nurtureId}` : ''}</div>`;
+      } else if (type === 'revenue_report' && result) {
+        const total = result.total_revenue || result.total || 0;
+        const sources = result.sources?.length || result.attributions?.length || 0;
+        html = `<div class="chat-result-card">💵 <strong>Revenue: $${total}</strong>${sources ? `<br>${sources} attribution sources` : ''}</div>`;
       } else {
         // Default: show JSON preview
         const preview = JSON.stringify(result, null, 2).substring(0, 300);
