@@ -423,6 +423,36 @@
   </div>
 </div>
 
+<div id="brainLearningBox" class="metric-box" style="margin-top:14px;">
+  <h3 style="color:#00bfff; margin-bottom:10px;">AI Brain Learning</h3>
+  <div class="csn-grid">
+    <div class="csn-tile">
+      <div class="csn-label">Patterns Learned</div>
+      <div id="brainPatterns" class="csn-value">--</div>
+    </div>
+    <div class="csn-tile">
+      <div class="csn-label">Hive Patterns</div>
+      <div id="brainHivePatterns" class="csn-value">--</div>
+    </div>
+    <div class="csn-tile">
+      <div class="csn-label">Synergy Score</div>
+      <div id="brainSynergy" class="csn-value">--</div>
+    </div>
+    <div class="csn-tile">
+      <div class="csn-label">Success Rate</div>
+      <div id="brainSuccessRate" class="csn-value">--</div>
+    </div>
+    <div class="csn-tile">
+      <div class="csn-label">Training Cycles</div>
+      <div id="brainTrainingCycles" class="csn-value">--</div>
+    </div>
+    <div class="csn-tile">
+      <div class="csn-label">AI Family Tasks</div>
+      <div id="brainFamilyTasks" class="csn-value">--</div>
+    </div>
+  </div>
+</div>
+
 <div id="proposalViewerBox" style="margin-top:14px; background:#111; padding:12px; border-radius:10px; box-shadow:0 0 10px rgba(0,255,255,0.1); font-size:0.9rem; color:#ccc; cursor:pointer;" onclick="openProposalInboxModal()">
   <h4 style="color:#00bfff; margin-bottom:6px;">📬 Proposals & Approvals <span id="pendingApprovalsCount" style="background:#00bfff; color:#000; padding:2px 8px; border-radius:10px; font-size:0.75rem; margin-left:8px; display:none;">0</span></h4>
   <div style="font-size:0.85rem;">Review opportunities your AiGentsy found for you.</div>
@@ -3541,6 +3571,40 @@ document.addEventListener("keydown", (e) => {
 })();
 
 // ============================================================
+// 🧠 AI BRAIN LEARNING STATS
+// ============================================================
+
+async function fetchBrainStats() {
+  const username = localStorage.getItem("aigentsyUsername");
+  if (!username) return;
+  try {
+    const response = await fetch(`${window.BACKEND_BASE}/brain/stats/${encodeURIComponent(username)}`);
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!data.ok) return;
+
+    const ym = data.yield_memory || {};
+    const mh = data.metahive || {};
+    const af = data.ai_family || {};
+    const pt = data.policy_trainer || {};
+
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+    set("brainPatterns", ym.total_patterns || 0);
+    set("brainHivePatterns", mh.total_patterns || 0);
+    set("brainSynergy", af.synergy_score ? (af.synergy_score * 100).toFixed(0) + "%" : "--");
+    set("brainSuccessRate", mh.avg_success_rate ? (mh.avg_success_rate * 100).toFixed(0) + "%" : "--");
+    set("brainTrainingCycles", pt.training_cycles || 0);
+    set("brainFamilyTasks", af.total_tasks || 0);
+  } catch (e) {
+    console.warn("Brain stats not available:", e.message);
+  }
+}
+
+// Refresh brain stats every 60 seconds
+setInterval(fetchBrainStats, 60000);
+
+// ============================================================
 // 💎 AIGX DASHBOARD API INTEGRATION
 // ============================================================
 
@@ -3722,6 +3786,7 @@ async function initializeDashboard() {
   // ✅ FIX: Load ALL data FIRST, then render dashboard
   // This ensures reputation is available when the chart renders
   await fetchAIGxDashboardData(username);
+  fetchBrainStats();
   await loadTierAndReputation();
   
   // NOW render the dashboard with complete data
