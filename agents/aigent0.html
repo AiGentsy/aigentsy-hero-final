@@ -2384,9 +2384,26 @@ async function runAgent() {
         const dims = result.dimensions?.length || result.sources?.length || 0;
         html = `<div class="chat-result-card">🎯 <strong>Found ${count} opportunities</strong>${dims ? ` across ${dims} dimensions` : ''}</div>`;
       } else if ((type === 'pitch' || type === 'sponsorship_pitch') && result) {
-        const subject = result.subject || result.title || action.label;
-        html = `<div class="chat-result-card">📝 <strong>Pitch generated:</strong> ${subject}
+        const pitch = result.pitch || result;
+        const subject = pitch.subject || pitch.title || result.subject || result.title || action.label;
+        const target = pitch.target || result.target || '';
+        let deliveryInfo = '';
+        const dr = pitch.delivery_result || result.delivery_result;
+        if (dr) {
+          deliveryInfo = `<br>Delivered: Email=${dr.email ? 'Yes' : 'No'}, Webhook=${dr.webhook ? 'Yes' : 'No'}`;
+        }
+        html = `<div class="chat-result-card">📝 <strong>Pitch: ${subject}</strong>${target ? `<br>Target: ${target}` : ''}${deliveryInfo}
           <button class="chat-action-btn" onclick="GXA.viewAutoSales()" style="margin-top:8px">📋 View in Queue</button></div>`;
+      } else if (type === 'social_post' && result) {
+        const platform = result.platform || result.action || 'social';
+        const postUrl = result.post_url || result.tweet_url || '';
+        const postId = result.post_id || result.tweet_id || '';
+        html = `<div class="chat-result-card">📢 <strong>Posted to ${platform}</strong>${postUrl ? `<br><a href="${postUrl}" target="_blank" style="color:#58a6ff">View Post</a>` : ''}${postId ? `<br>Post ID: ${postId}` : ''}</div>`;
+      } else if (type === 'email_outreach' && result) {
+        const channel = result.channel || 'email';
+        const status = result.status || (result.sent ? 'sent' : 'queued');
+        const proposalId = result.proposal_id || '';
+        html = `<div class="chat-result-card">✉️ <strong>Outreach ${status}</strong> via ${channel}${proposalId ? `<br>Proposal: ${proposalId}` : ''}</div>`;
       } else if (type === 'content' && result) {
         const preview = result.content?.substring(0, 200) || result.text?.substring(0, 200) || JSON.stringify(result).substring(0, 200);
         html = `<div class="chat-result-card">📱 <strong>Content generated:</strong><br><em>${preview}${preview.length >= 200 ? '...' : ''}</em></div>`;
