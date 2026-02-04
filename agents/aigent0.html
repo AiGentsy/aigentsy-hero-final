@@ -109,11 +109,22 @@
     border-color: #00ffcc;
     font-weight: 700;
   }
-  .chat-action-btn.primary:hover { 
-    background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%); 
+  .chat-action-btn.primary:hover {
+    background: linear-gradient(135deg, #00ffcc 0%, #00bfff 100%);
     box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
   }
-  
+  .chat-action-btn[disabled] { cursor: not-allowed; opacity: 0.6; }
+  .chat-action-btn:active:not([disabled]) { transform: scale(0.97); }
+  .chat-result-card {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
   /* STOREFRONT PICKER */
   .storefront-options { display: flex; flex-direction: column; gap: 12px; }
   .storefront-option {
@@ -2214,78 +2225,79 @@ async function runAgent() {
     // ═══════════════════════════════════════════════════════════════════════════════
     // ACTION BUTTONS - Add clickable actions based on response content
     // ═══════════════════════════════════════════════════════════════════════════════
-    function addActionButtons(reply, businessType) {
+    function addActionButtons(reply, businessType, actions) {
       let buttons = '';
+
+      // ═══════════════════════════════════════════════════════════════
+      // ACTIONIZED RESPONSE BUTTONS — structured from backend
+      // ═══════════════════════════════════════════════════════════════
+      if (actions && actions.length > 0) {
+        actions.forEach((action, idx) => {
+          const actionJson = JSON.stringify(action).replace(/"/g, '&quot;');
+          buttons += `<button class="chat-action-btn" id="action-btn-${idx}" onclick='executeAction(${JSON.stringify(action)}, this)'>${action.label}</button>`;
+        });
+        // Always add "Let's Do It" for structured actions
+        buttons += `<button class="chat-action-btn primary" onclick="quickAction('approve')">✓ Let's Do It</button>`;
+        return `<div class="chat-actions">${buttons}</div>`;
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // LEGACY FALLBACK — keyword-based buttons (backward compat)
+      // ═══════════════════════════════════════════════════════════════
       const replyLower = reply.toLowerCase();
-      
-      // ═══════════════════════════════════════════════════════════════
-      // MONETIZATION-FOCUSED ACTION BUTTONS
-      // Always surface ways to make money
-      // ═══════════════════════════════════════════════════════════════
-      
-      // Building/Creating products to sell
+
       if (replyLower.includes('build') || replyLower.includes('tool') || replyLower.includes('create') || replyLower.includes('launch')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('build')">🛠️ Start Building</button>`;
       }
-      
-      // Finding clients (MONEY)
       if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find') || replyLower.includes('lead')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>`;
       }
-      
-      // Pricing (MONEY)
       if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue') || replyLower.includes('charge') || replyLower.includes('rate')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('pricing')">💰 Set Pricing</button>`;
       }
-      
-      // Proposals (MONEY - closing deals)
       if (replyLower.includes('proposal') || replyLower.includes('pitch') || replyLower.includes('deal') || replyLower.includes('contract')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('proposal')">📝 Draft Proposal</button>`;
       }
-      
-      // Content (MONETIZABLE)
       if (replyLower.includes('content') || replyLower.includes('post') || replyLower.includes('social') || replyLower.includes('video') || replyLower.includes('reel')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('content')">📱 Create Content</button>`;
       }
-      
-      // Marketing (DRIVES MONEY)
       if (replyLower.includes('seo') || replyLower.includes('traffic') || replyLower.includes('marketing') || replyLower.includes('ad') || replyLower.includes('campaign')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('marketing')">📈 Launch Marketing</button>`;
       }
-      
-      // Partnership (MONEY - JV deals)
       if (replyLower.includes('partner') || replyLower.includes('collab') || replyLower.includes('affiliate') || replyLower.includes('referral')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('partnership')">🤝 Find Partners</button>`;
       }
-      
-      // Sponsorship (MONEY)
       if (replyLower.includes('sponsor') || replyLower.includes('brand deal') || replyLower.includes('influencer')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('sponsorship')">💎 Get Sponsorship</button>`;
       }
-      
-      // Opportunity detection (MONEY)
       if (replyLower.includes('opportunit') || replyLower.includes('gig') || replyLower.includes('job') || replyLower.includes('project')) {
         buttons += `<button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>`;
       }
-      
-      // Always show a "Let's do it" button if there's a recommendation
       if (replyLower.includes('recommend') || replyLower.includes('start with') || replyLower.includes('my pick') || replyLower.includes('i suggest') || replyLower.includes("here's the deal")) {
         buttons += `<button class="chat-action-btn primary" onclick="quickAction('approve')">✓ Let's Do It</button>`;
       }
-      
-      // If no specific buttons triggered, show generic monetization actions
+
       if (!buttons) {
         buttons = `
           <button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>
           <button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 Opportunities</button>
         `;
       }
-      
+
       return `<div class="chat-actions">${buttons}</div>`;
     }
     
     // Quick action handler - expanded for monetization
+    // Track last executed actions for "Let's Do It" replay
+    window._lastExecutedActions = [];
+
     window.quickAction = function(action) {
+      // "Let's Do It" replays the last executed action if available
+      if (action === 'approve' && window._lastExecutedActions.length > 0) {
+        executeAction(window._lastExecutedActions.at(-1));
+        return;
+      }
+
       const actions = {
         'build': "Let's start building. What's the first feature I should create?",
         'find_clients': "Help me find my first 3 paying clients for this. Where are they and how do I reach them?",
@@ -2297,7 +2309,7 @@ async function runAgent() {
         'partnership': "Find potential partners I could collaborate with for mutual revenue.",
         'sponsorship': "Help me land a brand sponsorship. What companies should I pitch?"
       };
-      
+
       const message = actions[action] || "Let's move forward with this.";
       const textarea = document.getElementById("agentInput");
       if (textarea) {
@@ -2305,10 +2317,107 @@ async function runAgent() {
         runAgent();
       }
     };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // EXECUTE ACTION — calls real backend endpoints via /action/execute dispatcher
+    // ═══════════════════════════════════════════════════════════════════════════════
+    window.executeAction = async function(action, btnElement) {
+      const btn = btnElement || document.querySelector(`[id^="action-btn-"]`);
+      const originalLabel = btn ? btn.textContent : '';
+
+      // Show loading state
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Running...';
+      }
+
+      try {
+        const baseUrl = window.AME_API || 'https://aigentsy-ame-runtime.onrender.com';
+        const res = await fetch(`${baseUrl}/action/execute`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: action.type,
+            endpoint: action.endpoint,
+            method: action.method,
+            params: action.params || {}
+          })
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          if (btn) btn.textContent = '✅ Done!';
+          window._lastExecutedActions.push(action);
+          displayActionResult(action, data.result);
+        } else {
+          if (btn) btn.textContent = '❌ Failed';
+          console.error('Action failed:', data.error);
+          showToast(data.error || 'Action failed', 'error');
+        }
+      } catch (err) {
+        if (btn) btn.textContent = '❌ Failed';
+        console.error('Action execution error:', err);
+        showToast('Connection error executing action', 'error');
+      }
+
+      // Reset button after 3 seconds
+      setTimeout(() => {
+        if (btn) {
+          btn.textContent = originalLabel;
+          btn.disabled = false;
+        }
+      }, 3000);
+    };
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // DISPLAY ACTION RESULT — renders action results inline in the chat log
+    // ═══════════════════════════════════════════════════════════════════════════════
+    function displayActionResult(action, result) {
+      const chatLog = document.getElementById("chatLog");
+      if (!chatLog) return;
+
+      let html = '';
+      const type = action.type;
+
+      if (type === 'discovery' && result) {
+        const count = result.opportunities?.length || result.match_count || 0;
+        const dims = result.dimensions?.length || result.sources?.length || 0;
+        html = `<div class="chat-result-card">🎯 <strong>Found ${count} opportunities</strong>${dims ? ` across ${dims} dimensions` : ''}</div>`;
+      } else if ((type === 'pitch' || type === 'sponsorship_pitch') && result) {
+        const subject = result.subject || result.title || action.label;
+        html = `<div class="chat-result-card">📝 <strong>Pitch generated:</strong> ${subject}
+          <button class="chat-action-btn" onclick="GXA.viewAutoSales()" style="margin-top:8px">📋 View in Queue</button></div>`;
+      } else if (type === 'content' && result) {
+        const preview = result.content?.substring(0, 200) || result.text?.substring(0, 200) || JSON.stringify(result).substring(0, 200);
+        html = `<div class="chat-result-card">📱 <strong>Content generated:</strong><br><em>${preview}${preview.length >= 200 ? '...' : ''}</em></div>`;
+      } else if ((type === 'deploy' || type === 'publish') && result) {
+        const url = result.url || result.liveUrl || result.storefront_url || '';
+        html = `<div class="chat-result-card">🚀 <strong>${type === 'deploy' ? 'Deployed' : 'Published'}!</strong>${url ? `<br><a href="${url}" target="_blank" style="color:#00bfff">${url}</a>` : ''}</div>`;
+      } else if (type === 'pricing' && result) {
+        const bid = result.recommended_bid || result.price || result.amount || 'N/A';
+        html = `<div class="chat-result-card">💰 <strong>Recommended bid:</strong> $${bid}</div>`;
+      } else if (type === 'r3_allocate' && result) {
+        const channels = result.channels?.length || result.allocations?.length || 0;
+        html = `<div class="chat-result-card">📊 <strong>Budget allocated</strong>${channels ? ` across ${channels} channels` : ''}</div>`;
+      } else if (type === 'queue' && result) {
+        const items = result.queue?.length || result.opportunities?.length || 0;
+        html = `<div class="chat-result-card">📋 <strong>${items} opportunities</strong> in your pipeline</div>`;
+      } else {
+        // Default: show JSON preview
+        const preview = JSON.stringify(result, null, 2).substring(0, 300);
+        html = `<div class="chat-result-card">✅ <strong>${action.label} complete</strong><br><code class="chat-code">${preview}</code></div>`;
+      }
+
+      const resultDiv = document.createElement('div');
+      resultDiv.className = 'chat-msg bot';
+      resultDiv.innerHTML = html;
+      chatLog.appendChild(resultDiv);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
     
     const data = await res.json();
     let reply = data.output || "No response.";
-    
+
     // ✅ FIX: Update local state from backend response
     if (data.business_type && data.business_type !== "general") {
       if (window.aigentsyUser) {
@@ -2317,11 +2426,20 @@ async function runAgent() {
       localStorage.setItem("aigentsyKit", data.business_type);
       console.log("📦 Updated kit from backend:", data.business_type);
     }
-    
-    // ✅ Parse markdown and add action buttons
+
+    // Auto-route label — show which C-Suite role handled the query
+    let routeLabel = '';
+    if (data.routed_from === "auto" && data.role) {
+      const roleNames = { CFO: '💰 CFO', CMO: '📣 CMO', CTO: '🧬 CTO', CLO: '📜 CLO' };
+      routeLabel = `<div style="font-size:0.75rem;color:#888;margin-bottom:6px">Auto-routed to <strong style="color:#00bfff">${roleNames[data.role] || data.role}</strong></div>`;
+      // Sync sidebar C-Suite highlight if the function exists
+      if (window.setActiveCSuite) window.setActiveCSuite(data.role);
+    }
+
+    // ✅ Parse markdown and add action buttons (with structured actions from backend)
     const formattedReply = parseMarkdown(reply);
-    const actionButtons = addActionButtons(reply, businessType);
-    loader.innerHTML = formattedReply + actionButtons;
+    const actionButtons = addActionButtons(reply, businessType, data.actions);
+    loader.innerHTML = routeLabel + formattedReply + actionButtons;
     
     memory.push(`🤖 ${reply}`);
     _saveChatHistory();
