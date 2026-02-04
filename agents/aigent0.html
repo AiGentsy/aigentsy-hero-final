@@ -469,26 +469,21 @@
     </div>
   </header>
   <div class="grp">
+    <h4>Sell</h4>
+    <button onclick="GXA.findClients()">🎯 Find Clients</button>
+    <button onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>
+    <button onclick="GXA.generateTestPitch()">📝 Create Pitch</button>
+  </div>
+  <div class="grp">
     <h4>Launch</h4>
     <button onclick="GXA.publishStorefront()">🚀 Publish Storefront</button>
-    <button onclick="GXA.copyWidget()">🔗 Copy Widget</button>
+    <button onclick="GXA.browseDeals()">🏬 Browse Deals</button>
+    <button onclick="GXA.viewPipeline()">📊 View Pipeline</button>
   </div>
   <div class="grp">
-    <h4>Sell</h4>
-    <button onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>
-    <button onclick="GXA.instantQuote()">📝 Contracts & Quotes</button>
-    <button onclick="GXA.openMarket()">🏬 Browse Marketplace</button>
-  </div>
-  <div class="grp">
-    <h4>Earnings & Payouts</h4>
-    <button onclick="GXA.registerBusiness()">🏢 Register Business</button>
+    <h4>Earn</h4>
     <button onclick="GXA.createJV()">🤝 Create Partnership</button>
     <button onclick="GXA.payout()">💸 Payout</button>
-  </div>
-  <div class="grp">
-    <h4>Grow</h4>
-    <button onclick="GXA.findPartners()">👥 Find Partners</button>
-    <button onclick="GXA.viewPipeline()">📊 View Pipeline</button>
   </div>
 </aside>
 <div id="gxModal" class="gx-modal" role="dialog" aria-modal="true">
@@ -920,85 +915,66 @@ async function renderDynamicKit(user) {
       
       console.log(`✅ Kit loaded: ${data.kit_name} - ${data.template_count} templates worth $${data.kit_value}`);
       
-      // Render documents with different handlers based on type
-      kitDocBox.innerHTML = data.documents.map(item => {
-        // DOWNLOADABLE FILES (.docx, .md, etc)
+      // ── Categorize documents into 3 packages ──
+      const launchItems = [];
+      const salesItems = [];
+      const growthItems = [];
+
+      for (const item of data.documents) {
+        const nameLower = (item.name || '').toLowerCase();
+        const idLower = (item.id || '').toLowerCase();
+        if (item.type === 'deployable') {
+          launchItems.push(item);
+        } else if (item.type === 'download' && /brand|logo|style|identity|storefront/.test(nameLower + idLower)) {
+          launchItems.push(item);
+        } else if (item.category === 'email' || /pitch|proposal|quote|contract|outreach|cold|sequence|nurture/.test(nameLower + idLower)) {
+          salesItems.push(item);
+        } else if (item.type === 'download') {
+          // Downloads not in launch go to growth
+          growthItems.push(item);
+        } else {
+          growthItems.push(item);
+        }
+      }
+
+      // Render a single item based on type
+      function renderKitItem(item) {
         if (item.type === 'download' || item.type === 'preview') {
-          return `
-            <div onclick="downloadKitFile('${item.download_url}', '${item.name}')" 
-                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; transition: all 0.2s; display:flex; justify-content:space-between; align-items:center;"
-                 onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
-                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-              <div>
-                <div style="color:#00bfff;">${item.icon || '📄'} ${item.name}</div>
-                <div style="font-size:0.7rem; color:#666; margin-top:2px;">
-                  ${item.file_type?.toUpperCase() || ''} • ${item.file_size || ''}
-                  ${item.retail_value > 0 ? ` • Worth $${item.retail_value.toLocaleString()}` : ''}
-                </div>
-              </div>
-              <div style="color:#00bfff;">📥</div>
-            </div>
-          `;
+          return `<div onclick="downloadKitFile('${item.download_url}', '${item.name}')" style="padding:6px 8px; margin:3px 0; background:#0a0a0a; border:1px solid #222; border-radius:4px; cursor:pointer; font-size:0.78rem; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;" onmouseover="this.style.borderColor='#00bfff'" onmouseout="this.style.borderColor='#222'"><div><div style="color:#ccc;">${item.icon || '📄'} ${item.name}</div><div style="font-size:0.65rem; color:#555; margin-top:1px;">${item.file_type?.toUpperCase() || ''} ${item.retail_value > 0 ? '• $' + item.retail_value.toLocaleString() : ''}</div></div><div style="color:#555;">📥</div></div>`;
         }
-        // DEPLOYABLE STOREFRONTS (preview + deploy)
-        else if (item.type === 'deployable') {
-          return `
-            <div style="padding:8px 10px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; font-size:0.8rem; transition: all 0.2s;"
-                 onmouseover="this.style.background='#0a1a0a'; this.style.borderColor='#10b981';"
-                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-              <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="color:#10b981;">${item.icon || '🌐'} ${item.name}</div>
-                  <div style="font-size:0.7rem; color:#666; margin-top:2px;">
-                    ${item.best_for || 'Deploy-ready storefront'}
-                    ${item.retail_value > 0 ? ` • Worth $${item.retail_value.toLocaleString()}` : ''}
-                  </div>
-                </div>
-                <div style="display:flex; gap:6px;">
-                  <button onclick="previewStorefront('${item.template_file}', '${item.name}')"
-                    style="background:#1a2a1a; border:1px solid #10b981; color:#10b981; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.7rem;">Preview</button>
-                  <button onclick="deployStorefront('${item.template_file}', '${item.variation}', '${data.kit_type}')"
-                    style="background:#10b981; border:none; color:#000; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.7rem; font-weight:600;">Deploy</button>
-                </div>
-              </div>
-            </div>
-          `;
+        if (item.type === 'deployable') {
+          return `<div style="padding:6px 8px; margin:3px 0; background:#0a0a0a; border:1px solid #222; border-radius:4px; font-size:0.78rem; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='#222'"><div><div style="color:#ccc;">${item.icon || '🌐'} ${item.name}</div><div style="font-size:0.65rem; color:#555; margin-top:1px;">${item.best_for || 'Storefront'} ${item.retail_value > 0 ? '• $' + item.retail_value.toLocaleString() : ''}</div></div><div style="display:flex; gap:4px;"><button onclick="previewStorefront('${item.template_file}','${item.name}')" style="background:transparent; border:1px solid #10b981; color:#10b981; padding:2px 6px; border-radius:3px; cursor:pointer; font-size:0.65rem;">Preview</button><button onclick="deployStorefront('${item.template_file}','${item.variation}','${data.kit_type}')" style="background:#10b981; border:none; color:#000; padding:2px 6px; border-radius:3px; cursor:pointer; font-size:0.65rem; font-weight:600;">Deploy</button></div></div>`;
         }
-        // EDITABLE TEMPLATES (open in modal) — email sequences get a mail icon
-        else if (item.type === 'editable') {
+        if (item.type === 'editable') {
           const isEmail = item.category === 'email';
-          const borderColor = isEmail ? '#f59e0b' : '#a78bfa';
-          const labelColor = isEmail ? '#f59e0b' : '#a78bfa';
-          const hoverBg = isEmail ? '#1a1a0a' : '#1a1a2e';
-          const typeLabel = isEmail ? '📧 Email Sequence' : '✏️ Editable';
-          return `
-            <div onclick="openKitDocument('${item.id}')"
-                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; transition: all 0.2s; display:flex; justify-content:space-between; align-items:center;"
-                 onmouseover="this.style.background='${hoverBg}'; this.style.borderColor='${borderColor}';"
-                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-              <div>
-                <div style="color:${labelColor};">${item.icon || '📄'} ${item.name}</div>
-                <div style="font-size:0.7rem; color:#666; margin-top:2px;">
-                  ${typeLabel} • ${item.estimated_time || '5 min'}
-                  ${item.retail_value > 0 ? ` • Worth $${item.retail_value.toLocaleString()}` : ''}
-                </div>
-              </div>
-              <div style="color:${labelColor};">${isEmail ? '📧' : '📝'}</div>
-            </div>
-          `;
+          const clr = isEmail ? '#f59e0b' : '#a78bfa';
+          const badge = isEmail ? '📧' : '📝';
+          return `<div onclick="openKitDocument('${item.id}')" style="padding:6px 8px; margin:3px 0; background:#0a0a0a; border:1px solid #222; border-radius:4px; cursor:pointer; font-size:0.78rem; display:flex; justify-content:space-between; align-items:center; transition:all 0.2s;" onmouseover="this.style.borderColor='${clr}'" onmouseout="this.style.borderColor='#222'"><div><div style="color:#ccc;">${item.icon || badge} ${item.name}</div><div style="font-size:0.65rem; color:#555; margin-top:1px;">${isEmail ? 'Email Sequence' : 'Editable'} ${item.retail_value > 0 ? '• $' + item.retail_value.toLocaleString() : ''}</div></div><div style="color:#555;">${badge}</div></div>`;
         }
-        // FALLBACK (treat as editable)
-        else {
-          return `
-            <div onclick="openKitDocument('${item.id}')" 
-                 style="padding:6px 8px; margin:4px 0; background:#0a0a0a; border:1px solid #333; border-radius:4px; cursor:pointer; font-size:0.8rem; color:#00bfff; transition: all 0.2s;"
-                 onmouseover="this.style.background='#1a1a2e'; this.style.borderColor='#00bfff';"
-                 onmouseout="this.style.background='#0a0a0a'; this.style.borderColor='#333';">
-              📄 ${item.name}
+        return `<div onclick="openKitDocument('${item.id}')" style="padding:6px 8px; margin:3px 0; background:#0a0a0a; border:1px solid #222; border-radius:4px; cursor:pointer; font-size:0.78rem; color:#ccc; transition:all 0.2s;" onmouseover="this.style.borderColor='#00bfff'" onmouseout="this.style.borderColor='#222'">📄 ${item.name}</div>`;
+      }
+
+      // Render a package section
+      function renderPackage(icon, title, color, items, openByDefault) {
+        if (items.length === 0) return '';
+        const totalValue = items.reduce((s, i) => s + (i.retail_value || 0), 0);
+        return `
+          <details${openByDefault ? ' open' : ''} style="margin-bottom:6px;">
+            <summary style="padding:8px 10px; background:#111; border:1px solid ${color}33; border-radius:6px; cursor:pointer; font-size:0.82rem; font-weight:600; color:${color}; display:flex; justify-content:space-between; align-items:center; list-style:none;">
+              <span>${icon} ${title} (${items.length})</span>
+              <span style="font-size:0.7rem; color:#666;">${totalValue > 0 ? '$' + totalValue.toLocaleString() + ' value' : ''}</span>
+            </summary>
+            <div style="padding:4px 2px;">
+              ${items.map(renderKitItem).join('')}
             </div>
-          `;
-        }
-      }).join('');
+          </details>
+        `;
+      }
+
+      kitDocBox.innerHTML =
+        renderPackage('🚀', 'Launch Kit', '#10b981', launchItems, true) +
+        renderPackage('💰', 'Sales Kit', '#f59e0b', salesItems, false) +
+        renderPackage('📈', 'Growth Kit', '#a78bfa', growthItems, false);
       
     } catch (error) {
       console.warn('Kit documents backend error, using fallback:', error);
@@ -2280,7 +2256,7 @@ async function runAgent() {
         buttons += `<button class="chat-action-btn" onclick="quickAction('build')">🛠️ Start Building</button>`;
       }
       if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find') || replyLower.includes('lead')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>`;
+        buttons += `<button class="chat-action-btn" onclick="GXA.findClients()">🎯 Find Clients</button>`;
       }
       if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue') || replyLower.includes('charge') || replyLower.includes('rate')) {
         buttons += `<button class="chat-action-btn" onclick="quickAction('pricing')">💰 Set Pricing</button>`;
@@ -2309,7 +2285,7 @@ async function runAgent() {
 
       if (!buttons) {
         buttons = `
-          <button class="chat-action-btn" onclick="quickAction('find_clients')">🎯 Find Clients</button>
+          <button class="chat-action-btn" onclick="GXA.findClients()">🎯 Find Clients</button>
           <button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 Opportunities</button>
         `;
       }
@@ -2330,7 +2306,6 @@ async function runAgent() {
 
       const actions = {
         'build': "Let's start building. What's the first feature I should create?",
-        'find_clients': "Help me find my first 3 paying clients for this. Where are they and how do I reach them?",
         'pricing': "What should I charge for this? Give me specific pricing tiers.",
         'proposal': "Draft a proposal I can send to prospects today.",
         'content': "Create some content I can post right now to attract customers.",
@@ -3383,7 +3358,7 @@ window.GXA = (() => {
             <div style="padding:30px; text-align:center; background:#0a0a0a; border-radius:8px;">
               <div style="font-size:32px; margin-bottom:8px;">🎯</div>
               <div style="color:#888; margin-bottom:16px;">No pitches in queue</div>
-              <button class="btn-glow" onclick="window.GXA.generateTestPitch()">Generate Test Pitch</button>
+              <button class="btn-glow" onclick="window.GXA.generateTestPitch()">Create Pitch</button>
             </div>
           `;
         } else {
@@ -3465,48 +3440,103 @@ window.GXA = (() => {
     },
     
     async generateTestPitch() {
-      showToast("Generating test pitch...", "info");
+      const recipient = prompt("Who should we pitch? (email address)", "");
+      if (!recipient || !recipient.includes("@")) {
+        if (recipient !== null) showToast("Enter a valid email to pitch", "error");
+        return;
+      }
+      const user = window.aigentsyUser || {};
+      const kit = user.companyType || "general";
+      showToast("Generating pitch...", "info");
       try {
         const res = await fetch(`${BASE}/ame/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            recipient: "demo@example.com",
+            target: recipient,
+            recipient: recipient,
             channel: "email",
-            context: { offer: "AI-powered automation", match_reason: "Based on your profile" },
-            originator: "manual_test"
+            context: { offer: `${kit.replace(/_/g, ' ')} services`, match_reason: `Personalized outreach from ${U.name}`, sku_id: kit },
+            originator: U.name || "dashboard"
           })
         });
         const data = await res.json();
         if (data.ok) {
-          showToast("✅ Test pitch generated!", "success");
+          showToast("Pitch created — review and approve it!", "success");
           this.viewAutoSales();
+        } else {
+          showToast(data.error || "Failed to create pitch", "error");
         }
       } catch (err) {
-        showToast("⚠️ Error", "error");
+        showToast("Connection error", "error");
       }
     },
     
-    // ========== OTHER ACTIONS ==========
-    browseDeals() {
-      openModal("Browse Deals", `
-        <p style="color:#ccc; margin-bottom:12px;">Active opportunities you can claim:</p>
-        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
-          <div style="color:#00bfff; font-weight:600;">No active deals yet</div>
-          <p style="font-size:0.85rem; color:#888; margin:6px 0 0 0;">When buyers post needs matching your skills, they'll appear here.</p>
-        </div>
-        <p style="font-size:0.85rem; color:#888;">Intent Exchange browser coming in Task 5!</p>
-      `);
+    // ========== FIND CLIENTS (real backend action) ==========
+    async findClients() {
+      showToast("Scanning for leads...", "info");
+      try {
+        const res = await fetch(`${BASE}/ame/find-clients/${U.name}?limit=5`);
+        const data = await res.json();
+        if (data.ok) {
+          if (data.pitches_generated > 0) {
+            showToast(`Found ${data.leads_found} leads, ${data.pitches_generated} pitches ready!`, "success");
+            this.viewAutoSales();
+          } else {
+            openModal("Find Clients", `
+              <p style="color:#ccc; margin-bottom:12px;">No matching leads found right now.</p>
+              <p style="color:#888; font-size:0.85rem; margin-bottom:8px;">Tips to get discovered:</p>
+              <ul style="color:#aaa; font-size:0.85rem; padding-left:20px; margin-bottom:16px;">
+                <li>Publish your storefront</li>
+                <li>Create a pitch to reach out directly</li>
+                <li>Post proof-of-outcome for credibility</li>
+              </ul>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-glow" onclick="GXA.publishStorefront()" style="flex:1;">🚀 Publish Storefront</button>
+                <button class="btn-glow" onclick="GXA.generateTestPitch()" style="flex:1; background:#444;">📝 Create Pitch</button>
+              </div>
+            `);
+          }
+        } else {
+          showToast(data.error || "Search failed", "error");
+        }
+      } catch (err) {
+        showToast("Connection error", "error");
+      }
     },
-    
-    findPartners() {
-      openModal("Find Partners", `
-        <p style="color:#ccc; margin-bottom:12px;">Team up with other businesses:</p>
-        <div style="background:#0a0a0a; padding:12px; border-radius:8px; margin-bottom:10px;">
-          <p style="font-size:0.85rem; color:#888;">Find complementary businesses to create joint offerings.</p>
-        </div>
-        <button class="btn-glow" onclick="GXA.createJV()" style="width:100%;">🤝 Create Partnership</button>
-      `);
+
+    // ========== BROWSE DEALS (real backend action) ==========
+    async browseDeals() {
+      showToast("Loading deals...", "info");
+      try {
+        const res = await fetch(`${BASE}/deals/browse/${U.name}?limit=10`);
+        const data = await res.json();
+        const deals = data.deals || [];
+        if (deals.length === 0) {
+          openModal("Browse Deals", `
+            <p style="color:#ccc; margin-bottom:12px;">No open deals right now.</p>
+            <p style="color:#888; font-size:0.85rem; margin-bottom:16px;">When buyers post needs matching your skills, they'll appear here.</p>
+            <button class="btn-glow" onclick="GXA.findClients()" style="width:100%;">🎯 Find Clients Instead</button>
+          `);
+        } else {
+          const html = deals.map(d => `
+            <div style="padding:12px; background:#0a0a0a; border:1px solid #333; border-radius:8px; margin-bottom:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color:#00bfff; font-weight:600; flex:1;">${escapeHtml(d.brief || 'Untitled')}</span>
+                <span style="color:#10b981; font-weight:700; margin-left:12px;">$${d.budget || 0}</span>
+              </div>
+              <div style="font-size:0.8rem; color:#888; margin-top:4px;">From: ${escapeHtml(d.buyer || 'Anonymous')}</div>
+              <button class="btn-glow btn-sm" onclick="GXA.quickIntent()" style="margin-top:8px; font-size:0.75rem;">Bid on This</button>
+            </div>
+          `).join('');
+          openModal("Browse Deals", `
+            <p style="color:#ccc; margin-bottom:12px;">${deals.length} open opportunities:</p>
+            <div style="max-height:400px; overflow-y:auto;">${html}</div>
+          `);
+        }
+      } catch (err) {
+        showToast("Connection error", "error");
+      }
     },
     
     viewPipeline() {
