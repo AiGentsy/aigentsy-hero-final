@@ -2284,32 +2284,49 @@ async function runAgent() {
       // SDK/Integration patterns
       'sdk': { endpoint: '/actionize/deploy', type: 'deploy', icon: '🔧' },
       'white-label': { endpoint: '/actionize/deploy', type: 'deploy', icon: '🏷️' },
+      'oem': { endpoint: '/actionize/deploy', type: 'deploy', icon: '🏭' },
       'integrate': { endpoint: '/actionize/deploy', type: 'deploy', icon: '🔗' },
-      // Sponsorship/Partnership patterns
+      // Sponsorship patterns (pitches)
       'sponsorship': { endpoint: '/ame/generate', type: 'pitch', icon: '💎' },
       'sponsor': { endpoint: '/ame/generate', type: 'pitch', icon: '💎' },
-      'partnership': { endpoint: '/execution/discover-and-route', type: 'partner_discovery', icon: '🤝' },
-      'partner': { endpoint: '/execution/discover-and-route', type: 'partner_discovery', icon: '🤝' },
+      'brand deal': { endpoint: '/ame/generate', type: 'pitch', icon: '💎' },
+      // Partnership patterns (discovery)
+      'partnership': { endpoint: '/discovery/partners', type: 'partner_discovery', icon: '🤝' },
+      'partner': { endpoint: '/discovery/partners', type: 'partner_discovery', icon: '🤝' },
+      'collaborat': { endpoint: '/discovery/partners', type: 'partner_discovery', icon: '🤝' },
       // MetaBridge/Team patterns
-      'metabridge': { endpoint: '/metabridge/match', type: 'metabridge', icon: '🌉' },
+      'metabridge': { endpoint: '/alpha-discovery/run', type: 'discovery', icon: '🌉' },
       'auto-team': { endpoint: '/metabridge/auto-team', type: 'metabridge', icon: '👥' },
-      'matching engine': { endpoint: '/metabridge/match', type: 'metabridge', icon: '⚡' },
+      'matching engine': { endpoint: '/alpha-discovery/run', type: 'discovery', icon: '⚡' },
+      'intent exchange': { endpoint: '/ifx/intents', type: 'intent_bid', icon: '🎯' },
       // Content/Social patterns
-      'content': { endpoint: '/social/post', type: 'social_post', icon: '📱' },
-      'creator': { endpoint: '/social/post', type: 'social_post', icon: '🎬' },
-      'monetiz': { endpoint: '/storefront/publish', type: 'pricing', icon: '💰' },
-      // Revenue/Pricing patterns
+      'content': { endpoint: '/social/generate', type: 'social_post', icon: '📱' },
+      'creator': { endpoint: '/syndication/creator-onboard', type: 'syndication_onboard', icon: '🎬' },
+      'influencer': { endpoint: '/ame/generate', type: 'pitch', icon: '📢' },
+      // Monetization patterns
+      'monetiz': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '💰' },
       'revenue': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '💵' },
       'pricing': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '💰' },
       'yield': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '📈' },
       'fee': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '💳' },
+      'commission': { endpoint: '/pricing/recommend_bid', type: 'pricing', icon: '💲' },
+      // Syndication patterns
+      'syndication': { endpoint: '/syndication/creator-onboard', type: 'syndication_onboard', icon: '📡' },
+      'syndicate': { endpoint: '/syndication/creator-onboard', type: 'syndication_onboard', icon: '📡' },
+      'licensing': { endpoint: '/syndication/creator-onboard', type: 'syndication_onboard', icon: '📜' },
+      'remix': { endpoint: '/syndication/creator-onboard', type: 'syndication_onboard', icon: '🔄' },
       // Nurture/Outreach patterns
       'nurture': { endpoint: '/outreach/nurture/auto', type: 'nurture_start', icon: '📧' },
-      'email': { endpoint: '/outreach/nurture/auto', type: 'nurture_start', icon: '✉️' },
+      'email sequence': { endpoint: '/outreach/nurture/auto', type: 'nurture_start', icon: '✉️' },
       'outreach': { endpoint: '/ame/generate', type: 'pitch', icon: '📨' },
       // Pitch patterns
       'pitch': { endpoint: '/ame/generate', type: 'pitch', icon: '📝' },
       'proposal': { endpoint: '/ame/generate', type: 'pitch', icon: '📄' },
+      // Discovery patterns
+      'alpha discovery': { endpoint: '/alpha-discovery/run', type: 'discovery', icon: '🔍' },
+      'discover': { endpoint: '/alpha-discovery/run', type: 'discovery', icon: '🔍' },
+      'find client': { endpoint: '/ame/find-clients', type: 'discovery', icon: '🎯' },
+      'find brand': { endpoint: '/discovery/partners', type: 'partner_discovery', icon: '🏢' },
     };
 
     function detectStrategyAction(text) {
@@ -2325,14 +2342,30 @@ async function runAgent() {
     function wrapStrategyBubble(strategyText, action) {
       const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || "";
       const kit = window.aigentsyUser?.companyType || "social";
+      const businessName = window.aigentsyUser?.businessName || username;
+
+      // Build params based on action type
+      let params = { username, kit, strategy: strategyText };
+
+      if (action.type === 'syndication_onboard') {
+        params = { creator_id: username, name: businessName, rev_share_pct: 20, content_types: ['video', 'social', 'article'] };
+      } else if (action.type === 'partner_discovery') {
+        params = { username, kit, mode: 'partner', limit: 10 };
+      } else if (action.type === 'pitch') {
+        params = { recipient: username, channel: 'email', context: { offer: kit, strategy: strategyText }, originator: username };
+      } else if (action.type === 'discovery') {
+        params = { platforms: ['github', 'upwork', 'reddit'], dimensions: [1, 2, 3, 4, 5] };
+      } else if (action.type === 'social_post') {
+        params = { username, platform: 'twitter', content_type: 'text', topic: strategyText.substring(0, 100) };
+      }
+
       const actionObj = {
         type: action.type,
         label: `${action.icon} Execute: ${strategyText.substring(0, 40)}...`,
         endpoint: action.endpoint,
         method: 'POST',
-        params: { username, kit, strategy: strategyText }
+        params
       };
-      const actionJson = JSON.stringify(actionObj).replace(/'/g, "\\'").replace(/"/g, '&quot;');
       return `<div class="strategy-bubble" onclick='executeAction(${JSON.stringify(actionObj)})' title="Click to execute this strategy">
         <span class="strategy-icon">${action.icon}</span>
         <span class="strategy-text">${strategyText}</span>
@@ -2541,8 +2574,8 @@ async function runAgent() {
                    params: { username, template_type: kit } },
         'pricing': { type: 'pricing', label: '💰 Get Pricing', endpoint: '/pricing/recommend_bid', method: 'POST',
                      params: { username, kit } },
-        'partnership': { type: 'partner_discovery', label: '🤝 Find Partners', endpoint: '/execution/discover-and-route', method: 'POST',
-                         params: { username, mode: 'partner' } },
+        'partnership': { type: 'partner_discovery', label: '🤝 Find Partners', endpoint: '/discovery/partners', method: 'POST',
+                         params: { username, kit, mode: 'partner', limit: 10 } },
         'nurture': { type: 'nurture_start', label: '📧 Start Nurture', endpoint: '/outreach/nurture/auto', method: 'POST',
                      params: { username, kit } },
       };
@@ -2664,8 +2697,16 @@ async function runAgent() {
         const items = result.queue?.length || result.opportunities?.length || 0;
         html = `<div class="chat-result-card">📋 <strong>${items} opportunities</strong> in your pipeline</div>`;
       } else if (type === 'partner_discovery' && result) {
-        const found = result.partners?.length || result.matches?.length || result.results?.length || 0;
-        html = `<div class="chat-result-card">🔍 <strong>Found ${found} potential partners</strong>${result.source ? `<br>Source: ${result.source}` : ''}</div>`;
+        const partners = result.partners || result.matches || result.results || [];
+        const found = partners.length;
+        let partnerList = '';
+        if (found > 0) {
+          partnerList = '<br>' + partners.slice(0, 3).map(p =>
+            `• <strong>${p.username || p.name}</strong> (${p.kit || p.offer || 'partner'})`
+          ).join('<br>');
+          if (found > 3) partnerList += `<br>... and ${found - 3} more`;
+        }
+        html = `<div class="chat-result-card">🤝 <strong>Found ${found} potential partners</strong>${partnerList || '<br>No matches yet — try expanding your network'}</div>`;
       } else if (type === 'create_jv' && result) {
         const jvId = result.jv_id || result.id || '';
         const partner = result.partner || result.partner_name || '';
@@ -2675,9 +2716,12 @@ async function runAgent() {
         const query = result.query || '';
         html = `<div class="chat-result-card">🌉 <strong>MetaBridge: ${matches} matches</strong>${query ? `<br>Query: ${query}` : ''}</div>`;
       } else if (type === 'syndication_onboard' && result) {
-        const name = result.creator_name || result.name || '';
-        const rev = result.rev_share_pct || result.rev_share || '';
-        html = `<div class="chat-result-card">📡 <strong>Creator onboarded${name ? `: ${name}` : ''}</strong>${rev ? `<br>Revenue share: ${rev}%` : ''}</div>`;
+        const storefront = result.storefront || result;
+        const name = storefront.name || result.creator_name || result.name || window.aigentsyUser?.username || 'You';
+        const rev = storefront.rev_share_pct || result.rev_share_pct || result.rev_share || 20;
+        const creatorId = storefront.creator_id || result.creator_id || '';
+        const contentTypes = (storefront.content_types || result.content_types || []).join(', ');
+        html = `<div class="chat-result-card">📡 <strong>Creator onboarded: ${name}</strong><br>Revenue share: ${rev}%${contentTypes ? `<br>Content types: ${contentTypes}` : ''}${creatorId ? `<br>ID: ${creatorId}` : ''}<br><em>You can now syndicate content and earn revenue!</em></div>`;
       } else if (type === 'intent_bid' && result) {
         const intentId = result.intent_id || result.id || '';
         const bidPrice = result.price || result.bid_price || '';
@@ -2700,6 +2744,13 @@ async function runAgent() {
         const total = result.total_revenue || result.total || 0;
         const sources = result.sources?.length || result.attributions?.length || 0;
         html = `<div class="chat-result-card">💵 <strong>Revenue: $${total}</strong>${sources ? `<br>${sources} attribution sources` : ''}</div>`;
+      } else if (type === 'discovery' && result) {
+        const total = result.total_opportunities || result.total || 0;
+        const dims = result.dimensions_used?.length || 0;
+        const routing = result.routing || {};
+        const aigentsy = routing.aigentsy_routed?.count || routing.aigentsy || 0;
+        const user = routing.user_routed?.count || routing.user || 0;
+        html = `<div class="chat-result-card">🔍 <strong>Alpha Discovery: ${total} opportunities</strong>${dims ? `<br>Searched ${dims} dimensions` : ''}${aigentsy || user ? `<br>Routed: ${aigentsy} auto-execute, ${user} for review` : ''}</div>`;
       } else {
         // Default: show JSON preview
         const preview = JSON.stringify(result, null, 2).substring(0, 300);
