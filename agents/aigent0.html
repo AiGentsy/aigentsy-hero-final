@@ -1196,22 +1196,47 @@ function getKitItemsForType(companyType) {
   return kitTemplates[companyType] || kitTemplates.general;
 }
 
+// Document type classifier for action buttons
+function classifyDocumentType(docId, docData) {
+  if (docData?.category === 'email') return 'email';
+  if (docData?.type === 'deployable') return 'deployable';
+  if (/^email-|sequence|series/i.test(docId)) return 'email';
+  if (/^landing-|storefront/i.test(docId)) return 'deployable';
+  if (/proposal|pitch|outreach/i.test(docId)) return 'proposal';
+  if (/content|calendar|social/i.test(docId)) return 'content';
+  if (/rate-card|pricing|membership/i.test(docId)) return 'pricing';
+  return 'editable';
+}
+
+// Document action config: type → monetizable endpoint
+const DOC_ACTIONS = {
+  'email':     { label: '🚀 Activate Sequence', endpoint: '/outreach/nurture/auto', method: 'POST', type: 'nurture_start' },
+  'deployable': { label: '🚀 Deploy Now', endpoint: '/actionize/deploy', method: 'POST', type: 'deploy' },
+  'proposal':  { label: '📨 Create & Send', endpoint: '/ame/generate', method: 'POST', type: 'pitch' },
+  'content':   { label: '📅 Schedule Post', endpoint: '/social/post', method: 'POST', type: 'social_post' },
+  'pricing':   { label: '💰 Publish Pricing', endpoint: '/storefront/publish', method: 'POST', type: 'pricing' },
+  'editable':  { label: '📋 Use Template', endpoint: '/ame/generate', method: 'POST', type: 'pitch' },
+};
+
 // Open kit document in modal - FETCH FROM BACKEND
 async function openKitDocument(docId) {
   const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername");
-  
+  const kit = window.aigentsyUser?.companyType || "general";
+
   let docContent;
-  
+  let docData = null;
+
   try {
     // ✅ NEW: Fetch document content from backend
     const response = await fetch(`${window.BACKEND_BASE}/kit/document/${username}/${docId}`);
     const data = await response.json();
-    
+
     if (data.ok) {
       docContent = {
         title: formatDocTitle(docId),
         content: data.content
       };
+      docData = data;
       console.log('✅ Kit document loaded from backend:', docId);
     } else {
       throw new Error('Backend returned error');
@@ -1221,20 +1246,33 @@ async function openKitDocument(docId) {
     // Fallback to hardcoded template
     docContent = getKitDocumentContent(docId);
   }
-  
+
+  // Determine document type and action
+  const docType = classifyDocumentType(docId, docData);
+  const docAction = DOC_ACTIONS[docType];
+  const actionObj = {
+    type: docAction.type,
+    label: docAction.label,
+    endpoint: docAction.endpoint,
+    method: docAction.method,
+    params: { username, kit, doc_id: docId }
+  };
+  const actionJson = JSON.stringify(actionObj).replace(/'/g, "\\'");
+
   const modalBody = document.getElementById('gxModalBody');
   document.getElementById('gxModalTitle').textContent = docContent.title;
-  
+
   modalBody.innerHTML = `
     <div style="margin-bottom:12px;">
       <textarea id="kitDocEditor" style="width:100%; min-height:300px; padding:12px; background:#0a0a0a; color:#fff; border:1px solid #444; border-radius:6px; font-family:monospace; font-size:0.9rem;">${docContent.content}</textarea>
     </div>
-    <div style="display:flex; gap:8px; justify-content:flex-end;">
+    <div style="display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;">
+      <button class="btn-glow primary" onclick='executeAction(${actionJson})' style="background:linear-gradient(135deg,#00ff88,#00cc6a);">${docAction.label}</button>
       <button class="btn-glow" onclick="saveKitDocument('${docId}')">💾 Save Changes</button>
       <button class="btn-glow" onclick="downloadKitDocument('${docId}')" style="background:#444;">⬇️ Download</button>
     </div>
   `;
-  
+
   document.getElementById('gxModal').classList.add('open');
 }
 
@@ -2248,33 +2286,55 @@ async function runAgent() {
       }
 
       // ═══════════════════════════════════════════════════════════════
-      // LEGACY FALLBACK — keyword-based buttons (backward compat)
+      // KEYWORD-BASED ACTIONS — each button → real backend endpoint
       // ═══════════════════════════════════════════════════════════════
       const replyLower = reply.toLowerCase();
+      const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || "";
+      const kit = window.aigentsyUser?.companyType || "general";
+
+      // Build action objects for each button type
+      const CHAT_ACTIONS = {
+        build: { type: 'deploy', label: '🛠️ Start Building', endpoint: '/actionize/deploy', method: 'POST', params: { username, template_type: kit } },
+        pricing: { type: 'pricing', label: '💰 Set Pricing', endpoint: '/pricing/recommend_bid', method: 'POST', params: { username, kit } },
+        proposal: { type: 'pitch', label: '📝 Generate Pitch', endpoint: '/ame/generate', method: 'POST', params: { recipient: username, channel: 'email', context: { offer: kit }, originator: username } },
+        content: { type: 'social_post', label: '📱 Create Content', endpoint: '/social/post', method: 'POST', params: { username, platform: 'twitter', content_type: 'text' } },
+        marketing: { type: 'marketing', label: '📈 Launch Marketing', endpoint: '/r3/allocate', method: 'POST', params: { username, budget: 100 } },
+        partnership: { type: 'partner_discovery', label: '🤝 Find Partners', endpoint: '/execution/discover-and-route', method: 'POST', params: { username, mode: 'partner' } },
+        sponsorship: { type: 'pitch', label: '💎 Get Sponsorship', endpoint: '/ame/generate', method: 'POST', params: { recipient: username, channel: 'email', context: { offer: 'sponsorship' }, originator: username } },
+        nurture: { type: 'nurture_start', label: '📧 Start Nurture', endpoint: '/outreach/nurture/auto', method: 'POST', params: { username, kit } },
+      };
+
+      const mkBtn = (key) => {
+        const a = CHAT_ACTIONS[key];
+        return `<button class="chat-action-btn" onclick='executeAction(${JSON.stringify(a)}, this)'>${a.label}</button>`;
+      };
 
       if (replyLower.includes('build') || replyLower.includes('tool') || replyLower.includes('create') || replyLower.includes('launch')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('build')">🛠️ Start Building</button>`;
+        buttons += mkBtn('build');
       }
       if (replyLower.includes('client') || replyLower.includes('customer') || replyLower.includes('find') || replyLower.includes('lead')) {
         buttons += `<button class="chat-action-btn" onclick="GXA.findClients()">🎯 Find Clients</button>`;
       }
       if (replyLower.includes('price') || replyLower.includes('$') || replyLower.includes('revenue') || replyLower.includes('charge') || replyLower.includes('rate')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('pricing')">💰 Set Pricing</button>`;
+        buttons += mkBtn('pricing');
       }
       if (replyLower.includes('proposal') || replyLower.includes('pitch') || replyLower.includes('deal') || replyLower.includes('contract')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('proposal')">📝 Draft Proposal</button>`;
+        buttons += mkBtn('proposal');
       }
       if (replyLower.includes('content') || replyLower.includes('post') || replyLower.includes('social') || replyLower.includes('video') || replyLower.includes('reel')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('content')">📱 Create Content</button>`;
+        buttons += mkBtn('content');
       }
       if (replyLower.includes('seo') || replyLower.includes('traffic') || replyLower.includes('marketing') || replyLower.includes('ad') || replyLower.includes('campaign')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('marketing')">📈 Launch Marketing</button>`;
+        buttons += mkBtn('marketing');
       }
       if (replyLower.includes('partner') || replyLower.includes('collab') || replyLower.includes('affiliate') || replyLower.includes('referral')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('partnership')">🤝 Find Partners</button>`;
+        buttons += mkBtn('partnership');
       }
       if (replyLower.includes('sponsor') || replyLower.includes('brand deal') || replyLower.includes('influencer')) {
-        buttons += `<button class="chat-action-btn" onclick="quickAction('sponsorship')">💎 Get Sponsorship</button>`;
+        buttons += mkBtn('sponsorship');
+      }
+      if (replyLower.includes('nurture') || replyLower.includes('email sequence') || replyLower.includes('drip')) {
+        buttons += mkBtn('nurture');
       }
       if (replyLower.includes('opportunit') || replyLower.includes('gig') || replyLower.includes('job') || replyLower.includes('project')) {
         buttons += `<button class="chat-action-btn" onclick="GXA.viewAutoSales()">🤖 View Opportunities</button>`;
@@ -2297,30 +2357,49 @@ async function runAgent() {
     // Track last executed actions for "Let's Do It" replay
     window._lastExecutedActions = [];
 
-    window.quickAction = function(action) {
+    window.quickAction = async function(action) {
       // "Let's Do It" replays the last executed action if available
       if (action === 'approve' && window._lastExecutedActions.length > 0) {
         executeAction(window._lastExecutedActions.at(-1));
         return;
       }
 
-      const actions = {
-        'build': "Let's start building. What's the first feature I should create?",
-        'pricing': "What should I charge for this? Give me specific pricing tiers.",
-        'proposal': "Draft a proposal I can send to prospects today.",
-        'content': "Create some content I can post right now to attract customers.",
-        'marketing': "Set up a marketing plan to get traffic and leads this week.",
-        'approve': "I'm in. Let's execute on your recommendation. What's step 1?",
-        'partnership': "Find potential partners I could collaborate with for mutual revenue.",
-        'sponsorship': "Help me land a brand sponsorship. What companies should I pitch?"
+      const username = window.aigentsyUser?.username || localStorage.getItem("aigentsyUsername") || "";
+      const kit = window.aigentsyUser?.companyType || "general";
+
+      // ACTION_MAP: every action → real backend endpoint → monetizable outcome
+      const ACTION_MAP = {
+        'proposal': { type: 'pitch', label: '📝 Generate Pitch', endpoint: '/ame/generate', method: 'POST',
+                      params: { recipient: username, channel: 'email', context: { offer: kit, match_reason: 'direct request' }, originator: username } },
+        'content':  { type: 'social_post', label: '📱 Create Content', endpoint: '/social/post', method: 'POST',
+                      params: { username, platform: 'twitter', content_type: 'text', topic: 'business update' } },
+        'marketing': { type: 'deploy', label: '🚀 Deploy Marketing', endpoint: '/actionize/deploy', method: 'POST',
+                       params: { username, template_type: 'marketing' } },
+        'sponsorship': { type: 'pitch', label: '🎤 Pitch Sponsors', endpoint: '/ame/generate', method: 'POST',
+                         params: { recipient: username, channel: 'email', context: { offer: 'sponsorship', match_reason: 'sponsorship outreach' }, originator: username } },
+        'build': { type: 'deploy', label: '🛠️ Deploy Business', endpoint: '/actionize/deploy', method: 'POST',
+                   params: { username, template_type: kit } },
+        'pricing': { type: 'pricing', label: '💰 Get Pricing', endpoint: '/pricing/recommend_bid', method: 'POST',
+                     params: { username, kit } },
+        'partnership': { type: 'partner_discovery', label: '🤝 Find Partners', endpoint: '/execution/discover-and-route', method: 'POST',
+                         params: { username, mode: 'partner' } },
+        'nurture': { type: 'nurture_start', label: '📧 Start Nurture', endpoint: '/outreach/nurture/auto', method: 'POST',
+                     params: { username, kit } },
       };
 
-      const message = actions[action] || "Let's move forward with this.";
-      const textarea = document.getElementById("agentInput");
-      if (textarea) {
-        textarea.value = message;
-        runAgent();
+      const actionConfig = ACTION_MAP[action];
+      if (!actionConfig) {
+        // Fallback: send as chat message for unknown actions
+        const textarea = document.getElementById("agentInput");
+        if (textarea) {
+          textarea.value = `Help me with: ${action}`;
+          runAgent();
+        }
+        return;
       }
+
+      showToast(`${actionConfig.label}...`, 'info');
+      await executeAction(actionConfig);
     };
 
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -2452,9 +2531,11 @@ async function runAgent() {
         const status = result.status || 'submitted';
         html = `<div class="chat-result-card">📨 <strong>Proposal ${status}</strong>${proposalId ? `<br>ID: ${proposalId}` : ''}</div>`;
       } else if (type === 'nurture_start' && result) {
-        const nurtureId = result.nurture_id || '';
-        const totalEmails = result.total_emails || result.sequence?.length || 0;
-        html = `<div class="chat-result-card">📧 <strong>Nurture sequence started</strong>${totalEmails ? `<br>${totalEmails} emails scheduled` : ''}${nurtureId ? `<br>ID: ${nurtureId}` : ''}</div>`;
+        const seqCount = result.sequences_activated || (result.sequences?.length) || 1;
+        const msg = result.message || `${seqCount} nurture sequence${seqCount > 1 ? 's' : ''} started`;
+        const totalEmails = result.total_emails || result.sequences?.[0]?.total_emails || result.sequence?.length || 0;
+        const nurtureId = result.nurture_id || result.sequences?.[0]?.nurture_id || '';
+        html = `<div class="chat-result-card">📧 <strong>${msg}</strong>${totalEmails ? `<br>${totalEmails} emails scheduled per sequence` : ''}${nurtureId ? `<br>First ID: ${nurtureId}` : ''}</div>`;
       } else if (type === 'revenue_report' && result) {
         const total = result.total_revenue || result.total || 0;
         const sources = result.sources?.length || result.attributions?.length || 0;
